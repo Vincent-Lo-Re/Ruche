@@ -207,7 +207,7 @@ select ok(
 );
 select pg_temp.as_postgres();
 update public.contents
-set deleted_at = now(), trash_batch = gen_random_uuid()
+set deleted_at = now()
 where id = '20000000-0000-4000-8000-000000000002';
 select pg_temp.as_person('editor');
 select throws_ok(

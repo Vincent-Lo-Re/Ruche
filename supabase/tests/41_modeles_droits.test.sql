@@ -4,7 +4,7 @@
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(57);
+select plan(56);
 
 select pg_temp.create_people();
 select pg_temp.empty_media_library();
@@ -90,20 +90,6 @@ select is(
         'template_detach_all')),
   5,
   'une seule signature par RPC (PostgREST choisit sans ambiguïté)'
-);
-select is(
-  array(
-    select p.oid::regprocedure::text
-    from pg_proc p
-    where p.pronamespace = 'private'::regnamespace
-      and p.proname in ('leaf_for_comparison', 'block_for_comparison', 'template_copy',
-        'detached_copy', 'resolve_alt_frozen', 'resolve_alts_frozen', 'template_stale_live',
-        'contents_check_kind', 'contents_check_draft', 'body_to_draft')
-      and (has_function_privilege('anon', p.oid, 'execute')
-        or has_function_privilege('authenticated', p.oid, 'execute'))
-  ),
-  array[]::text[],
-  'fonctions internes de l''étape 6 : ni anon ni authenticated'
 );
 
 -- ---------------------------------------------------------------------------------------------

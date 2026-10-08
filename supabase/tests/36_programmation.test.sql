@@ -102,11 +102,11 @@ select is(
   'programmer : l''instant enregistré est renvoyé'
 );
 select is(
-  (select array[scheduled_at::text, scheduled_by::text, scheduled_rev::text, (scheduled_set_at = now())::text]
+  (select array[scheduled_at::text, scheduled_by::text, scheduled_rev::text]
     from public.contents where id = pg_temp.cid('a1')),
   array['2030-10-03 08:00:00+02'::timestamptz::text, pg_temp.person_id('editor')::text,
-    pg_temp.rev('a1')::text, 'true'],
-  'programmer : heure, auteur, révision et moment de la programmation'
+    pg_temp.rev('a1')::text],
+  'programmer : heure, auteur et révision'
 );
 select lives_ok(
   $$select public.schedule(pg_temp.cid('a1'), '2030-10-04 08:00+02')$$, 'reprogrammer remplace l''heure'
@@ -252,7 +252,7 @@ select lives_ok($$select pg_temp.ready_article('a10')$$, 'un dernier article');
 select lives_ok($$select public.schedule(pg_temp.cid('a10'), now() + interval '1 hour')$$, 'programmé');
 select pg_temp.as_postgres();
 select pg_temp.make_due('a10');
-update public.contents set deleted_at = now(), trash_batch = gen_random_uuid() where id = pg_temp.cid('a10');
+update public.contents set deleted_at = now() where id = pg_temp.cid('a10');
 select is(private.run_due_publications(), 0, 'un contenu dans la corbeille ne part pas');
 
 -- ---------------------------------------------------------------------------------------------

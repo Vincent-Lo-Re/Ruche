@@ -3,13 +3,13 @@
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(43);
+select plan(41);
 
 select pg_temp.create_people();
 
 -- On part d'une médiathèque vide (la base de développement peut contenir des fichiers).
 select pg_temp.empty_media_library();
-update private.settings set files_last_kick_at = null, files_last_audit_at = null;
+update private.settings set files_last_kick_at = null;
 
 -- ---------------------------------------------------------------------------------------------
 -- Frein anti-abus (appels sans session de membre)
@@ -18,17 +18,12 @@ update private.settings set files_last_kick_at = null, files_last_audit_at = nul
 select pg_temp.as_service();
 select ok(public.files_claim_run('kick'), 'frein : premier passage « kick » permis');
 select ok(not public.files_claim_run('kick'), 'frein : second passage « kick » refusé aussitôt');
-select ok(public.files_claim_run('audit'), 'frein : premier contrôle permis');
-select ok(not public.files_claim_run('audit'), 'frein : second contrôle refusé aussitôt');
+select ok(not public.files_claim_run('audit'), 'frein : « audit » n''existe plus');
 select ok(not public.files_claim_run('clean'), 'frein : « clean » jamais permis sans membre');
 select pg_temp.as_postgres();
 update private.settings set files_last_kick_at = now() - interval '21 seconds';
 select pg_temp.as_service();
 select ok(public.files_claim_run('kick'), 'frein : « kick » de nouveau permis après 20 s');
-select pg_temp.as_postgres();
-update private.settings set files_last_audit_at = now() - interval '59 minutes';
-select pg_temp.as_service();
-select ok(not public.files_claim_run('audit'), 'frein : contrôle refusé avant une heure');
 select pg_temp.as_postgres();
 
 -- ---------------------------------------------------------------------------------------------

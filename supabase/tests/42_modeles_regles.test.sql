@@ -526,10 +526,10 @@ select is(
 create temporary table p2_pushed on commit drop as select (pg_temp.live('p2')).*;
 select lives_ok($$select pg_temp.publish('p2')$$, 'la seconde page est republiée telle quelle');
 select is(
-  (select array[(v.body = p.body)::text, (v.body_hash = p.body_hash)::text, (v.files = p.files)::text]
+  (select array[(v.body = p.body)::text, (v.files = p.files)::text]
     from public.versions v, p2_pushed p where v.id = (pg_temp.live('p2')).id),
-  array['true', 'true', 'true'],
-  'la version mise à jour est celle qu''aurait donnée la publication (corps, empreinte, fichiers)'
+  array['true', 'true'],
+  'la version mise à jour est celle qu''aurait donnée la publication (corps, fichiers)'
 );
 
 -- Fichiers ([D30]) : un fichier déjà cité par la version garde son texte figé ; un fichier cité

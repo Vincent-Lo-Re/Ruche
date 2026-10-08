@@ -2,12 +2,13 @@
 // déplacer entre les buckets, effacer, nettoyer, contrôler les orphelins).
 // Voir docs/ARCHITECTURE-CONTENUS.md, § 3.7 (contrat complet), et work.ts pour le travail.
 //
-// Appel : POST, JSON { "mode": "kick" | "audit" | "clean" } (« kick » par défaut).
+// Appel : POST, JSON { "mode": "kick" | "clean" } (« kick » par défaut).
 // Deux sortes d'appelants :
 // - SANS session de membre (tâche planifiée « fichiers » par pg_net, avec la clé publishable
 //   dans l'en-tête apikey ; ou n'importe qui qui connaît cette adresse publique) : seulement
-//   « kick » et « audit », c'est-à-dire le travail DÉCIDÉ PAR LA BASE, idempotent, avec un frein
-//   tenu en base (un « kick » toutes les 20 s, un « audit » par heure : sinon 429) ;
+//   « kick », c'est-à-dire le travail DÉCIDÉ PAR LA BASE, idempotent, avec un frein tenu en base
+//   (un « kick » toutes les 20 s : sinon 429). Le contrôle des orphelins est une tâche planifiée
+//   de la base (private.audit_files) ;
 // - un MEMBRE de l'équipe (Authorization: Bearer <jeton de sa session>, ce que
 //   supabase.functions.invoke ajoute tout seul) : la base vérifie is_staff() avec son jeton
 //   (aal2 et session ouverte). Tous les modes, sans frein. « clean » lui est réservé.
@@ -19,15 +20,7 @@
 import { createClient } from "@supabase/supabase-js"
 import { corsHeaders } from "./cors.ts"
 import { memberToken, parseMode } from "./request.ts"
-import {
-  type Database,
-  type Orphan,
-  runAudit,
-  runClean,
-  runKick,
-  type Store,
-  type WorkItem,
-} from "./work.ts"
+import { type Database, type Orphan, runClean, runKick, type Store, type WorkItem } from "./work.ts"
 
 class HttpError extends Error {
   constructor(readonly status: number, readonly code: string, message: string) {
@@ -39,7 +32,7 @@ const messages = {
   notSignedIn: "Connecte-toi pour continuer.",
   staffOnly: "Réservé à l'équipe, après la double vérification.",
   tooSoon: "Un passage vient d'avoir lieu. Réessaie dans un instant.",
-  invalid: "Demande invalide : mode « kick », « audit » ou « clean » attendu.",
+  invalid: "Demande invalide : mode « kick » ou « clean » attendu.",
   methodNotAllowed: "Méthode non autorisée.",
   server: "Un problème est survenu. Réessaie dans un instant.",
 } as const
@@ -164,7 +157,7 @@ async function isStaff(token: string): Promise<boolean> {
   return data === true
 }
 
-async function claimRun(mode: "kick" | "audit"): Promise<boolean> {
+async function claimRun(mode: "kick"): Promise<boolean> {
   const { data, error } = await admin.rpc("files_claim_run", { run_mode: mode })
   if (error) throw failure("frein", error)
   return data === true
@@ -201,8 +194,6 @@ Deno.serve(async (request) => {
     switch (mode) {
       case "kick":
         return json(200, await runKick(db, store), headers)
-      case "audit":
-        return json(200, await runAudit(db), headers)
       case "clean":
         return json(200, await runClean(db, store), headers)
     }

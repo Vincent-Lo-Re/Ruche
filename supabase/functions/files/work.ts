@@ -257,10 +257,3 @@ export async function runClean(db: Database, store: Store): Promise<CleanSummary
   }
   return { mode: "clean", removed: orphans.length, orphans: await db.audit() }
 }
-
-export type AuditSummary = { mode: "audit"; orphans: number }
-
-/** Mode « audit » : contrôle des fichiers orphelins (résultat dans media_audit). */
-export async function runAudit(db: Database): Promise<AuditSummary> {
-  return { mode: "audit", orphans: await db.audit() }
-}

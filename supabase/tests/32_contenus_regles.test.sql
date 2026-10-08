@@ -622,7 +622,7 @@ select is(
 
 -- La seconde page va à la corbeille.
 update public.contents
-set deleted_at = now(), deleted_by = pg_temp.person_id('editor'), trash_batch = gen_random_uuid()
+set deleted_at = now(), deleted_by = pg_temp.person_id('editor')
 where id = pg_temp.cid('page2');
 
 -- ---------------------------------------------------------------------------------------------
@@ -694,7 +694,7 @@ select lives_ok(
 );
 select pg_temp.as_postgres();
 update public.contents
-set deleted_at = now(), deleted_by = pg_temp.person_id('editor'), trash_batch = gen_random_uuid()
+set deleted_at = now(), deleted_by = pg_temp.person_id('editor')
 where id = pg_temp.cid('from-starter');
 select is(
   (select array_agg(u.title order by u.title)
@@ -722,7 +722,7 @@ select lives_ok(
 );
 select pg_temp.as_postgres();
 update public.contents
-set deleted_at = now(), deleted_by = pg_temp.person_id('editor2'), trash_batch = gen_random_uuid()
+set deleted_at = now(), deleted_by = pg_temp.person_id('editor2')
 where id = pg_temp.cid('parti');
 create temporary table before_removal as
 select to_jsonb(c) - array['created_by', 'draft_saved_by', 'deleted_by'] as row_data

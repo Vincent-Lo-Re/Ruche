@@ -310,7 +310,7 @@ Deno.test({
         assertEquals(invalid.status, 400)
         await invalid.body?.cancel()
 
-        await sql`update private.settings set files_last_kick_at = null, files_last_audit_at = null`
+        await sql`update private.settings set files_last_kick_at = null`
         const first = await callFiles({ mode: "kick" })
         assertEquals(first.status, 200)
         await first.body?.cancel()
@@ -318,8 +318,8 @@ Deno.test({
         assertEquals(second.status, 429)
         assertEquals((await second.json()).error.code, "trop_tot")
         const audit = await callFiles({ mode: "audit" })
-        assertEquals(audit.status, 200)
-        assertEquals((await audit.json()).mode, "audit")
+        assertEquals(audit.status, 400, "le mode « audit » n'existe plus")
+        await audit.body?.cancel()
         const memberClean = await callFiles({ mode: "clean" }, token)
         assertEquals(memberClean.status, 200)
         assertEquals((await memberClean.json()).mode, "clean")

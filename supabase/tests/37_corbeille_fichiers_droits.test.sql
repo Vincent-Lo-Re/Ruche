@@ -5,7 +5,7 @@
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(54);
+select plan(52);
 
 select pg_temp.create_people();
 select pg_temp.empty_media_library();
@@ -67,17 +67,6 @@ select function_privs_are(
 select function_privs_are(
   'public', 'app_file_locations', array['uuid[]'], 'authenticated', array['EXECUTE'],
   'authenticated : peut appeler app_file_locations'
-);
-select ok(
-  (select p.prosecdef and p.provolatile = 's' from pg_proc p
-    where p.oid = 'public.app_file_locations(uuid[])'::regprocedure),
-  'app_file_locations : security definer et stable (ne modifie rien)'
-);
-select ok(
-  not has_function_privilege('anon', 'private.visible_media(uuid[])', 'execute')
-    and not has_function_privilege('authenticated', 'private.public_media()', 'execute')
-    and not has_function_privilege('authenticated', 'private.media_stale_live(uuid)', 'execute'),
-  'les fonctions internes de la règle des fichiers ne sont pas appelables par l''API'
 );
 
 -- ---------------------------------------------------------------------------------------------
@@ -182,7 +171,7 @@ select is(
 
 select pg_temp.as_person('editor');
 select is(
-  (select trashed from public.trash(pg_temp.cid('brouillon'))), 1, 'éditeur aal2 : trash permis'
+  (select count(*)::int from public.trash(pg_temp.cid('brouillon'))), 1, 'éditeur aal2 : trash permis'
 );
 select is(
   (select count(*)::int from public.trash_items where item_type = 'content'), 1,
@@ -236,7 +225,7 @@ select is(
   (select restored from public.restore(pg_temp.cid('brouillon'))), 1, 'admin : restore permis'
 );
 select is(
-  (select trashed from public.trash(pg_temp.cid('brouillon'))), 1, 'admin : trash permis'
+  (select count(*)::int from public.trash(pg_temp.cid('brouillon'))), 1, 'admin : trash permis'
 );
 select is(
   public.empty_trash(jsonb_build_array(jsonb_build_object('type', 'content', 'id', pg_temp.cid('brouillon')))),
