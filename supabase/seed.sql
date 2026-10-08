@@ -9,6 +9,5 @@
 update private.settings
 set files_url = 'http://kong:8000/functions/v1/files',
   publishable_key = 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH',
-  files_last_kick_at = null,
-  files_last_audit_at = null
+  files_last_kick_at = null
 where id;
