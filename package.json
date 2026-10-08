@@ -7,8 +7,8 @@
     "db:reset": "supabase db reset",
     "db:test": "supabase test db",
     "functions:test": "npm run functions:test:equipe && npm run functions:test:files",
-    "functions:test:equipe": "cd supabase/functions/equipe && npx --yes deno@2.9.6 fmt --check && npx --yes deno@2.9.6 lint && npx --yes deno@2.9.6 check index.ts && npx --yes deno@2.9.6 test",
-    "functions:test:files": "cd supabase/functions/files && npx --yes deno@2.9.6 fmt --check && npx --yes deno@2.9.6 lint && npx --yes deno@2.9.6 check index.ts integration/files_integration.ts && npx --yes deno@2.9.6 test --allow-read=.,../equipe",
+    "functions:test:equipe": "cd supabase/functions/equipe && npx --yes deno@2.9.6 fmt --check && npx --yes deno@2.9.6 lint && npx --yes deno@2.9.6 check index.ts && npx --yes deno@2.9.6 test --allow-env=ADMIN_ORIGINS",
+    "functions:test:files": "cd supabase/functions/files && npx --yes deno@2.9.6 fmt --check && npx --yes deno@2.9.6 lint && npx --yes deno@2.9.6 check index.ts integration/files_integration.ts && npx --yes deno@2.9.6 test --allow-read=.,../equipe --allow-env=ADMIN_ORIGINS",
     "functions:integration": "cd supabase/functions/files && npx --yes deno@2.9.6 test --allow-all integration/files_integration.ts"
   },
   "devDependencies": {

@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert"
-import { corsHeaders, isAllowedOrigin } from "./cors.ts"
+import { corsHeaders, isAllowedOrigin, originRules } from "./cors.ts"
 
 // Les règles elles-mêmes sont testées avec la fonction « equipe » : ici, on vérifie que les deux
 // copies sont identiques (hors en-tête de commentaire).
@@ -12,9 +12,9 @@ Deno.test("mêmes règles CORS que la fonction equipe", async () => {
 })
 
 Deno.test("l'admin est acceptée, une autre origine non", () => {
-  assertEquals(isAllowedOrigin("https://admin.declikora.app"), true)
-  assertEquals(isAllowedOrigin("https://declikora-admin.vercel.app"), true)
-  assertEquals(isAllowedOrigin("https://pirate.fr"), false)
+  const rules = originRules("https://admin.example.com")
+  assertEquals(isAllowedOrigin("https://admin.example.com", rules), true)
+  assertEquals(isAllowedOrigin("https://pirate.fr", rules), false)
   assertEquals(
     corsHeaders("http://127.0.0.1:5173")["Access-Control-Allow-Methods"],
     "POST, OPTIONS",

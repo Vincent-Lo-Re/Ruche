@@ -12,8 +12,8 @@
 - **Une fusion à la fois** : on attend que la précédente soit en ligne avant de fusionner la suivante. Sur `main`, les garde-fous ne s'arrêtent jamais l'un l'autre (`.github/workflows/garde-fous.yml`) : Vercel ne met une fusion en ligne que si ses propres garde-fous sont verts.
 - **Décisions par QCM**, puis écrites dans `docs/`. On emploie des mots courants, et rien de l'ancien projet (`declikora-project`) n'est repris sans être redécidé.
 - **Offres gratuites** tant qu'aucun abonnement n'a été décidé.
-- **Mise en production de la base et des fonctions** : c'est l'utilisateur qui lance les commandes, depuis `~/Projets/Declikora-deploiement`, dans l'ordre `config push`, `db push`, `functions deploy`. Une étape n'est fusionnée que lorsque la précédente est en ligne.
-- **La base avant l'admin** : un changement qui a besoin d'une migration (ou d'une fonction serveur) se fusionne en deux fois. D'abord une demande de fusion avec la migration seule, sans rien changer à l'admin, puis `db push` (ou `functions deploy`). Ensuite seulement, la demande de fusion de l'admin qui s'en sert. Vercel met l'admin en ligne dès que les garde-fous de `main` sont verts : sans cet ordre, l'admin en ligne appelle une base qui n'est pas prête (arrivé le 29/09/2026 avec la Médiathèque).
+- **Mise en production de la base et des fonctions** (règle du 08/10/2026) : chaque installation a son projet Supabase relié à un dépôt GitHub (intégration GitHub, « Deploy to production »). Une fusion dans `main` applique toute seule les nouvelles migrations et déploie les fonctions ; la démo de Ruche reçoit ainsi chaque version en premier. Seuls restent à la main, faits par l'utilisateur, les réglages propres à une installation (réglages de connexion par `config push`, réglages des fonctions par `secrets set`, premier compte admin) : `installation/README.md`.
+- **La base avant l'admin** : un changement qui a besoin d'une migration (ou d'une fonction serveur) se fusionne en deux fois. D'abord une demande de fusion avec la migration seule, sans rien changer à l'admin ; on attend qu'elle soit en ligne (migration appliquée, fonction déployée). Ensuite seulement, la demande de fusion de l'admin qui s'en sert. Vercel met l'admin en ligne dès que les garde-fous de `main` sont verts : sans cet ordre, l'admin en ligne appelle une base qui n'est pas prête (arrivé le 29/09/2026 avec la Médiathèque).
 
 ## 2. Interface (React, shadcn/ui, Tailwind CSS)
 
@@ -60,7 +60,7 @@
 
 ## 5. Fonctions serveur et fichiers
 
-- **Les fonctions `equipe` et `files` vérifient elles-mêmes** la session et le rôle, n'acceptent que les origines connues (`cors.ts`) et peuvent être relancées sans risque.
+- **Les fonctions `equipe` et `files` vérifient elles-mêmes** la session et le rôle, n'acceptent que les adresses de l'admin de leur installation (secret `ADMIN_ORIGINS`, lu par `cors.ts`) et peuvent être relancées sans risque.
 - **La clé secrète reste côté serveur** ; le navigateur et l'app n'ont que la clé publishable.
 - **SVG et Lottie** : nettoyés ou vérifiés dans l'admin, puis vérifiés par le serveur avec une liste blanche. Les fichiers restent protégés, sauf ceux d'un contenu gratuit en ligne et les images de présentation.
 
