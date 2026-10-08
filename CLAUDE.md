@@ -45,6 +45,10 @@ Elles ont été vérifiées sur npm et Expo le 2026-09-27. Elles sont épinglée
 ## Commandes
 
 ```bash
+# Serveurs locaux (Docker Desktop ouvert)
+npm run local                  # Supabase s'il ne tourne pas, puis l'admin dans ce terminal (Ctrl + C l'arrête)
+npm run local:stop             # arrête l'admin et Supabase (données gardées)
+
 # Administration
 cd web && npm run dev          # serveur de dev
 cd web && npm run lint         # ESLint
