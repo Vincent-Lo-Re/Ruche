@@ -61,7 +61,10 @@ Dans cet ordre, depuis une copie de travail du dépôt sur `main`.
    `config.toml`.
 
 5. **Réglages des fonctions** : `npx supabase secrets set --env-file installation/functions.env`.
-6. **Premier compte admin** : tableau de bord (Authentication › Users › Invite), puis le SQL de
+6. **Sauvegarde** (dépôt privé de l'installation seulement) : secret `SUPABASE_DB_URL` (chaîne
+   « Session pooler », mot de passe compris), puis activer « Sauvegarde de la base » dans Actions.
+   Jamais dans un dépôt public : ses artifacts seraient téléchargeables par tous.
+7. **Premier compte admin** : tableau de bord (Authentication › Users › Invite), puis le SQL de
    `docs/ADMINISTRATION.md`, § 2.
 
 Ces réglages ne changent qu'avec l'installation (nouvelle adresse de l'admin…) : on refait alors
