@@ -12,15 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {
-  accentChartSwatches,
-  accentSwatches,
-  baseChartSwatches,
-  baseInkSwatches,
-  baseMenuSwatches,
-  DEFAULT_PALETTE,
-  palettePresets,
-} from "@/lib/palettes"
+import { DEFAULT_PALETTE, palettePresets, swatchCss } from "@/lib/palettes"
 import { texts } from "@/texts"
 
 const labels = texts.colors
@@ -41,6 +33,8 @@ export function PaletteChoice() {
     palette.accent === DEFAULT_PALETTE.accent
   return (
     <Field>
+      {/* Les couleurs des pastilles de chaque carte, tirées des palettes (lib/palettes.ts). */}
+      <style>{swatchCss()}</style>
       <div className="flex min-h-6 items-center justify-between gap-2">
         <FieldTitle id={titleId}>{labels.presets.title}</FieldTitle>
         {!isDefault && (
@@ -60,12 +54,6 @@ export function PaletteChoice() {
         className="grid gap-3 sm:grid-cols-2"
       >
         {palettePresets.map(({ id, base, accent }) => {
-          const ink =
-            accent === "none" ? baseInkSwatches[base] : accentSwatches[accent]
-          const charts =
-            accent === "none"
-              ? baseChartSwatches[base]
-              : accentChartSwatches[accent]
           const chosen = palette.base === base && palette.accent === accent
           return (
             <button
@@ -91,23 +79,20 @@ export function PaletteChoice() {
                 <CardContent aria-hidden className="space-y-2">
                   <div className="flex gap-2">
                     <span
-                      className={cn(
-                        "h-10 flex-1 rounded-lg ring-1 ring-foreground/10",
-                        baseMenuSwatches[base]
-                      )}
+                      data-swatch="menu"
+                      className="h-10 flex-1 rounded-lg ring-1 ring-foreground/10"
                     />
                     <span
-                      className={cn(
-                        "h-10 flex-1 rounded-lg ring-1 ring-foreground/10",
-                        ink
-                      )}
+                      data-swatch="ink"
+                      className="h-10 flex-1 rounded-lg ring-1 ring-foreground/10"
                     />
                   </div>
                   <div className="flex gap-1">
-                    {charts.map((bar) => (
+                    {[1, 2, 3, 4, 5].map((n) => (
                       <span
-                        key={bar}
-                        className={cn("h-2.5 flex-1 rounded-sm", bar)}
+                        key={n}
+                        data-swatch={`chart-${n}`}
+                        className="h-2.5 flex-1 rounded-sm"
                       />
                     ))}
                   </div>

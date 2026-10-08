@@ -4,6 +4,7 @@ import {
   chosenValue,
   defaultPreview,
   devices,
+  deviceHeightOf,
   fullScreenScale,
   previewFromSearch,
   previewLocked,
@@ -58,12 +59,21 @@ describe("écran entier", () => {
 
   it("réduit le téléphone pour qu'il tienne en hauteur, sans l'agrandir ni trop le réduire", () => {
     // iPhone : 874 + 2 × 10 = 894 de haut.
-    expect(fullScreenScale("ios", 1000)).toBe(1)
-    expect(fullScreenScale("ios", 894)).toBe(1)
-    expect(fullScreenScale("ios", 700)).toBe(0.78)
+    expect(fullScreenScale(894, 1000)).toBe(1)
+    expect(fullScreenScale(894, 894)).toBe(1)
+    expect(fullScreenScale(894, 700)).toBe(0.78)
     // Android : 915 + 2 × 9 = 933.
-    expect(fullScreenScale("android", 700)).toBe(0.75)
-    expect(fullScreenScale("ios", 100)).toBe(0.4)
+    expect(fullScreenScale(933, 700)).toBe(0.75)
+    expect(fullScreenScale(894, 100)).toBe(0.4)
+  })
+
+  it("lit la hauteur du téléphone dans les variables de l'aperçu", () => {
+    const element = document.createElement("div")
+    element.style.setProperty("--blocks-screen-height", "874px")
+    element.style.setProperty("--blocks-device-padding", "10px")
+    document.body.append(element)
+    expect(deviceHeightOf(element)).toBe(894)
+    element.remove()
   })
 })
 

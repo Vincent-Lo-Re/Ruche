@@ -1,8 +1,5 @@
 {
-  "$comment": "Mesures communes à l'aperçu de l'admin et à l'app ([D12]). Tailles en points (px dans l'admin), hauteurs de ligne sans unité. Après toute modification : cd web && npm run blocks:generate (variables CSS et constantes dans web/src/blocks/generated/).",
-  "phone": {
-    "width": 390
-  },
+  "$comment": "Mesures communes à l'aperçu de l'admin et à l'app ([D12]). Tailles en points (px dans l'admin), hauteurs de ligne sans unité. Après toute modification : cd web && npm run blocks:generate (variables CSS dans web/src/blocks/generated/tokens.css).",
   "font": {
     "family": "Inter",
     "titleSize": 28,
@@ -27,8 +24,7 @@
     "listIndent": 24,
     "listItemGap": 6,
     "boxPadding": 16,
-    "boxGap": 12,
-    "captionGap": 8
+    "boxGap": 12
   },
   "radius": {
     "box": 12,

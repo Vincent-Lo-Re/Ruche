@@ -5,6 +5,34 @@ import reactRefresh from "eslint-plugin-react-refresh"
 import globals from "globals"
 import tseslint from "typescript-eslint"
 
+// Les classes interdites (docs/BONNES-PRATIQUES.md, § 2), dans une chaîne ou un gabarit : une
+// valeur arbitraire chiffrée, une couleur de la palette Tailwind (blanc et noir compris).
+const arbitrary = "(^|[\\s:])[a-z][a-z0-9-]*-\\[[^\\]]*\\d[^\\]]*\\]"
+const paletteColor =
+  '(^|[\\s:])(bg|text|border|ring|outline|fill|stroke|from|via|to|decoration|divide|shadow)-((red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|gray|zinc|neutral|stone)-\\d|(white|black)(\\/\\d+)?($|[\\s"]))'
+const arbitraryMessage =
+  "Pas de valeur arbitraire chiffrée (w-[390px]) : un jeton ou un utilitaire nommé dans index.css."
+const paletteMessage =
+  "Pas de couleur de la palette Tailwind : un jeton du thème (text-warning, bg-status-live…)."
+const classRules = [
+  {
+    selector: `Literal[value=/${arbitrary}/]:not([regex])`,
+    message: arbitraryMessage,
+  },
+  {
+    selector: `Literal[value=/${paletteColor}/]:not([regex])`,
+    message: paletteMessage,
+  },
+  {
+    selector: `TemplateElement[value.raw=/${arbitrary}/]`,
+    message: arbitraryMessage,
+  },
+  {
+    selector: `TemplateElement[value.raw=/${paletteColor}/]`,
+    message: paletteMessage,
+  },
+]
+
 export default defineConfig([
   // src/blocks/generated : tiré de blocks/ par npm run blocks:generate (ne pas modifier).
   globalIgnores([
@@ -69,31 +97,16 @@ export default defineConfig([
           message:
             "Pas de style en ligne : une classe Tailwind, un jeton ou un utilitaire de index.css.",
         },
-        {
-          selector:
-            "Literal[value=/(^|[\\s:])[a-z][a-z0-9-]*-\\[[^\\]]*\\d[^\\]]*\\]/]",
-          message:
-            "Pas de valeur arbitraire chiffrée (w-[390px]) : un jeton ou un utilitaire nommé dans index.css.",
-        },
-        {
-          selector:
-            "Literal[value=/(^|[\\s:])(bg|text|border|ring|outline|fill|stroke|from|via|to|decoration|divide|shadow)-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|gray|zinc|neutral|stone)-\\d/]",
-          message:
-            "Pas de couleur de la palette Tailwind : un jeton du thème (text-warning, bg-status-live…).",
-        },
-        {
-          selector:
-            "TemplateElement[value.raw=/(^|[\\s:])[a-z][a-z0-9-]*-\\[[^\\]]*\\d[^\\]]*\\]/]",
-          message:
-            "Pas de valeur arbitraire chiffrée (w-[390px]) : un jeton ou un utilitaire nommé dans index.css.",
-        },
-        {
-          selector:
-            "TemplateElement[value.raw=/(^|[\\s:])(bg|text|border|ring|outline|fill|stroke|from|via|to|decoration|divide|shadow)-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|gray|zinc|neutral|stone)-\\d/]",
-          message:
-            "Pas de couleur de la palette Tailwind : un jeton du thème (text-warning, bg-status-live…).",
-        },
+        ...classRules,
       ],
+    },
+  },
+  {
+    // Les mêmes règles de classes dans les fichiers .ts (listes de classes, textes de cva…).
+    files: ["src/**/*.ts"],
+    ignores: ["src/**/*.test.ts"],
+    rules: {
+      "no-restricted-syntax": ["error", ...classRules],
     },
   },
   {

@@ -15,8 +15,6 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -25,7 +23,6 @@
   --color-sidebar-active: var(--sidebar-active);
   --color-sidebar-active-foreground: var(--sidebar-active-foreground);
   --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
   --color-panel: var(--panel);
   --color-brand-light: var(--brand-light);
   --color-brand-dark: var(--brand-dark);
@@ -96,7 +93,6 @@
   --brand-dark: oklch(0.145 0 0);
   --brand-light-muted: oklch(0.556 0 0);
   --brand-dark-muted: oklch(0.708 0 0);
-  --sidebar: var(--muted);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-accent: var(--card);
   --sidebar-accent-foreground: var(--card-foreground);
@@ -105,8 +101,6 @@
   --sidebar-active-foreground: var(--sidebar-accent-foreground);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
   /* La couleur des boutons de la page (en clair ou en sombre, selon la page), relevée ici avant que
      le menu, toujours sombre (classe dark), ne redéfinisse --primary : l'élément choisi du menu la
      prend avec une couleur d'accent (lib/palettes.ts). Jamais redéfinie dans .dark. */
@@ -117,6 +111,18 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
+  /* Fenêtre des envois (web/src/components/media/upload-window.tsx) : tant qu'elle est ouverte,
+     elle pose data-upload-window et sa hauteur (--upload-window-height) sur <html>. La place à
+     laisser en bas des pages et sous les messages (Toaster) en découle : sa hauteur et un écart. */
+  --upload-window-space: 0px;
+  --feed-footer-height: --spacing(20);
+  --feed-footer-space: 0px;
+  /* L'écart blanc autour du menu et du contenu (le preset de shadcn : 24 px). */
+  --page-gap: --spacing(6);
+  /* Le header des pages avec le menu (ADMIN § 7) : 64 px, les panneaux juste dessous (sans les
+     6 px du preset de shadcn, retirés le 07/10/2026 : ses liens ont autant d'espace au-dessus,
+     jusqu'au haut de la fenêtre, qu'en dessous, jusqu'aux panneaux). */
+  --header-height: --spacing(16);
 }
 
 .dark {
@@ -141,7 +147,6 @@
   --ring: oklch(0.556 0 0);
   /* Comme la page de shadcn en sombre : le gris des panneaux à 30 % sur le fond. */
   --panel: color-mix(in oklab, var(--muted) 30%, var(--background));
-  --sidebar: var(--panel);
   --sidebar-foreground: oklch(0.985 0 0);
   /* Le menu est une carte sombre : l'élément choisi y prend le gris de muted. */
   --sidebar-accent: var(--muted);
@@ -150,13 +155,6 @@
   --sidebar-active-foreground: var(--sidebar-accent-foreground);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
 }
 
 /* Grille des vignettes de la médiathèque (liste et chargement) : des colonnes d'au moins 11 rem. */
@@ -172,7 +170,7 @@
 /* Une section de réglages (Paramètres) : à gauche son titre et sa phrase (16 rem), à droite sa
    carte ; utilisé sous un conteneur assez large (@3xl), sinon tout s'empile. */
 @utility grid-cols-settings {
-  grid-template-columns: 16rem minmax(0, 1fr);
+  grid-template-columns: --spacing(64) minmax(0, 1fr);
 }
 
 /* Une liste au centre et, à droite, sa colonne d'ajout de 20 rem (Catégories, Formules). */
@@ -194,8 +192,8 @@
 @utility sidebar-on-white {
   --sidebar-accent: var(--muted);
   --sidebar-accent-foreground: var(--foreground);
-  --sidebar-active: var(--muted);
-  --sidebar-active-foreground: var(--foreground);
+  --sidebar-active: var(--sidebar-accent);
+  --sidebar-active-foreground: var(--sidebar-accent-foreground);
 }
 
 /* Éditeur des contenus : le bas des deux colonnes, à la même hauteur (à gauche le retour et « Ajouter un
@@ -223,23 +221,6 @@
 /* Liste qui défile dans une fenêtre de choix (image, audio, modèle) : trois cinquièmes de l'écran. */
 @utility max-h-picker {
   max-height: 60vh;
-}
-
-/*
- * Fenêtre des envois (web/src/components/media/upload-window.tsx) : tant qu'elle est ouverte,
- * elle pose data-upload-window et sa hauteur (--upload-window-height) sur <html>. La place à
- * laisser en bas des pages et sous les messages (Toaster) en découle : sa hauteur et un écart.
- */
-:root {
-  --upload-window-space: 0px;
-  --feed-footer-height: --spacing(20);
-  --feed-footer-space: 0px;
-  /* L'écart blanc autour du menu et du contenu (le preset de shadcn : 24 px). */
-  --page-gap: --spacing(6);
-  /* Le header des pages avec le menu (ADMIN § 7) : 64 px, les panneaux juste dessous (sans les
-     6 px du preset de shadcn, retirés le 07/10/2026 : ses liens ont autant d'espace au-dessus,
-     jusqu'au haut de la fenêtre, qu'en dessous, jusqu'aux panneaux). */
-  --header-height: --spacing(16);
 }
 
 :root[data-upload-window] {
@@ -296,7 +277,6 @@
     cursor: pointer;
   }
   html {
-    @apply font-sans;
     color-scheme: light;
     /* La poignée : le gris des textes secondaires, adouci ; le fond : transparent. Hérité par
        toutes les zones qui défilent, en clair comme en sombre. */
@@ -325,7 +305,7 @@
   }
   25%,
   75% {
-    box-shadow: inset 0 0 0 2px var(--warning);
+    box-shadow: var(--highlight-ring);
   }
 }
 
@@ -333,11 +313,12 @@
 @keyframes highlight-hold {
   from,
   to {
-    box-shadow: inset 0 0 0 2px var(--warning);
+    box-shadow: var(--highlight-ring);
   }
 }
 
 [data-highlight] {
+  --highlight-ring: inset 0 0 0 2px var(--warning);
   animation: highlight-pulse 1.5s ease-in-out;
 }
 
@@ -378,14 +359,14 @@
    déjà chargée (layouts/root-layout.tsx, app-layout.tsx), comme un onglet (TabsContent de
    components/ui/tabs.tsx) et chaque étape de la connexion (components/auth-form.tsx) ; rien ne
    bouge si l'ordinateur demande moins d'animations. */
-@keyframes page-fade {
+@keyframes appear {
   from {
     opacity: 0;
   }
 }
 
 [data-page-fade] {
-  animation: page-fade 500ms ease-out;
+  animation: appear 500ms ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -398,7 +379,7 @@
    (lib/scroll-memory.ts, data-returned) : son fond prend la teinte du survol, puis s'efface. */
 @keyframes returned-row {
   from {
-    background-color: var(--accent);
+    background-color: var(--returned-row);
   }
 }
 
@@ -406,11 +387,12 @@
 @keyframes returned-row-hold {
   from,
   to {
-    background-color: var(--accent);
+    background-color: var(--returned-row);
   }
 }
 
 [data-returned] {
+  --returned-row: var(--accent);
   animation: returned-row 1.6s ease-in;
 }
 
@@ -477,7 +459,7 @@
 }
 
 [data-motion-phase="trace"] [data-motion="reveal"] {
-  animation: monogram-reveal 1s ease-out both;
+  animation: appear 1s ease-out both;
   animation-delay: calc(var(--motion-order, 0) * 150ms + 600ms);
 }
 
@@ -523,12 +505,6 @@
   }
   to {
     stroke-dashoffset: 0;
-  }
-}
-
-@keyframes monogram-reveal {
-  from {
-    opacity: 0;
   }
 }
 

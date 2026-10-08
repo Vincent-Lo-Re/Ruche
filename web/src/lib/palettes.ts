@@ -960,225 +960,58 @@ const accentPalettes: Record<Exclude<AccentColor, "none">, Pair> = {
   },
 }
 
-// Les pastilles des palettes (classes écrites en entier pour que Tailwind les produise) : la
-// couleur du bouton principal d'une base (sans accent) et celle de chaque accent.
-export const baseInkSwatches: Record<BaseColor, string> = {
-  stone: "bg-[oklch(0.216_0.006_56.043)]",
-  neutral: "bg-[oklch(0.205_0_0)]",
-  zinc: "bg-[oklch(0.21_0.006_285.885)]",
-  mauve: "bg-[oklch(0.212_0.019_322.12)]",
-  olive: "bg-[oklch(0.228_0.013_107.4)]",
-  mist: "bg-[oklch(0.218_0.008_223.9)]",
-  taupe: "bg-[oklch(0.214_0.009_43.1)]",
-}
-
-export const accentSwatches: Record<Exclude<AccentColor, "none">, string> = {
-  amber: "bg-[oklch(0.555_0.163_48.998)]",
-  blue: "bg-[oklch(0.488_0.243_264.376)]",
-  cyan: "bg-[oklch(0.52_0.105_223.128)]",
-  emerald: "bg-[oklch(0.508_0.118_165.612)]",
-  fuchsia: "bg-[oklch(0.518_0.253_323.949)]",
-  green: "bg-[oklch(0.527_0.154_150.069)]",
-  indigo: "bg-[oklch(0.457_0.24_277.023)]",
-  lime: "bg-[oklch(0.841_0.238_128.85)]",
-  orange: "bg-[oklch(0.553_0.195_38.402)]",
-  pink: "bg-[oklch(0.525_0.223_3.958)]",
-  purple: "bg-[oklch(0.496_0.265_301.924)]",
-  red: "bg-[oklch(0.505_0.213_27.518)]",
-  rose: "bg-[oklch(0.514_0.222_16.935)]",
-  sky: "bg-[oklch(0.5_0.134_242.749)]",
-  teal: "bg-[oklch(0.511_0.096_186.391)]",
-  violet: "bg-[oklch(0.491_0.27_292.581)]",
-  yellow: "bg-[oklch(0.852_0.199_91.936)]",
-}
-
-// Les cartes des palettes : le gris sombre de chaque base (celui du menu), et les cinq couleurs
-// des graphiques de chaque accent.
-export const baseMenuSwatches: Record<BaseColor, string> = {
-  stone: "bg-[oklch(0.216_0.006_56.043)]",
-  neutral: "bg-[oklch(0.205_0_0)]",
-  zinc: "bg-[oklch(0.21_0.006_285.885)]",
-  mauve: "bg-[oklch(0.212_0.019_322.12)]",
-  olive: "bg-[oklch(0.228_0.013_107.4)]",
-  mist: "bg-[oklch(0.218_0.008_223.9)]",
-  taupe: "bg-[oklch(0.214_0.009_43.1)]",
-}
-
-export const baseChartSwatches: Record<BaseColor, string[]> = {
-  stone: [
-    "bg-[oklch(0.869_0.005_56.366)]",
-    "bg-[oklch(0.553_0.013_58.071)]",
-    "bg-[oklch(0.444_0.011_73.639)]",
-    "bg-[oklch(0.374_0.01_67.558)]",
-    "bg-[oklch(0.268_0.007_34.298)]",
-  ],
-  neutral: [
-    "bg-[oklch(0.87_0_0)]",
-    "bg-[oklch(0.556_0_0)]",
-    "bg-[oklch(0.439_0_0)]",
-    "bg-[oklch(0.371_0_0)]",
-    "bg-[oklch(0.269_0_0)]",
-  ],
-  zinc: [
-    "bg-[oklch(0.871_0.006_286.286)]",
-    "bg-[oklch(0.552_0.016_285.938)]",
-    "bg-[oklch(0.442_0.017_285.786)]",
-    "bg-[oklch(0.37_0.013_285.805)]",
-    "bg-[oklch(0.274_0.006_286.033)]",
-  ],
-  mauve: [
-    "bg-[oklch(0.865_0.012_325.68)]",
-    "bg-[oklch(0.542_0.034_322.5)]",
-    "bg-[oklch(0.435_0.029_321.78)]",
-    "bg-[oklch(0.364_0.029_323.89)]",
-    "bg-[oklch(0.263_0.024_320.12)]",
-  ],
-  olive: [
-    "bg-[oklch(0.88_0.011_106.6)]",
-    "bg-[oklch(0.58_0.031_107.3)]",
-    "bg-[oklch(0.466_0.025_107.3)]",
-    "bg-[oklch(0.394_0.023_107.4)]",
-    "bg-[oklch(0.286_0.016_107.4)]",
-  ],
-  mist: [
-    "bg-[oklch(0.872_0.007_219.6)]",
-    "bg-[oklch(0.56_0.021_213.5)]",
-    "bg-[oklch(0.45_0.017_213.2)]",
-    "bg-[oklch(0.378_0.015_216)]",
-    "bg-[oklch(0.275_0.011_216.9)]",
-  ],
-  taupe: [
-    "bg-[oklch(0.868_0.007_39.5)]",
-    "bg-[oklch(0.547_0.021_43.1)]",
-    "bg-[oklch(0.438_0.017_39.3)]",
-    "bg-[oklch(0.367_0.016_35.7)]",
-    "bg-[oklch(0.268_0.011_36.5)]",
+// Les couleurs de départ (Neutre), celles d'index.css : pour la pastille de Neutre seulement.
+const neutralSwatch = {
+  ink: "oklch(0.205 0 0)",
+  charts: [
+    "oklch(0.87 0 0)",
+    "oklch(0.556 0 0)",
+    "oklch(0.439 0 0)",
+    "oklch(0.371 0 0)",
+    "oklch(0.269 0 0)",
   ],
 }
 
-export const accentChartSwatches: Record<
-  Exclude<AccentColor, "none">,
-  string[]
-> = {
-  amber: [
-    "bg-[oklch(0.879_0.169_91.605)]",
-    "bg-[oklch(0.769_0.188_70.08)]",
-    "bg-[oklch(0.666_0.179_58.318)]",
-    "bg-[oklch(0.555_0.163_48.998)]",
-    "bg-[oklch(0.473_0.137_46.201)]",
-  ],
-  blue: [
-    "bg-[oklch(0.809_0.105_251.813)]",
-    "bg-[oklch(0.623_0.214_259.815)]",
-    "bg-[oklch(0.546_0.245_262.881)]",
-    "bg-[oklch(0.488_0.243_264.376)]",
-    "bg-[oklch(0.424_0.199_265.638)]",
-  ],
-  cyan: [
-    "bg-[oklch(0.865_0.127_207.078)]",
-    "bg-[oklch(0.715_0.143_215.221)]",
-    "bg-[oklch(0.609_0.126_221.723)]",
-    "bg-[oklch(0.52_0.105_223.128)]",
-    "bg-[oklch(0.45_0.085_224.283)]",
-  ],
-  emerald: [
-    "bg-[oklch(0.845_0.143_164.978)]",
-    "bg-[oklch(0.696_0.17_162.48)]",
-    "bg-[oklch(0.596_0.145_163.225)]",
-    "bg-[oklch(0.508_0.118_165.612)]",
-    "bg-[oklch(0.432_0.095_166.913)]",
-  ],
-  fuchsia: [
-    "bg-[oklch(0.833_0.145_321.434)]",
-    "bg-[oklch(0.667_0.295_322.15)]",
-    "bg-[oklch(0.591_0.293_322.896)]",
-    "bg-[oklch(0.518_0.253_323.949)]",
-    "bg-[oklch(0.452_0.211_324.591)]",
-  ],
-  green: [
-    "bg-[oklch(0.871_0.15_154.449)]",
-    "bg-[oklch(0.723_0.219_149.579)]",
-    "bg-[oklch(0.627_0.194_149.214)]",
-    "bg-[oklch(0.527_0.154_150.069)]",
-    "bg-[oklch(0.448_0.119_151.328)]",
-  ],
-  indigo: [
-    "bg-[oklch(0.785_0.115_274.713)]",
-    "bg-[oklch(0.585_0.233_277.117)]",
-    "bg-[oklch(0.511_0.262_276.966)]",
-    "bg-[oklch(0.457_0.24_277.023)]",
-    "bg-[oklch(0.398_0.195_277.366)]",
-  ],
-  lime: [
-    "bg-[oklch(0.897_0.196_126.665)]",
-    "bg-[oklch(0.768_0.233_130.85)]",
-    "bg-[oklch(0.648_0.2_131.684)]",
-    "bg-[oklch(0.532_0.157_131.589)]",
-    "bg-[oklch(0.453_0.124_130.933)]",
-  ],
-  orange: [
-    "bg-[oklch(0.837_0.128_66.29)]",
-    "bg-[oklch(0.705_0.213_47.604)]",
-    "bg-[oklch(0.646_0.222_41.116)]",
-    "bg-[oklch(0.553_0.195_38.402)]",
-    "bg-[oklch(0.47_0.157_37.304)]",
-  ],
-  pink: [
-    "bg-[oklch(0.823_0.12_346.018)]",
-    "bg-[oklch(0.656_0.241_354.308)]",
-    "bg-[oklch(0.592_0.249_0.584)]",
-    "bg-[oklch(0.525_0.223_3.958)]",
-    "bg-[oklch(0.459_0.187_3.815)]",
-  ],
-  purple: [
-    "bg-[oklch(0.827_0.119_306.383)]",
-    "bg-[oklch(0.627_0.265_303.9)]",
-    "bg-[oklch(0.558_0.288_302.321)]",
-    "bg-[oklch(0.496_0.265_301.924)]",
-    "bg-[oklch(0.438_0.218_303.724)]",
-  ],
-  red: [
-    "bg-[oklch(0.808_0.114_19.571)]",
-    "bg-[oklch(0.637_0.237_25.331)]",
-    "bg-[oklch(0.577_0.245_27.325)]",
-    "bg-[oklch(0.505_0.213_27.518)]",
-    "bg-[oklch(0.444_0.177_26.899)]",
-  ],
-  rose: [
-    "bg-[oklch(0.81_0.117_11.638)]",
-    "bg-[oklch(0.645_0.246_16.439)]",
-    "bg-[oklch(0.586_0.253_17.585)]",
-    "bg-[oklch(0.514_0.222_16.935)]",
-    "bg-[oklch(0.455_0.188_13.697)]",
-  ],
-  sky: [
-    "bg-[oklch(0.828_0.111_230.318)]",
-    "bg-[oklch(0.685_0.169_237.323)]",
-    "bg-[oklch(0.588_0.158_241.966)]",
-    "bg-[oklch(0.5_0.134_242.749)]",
-    "bg-[oklch(0.443_0.11_240.79)]",
-  ],
-  teal: [
-    "bg-[oklch(0.855_0.138_181.071)]",
-    "bg-[oklch(0.704_0.14_182.503)]",
-    "bg-[oklch(0.6_0.118_184.704)]",
-    "bg-[oklch(0.511_0.096_186.391)]",
-    "bg-[oklch(0.437_0.078_188.216)]",
-  ],
-  violet: [
-    "bg-[oklch(0.811_0.111_293.571)]",
-    "bg-[oklch(0.606_0.25_292.717)]",
-    "bg-[oklch(0.541_0.281_293.009)]",
-    "bg-[oklch(0.491_0.27_292.581)]",
-    "bg-[oklch(0.432_0.232_292.759)]",
-  ],
-  yellow: [
-    "bg-[oklch(0.905_0.182_98.111)]",
-    "bg-[oklch(0.795_0.184_86.047)]",
-    "bg-[oklch(0.681_0.162_75.834)]",
-    "bg-[oklch(0.554_0.135_66.442)]",
-    "bg-[oklch(0.476_0.114_61.907)]",
-  ],
+const chartsOf = (vars: Vars) => [1, 2, 3, 4, 5].map((n) => vars[`chart-${n}`])
+
+/**
+ * Les couleurs de la carte d'une association (Mon compte) : le gris sombre de la base (celui du
+ * menu), le bouton principal (la base, ou l'accent) et les cinq couleurs des graphiques.
+ */
+function presetSwatch(base: BaseColor, accent: AccentColor) {
+  const baseInk =
+    base === "neutral" ? neutralSwatch.ink : basePalettes[base].light.primary
+  if (accent !== "none") {
+    const vars = accentPalettes[accent].light
+    return { menu: baseInk, ink: vars.primary, charts: chartsOf(vars) }
+  }
+  return {
+    menu: baseInk,
+    ink: baseInk,
+    charts:
+      base === "neutral"
+        ? neutralSwatch.charts
+        : chartsOf(basePalettes[base].light),
+  }
+}
+
+/**
+ * Les règles des pastilles de chaque association, tirées des palettes : une carte porte
+ * data-preset, chaque pastille data-swatch (menu, ink, chart-1 à chart-5).
+ */
+export function swatchCss(): string {
+  return palettePresets
+    .flatMap(({ id, base, accent }) => {
+      const { menu, ink, charts } = presetSwatch(base, accent)
+      const rule = (part: string, color: string) =>
+        `[data-preset="${id}"] [data-swatch="${part}"] { background-color: ${color}; }`
+      return [
+        rule("menu", menu),
+        rule("ink", ink),
+        ...charts.map((color, index) => rule(`chart-${index + 1}`, color)),
+      ]
+    })
+    .join("\n")
 }
 
 /**
@@ -1277,9 +1110,10 @@ export function paletteCss(palette: Palette): string {
     Object.assign(dark, accentPalettes[palette.accent].dark)
   }
   const block = (selector: string, vars: Record<string, string>) => {
-    const lines = Object.entries(vars).map(
-      ([name, value]) => `  --${name}: ${value};`
-    )
+    const lines = Object.entries(vars)
+      // sidebar-primary ne sert qu'aux couleurs des logos (presetLogoColors), pas au CSS.
+      .filter(([name]) => !name.startsWith("sidebar-primary"))
+      .map(([name, value]) => `  --${name}: ${value};`)
     return lines.length > 0 ? `${selector} {\n${lines.join("\n")}\n}` : ""
   }
   // L'élément choisi du menu (toujours sombre) : la couleur des boutons de la page, en clair comme

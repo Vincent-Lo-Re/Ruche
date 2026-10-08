@@ -25,6 +25,7 @@
     "csp.ts",
     "csp.test.ts",
     "texts-used.test.ts",
+    "css-used.test.ts",
     "playwright.config.ts",
     "e2e"
   ]

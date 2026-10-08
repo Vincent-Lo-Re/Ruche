@@ -113,7 +113,7 @@ function MfaSetup({
           title={texts.mfa.setupTitle}
           description={texts.mfa.setupDescription}
           media={
-            <div className="mx-auto rounded-xl border bg-white p-4">
+            <div className="mx-auto rounded-xl border bg-brand-light p-4">
               <img
                 src={enrollment.data.qrCode}
                 alt={texts.mfa.qrCode}

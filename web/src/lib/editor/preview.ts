@@ -96,13 +96,6 @@ export function withPreview(
   return params
 }
 
-// La hauteur du téléphone entier : --blocks-screen-height et deux fois --blocks-device-padding
-// de preview.css (.blocks-preview-layout[data-device]) ; les changer des deux côtés.
-const deviceHeights: Record<Device, number> = {
-  ios: 874 + 2 * 10,
-  android: 915 + 2 * 9,
-}
-
 // En dessous, le texte ne se lirait plus : l'écran déborde plutôt que de rapetisser encore.
 const MIN_SCALE = 0.4
 
@@ -116,10 +109,14 @@ export function showsFullScreen(preview: PreviewSettings): boolean {
 
 /**
  * La réduction de l'écran entier pour tenir dans la hauteur disponible : 1 si la place suffit,
- * arrondie au centième inférieur, jamais sous 0,4.
+ * arrondie au centième inférieur, jamais sous 0,4. deviceHeight : la hauteur du téléphone entier,
+ * lue dans les variables de preview.css (deviceHeightOf).
  */
-export function fullScreenScale(device: Device, available: number): number {
-  const scale = Math.floor((available / deviceHeights[device]) * 100) / 100
+export function fullScreenScale(
+  deviceHeight: number,
+  available: number
+): number {
+  const scale = Math.floor((available / deviceHeight) * 100) / 100
   return Math.min(1, Math.max(MIN_SCALE, scale))
 }
 
@@ -149,4 +146,14 @@ export function previewLocked(
     access.accessChosen &&
     access.accessLevelId !== null
   )
+}
+
+/**
+ * La hauteur du téléphone entier, d'après les variables de l'élément (preview.css,
+ * .blocks-preview-layout[data-device]) : l'écran et deux fois le cadre.
+ */
+export function deviceHeightOf(element: Element): number {
+  const style = getComputedStyle(element)
+  const px = (name: string) => parseFloat(style.getPropertyValue(name)) || 0
+  return px("--blocks-screen-height") + 2 * px("--blocks-device-padding")
 }
