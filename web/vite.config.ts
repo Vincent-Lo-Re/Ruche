@@ -1,12 +1,34 @@
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
 import { fileURLToPath } from "node:url"
-import { defineConfig } from "vite"
+import { defineConfig, loadEnv, type Plugin } from "vite"
 import { configDefaults } from "vitest/config"
+import { contentSecurityPolicy } from "./csp.ts"
+
+// Les règles de sécurité de l'admin construite, tirées de l'adresse de la base de l'installation
+// (csp.ts). Seulement à la construction : le serveur de développement en a besoin d'autres.
+function securityPolicy(): Plugin {
+  let policy = ""
+  return {
+    name: "security-policy",
+    apply: "build",
+    configResolved(config) {
+      const env = loadEnv(config.mode, config.envDir || process.cwd(), "VITE_")
+      policy = contentSecurityPolicy(env.VITE_SUPABASE_URL)
+    },
+    transformIndexHtml: () => [
+      {
+        tag: "meta",
+        attrs: { "http-equiv": "Content-Security-Policy", content: policy },
+        injectTo: "head-prepend",
+      },
+    ],
+  }
+}
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), securityPolicy()],
   // Même adresse que site_url dans supabase/config.toml : les liens des e-mails
   // (invitation) et la session restent sur une seule origine.
   server: {
