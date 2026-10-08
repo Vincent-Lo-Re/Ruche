@@ -6,7 +6,6 @@ valeurs. Le code de Ruche ne nomme aucune installation.
 
 | Fichier | Contenu |
 |---|---|
-| `supabase.env` | Réglages de connexion (adresse de l'admin, liens des e-mails), lus par `supabase config push` |
 | `functions.env` | Réglages des fonctions serveur (adresses de l'admin acceptées), envoyés par `supabase secrets set` |
 
 Aucun secret dans ces fichiers : le dépôt est public.
@@ -45,15 +44,18 @@ Dans cet ordre, depuis une copie de travail du dépôt sur `main`.
    where id;
    ```
 
-4. **Réglages de connexion** (le lien GitHub ne les envoie pas) :
+4. **Réglages de connexion** (le lien GitHub ne les envoie pas) : ceux de l'installation sont
+   dans un bloc `[remotes.<nom>]` de `supabase/config.toml`, à son `project_id` (celui de la démo
+   y est ; celui d'un client vit dans son dépôt et s'ajoute au fichier dans sa copie de
+   déploiement). Les variables `SUPABASE_<SECTION>_<CLÉ>` ne sont pas lues par la CLI 2.120.
 
    ```bash
    npx supabase link --project-ref <réf. du projet>
-   set -a && . installation/supabase.env && set +a && npx supabase config diff
-   set -a && . installation/supabase.env && set +a && npx supabase config push
+   npx supabase config diff
+   npx supabase config push
    ```
 
-   Relire le `config diff` d'abord. Le SMTP de l'installation se règle dans le tableau de bord
+   Relire le `config diff` d'abord : sa première ligne doit dire « using [remotes.<nom>] ». Le SMTP de l'installation se règle dans le tableau de bord
    **avant** le premier `config push` (sur l'offre gratuite, Supabase refuse de modifier les
    modèles d'e-mails avec son service d'envoi intégré) ; ne jamais le déclarer dans
    `config.toml`.
