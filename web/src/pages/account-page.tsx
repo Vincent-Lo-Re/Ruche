@@ -2,11 +2,13 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import type { Factor } from "@supabase/supabase-js"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { ShieldCheck } from "lucide-react"
-import type { ReactNode } from "react"
+import { useState, type ReactNode } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
 import { profileQueryKey, useAuth, type Profile } from "@/auth/auth-context"
+import { EmailChangeDialog } from "@/components/account/email-change-dialog"
+import { LanguageSelect } from "@/components/language-select"
 import { PageHeader } from "@/components/page-header"
 import { SettingsSection } from "@/components/settings/settings-section"
 import { useBrand } from "@/hooks/use-brand-name"
@@ -37,13 +39,6 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 import { saveFullName, saveLanguage } from "@/lib/auth"
 import { formatDateTime } from "@/lib/dates"
@@ -166,12 +161,15 @@ function MfaCard({ factor }: { factor: Factor | null }) {
 }
 
 /**
- * Le profil, sur le modèle de la carte « Account Access » de shadcn : le nom, l'adresse e-mail
- * (grisée, elle ne se change pas ici) avec le rôle à droite ; « Enregistrer » collé au nom.
+ * Le profil, sur le modèle de la carte « Account Access » de shadcn : le nom, avec « Enregistrer »
+ * collé au champ ; l'adresse e-mail grisée, avec le rôle à droite et « Modifier » collé au champ,
+ * qui ouvre le changement d'adresse (EmailChangeDialog).
  */
 function ProfileCard({ profile }: { profile: Profile }) {
   const labels = texts.account.profile
   const queryClient = useQueryClient()
+  const { session } = useAuth()
+  const [changingEmail, setChangingEmail] = useState(false)
   const form = useForm({
     resolver: zodResolver(profileSchema),
     defaultValues: { full_name: profile.full_name ?? "" },
@@ -236,18 +234,33 @@ function ProfileCard({ profile }: { profile: Profile }) {
                     {texts.roles[profile.role]}
                   </span>
                 </div>
-                <Input
-                  id="account-email"
-                  type="email"
-                  value={profile.email}
-                  disabled
-                  readOnly
-                />
+                <ButtonGroup className="w-full">
+                  <Input
+                    id="account-email"
+                    type="email"
+                    value={profile.email}
+                    disabled
+                    readOnly
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setChangingEmail(true)}
+                  >
+                    {texts.account.emailChange.open}
+                  </Button>
+                </ButtonGroup>
               </Field>
             </FieldGroup>
           </CardContent>
         </Card>
       </form>
+      <EmailChangeDialog
+        open={changingEmail}
+        onOpenChange={setChangingEmail}
+        userId={profile.id}
+        currentEmail={session?.user.email ?? profile.email}
+      />
     </SettingsSection>
   )
 }
@@ -286,7 +299,8 @@ function LanguageCard() {
         <CardContent>
           <Field>
             <FieldLabel htmlFor="account-language">{labels.label}</FieldLabel>
-            <Select
+            <LanguageSelect
+              id="account-language"
               items={items}
               value={current}
               disabled={save.isPending}
@@ -294,18 +308,7 @@ function LanguageCard() {
                 const next: Language | null = isLanguage(value) ? value : null
                 if (next !== chosen) save.mutate(next)
               }}
-            >
-              <SelectTrigger id="account-language" className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {items.map((item) => (
-                  <SelectItem key={item.value} value={item.value}>
-                    {item.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            />
           </Field>
         </CardContent>
       </Card>

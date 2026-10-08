@@ -250,6 +250,26 @@ export const fr: Texts = {
       // Lu par les lecteurs d'écran devant le rôle.
       rolePrefix: "Rôle : ",
     },
+    emailChange: {
+      // Bouton à côté de l'adresse grisée de la carte Profil.
+      open: "Modifier",
+      title: "Changer d'adresse e-mail",
+      description:
+        "On envoie un code à la nouvelle adresse pour la confirmer. Ton adresse actuelle reçoit aussi un e-mail : tu sauras si quelqu'un d'autre essaie.",
+      newEmail: "Nouvelle adresse e-mail",
+      sameEmail: "C'est déjà ton adresse e-mail.",
+      taken: "Cette adresse est déjà celle d'un autre compte.",
+      send: "Envoyer le code",
+      codeTitle: "Saisis le code",
+      codeSent: (email: string) =>
+        `On a envoyé un code à 6 chiffres à ${email}. Il est valable 10 minutes.`,
+      code: "Code reçu par e-mail",
+      confirm: "Confirmer",
+      resend: "Recevoir un nouveau code",
+      resent: "Un nouveau code est en route.",
+      otherEmail: "Choisir une autre adresse",
+      done: "Adresse e-mail changée.",
+    },
     language: {
       title: "Langue",
       description:

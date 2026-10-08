@@ -1,16 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
+import { LanguageSelect } from "@/components/language-select"
 import { LoadState } from "@/components/load-state"
 import { Card, CardContent } from "@/components/ui/card"
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { adminBrandKey, saveAdminLanguage } from "@/lib/admin-identity"
 import { isLanguage, LANGUAGES, type Language } from "@/lib/language"
 import { adminBrandRead } from "@/lib/reads"
@@ -46,7 +40,8 @@ export function AdminLanguageCard() {
         {brand.isSuccess ? (
           <Field>
             <FieldLabel htmlFor="admin-language">{labels.label}</FieldLabel>
-            <Select
+            <LanguageSelect
+              id="admin-language"
               items={items}
               value={save.isPending ? save.variables : brand.data.language}
               disabled={save.isPending}
@@ -54,18 +49,7 @@ export function AdminLanguageCard() {
                 if (isLanguage(value) && value !== brand.data.language)
                   save.mutate(value)
               }}
-            >
-              <SelectTrigger id="admin-language" className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {items.map((item) => (
-                  <SelectItem key={item.value} value={item.value}>
-                    {item.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            />
             <FieldDescription>{labels.hint}</FieldDescription>
           </Field>
         ) : (

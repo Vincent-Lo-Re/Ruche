@@ -1,7 +1,8 @@
+import { AuthApiError } from "@supabase/supabase-js"
 import { fireEvent, screen, within } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
-import { supabase } from "@/lib/supabase"
+import { detachedAuth, supabase } from "@/lib/supabase"
 import { fakeAuth, renderApp, testProfile } from "@/test/render"
 import { texts } from "@/texts"
 
@@ -20,7 +21,7 @@ describe("Mon compte", () => {
     )
     // Dans la page : le menu de gauche montre aussi le rôle, à côté de l'avatar.
     const page = within(screen.getByRole("main"))
-    // L'adresse grisée (elle ne se change pas ici), le rôle à côté.
+    // L'adresse grisée (elle se change par « Modifier »), le rôle à côté.
     expect(page.getByLabelText(texts.account.profile.email)).toHaveValue(
       testProfile.email
     )
@@ -50,6 +51,110 @@ describe("Mon compte", () => {
 
     expect(await screen.findByText(labels.failed)).toBeVisible()
     expect(updateUser).toHaveBeenCalledWith({ data: { language: "en" } })
+  })
+
+  describe("changer d'adresse e-mail", () => {
+    const labels = texts.account.emailChange
+
+    async function openDialog() {
+      await renderApp("/account", fakeAuth({ role: "editor" }))
+      fireEvent.click(screen.getByRole("button", { name: labels.open }))
+      return screen.findByRole("dialog")
+    }
+
+    function askFor(dialog: HTMLElement, email: string) {
+      fireEvent.change(within(dialog).getByLabelText(labels.newEmail), {
+        target: { value: email },
+      })
+      fireEvent.click(within(dialog).getByRole("button", { name: labels.send }))
+    }
+
+    it("la nouvelle adresse, puis son code : le 6e chiffre confirme, le profil suit", async () => {
+      const updateUser = vi
+        .spyOn(supabase.auth, "updateUser")
+        .mockResolvedValue({ data: { user: null }, error: null } as never)
+      const verify = vi.spyOn(detachedAuth, "verifyOtp").mockResolvedValue({
+        data: { user: null, session: null },
+        error: null,
+      } as never)
+      // La session du membre (double vérification passée) est relue, pas remplacée.
+      const refresh = vi
+        .spyOn(supabase.auth, "refreshSession")
+        .mockResolvedValue({
+          data: { user: null, session: null },
+          error: null,
+        } as never)
+      const dialog = await openDialog()
+
+      askFor(dialog, "nouvelle@exemple.test")
+      expect(
+        await within(dialog).findByText(
+          labels.codeSent("nouvelle@exemple.test")
+        )
+      ).toBeVisible()
+      expect(updateUser).toHaveBeenCalledWith({
+        email: "nouvelle@exemple.test",
+      })
+
+      fireEvent.change(within(dialog).getByLabelText(labels.code), {
+        target: { value: "123456" },
+      })
+      expect(await screen.findByText(labels.done)).toBeVisible()
+      expect(verify).toHaveBeenCalledTimes(1)
+      expect(verify).toHaveBeenCalledWith({
+        email: "nouvelle@exemple.test",
+        token: "123456",
+        type: "email_change",
+      })
+      expect(refresh).toHaveBeenCalledTimes(1)
+    })
+
+    it("un code refusé pour la nouvelle adresse est essayé pour l'actuelle, puis vidé", async () => {
+      vi.spyOn(supabase.auth, "updateUser").mockResolvedValue({
+        data: { user: null },
+        error: null,
+      } as never)
+      const verify = vi.spyOn(detachedAuth, "verifyOtp").mockResolvedValue({
+        data: { user: null, session: null },
+        error: new AuthApiError(
+          "Token has expired or is invalid",
+          403,
+          "otp_expired"
+        ),
+      } as never)
+      const dialog = await openDialog()
+      askFor(dialog, "nouvelle@exemple.test")
+      const code = await within(dialog).findByLabelText(labels.code)
+
+      fireEvent.change(code, { target: { value: "123456" } })
+
+      expect(await screen.findByText(texts.signIn.wrongCode)).toBeVisible()
+      expect(code).toHaveValue("")
+      expect(verify).toHaveBeenCalledTimes(2)
+      expect(verify).toHaveBeenLastCalledWith({
+        email: testProfile.email,
+        token: "123456",
+        type: "email_change",
+      })
+    })
+
+    it("refuse sa propre adresse sans rien envoyer, et dit qu'une adresse est déjà prise", async () => {
+      const updateUser = vi
+        .spyOn(supabase.auth, "updateUser")
+        .mockResolvedValue({
+          data: { user: null },
+          error: new AuthApiError("Already registered", 422, "email_exists"),
+        } as never)
+      const dialog = await openDialog()
+
+      askFor(dialog, testProfile.email.toUpperCase())
+      expect(await within(dialog).findByText(labels.sameEmail)).toBeVisible()
+      expect(updateUser).not.toHaveBeenCalled()
+
+      askFor(dialog, "prise@exemple.test")
+      expect(await within(dialog).findByText(labels.taken)).toBeVisible()
+      expect(within(dialog).getByLabelText(labels.newEmail)).toBeVisible()
+    })
   })
 
   it("refuse un nom trop long sans rien envoyer", async () => {

@@ -279,6 +279,12 @@ content_path = "./supabase/templates/code-connexion.html"
 subject = "{{ if and .Data.language (eq .Data.language \"fr\") }}Confirme ton adresse e-mail{{ else }}Confirm your email address{{ end }}"
 content_path = "./supabase/templates/confirmation.html"
 
+# Changement d'adresse (Mon compte) : un code à l'ancienne adresse et un à la nouvelle
+# (double_confirm_changes).
+[auth.email.template.email_change]
+subject = "{{ if and .Data.language (eq .Data.language \"fr\") }}Ton code pour changer d'adresse{{ else }}Your code to change your email address{{ end }}"
+content_path = "./supabase/templates/changement-adresse.html"
+
 # Uncomment to customize notification email template
 # [auth.email.notification.password_changed]
 # enabled = true

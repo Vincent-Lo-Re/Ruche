@@ -1,6 +1,8 @@
 // Les appels de Supabase Auth faits par les pages de connexion, d'invitation, de double
 // vérification et du compte. Les pages n'appellent pas Supabase elles-mêmes.
 
+import { isAuthApiError } from "@supabase/supabase-js"
+
 import {
   authErrorMessage,
   isNotAMemberError,
@@ -8,7 +10,8 @@ import {
 } from "@/lib/auth-errors"
 import { brandName, getAdminBrand } from "@/lib/admin-identity"
 import type { Language } from "@/lib/language"
-import { supabase } from "@/lib/supabase"
+import { detachedAuth, supabase } from "@/lib/supabase"
+import { texts } from "@/texts"
 
 // « Code envoyé », « code déjà envoyé il y a moins d'une minute » (le code précédent reste
 // valable), ou message d'erreur à afficher.
@@ -127,4 +130,41 @@ export async function saveFullName(
 export async function saveLanguage(language: Language | null): Promise<void> {
   const { error } = await supabase.auth.updateUser({ data: { language } })
   if (error) throw error
+}
+
+/**
+ * Demande le changement d'adresse (Mon compte) : Supabase envoie un code à la nouvelle adresse et
+ * un autre à l'adresse actuelle, qui sert d'alerte. Une adresse déjà prise par un autre compte est
+ * refusée.
+ */
+export async function requestEmailChange(email: string): Promise<SendResult> {
+  const { error } = await supabase.auth.updateUser({ email })
+  if (!error) return "sent"
+  if (isRateLimitError(error)) return "recentlySent"
+  if (isAuthApiError(error) && error.code === "email_exists")
+    return { error: texts.account.emailChange.taken }
+  return { error: texts.common.unexpected }
+}
+
+/**
+ * Confirme le changement d'adresse avec un code. Avec des codes, Supabase n'exige pas les deux
+ * (essai du 09/10/2026, double_confirm_changes actif) : le code de la nouvelle adresse suffit, et
+ * celui de l'adresse actuelle aussi, essayé s'il est refusé (les deux e-mails disent « saisis ce
+ * code »). La vérification passe par detachedAuth : elle ouvrirait une nouvelle session sans la
+ * double vérification ; la session du membre est relue à la place, avec sa nouvelle adresse.
+ * Renvoie le message d'erreur à afficher, sinon null.
+ */
+export async function confirmEmailChange(
+  newEmail: string,
+  currentEmail: string,
+  code: string
+): Promise<string | null> {
+  const verify = (email: string) =>
+    detachedAuth.verifyOtp({ email, token: code, type: "email_change" })
+  let { error } = await verify(newEmail)
+  if (error && !isRateLimitError(error))
+    ({ error } = await verify(currentEmail))
+  if (error) return authErrorMessage(error, "emailCode")
+  await supabase.auth.refreshSession()
+  return null
 }
