@@ -1264,7 +1264,7 @@ begin
   end if;
 
   -- Le garde de corbeille laisse passer ces changements du brouillon (§ 3.2, cas 3).
-  perform set_config('declikora.detach_all', 'on', true);
+  perform set_config('ruche.detach_all', 'on', true);
 
   for target in
     select c.id, c.draft from public.contents c where c.id = any (users) order by c.id
@@ -1301,7 +1301,7 @@ begin
     return query select target.id, new_rev;
   end loop;
 
-  perform set_config('declikora.detach_all', '', true);
+  perform set_config('ruche.detach_all', '', true);
 end;
 $$;
 

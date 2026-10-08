@@ -455,7 +455,7 @@ function ReadyRow({
 }
 
 /**
- * La carte du contenu dans la liste de sa section (le Fil, Radio Éclaircies) : son image de
+ * La carte du contenu dans la liste de sa section (Blog, Podcasts) : son image de
  * présentation (la vignette, qui est aussi en tête du contenu) et son titre. Pas de résumé
  * (03/10/2026, ADMIN § 4).
  */

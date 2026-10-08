@@ -457,7 +457,7 @@ create trigger contents_10_kind
 --   2. quand une colonne d'auteur passe à null et que rien d'autre ne change (retrait d'un
 --      membre de l'équipe : « on delete set null ») ;
 --   3. pendant template_detach_all (étape 6), qui le signale par un réglage local à la
---      transaction (set_config('declikora.detach_all', 'on', true)) et ne change que le
+--      transaction (set_config('ruche.detach_all', 'on', true)) et ne change que le
 --      brouillon et ce qui en découle. Aucune écriture directe n'étant permise sur contents,
 --      seul le code de la base peut le poser.
 create function private.contents_trash_guard()
@@ -486,7 +486,7 @@ begin
     return new;
   end if;
 
-  if coalesce(current_setting('declikora.detach_all', true), '') = 'on'
+  if coalesce(current_setting('ruche.detach_all', true), '') = 'on'
     and (to_jsonb(new) - draft_columns) = (to_jsonb(old) - draft_columns) then
     return new;
   end if;

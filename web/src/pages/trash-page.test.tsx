@@ -215,7 +215,7 @@ describe("Corbeille : contenus", () => {
     ...page,
     id: "00000000-0000-4000-8000-00000000000d",
     kind: "article",
-    title: "Bien respirer",
+    title: "Premier article",
     trash_batch: "00000000-0000-4000-8000-0000000000b2",
   }
   // Parti avec l'article (même lot) : restauré ou effacé avec lui.

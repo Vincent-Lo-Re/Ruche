@@ -292,7 +292,7 @@ stable
 security definer
 set search_path = ''
 as $$
-  select gen_random_uuid(), 'article', 'Bien respirer', true, false
+  select gen_random_uuid(), 'article', 'Premier article', true, false
   where target_media_id = '20000000-0000-4000-8000-000000000002'
 $$;
 update public.media set status = 'ready', reject_reason = null
@@ -300,7 +300,7 @@ where id = '20000000-0000-4000-8000-000000000002';
 
 select pg_temp.as_person('editor');
 select is(
-  (select title from public.media_uses('20000000-0000-4000-8000-000000000002')), 'Bien respirer',
+  (select title from public.media_uses('20000000-0000-4000-8000-000000000002')), 'Premier article',
   'media_uses : la liste des contenus'
 );
 select throws_like(

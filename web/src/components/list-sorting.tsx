@@ -72,7 +72,7 @@ function useListSorting(ids: string[], onReorder: (ids: string[]) => void) {
 }
 
 /**
- * Une liste à plat rangée par glisser-déposer (Catégories, Formules, Le Fil, Radio Éclaircies) :
+ * Une liste à plat rangée par glisser-déposer (Catégories, Formules, Blog, Podcasts) :
  * à la souris par la poignée, ou au clavier (Espace ou Entrée, flèches). Les
  * éléments (useSortable) sont dans children, dans l'ordre de items.
  */

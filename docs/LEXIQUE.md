@@ -23,7 +23,7 @@
 | l'admin | the admin | L'outil web où l'équipe gère l'app. | administration (sauf dans les e-mails), back-office / back office, CMS, dashboard |
 | Tableau de bord | Dashboard | Première page après la connexion. | Accueil / Home |
 | Blog | Blog | Section des articles et de leurs catégories. | Le Fil / Feed |
-| Podcasts | Podcasts | Section des épisodes et de leurs catégories. | Radio Éclaircies, Radio / Podcast (au singulier) |
+| Podcasts | Podcasts | Section des épisodes et de leurs catégories. | Podcasts, Radio / Podcast (au singulier) |
 | Pages | Pages | Section des pages simples de l'app (mentions légales…). | — |
 | Modèles de bloc | Block templates | Section des modèles réutilisables. | Modèles de blocs, Modèles (seul, dans un titre), gabarits / Patterns, Templates (seul) |
 | Médiathèque | Media library | Section de tous les fichiers envoyés. | Médias, bibliothèque / Media (seul), Assets, Files |
@@ -181,7 +181,7 @@
 | Français | English | Définition | À éviter (FR / EN) |
 |---|---|---|---|
 | Identité de l'admin / de l'app | Admin branding / App branding | Onglets des Paramètres. | — / Admin identity |
-| marque, nom de la marque | brand, brand name | Le nom affiché partout ; « Ruche » à défaut. Les e-mails, qui ne lisent pas la base, disent « ton administration » / « your admin ». | Declikora (dans les e-mails) |
+| marque, nom de la marque | brand, brand name | Le nom affiché partout ; « Ruche » à défaut. Les e-mails, qui ne lisent pas la base, disent « ton administration » / « your admin ». | un nom de client (dans les e-mails) |
 | Ruche | Ruche | Nom à défaut. Ne se traduit pas, n'apparaît jamais dans les textes. | — / Hive |
 | à défaut | default | Ce qui s'affiche quand rien n'est choisi. | — |
 | logotype | logo | Le logo complet, dans le menu et à la connexion. | logo (seul) / wordmark |

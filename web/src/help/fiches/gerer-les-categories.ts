@@ -5,7 +5,7 @@ export const fiche: HelpFiche = {
   theme: "contenus",
   title: "Gérer les catégories",
   summary:
-    "Le Fil et Radio Éclaircies ont chacun leurs catégories, que l'app utilise pour filtrer les contenus.",
+    "Le Blog et les Podcasts ont chacun leurs catégories, que l'app utilise pour filtrer les contenus.",
   keywords: [
     "catégorie",
     "filtre",
@@ -16,7 +16,7 @@ export const fiche: HelpFiche = {
     "étiquette",
   ],
   steps: [
-    "Ouvre « Le Fil » ou « Radio Éclaircies », puis clique sur « Catégories ».",
+    "Ouvre « Blog » ou « Podcasts », puis clique sur « Catégories ».",
     "Pour en ajouter une, écris son nom dans « Ajouter une catégorie », puis clique sur « Ajouter ».",
     "Range-les avec la poignée, à la souris ou au clavier : l'app les montre dans cet ordre.",
     "Pour renommer ou supprimer une catégorie, ouvre le menu de sa ligne et choisis « Renommer » ou « Supprimer ».",

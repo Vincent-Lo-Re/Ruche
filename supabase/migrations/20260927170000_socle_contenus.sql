@@ -56,9 +56,9 @@ revoke all on all tables in schema private from public, anon, authenticated;
 -- ---------------------------------------------------------------------------------------------
 
 -- Une seule ligne. Les valeurs sont PUBLIQUES (adresse de la fonction « files » et clé
--- publishable, déjà présente dans l'admin) : aucun secret n'est rangé ici, et rien n'est à
--- régler à la main en ligne.
--- - Cette migration écrit les valeurs de PRODUCTION (projet « Declikora »).
+-- publishable, déjà présente dans l'admin) : aucun secret n'est rangé ici.
+-- - Cette migration écrit des valeurs d'attente : chaque installation y met les siennes une
+--   fois, à la main (installation/README.md, étape 3).
 -- - supabase/seed.sql, qui ne tourne qu'en local (db start, start, db reset ; jamais db push),
 --   les remplace par les valeurs locales.
 -- La fonction « files » ne fait, sans session de membre, que le travail décidé par la base
@@ -77,15 +77,16 @@ create table private.settings (
 
 comment on table private.settings is
   'Réglages publics des tâches planifiées (adresse de la fonction files, clé publishable) et '
-  'frein anti-abus. Valeurs de production ici, valeurs locales dans supabase/seed.sql.';
+  'frein anti-abus. Valeurs d''attente ici (chaque installation met les siennes), valeurs locales '
+  'dans supabase/seed.sql.';
 
 alter table private.settings enable row level security;
 revoke all on private.settings from public, anon, authenticated;
 
 insert into private.settings (files_url, publishable_key)
 values (
-  'https://kajocxepxgaquculhrky.supabase.co/functions/v1/files',
-  'sb_publishable_nwCD7WH9Btl4RDEWktB4zw_lcRYwrI_'
+  'https://a-remplacer.supabase.co/functions/v1/files',
+  'sb_publishable_a_remplacer'
 )
 on conflict (id) do nothing;
 

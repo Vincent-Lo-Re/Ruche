@@ -80,7 +80,7 @@ async function prepareFiles(
   await prepareImages(queryClient, shownFiles(media ?? []), limit)
 }
 
-/** Le Fil, Radio Éclaircies, Pages. */
+/** Blog, Podcasts, Pages. */
 export function prepareContentList(kind: ContentKind): Prepare {
   const profile = contentProfile(kind)
   return async ({ queryClient }) => {

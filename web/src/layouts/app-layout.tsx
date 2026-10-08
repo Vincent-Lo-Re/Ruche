@@ -9,7 +9,7 @@ import { SidebarInset, SidebarWrapper } from "@/components/ui/sidebar"
 /**
  * Les pages avec le header et le menu à gauche. L'éditeur, lui, prend tout l'écran. D'une page à l'autre, le
  * menu ne bouge pas : le contenu seul s'ouvre à neuf (une page n'en reprend jamais une autre, par
- * exemple la recherche du Fil dans Radio Éclaircies), en fondu.
+ * exemple la recherche du Blog dans les Podcasts), en fondu.
  */
 export function AppLayout() {
   const { pathname } = useLocation()

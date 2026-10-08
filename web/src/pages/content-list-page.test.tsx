@@ -125,8 +125,8 @@ const articles = [
 const newArticle: api.Content = {
   id: ARTICLE,
   kind: "article",
-  title: "Bien respirer",
-  draft: { v: 1, title: "Bien respirer", blocks: [] },
+  title: "Premier article",
+  draft: { v: 1, title: "Premier article", blocks: [] },
   draft_rev: 1,
   draft_saved_at: "2026-09-28T08:00:00Z",
   deleted_at: null,
@@ -442,7 +442,7 @@ describe("Blog", () => {
     watch.observe(document.body, { childList: true, subtree: true })
     fireEvent.click(link)
     expect(await screen.findByLabelText(texts.editor.title.label)).toHaveValue(
-      "Bien respirer"
+      "Premier article"
     )
     watch.disconnect()
     expect(sawLoading).toBe(false)
@@ -473,7 +473,7 @@ describe("Blog", () => {
       .closest("[data-page-fade]")
     expect(next).not.toBeNull()
     expect(next).not.toBe(content)
-    // La recherche du Fil ne passe pas dans Radio Éclaircies.
+    // La recherche du Blog ne passe pas dans les Podcasts.
     expect(router.state.location.search).toBe("")
     expect(await screen.findByRole("searchbox")).toHaveValue("")
     await waitFor(() => expect(shownTitles()).toHaveLength(3))
@@ -541,7 +541,7 @@ describe("Blog", () => {
 
     fireEvent.change(
       within(dialog).getByLabelText(texts.publication.settings.titleLabel),
-      { target: { value: "Bien respirer" } }
+      { target: { value: "Premier article" } }
     )
     await pick(labels.newContent.starter, "Interview")
     fireEvent.click(
@@ -558,7 +558,7 @@ describe("Blog", () => {
     await waitFor(() =>
       expect(api.createContent).toHaveBeenCalledWith(
         "article",
-        "Bien respirer",
+        "Premier article",
         INTERVIEW
       )
     )

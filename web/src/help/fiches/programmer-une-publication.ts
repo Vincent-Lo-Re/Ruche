@@ -24,7 +24,7 @@ export const fiche: HelpFiche = {
   notes: [
     "C'est le dernier brouillon enregistré à cette heure-là qui part dans l'app : tu peux continuer à écrire d'ici là.",
     "Si quelqu'un a modifié le brouillon depuis la programmation et a encore l'éditeur ouvert à l'heure prévue, la publication attend qu'il le quitte, une heure au plus. Ensuite, elle échoue.",
-    "Dans les listes (Le Fil, Radio Éclaircies, Pages), une pastille sur la ligne montre une publication programmée, en attente ou échouée.",
+    "Dans les listes (Blog, Podcasts, Pages), une pastille sur la ligne montre une publication programmée, en attente ou échouée.",
     "Il faut les mêmes réglages que pour publier : titre, image de présentation, audio d'un épisode, adresse d'une page.",
   ],
 }

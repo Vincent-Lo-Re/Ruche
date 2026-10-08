@@ -208,8 +208,8 @@ export async function reorderContents(
 }
 
 /**
- * Les contenus d'une sorte, hors corbeille : dans l'ordre de la liste pour Le Fil et Radio
- * Éclaircies, les derniers modifiés d'abord pour les pages.
+ * Les contenus d'une sorte, hors corbeille : dans l'ordre de la liste pour le Blog et les
+ * Podcasts, les derniers modifiés d'abord pour les pages.
  */
 export async function listContents(
   kind: ContentKind
@@ -221,7 +221,7 @@ export async function listContents(
     )
     .eq("kind", kind)
     .is("deleted_at", null)
-  // Le Fil, Radio Éclaircies : dans l'ordre de la liste ([D47], comme l'app) ; les
+  // Blog, Podcasts : dans l'ordre de la liste ([D47], comme l'app) ; les
   // pages : les dernières modifiées d'abord.
   const ordered = isOrderedKind(kind)
     ? query.order("list_position").order("id")

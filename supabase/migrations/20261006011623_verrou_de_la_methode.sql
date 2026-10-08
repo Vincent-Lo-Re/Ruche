@@ -194,7 +194,7 @@ begin
   target_method := private.method_of(target.id);
   if target_method is not null then
     -- Les prises de main d'une même méthode passent une par une.
-    perform pg_advisory_xact_lock(hashtext('declikora.method_lock:' || target_method::text));
+    perform pg_advisory_xact_lock(hashtext('ruche.method_lock:' || target_method::text));
     family := private.lock_scope(array[target.id]);
 
     if not coalesce(lock_take.force, false) and exists (
@@ -703,7 +703,7 @@ begin
     -- Une personne à la fois sur toute la méthode : on n'y ajoute rien pendant qu'une autre
     -- personne l'écrit. Les prises de main de la méthode attendent la fin de la création.
     perform pg_advisory_xact_lock(
-      hashtext('declikora.method_lock:' || private.method_of(parent.id)::text)
+      hashtext('ruche.method_lock:' || private.method_of(parent.id)::text)
     );
     writer := private.active_writer(array[parent.id], me);
     if writer is not null then
@@ -846,7 +846,7 @@ begin
   end if;
 
   -- Le garde de corbeille laisse passer ces changements du brouillon (§ 3.2, cas 3).
-  perform set_config('declikora.detach_all', 'on', true);
+  perform set_config('ruche.detach_all', 'on', true);
 
   for target in
     select c.id, c.draft from public.contents c where c.id = any (users) order by c.id
@@ -883,7 +883,7 @@ begin
     return query select target.id, new_rev;
   end loop;
 
-  perform set_config('declikora.detach_all', '', true);
+  perform set_config('ruche.detach_all', '', true);
 end;
 $$;
 

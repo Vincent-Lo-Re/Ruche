@@ -178,7 +178,7 @@ begin
         detail = 'Choisis l''adresse de la page avant de la publier.';
     end if;
     -- Deux pages publiées en même temps avec la même adresse : l'une attend l'autre.
-    perform pg_advisory_xact_lock(hashtext('declikora.page_slug:' || target.slug));
+    perform pg_advisory_xact_lock(hashtext('ruche.page_slug:' || target.slug));
     if exists (
       select 1
       from private.live l
@@ -502,7 +502,7 @@ begin
   end if;
 
   -- Un rangement à la fois par section ; une catégorie ajoutée ou supprimée entre-temps attend.
-  perform pg_advisory_xact_lock(hashtext('declikora.categories:' || categories_reorder.section));
+  perform pg_advisory_xact_lock(hashtext('ruche.categories:' || categories_reorder.section));
   perform 1 from public.categories c
   where c.section = categories_reorder.section
   order by c.id

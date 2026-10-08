@@ -230,7 +230,7 @@ stable
 security definer
 set search_path = ''
 as $$
-  select gen_random_uuid(), 'article', 'Bien respirer', true, false
+  select gen_random_uuid(), 'article', 'Premier article', true, false
   where target_media_id in (
     '60000000-0000-4000-8000-000000000008', '60000000-0000-4000-8000-000000000009')
 $$;

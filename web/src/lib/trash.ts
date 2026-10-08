@@ -4,7 +4,7 @@ import type { TrashItem } from "@/lib/media/api"
 import { isMediaKind } from "@/lib/media/constants"
 import { texts } from "@/texts"
 
-// Filtre par type, dans l'ordre du menu : Le Fil, Radio Éclaircies, Pages, Modèles de bloc,
+// Filtre par type, dans l'ordre du menu : Blog, Podcasts, Pages, Modèles de bloc,
 // Médiathèque.
 const trashFilterOrder = [
   "article",

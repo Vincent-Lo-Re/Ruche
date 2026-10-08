@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Declikora",
-    "slug": "declikora",
+    "name": "Ruche",
+    "slug": "ruche",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "declikora",
+    "scheme": "ruche",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon"

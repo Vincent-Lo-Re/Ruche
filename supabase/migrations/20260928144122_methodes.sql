@@ -1078,7 +1078,7 @@ begin
         detail = 'Choisis l''adresse de la page avant de la publier.';
     end if;
     -- Deux pages publiées en même temps avec la même adresse : l'une attend l'autre.
-    perform pg_advisory_xact_lock(hashtext('declikora.page_slug:' || target.slug));
+    perform pg_advisory_xact_lock(hashtext('ruche.page_slug:' || target.slug));
     if exists (
       select 1
       from private.live l

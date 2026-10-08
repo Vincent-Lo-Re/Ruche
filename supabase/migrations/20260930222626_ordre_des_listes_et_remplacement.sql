@@ -1,6 +1,6 @@
 -- Deux ajouts du 30/09/2026 (ADMIN § 3 et § 6) :
 --
--- 1. L'ordre des listes du Fil, de Radio Éclaircies et des Méthodes : chaque article, épisode ou
+-- 1. L'ordre des listes du Blog, des Podcasts et des Méthodes : chaque article, épisode ou
 --    méthode a une place dans sa section (list_position, la plus petite en tête). Un contenu neuf
 --    arrive en tête ; l'équipe range ensuite par glisser-déposer (contents_reorder). Un seul ordre
 --    pour tout, brouillons compris : l'app (app_feed) montre ceux qui sont en ligne, dans cet
@@ -97,7 +97,7 @@ begin
   end if;
 
   -- Un rangement à la fois par sorte.
-  perform pg_advisory_xact_lock(hashtext('declikora.list:' || contents_reorder.kind));
+  perform pg_advisory_xact_lock(hashtext('ruche.list:' || contents_reorder.kind));
   perform 1 from public.contents c
   where c.kind = contents_reorder.kind and c.deleted_at is null
   order by c.id
