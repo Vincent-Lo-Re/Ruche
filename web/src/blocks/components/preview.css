@@ -3,6 +3,29 @@
    de shadcn/ui ; tout ce qui est dans .blocks-phone imite l'app. */
 
 @import "../generated/tokens.css";
+/* Le thème de l'admin (--spacing(), rayons), sans rien en recopier ici. */
+@reference "../../index.css";
+
+/* Les tailles de texte de l'app, agrandies par « Grand texte » (--blocks-text-scale, posé sur le
+   téléphone) : une fois pour tout ce qui est dedans, et pour l'aperçu réduit (« Mes blocs »). */
+.blocks-device,
+.blocks-mini {
+  --blocks-size-body: calc(
+    var(--blocks-font-body-size) * var(--blocks-text-scale, 1)
+  );
+  --blocks-size-title: calc(
+    var(--blocks-font-title-size) * var(--blocks-text-scale, 1)
+  );
+  --blocks-size-h2: calc(
+    var(--blocks-font-h2-size) * var(--blocks-text-scale, 1)
+  );
+  --blocks-size-h3: calc(
+    var(--blocks-font-h3-size) * var(--blocks-text-scale, 1)
+  );
+  --blocks-size-caption: calc(
+    var(--blocks-font-caption-size) * var(--blocks-text-scale, 1)
+  );
+}
 
 /* L'écran de l'app, et l'aperçu réduit d'un bloc enregistré (« Mes blocs »). */
 .blocks-phone,
@@ -10,15 +33,10 @@
   background: var(--blocks-color-background);
   color: var(--blocks-color-text);
   font-family: var(--blocks-font-family), "Inter Variable", sans-serif;
-  font-size: calc(var(--blocks-font-body-size) * var(--blocks-text-scale, 1));
+  font-size: var(--blocks-size-body);
   line-height: var(--blocks-font-body-line-height);
   font-weight: var(--blocks-font-regular-weight);
   padding: var(--blocks-space-page-padding);
-}
-
-.blocks-phone {
-  width: var(--blocks-phone-width);
-  min-height: 640px;
 }
 
 .blocks-title {
@@ -30,7 +48,7 @@
   outline: none;
   background: transparent;
   color: inherit;
-  font-size: calc(var(--blocks-font-title-size) * var(--blocks-text-scale, 1));
+  font-size: var(--blocks-size-title);
   line-height: var(--blocks-font-title-line-height);
   font-weight: var(--blocks-font-heading-weight);
   margin-bottom: var(--blocks-space-block-gap);
@@ -45,8 +63,8 @@
    blocs). */
 .blocks-title:focus-visible {
   outline: 2px solid color-mix(in oklab, var(--ring) 70%, transparent);
-  outline-offset: 4px;
-  border-radius: 4px;
+  outline-offset: --spacing(1);
+  border-radius: var(--radius-sm);
 }
 
 .blocks-list,
@@ -63,7 +81,7 @@
 
 .blocks-box-list {
   gap: var(--blocks-space-box-gap);
-  min-height: 2.5rem;
+  min-height: --spacing(10);
 }
 
 /* Texte */
@@ -85,13 +103,13 @@
 }
 
 .blocks-text h2 {
-  font-size: calc(var(--blocks-font-h2-size) * var(--blocks-text-scale, 1));
+  font-size: var(--blocks-size-h2);
   line-height: var(--blocks-font-h2-line-height);
   font-weight: var(--blocks-font-heading-weight);
 }
 
 .blocks-text h3 {
-  font-size: calc(var(--blocks-font-h3-size) * var(--blocks-text-scale, 1));
+  font-size: var(--blocks-size-h3);
   line-height: var(--blocks-font-h3-line-height);
   font-weight: var(--blocks-font-heading-weight);
 }
@@ -162,8 +180,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: calc(var(--spacing) * 3);
-  padding: calc(var(--spacing) * 4);
+  gap: --spacing(3);
+  padding: --spacing(4);
   text-align: center;
   aspect-ratio: 4 / 3;
   background: var(--blocks-color-image-placeholder);
@@ -176,9 +194,7 @@
 .blocks-meta,
 .blocks-locked-text,
 .blocks-locked-action {
-  font-size: calc(
-    var(--blocks-font-caption-size) * var(--blocks-text-scale, 1)
-  );
+  font-size: var(--blocks-size-caption);
   line-height: var(--blocks-font-caption-line-height);
 }
 
@@ -216,14 +232,13 @@
 
 /* Présentation d'un article ou d'un épisode (étape 7) : image de présentation, audio,
    en tête du contenu comme dans l'app. */
-.blocks-cover {
+.blocks-cover,
+.blocks-audio {
   margin-bottom: var(--blocks-space-block-gap);
   cursor: pointer;
 }
 
 .blocks-audio {
-  margin-bottom: var(--blocks-space-block-gap);
-  cursor: pointer;
   /* Le lecteur (boutons et barre de l'admin) prend les couleurs du téléphone, dont le thème peut
      différer de celui de l'admin (éditeur des contenus). */
   --background: var(--blocks-color-background);
@@ -240,7 +255,7 @@
 /* « Mes blocs » (éditeur des contenus) : l'aperçu réduit d'un bloc enregistré, avec les mesures de
    l'app ramenées à un peu plus de la moitié, coupé au-delà d'une dizaine de lignes. */
 .blocks-mini {
-  max-height: 16rem;
+  max-height: --spacing(64);
   overflow: hidden;
   zoom: 0.55;
   pointer-events: none;
@@ -269,7 +284,7 @@
 
 /* Les mesures de chaque téléphone, une seule fois, sur la grille de l'aperçu (qui contient le
    téléphone, ses barres et les messages au-dessus de lui). La hauteur de l'écran et le cadre
-   sont repris dans lib/editor/preview.ts (deviceHeights) : les changer des deux côtés. */
+   donnent aussi la réduction de l'écran entier (deviceHeightOf de lib/editor/preview.ts). */
 .blocks-preview-layout[data-device="ios"] {
   --blocks-phone-width: 402px;
   --blocks-screen-height: 874px;
@@ -444,16 +459,17 @@
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  gap: 12px;
-  padding: 8px 16px;
-  border-bottom: 1px solid var(--blocks-color-box-border);
+  gap: --spacing(3);
+  padding: --spacing(2) --spacing(4);
+  border-bottom: var(--blocks-border-box-width) solid
+    var(--blocks-color-box-border);
   font-size: 15px;
   font-weight: 500;
 }
 
 .blocks-appbar svg {
-  width: 20px;
-  height: 20px;
+  width: --spacing(5);
+  height: --spacing(5);
 }
 
 .blocks-read .blocks-cover,
@@ -471,7 +487,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: --spacing(1.5);
   text-align: center;
 }
 
@@ -484,9 +500,9 @@
 }
 
 .blocks-locked-action {
-  margin-top: 6px;
+  margin-top: --spacing(1.5);
   border-radius: var(--blocks-radius-image);
-  padding: 6px 12px;
+  padding: --spacing(1.5) --spacing(3);
   background: var(--blocks-color-text);
   color: var(--blocks-color-background);
   font-weight: 600;

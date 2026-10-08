@@ -2,7 +2,6 @@
 /* Aperçu des blocs dans l'admin : mêmes mesures que l'app (blocks/blocks.tokens.json). Le
    thème suit celui de l'admin, sauf dans un aperçu qui choisit le sien (data-blocks-theme). */
 :root {
-  --blocks-phone-width: 390px;
   --blocks-font-family: Inter;
   --blocks-font-title-size: 28px;
   --blocks-font-title-line-height: 1.2;
@@ -25,7 +24,6 @@
   --blocks-space-list-item-gap: 6px;
   --blocks-space-box-padding: 16px;
   --blocks-space-box-gap: 12px;
-  --blocks-space-caption-gap: 8px;
   --blocks-radius-box: 12px;
   --blocks-radius-image: 8px;
   --blocks-border-box-width: 1px;

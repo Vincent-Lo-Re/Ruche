@@ -12,7 +12,7 @@
 //   - web/src/blocks/generated/validators.js (+ .d.ts) : les validateurs Ajv « standalone »,
 //     en ESM, AUTONOMES (les aides d'Ajv sont incluses par esbuild : ni ajv, ni require, ni
 //     new Function à l'exécution, donc utilisables tels quels par l'app sous Hermes) ;
-//   - web/src/blocks/generated/tokens.css et tokens.ts : variables CSS et constantes ;
+//   - web/src/blocks/generated/tokens.css : variables CSS ;
 //   - supabase/tests/aides/blocs-cas.inc : les cas partagés, pour les tests pgTAP ;
 //   - quand le schéma a changé : une NOUVELLE migration qui recrée private.blocks_schema(variant)
 //     et private.blocks_schema_hash(). Jamais de retouche d'une migration existante.
@@ -279,13 +279,6 @@ ${cssVars(color.dark, "--blocks-color").join("\n")}
 [data-blocks-theme="light"] {
 ${cssVars(color.light, "--blocks-color").join("\n")}
 }
-`
-)
-writeFileSync(
-  `${outDir}tokens.ts`,
-  `// ${BANNER}
-// Tailles en px (points dans l'app), hauteurs de ligne et graisses sans unité.
-export const blocksTokens = ${JSON.stringify(tokens, null, 2)} as const
 `
 )
 

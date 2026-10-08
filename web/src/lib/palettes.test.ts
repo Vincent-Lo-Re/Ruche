@@ -7,6 +7,7 @@ import {
   paletteCss,
   readPalette,
   savePalette,
+  swatchCss,
 } from "@/lib/palettes"
 
 afterEach(() => {
@@ -32,13 +33,14 @@ describe("paletteCss", () => {
     expect(css).not.toContain("--sidebar-active")
   })
 
-  it("un accent pose tous ses jetons, comme shadcn : principale, secondaire, graphiques, menu", () => {
+  it("un accent pose ses jetons, comme shadcn : principale, secondaire, graphiques", () => {
     const css = paletteCss({ base: "neutral", accent: "blue" })
     const root = css.slice(0, css.indexOf(".dark"))
     expect(root).toContain("--primary: oklch(0.488 0.243 264.376);")
     expect(root).toContain("--secondary: oklch(0.967 0.001 286.375);")
     expect(root).toContain("--chart-1: oklch(0.809 0.105 251.813);")
-    expect(root).toContain("--sidebar-primary: oklch(0.546 0.245 262.881);")
+    // sidebar-primary ne sert qu'aux couleurs des logos : pas de variable CSS.
+    expect(root).not.toContain("--sidebar-primary")
     // L'élément choisi du menu (toujours sombre) : la couleur des boutons de la page, en clair comme
     // en sombre.
     expect(css).toContain(
@@ -79,5 +81,21 @@ describe("le choix sur ce navigateur", () => {
     expect(styles[0].textContent).toContain(
       "--primary: oklch(0.525 0.223 3.958);"
     )
+  })
+
+  it("les pastilles de chaque carte sont tirées des palettes", () => {
+    const css = swatchCss()
+    // Stone et orange : le gris sombre de Stone, le bouton et les graphiques de l'accent orange.
+    expect(css).toContain(
+      '[data-preset="stone-orange"] [data-swatch="menu"] { background-color: oklch(0.216 0.006 56.043); }'
+    )
+    expect(css).toContain(
+      '[data-preset="stone-orange"] [data-swatch="ink"] { background-color: oklch(0.553 0.195 38.402); }'
+    )
+    // Neutre : les couleurs d'index.css.
+    expect(css).toContain(
+      '[data-preset="neutral-none"] [data-swatch="chart-5"] { background-color: oklch(0.269 0 0); }'
+    )
+    expect(css.split("\n")).toHaveLength(11 * 7)
   })
 })

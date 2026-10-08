@@ -46,6 +46,7 @@ import {
 import {
   chosenValue,
   devices,
+  deviceHeightOf,
   fullScreenScale,
   previewFits,
   showsFullScreen,
@@ -91,21 +92,21 @@ export function FeedPreview({
 }) {
   // Écran entier (Lecture) : la hauteur disponible pour le téléphone, relue quand la fenêtre change.
   const frame = useRef<HTMLDivElement>(null)
-  const [available, setAvailable] = useState<number | null>(null)
+  const [measured, setMeasured] = useState<number | null>(null)
   const full = showsFullScreen(preview)
   useEffect(() => {
     const element = frame.current
     if (!full || !element) return
+    // La taille du téléphone vient de preview.css (variables de l'appareil choisi).
     const observer = new ResizeObserver(() =>
-      setAvailable(element.clientHeight)
+      setMeasured(
+        fullScreenScale(deviceHeightOf(element), element.clientHeight)
+      )
     )
     observer.observe(element)
     return () => observer.disconnect()
-  }, [full])
-  const scale =
-    full && available !== null
-      ? fullScreenScale(preview.device, available)
-      : null
+  }, [full, preview.device])
+  const scale = full ? measured : null
   return (
     // Une grille : les messages au-dessus du téléphone, puis la barre de mise en forme, le
     // téléphone et la barre de l'aperçu, ces deux barres alignées sur le début du contenu de

@@ -16,6 +16,13 @@ import { texts } from "@/texts"
 // audio et sa durée, [D45] (ce qui manque pour publier) et [D46] (transcription conseillée). La
 // base, Realtime et Storage sont simulés.
 
+// Le CSS n'est pas chargé dans les tests : la hauteur du téléphone (preview.css) est celle de
+// l'iPhone, 874 + 2 × 10.
+vi.mock("@/lib/editor/preview", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/editor/preview")>()),
+  deviceHeightOf: () => 894,
+}))
+
 vi.mock("@/lib/contents/api", async (importOriginal) => {
   const actual = await importOriginal<typeof api>()
   return {
