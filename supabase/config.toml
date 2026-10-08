@@ -110,8 +110,8 @@ port = 54324
 # pop3_port = 54326
 # Expéditeur des e-mails en local (Mailpit). En ligne, il se règle avec le SMTP de Brevo dans le
 # tableau de bord Supabase.
-admin_email = "ne-pas-repondre@declikora.app"
-sender_name = "Declikora"
+admin_email = "ne-pas-repondre@example.com"
+sender_name = "Ruche"
 
 [storage]
 enabled = true
@@ -157,7 +157,8 @@ max_indexes = 5
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
-# Local : l'admin (serveur Vite). La production est réglée dans [remotes.production], plus bas.
+# Local : l'admin (serveur Vite). En ligne, chaque installation donne la sienne
+# (SUPABASE_AUTH_SITE_URL de installation/supabase.env, voir la fin de ce fichier).
 site_url = "http://127.0.0.1:5173"
 # The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
 # external_url = ""
@@ -176,7 +177,7 @@ enable_refresh_token_rotation = true
 # Requires enable_refresh_token_rotation = true.
 refresh_token_reuse_interval = 10
 # Allow/disallow new user signups to your project.
-# Declikora : sur invitation seulement. Les invitations (clé secrète) restent possibles.
+# Ruche : sur invitation seulement. Les invitations (clé secrète) restent possibles.
 # En production, pousser ce réglage (`supabase config push`) et vérifier dans le tableau de bord
 # que « Allow new users to sign up » est désactivé AVANT le premier `supabase db push` (voir la
 # migration de l'équipe). Un projet neuf a les inscriptions ouvertes par défaut.
@@ -239,7 +240,7 @@ enable_confirmations = false
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = false
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
-# 1 s en local pour les tests ; la production a sa propre valeur dans [remotes.production].
+# 1 s en local pour les tests ; chaque installation a sa propre valeur en ligne.
 max_frequency = "1s"
 # Number of characters used in the email OTP.
 otp_length = 6
@@ -249,8 +250,8 @@ otp_length = 6
 otp_expiry = 600
 
 # Use a production-ready SMTP server
-# Declikora : NE PAS déclarer cette section, même avec enabled = false. Le SMTP de Brevo se règle à
-# la main dans le tableau de bord ; une section déclarée ici l'écraserait (ou le désactiverait) au
+# Ruche : NE PAS déclarer cette section, même avec enabled = false. Le SMTP de chaque installation
+# se règle à la main dans le tableau de bord ; une section déclarée ici l'écraserait (ou le désactiverait) au
 # prochain `supabase config push`.
 # [auth.email.smtp]
 # enabled = true
@@ -330,7 +331,7 @@ auth_token = "env(SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN)"
 max_enrolled_factors = 10
 
 # Control MFA via App Authenticator (TOTP)
-# Declikora : double vérification obligatoire pour toute l'équipe (imposée par la base, aal2).
+# Ruche : double vérification obligatoire pour toute l'équipe (imposée par la base, aal2).
 [auth.mfa.totp]
 enroll_enabled = true
 verify_enabled = true
@@ -462,37 +463,9 @@ enabled = true
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":180,\"commaStyle\":\"trailing\"}"
 
 # ---------------------------------------------------------------------------------------------
-# Production : projet Supabase « Declikora » (kajocxepxgaquculhrky).
-# Ces valeurs remplacent celles du dessus lors d'un `supabase config push` vers ce projet ; elles
-# sont ignorées en local. Les listes sont remplacées, pas complétées. Tout ce qui n'est pas repris
-# ici est poussé tel quel : relire `npx supabase config diff` avant chaque push.
+# En ligne : ce fichier ne garde que les valeurs locales. Chaque installation de Ruche (son projet
+# Supabase, l'adresse de son admin…) a ses réglages dans un fichier de variables, comme
+# installation/supabase.env pour la démo de Ruche : chaque SUPABASE_<SECTION>_<CLÉ> y remplace la
+# valeur d'ici au moment de `supabase config push` (procédure : installation/README.md). Relire
+# `npx supabase config diff` avant chaque push.
 # ---------------------------------------------------------------------------------------------
-[remotes.production]
-project_id = "kajocxepxgaquculhrky"
-
-[remotes.production.auth]
-# L'admin en ligne (étape 8) : les liens des e-mails (invitation) y mènent.
-site_url = "https://admin.declikora.app"
-# L'admin en ligne, sa première adresse (qui redirige vers admin.declikora.app) et les adresses de
-# test Vercel.
-additional_redirect_urls = [
-  "https://admin.declikora.app/**",
-  "https://declikora-admin.vercel.app/**",
-  "https://declikora-admin-*-vincent-lo-re.vercel.app/**",
-]
-
-[remotes.production.auth.email]
-# Délai minimal entre deux e-mails pour une même personne.
-max_frequency = "60s"
-# En ligne, on garde la confirmation des adresses (réglage d'origine du projet).
-enable_confirmations = true
-
-# Réglages d'origine du projet en ligne, gardés tels quels : sans ces lignes, `config push`
-# les remplacerait par les valeurs locales.
-[remotes.production.db.pooler]
-default_pool_size = 15
-max_client_conn = 200
-
-[remotes.production.storage.analytics]
-enabled = true
-max_namespaces = 10
