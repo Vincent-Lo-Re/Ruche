@@ -375,7 +375,7 @@ Tant qu'une ancienne app ne connaît pas le bloc, elle affiche l'encart « Mets 
 - **Garde de corbeille** sur `contents` (`before update`) : un contenu dans la corbeille ne change pas, **sauf** dans trois cas, vérifiés colonne par colonne :
   1. `restore` (qui vide `deleted_at`) ;
   2. une colonne d'auteur (`created_by`, `draft_saved_by`, `deleted_by`, `scheduled_by`) qui passe à `null`, toutes les autres colonnes restant identiques : c'est l'effet de `on delete set null` quand on retire un membre de l'équipe ;
-  3. `template_detach_all` (§ 3.5), qui ne change que `draft`, `draft_rev`, `draft_template_ids`, `draft_saved_at` et `draft_saved_by`. La fonction le signale par un réglage local à la transaction (`set_config('declikora.detach_all', 'on', true)`) ; aucune écriture directe n'étant permise sur `contents`, seul le code de la base peut le poser.
+  3. `template_detach_all` (§ 3.5), qui ne change que `draft`, `draft_rev`, `draft_template_ids`, `draft_saved_at` et `draft_saved_by`. La fonction le signale par un réglage local à la transaction (`set_config('ruche.detach_all', 'on', true)`) ; aucune écriture directe n'étant permise sur `contents`, seul le code de la base peut le poser.
 - **`versions`** : immuables (`before update`, `before truncate`) ; plan d'une méthode cohérent (§ 1.8).
 - **`media`** : `before delete` refuse si `media_uses` n'est pas vide (seconde ligne de défense).
 - **`private.live`** (vue interne, jamais exposée) : toutes les versions **en ligne**, avec `content_id`, `kind`, `version_id`, `method_id` et le **niveau réel** (`level_id`, `level_rank`, `null` = gratuit) :

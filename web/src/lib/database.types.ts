@@ -91,6 +91,7 @@ export type Database = {
           monogram_dark: string | null
           monogram_light: string | null
           name: string | null
+          website_url: string | null
         }
         ComputedFields: never
         Insert: {
@@ -105,6 +106,7 @@ export type Database = {
           monogram_dark?: string | null
           monogram_light?: string | null
           name?: string | null
+          website_url?: string | null
         }
         Update: {
           contact_email?: string | null
@@ -118,6 +120,7 @@ export type Database = {
           monogram_dark?: string | null
           monogram_light?: string | null
           name?: string | null
+          website_url?: string | null
         }
         Relationships: []
       }
@@ -693,6 +696,7 @@ export type Database = {
           monogram_dark: string
           monogram_light: string
           name: string
+          website_url: string
         }[]
       }
       admin_brand_variants: {

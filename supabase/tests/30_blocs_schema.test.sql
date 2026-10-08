@@ -9,7 +9,7 @@ select plan(23 + (select count(*)::int from blocks_cases));
 
 -- Brouillon d'essai : un bloc Texte avec « depth » niveaux de listes à puces imbriquées ; le
 -- lien du niveau le plus profond vise « deepest_href ».
-create function pg_temp.nested_lists(depth integer, deepest_href text default 'https://declikora.app')
+create function pg_temp.nested_lists(depth integer, deepest_href text default 'https://example.com')
 returns jsonb
 language plpgsql
 as $$
@@ -103,11 +103,11 @@ select is(
   'variante template : JSON Schema draft-07'
 );
 select is(
-  private.blocks_schema('draft') ->> '$id', 'https://declikora.app/blocks/draft.schema.json',
+  private.blocks_schema('draft') ->> '$id', 'https://github.com/Vincent-Lo-Re/Ruche/blob/main/blocks/generated/draft.schema.json',
   'variante draft : identifiant'
 );
 select is(
-  private.blocks_schema('published') ->> '$id', 'https://declikora.app/blocks/published.schema.json',
+  private.blocks_schema('published') ->> '$id', 'https://github.com/Vincent-Lo-Re/Ruche/blob/main/blocks/generated/published.schema.json',
   'variante published (étape 5) : identifiant'
 );
 select ok(private.blocks_schema('inconnue') is null, 'variante inconnue : null');

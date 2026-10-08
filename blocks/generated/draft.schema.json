@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://declikora.app/blocks/draft.schema.json",
+  "$id": "https://github.com/Vincent-Lo-Re/Ruche/blob/main/blocks/generated/draft.schema.json",
   "$comment": "Généré par web/scripts/blocks-generate.mjs (npm run blocks:generate) depuis blocks/. Ne pas modifier. Variante « draft ». Variante « draft » : le brouillon d'un contenu (article, épisode, méthode, chapitre, leçon, page).",
   "type": "object",
   "additionalProperties": false,

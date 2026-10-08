@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://declikora.app/blocks/template.schema.json",
+  "$id": "https://github.com/Vincent-Lo-Re/Ruche/blob/main/blocks/generated/template.schema.json",
   "$comment": "Généré par web/scripts/blocks-generate.mjs (npm run blocks:generate) depuis blocks/. Ne pas modifier. Variante « template ». Variante « template » : le brouillon d'un modèle de blocs (pas de bloc lié).",
   "type": "object",
   "additionalProperties": false,
