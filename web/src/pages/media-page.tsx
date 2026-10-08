@@ -81,7 +81,7 @@ import { texts } from "@/texts"
 
 type View = "grid" | "list"
 
-const viewStorageKey = "declikora:mediatheque:affichage"
+const viewStorageKey = "ruche:mediatheque:affichage"
 
 const viewChoices: { value: View; Icon: typeof LayoutGrid }[] = [
   { value: "grid", Icon: LayoutGrid },

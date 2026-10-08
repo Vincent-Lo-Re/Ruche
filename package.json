@@ -1,5 +1,5 @@
 {
-  "name": "declikora",
+  "name": "ruche",
   "private": true,
   "scripts": {
     "local": "sh scripts/local.sh start",

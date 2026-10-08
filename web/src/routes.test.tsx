@@ -37,18 +37,14 @@ describe("menu", () => {
       "Corbeille",
     ])
 
-    // Le compte, l'équipe et les paramètres sont dans le header, après « Site web ».
+    // Le compte, l'équipe et les paramètres sont dans le header (sans site web réglé, pas de
+    // lien « Site web » : app-header.test.tsx).
     const header = screen.getByRole("navigation", { name: texts.header.label })
     expect(
       within(header)
         .getAllByRole("link")
         .map((link) => link.textContent)
-    ).toEqual([
-      `${texts.header.website} ${texts.header.newTab}`,
-      "Mon compte",
-      "Équipe",
-      "Paramètres",
-    ])
+    ).toEqual(["Mon compte", "Équipe", "Paramètres"])
   })
 
   it("mène aux adresses en français", async () => {
@@ -91,7 +87,7 @@ describe("thème", () => {
     fireEvent.click(screen.getByRole("button", { name: texts.theme.dark }))
 
     expect(document.documentElement).toHaveClass("dark")
-    expect(localStorage.getItem("declikora-theme")).toBe("dark")
+    expect(localStorage.getItem("ruche-theme")).toBe("dark")
   })
 })
 
@@ -141,13 +137,13 @@ describe("rôles", () => {
   it("cache Équipe et Paramètres dans le menu d'un éditeur", async () => {
     await renderApp("/", fakeAuth({ role: "editor" }))
 
-    // Le header garde « Site web » et Mon compte.
+    // Le header garde Mon compte.
     const header = screen.getByRole("navigation", { name: texts.header.label })
     expect(
       within(header)
         .getAllByRole("link")
         .map((link) => link.textContent)
-    ).toEqual([`${texts.header.website} ${texts.header.newTab}`, "Mon compte"])
+    ).toEqual(["Mon compte"])
     expect(screen.queryByRole("link", { name: "Équipe" })).toBeNull()
   })
 

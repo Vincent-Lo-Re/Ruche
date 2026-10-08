@@ -11,22 +11,22 @@ async function languageWith(stored: Record<string, string>) {
 
 afterEach(() => {
   localStorage.clear()
-  localStorage.setItem("declikora-langue", "fr")
+  localStorage.setItem("ruche-langue", "fr")
   vi.resetModules()
 })
 
 describe("langue de l'admin", () => {
   it("celle du membre passe avant celle de toute l'admin, l'anglais sinon", async () => {
     expect(await languageWith({})).toBe("en")
-    expect(await languageWith({ "declikora-langue-admin": "fr" })).toBe("fr")
+    expect(await languageWith({ "ruche-langue-admin": "fr" })).toBe("fr")
     expect(
       await languageWith({
-        "declikora-langue-admin": "fr",
-        "declikora-langue": "en",
+        "ruche-langue-admin": "fr",
+        "ruche-langue": "en",
       })
     ).toBe("en")
     // Une valeur abîmée ne compte pas.
-    expect(await languageWith({ "declikora-langue": "de" })).toBe("en")
+    expect(await languageWith({ "ruche-langue": "de" })).toBe("en")
   })
 
   it("lit la langue rangée sur le compte du membre", async () => {

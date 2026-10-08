@@ -11,7 +11,7 @@ import {
 
 afterEach(() => {
   localStorage.clear()
-  document.getElementById("declikora-couleurs")?.remove()
+  document.getElementById("ruche-couleurs")?.remove()
 })
 
 describe("paletteCss", () => {
@@ -74,7 +74,7 @@ describe("le choix sur ce navigateur", () => {
   it("posé sur la page dans une seule balise style, remplacée à chaque choix", () => {
     applyPalette({ base: "zinc", accent: "none" })
     applyPalette({ base: "stone", accent: "pink" })
-    const styles = document.querySelectorAll("#declikora-couleurs")
+    const styles = document.querySelectorAll("#ruche-couleurs")
     expect(styles).toHaveLength(1)
     expect(styles[0].textContent).toContain(
       "--primary: oklch(0.525 0.223 3.958);"

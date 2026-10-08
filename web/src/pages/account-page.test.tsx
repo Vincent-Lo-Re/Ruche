@@ -8,7 +8,7 @@ import { texts } from "@/texts"
 afterEach(() => {
   vi.restoreAllMocks()
   localStorage.clear()
-  document.getElementById("declikora-couleurs")?.remove()
+  document.getElementById("ruche-couleurs")?.remove()
 })
 
 describe("Mon compte", () => {
@@ -92,12 +92,12 @@ describe("Mon compte", () => {
     fireEvent.click(zincBlue)
     expect(zincBlue).toHaveAttribute("aria-pressed", "true")
     expect(buttons[0]).toHaveAttribute("aria-pressed", "false")
-    const style = document.getElementById("declikora-couleurs")
+    const style = document.getElementById("ruche-couleurs")
     expect(style?.textContent).toContain(
       "--primary: oklch(0.488 0.243 264.376);"
     )
     expect(style?.textContent).toContain("--muted: oklch(0.967 0.001 286.375);")
-    expect(JSON.parse(localStorage.getItem("declikora-couleurs")!)).toEqual({
+    expect(JSON.parse(localStorage.getItem("ruche-couleurs")!)).toEqual({
       base: "zinc",
       accent: "blue",
     })
