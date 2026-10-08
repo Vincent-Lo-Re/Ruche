@@ -13,53 +13,31 @@ import {
 import { supabase } from "@/lib/supabase"
 import type { ContentUse } from "@/lib/uses-export"
 
-/** style : mise en forme réutilisable ; shared : bloc identique partout ; starter : point de départ. */
-export type TemplateSort = "style" | "shared" | "starter"
-
-/** La section d'un point de départ : la sorte de contenu qu'il sert à créer ([D42]). */
-export type TemplateFor =
-  "article" | "episode" | "chapter" | "lesson" | "exercise" | "page"
-
-/** Dans l'ordre de la page Modèles et du choix de la sorte. */
-export const templateSorts: readonly TemplateSort[] = [
-  "style",
-  "shared",
-  "starter",
-]
+/**
+ * style : mise en forme réutilisable ; shared : bloc identique partout ; starter : point de départ.
+ * Dans l'ordre de la page Modèles et du choix de la sorte.
+ */
+export const templateSorts = ["style", "shared", "starter"] as const
+export type TemplateSort = (typeof templateSorts)[number]
 
 /**
- * Dans l'ordre du menu (Blog, Podcasts, Méthodes, Pages). Les points de départ d'un chapitre,
- * d'une leçon ou d'un exercice restent : ils serviront aux méthodes refaites (ADMIN § 1).
+ * La section d'un point de départ : la sorte de contenu qu'il sert à créer ([D42]), dans l'ordre
+ * du menu (Blog, Podcasts, Pages).
  */
-const templateSections: readonly TemplateFor[] = [
-  "article",
-  "episode",
-  "chapter",
-  "lesson",
-  "exercise",
-  "page",
-]
-
-/**
- * Les sections proposées pour un nouveau point de départ : celles qui ont un éditeur aujourd'hui.
- * Les méthodes refaites ajouteront le chapitre, la leçon et l'exercice ; d'ici là, ils ne
- * serviraient à rien (un point de départ déjà créé reste lisible).
- */
-export const offeredTemplateSections: readonly TemplateFor[] = [
-  "article",
-  "episode",
-  "page",
-]
+export const templateSections = ["article", "episode", "page"] as const
+export type TemplateFor = (typeof templateSections)[number]
 
 export function isTemplateSort(value: unknown): value is TemplateSort {
   return (
-    typeof value === "string" && templateSorts.includes(value as TemplateSort)
+    typeof value === "string" &&
+    (templateSorts as readonly string[]).includes(value)
   )
 }
 
 export function isTemplateFor(value: unknown): value is TemplateFor {
   return (
-    typeof value === "string" && templateSections.includes(value as TemplateFor)
+    typeof value === "string" &&
+    (templateSections as readonly string[]).includes(value)
   )
 }
 
@@ -69,7 +47,7 @@ export const templateKeys = {
   list: ["contents", "templates", "list"] as const,
   uses: ["contents", "templates", "uses"] as const,
   usesOf: (id: string) => ["contents", "templates", "uses", id] as const,
-  // Les brouillons qui citent un modèle, quel qu'il soit (« Mes blocs » de l'éditeur du Fil).
+  // Les brouillons qui citent un modèle, quel qu'il soit (« Mes blocs » de l'éditeur des contenus).
   allUses: ["contents", "templates", "uses", "all"] as const,
   // La colonne « État » des Modèles de bloc : le nombre d'endroits de chaque modèle, et la liste
   // des endroits d'un modèle (fenêtre des utilisations).
@@ -188,7 +166,7 @@ export async function getTemplateUses(
           ? [
               {
                 content_id: content.id,
-                kind: content.kind,
+                kind: content.kind as ContentKind,
                 title: content.title ?? "",
                 in_draft: false,
                 in_app: false,
@@ -225,7 +203,7 @@ export async function getTemplateUses(
     const known = byId.get(row.id)
     byId.set(row.id, {
       content_id: row.id,
-      kind: row.kind,
+      kind: row.kind as ContentKind,
       title: row.title ?? "",
       in_draft: known?.in_draft ?? false,
       in_app: true,

@@ -12,6 +12,7 @@ import {
   type LucideIcon,
 } from "lucide-react"
 
+import type { ContentKind } from "@/lib/contents/api"
 import { texts } from "@/texts"
 
 export type SectionKey = keyof typeof texts.sections
@@ -75,25 +76,24 @@ export function editorPath(section: SectionKey, contentId: string): string {
 }
 
 // Section de l'éditeur de chaque sorte de contenu.
-const editorSections: Partial<Record<string, SectionKey>> = {
+const editorSections: Record<ContentKind, SectionKey> = {
   article: "blog",
   episode: "podcasts",
   page: "pages",
   template: "templates",
 }
 
-/** Section d'un contenu d'après sa sorte, ou null. */
-export function contentSection(kind: string): SectionKey | null {
-  return editorSections[kind] ?? null
+/** Section d'un contenu d'après sa sorte. */
+export function contentSection(kind: ContentKind): SectionKey {
+  return editorSections[kind]
 }
 
-/** Adresse de l'éditeur d'un contenu d'après sa sorte, ou null si elle n'a pas d'éditeur. */
+/** Adresse de l'éditeur d'un contenu d'après sa sorte. */
 export function contentEditorPath(
-  kind: string,
+  kind: ContentKind,
   contentId: string
-): string | null {
-  const section = contentSection(kind)
-  return section ? editorPath(section, contentId) : null
+): string {
+  return editorPath(contentSection(kind), contentId)
 }
 
 /** La fiche d'un fichier dans la Médiathèque : « /media?file=<id> ». */

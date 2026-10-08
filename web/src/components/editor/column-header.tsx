@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/tooltip"
 
 /**
- * Éditeur du Fil : l'en-tête d'une colonne ou d'une glissière (Plan, Blocs, réglages du bloc,
+ * Éditeur des contenus : l'en-tête d'une colonne ou d'une glissière (Plan, Blocs, réglages du bloc,
  * Article), toujours de la même hauteur : le retour s'il y a lieu (sur toute sa hauteur, à
  * gauche), son icône, son titre (coupé par « … », en entier dans l'infobulle), puis ses actions et
  * « Fermer » (×) s'il y a lieu.

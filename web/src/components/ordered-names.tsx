@@ -1,5 +1,3 @@
-import { useSortable } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   useMutation,
@@ -8,13 +6,13 @@ import {
   type UseQueryResult,
 } from "@tanstack/react-query"
 import { cn } from "cn"
-import { Ellipsis, GripVertical, Pencil, Plus, Trash2 } from "lucide-react"
+import { Ellipsis, Pencil, Plus, Trash2 } from "lucide-react"
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import type { z } from "zod"
 
-import { SortableList } from "@/components/list-sorting"
+import { DragHandle, SortableList } from "@/components/list-sorting"
 import { LoadState } from "@/components/load-state"
 import { useAccessCheck } from "@/components/team/use-access-check"
 import {
@@ -47,13 +45,14 @@ import { Input } from "@/components/ui/input"
 import { Item, ItemContent, ItemTitle } from "@/components/ui/item"
 import { Empty, EmptyDescription } from "@/components/ui/empty"
 import { Spinner } from "@/components/ui/spinner"
+import { useSortableItem } from "@/hooks/use-sortable-item"
 import { focusSoon } from "@/lib/focus"
 import { MAX_NAME_LENGTH } from "@/lib/schemas"
 import { texts } from "@/texts"
 
 type Named = { id: string; name: string }
 
-/** Les textes d'une liste de noms rangée (Catégories, Formules), tirés de texts.ts. */
+/** Les textes d'une liste de noms rangée (Formules), tirés de texts.ts. */
 type OrderedNamesLabels = {
   listLabel: string
   empty: string
@@ -95,7 +94,7 @@ type OrderedNamesProps<T extends Named> = {
   // La clé de la liste : l'ordre change tout de suite à l'écran, avant la réponse de la base.
   queryKey: QueryKey
   schema: z.ZodType<{ name: string }, { name: string }>
-  // Préfixe des identifiants des champs (« categorie », « formule »).
+  // Préfixe des identifiants des champs (« formule »).
   inputId: string
   create: (name: string) => Promise<T>
   rename: (id: string, name: string) => Promise<unknown>
@@ -103,13 +102,8 @@ type OrderedNamesProps<T extends Named> = {
   reorder: (ids: string[]) => Promise<unknown>
   // Après chaque changement : relire la liste (et ce qui en dépend).
   refresh: () => Promise<unknown>
-  // Ce qui s'affiche avant ou après le nom de chaque ligne (rang, nombre de brouillons…).
+  // Ce qui s'affiche avant le nom de chaque ligne (son rang).
   before?: (item: T, position: number) => ReactNode
-  after?: (item: T) => ReactNode
-  // Ce que la confirmation de suppression ajoute, et ce qui la prépare (relire un compte).
-  confirmDetail?: (item: T) => ReactNode
-  onAskRemove?: (item: T) => void
-  confirmBusy?: boolean
 }
 
 /** Le bouton « … » d'une ligne (là où le focus revient après un geste sur la ligne). */
@@ -121,7 +115,7 @@ function menuButtonOf(id: string): HTMLElement | null {
 
 /**
  * Une liste de noms qu'on range (glisser-déposer à la souris ou au clavier), renomme, complète
- * et dont on supprime des éléments, avec confirmation. Sert aux Catégories et aux Formules : la
+ * et dont on supprime des éléments, avec confirmation. Sert aux Formules : la
  * liste au centre, l'ajout dans une colonne à droite (en dessous sur un écran étroit).
  */
 export function OrderedNames<T extends Named>({
@@ -137,10 +131,6 @@ export function OrderedNames<T extends Named>({
   reorder: reorderItems,
   refresh,
   before,
-  after,
-  confirmDetail,
-  onAskRemove,
-  confirmBusy = false,
 }: OrderedNamesProps<T>) {
   const queryClient = useQueryClient()
   const checkAccess = useAccessCheck()
@@ -230,10 +220,8 @@ export function OrderedNames<T extends Named>({
               rename={rename}
               refresh={refresh}
               before={before}
-              after={after}
               onReorder={(ids) => reorder.mutate(ids)}
               onRemove={(item) => {
-                onAskRemove?.(item)
                 focusAfterRemove.current = undefined
                 setToRemove(item)
               }}
@@ -274,7 +262,6 @@ export function OrderedNames<T extends Named>({
               <AlertDialogTitle>{labels.confirmRemove.title}</AlertDialogTitle>
               <AlertDialogDescription>
                 {labels.confirmRemove.description(toRemove.name)}
-                {confirmDetail && <> {confirmDetail(toRemove)}</>}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -283,7 +270,7 @@ export function OrderedNames<T extends Named>({
               </AlertDialogCancel>
               <Button
                 variant="destructive"
-                disabled={remove.isPending || confirmBusy}
+                disabled={remove.isPending}
                 onClick={() => remove.mutate(toRemove)}
               >
                 {remove.isPending && <Spinner />}
@@ -299,7 +286,7 @@ export function OrderedNames<T extends Named>({
 
 type RowOptions<T extends Named> = Pick<
   OrderedNamesProps<T>,
-  "labels" | "schema" | "inputId" | "rename" | "refresh" | "before" | "after"
+  "labels" | "schema" | "inputId" | "rename" | "refresh" | "before"
 >
 
 function SortableNames<T extends Named>({
@@ -352,7 +339,6 @@ function SortableName<T extends Named>({
   onRename,
   onRemove,
   before,
-  after,
   ...options
 }: RowOptions<T> & {
   item: T
@@ -363,25 +349,17 @@ function SortableName<T extends Named>({
   onRemove: () => void
 }) {
   const { labels } = options
-  const {
-    setNodeRef,
-    setActivatorNodeRef,
-    listeners,
-    attributes,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { setNodeRef, isDragging, style, handle } = useSortableItem({
     id: item.id,
     disabled: disabled || renaming,
-    attributes: { roleDescription: labels.dnd.roleDescription },
+    roleDescription: labels.dnd.roleDescription,
   })
 
   return (
     <li
       ref={setNodeRef}
       // eslint-disable-next-line no-restricted-syntax -- position pendant un glisser-déposer (dnd-kit)
-      style={{ transform: CSS.Translate.toString(transform), transition }}
+      style={style}
       className={cn(isDragging && "relative z-10")}
       data-item={item.name}
       data-item-id={item.id}
@@ -392,17 +370,7 @@ function SortableName<T extends Named>({
         size="xs"
         className={cn("bg-card", isDragging && "shadow-md")}
       >
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          ref={setActivatorNodeRef}
-          {...attributes}
-          {...listeners}
-          aria-label={labels.handle(item.name)}
-          className="cursor-grab text-muted-foreground disabled:cursor-default active:cursor-grabbing"
-        >
-          <GripVertical aria-hidden />
-        </Button>
+        <DragHandle handle={handle} label={labels.handle(item.name)} />
         {before?.(item, position)}
         {renaming ? (
           <RenameForm {...options} item={item} onDone={() => onRename(false)} />
@@ -413,7 +381,6 @@ function SortableName<T extends Named>({
                 {item.name}
               </ItemTitle>
             </ItemContent>
-            {after?.(item)}
             <DropdownMenu>
               <DropdownMenuTrigger
                 disabled={disabled}

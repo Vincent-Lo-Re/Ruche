@@ -1,5 +1,5 @@
 /**
- * Le plan de l'éditeur du Fil (docs/ADMINISTRATION.md, § 4, « Les finitions ») : la ligne d'un
+ * Le plan de l'éditeur des contenus (docs/ADMINISTRATION.md, § 4, « Les finitions ») : la ligne d'un
  * texte, points à vérifier, copie d'un bloc. Sans React.
  */
 

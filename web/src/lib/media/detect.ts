@@ -2,8 +2,6 @@
 // et le type annoncé par le système (qui varie : « audio/x-m4a » depuis macOS, « audio/mp3 »…).
 // Le type envoyé à Storage et à la base est TOUJOURS un type normalisé (§ 1.9, [D33]).
 
-import type { MediaMime } from "@/lib/media/constants"
-
 type DetectedFormat =
   | "jpeg"
   | "png"
@@ -111,21 +109,6 @@ export function detectFormat(
     return "other-image"
   }
   if (declared.startsWith("video/")) return "video"
-  return null
-}
-
-/**
- * Type audio normalisé : « audio/mpeg » pour un MP3, « audio/mp4 » pour un M4A, quel que soit
- * le type annoncé (audio/x-m4a, audio/m4a, audio/mp3…). Null si ce n'est pas un audio accepté.
- */
-export function normalizeAudioType(
-  head: Uint8Array,
-  name: string,
-  type: string
-): Extract<MediaMime, "audio/mpeg" | "audio/mp4"> | null {
-  const format = detectFormat(head, name, type)
-  if (format === "mp3") return "audio/mpeg"
-  if (format === "m4a") return "audio/mp4"
   return null
 }
 

@@ -122,16 +122,8 @@ export const contentKeys = {
 // Lecture
 // ---------------------------------------------------------------------------------------------
 
-// Les sortes de contenu de l'admin. La base en connaît d'autres (les méthodes, en cours de
-// refonte) : l'admin ne les montre pas (ADMIN § 1, « Méthodes »).
-const CONTENT_KINDS = ["article", "episode", "page", "template"] as const
-
-export type ContentKind = (typeof CONTENT_KINDS)[number]
-
-/** Vrai pour une sorte que l'admin connaît. */
-export function isContentKind(kind: string): kind is ContentKind {
-  return (CONTENT_KINDS as readonly string[]).includes(kind)
-}
+// Les sortes de contenu, les mêmes que la base (contrainte de contents.kind).
+export type ContentKind = "article" | "episode" | "page" | "template"
 
 export type ContentListItem = {
   id: string

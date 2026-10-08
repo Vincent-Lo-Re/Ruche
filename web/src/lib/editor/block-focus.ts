@@ -67,7 +67,7 @@ function afterScroll(scroller: HTMLElement | null, then: () => void) {
 
 /**
  * Met le curseur dans un bloc qui vient d'apparaître (l'éditeur Tiptap se crée juste après).
- * `top` : le bloc monte en haut de l'écran du téléphone (choisi dans le plan du Fil) ; sinon,
+ * `top` : le bloc monte en haut de l'écran du téléphone (choisi dans le plan) ; sinon,
  * l'écran ne défile que s'il le faut.
  */
 export function focusBlockSoon(id: string, attempts = 20, top = false) {

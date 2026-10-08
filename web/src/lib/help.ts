@@ -3,6 +3,7 @@
  * recherche, et la recherche elle-même, sans React.
  */
 import type { HelpFiche, HelpTheme } from "@/help/types"
+import { normalizeSearch } from "@/lib/contents/list-filters"
 
 /** ⌘ K sur Mac, Ctrl + K ailleurs : ouvre (ou referme) la recherche de l'aide. */
 export function isHelpShortcut(
@@ -16,14 +17,6 @@ export function isHelpShortcut(
   )
 }
 
-/** En minuscules, sans accents : « Médiathèque » se trouve en tapant « mediatheque ». */
-function plain(text: string): string {
-  return text
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .toLowerCase()
-}
-
 /**
  * La note d'une fiche pour ce qui est tapé (le filtre de `Command`) : 1 si chaque mot tapé se
  * trouve dans son titre, son résumé ou ses mots-clés, sinon 0. Rien de tapé : toutes passent.
@@ -33,9 +26,9 @@ export function helpScore(
   search: string,
   keywords: string[] = []
 ): number {
-  const words = plain(search).split(/\s+/).filter(Boolean)
+  const words = normalizeSearch(search).split(/\s+/).filter(Boolean)
   if (words.length === 0) return 1
-  const haystack = plain([value, ...keywords].join(" "))
+  const haystack = normalizeSearch([value, ...keywords].join(" "))
   return words.every((word) => haystack.includes(word)) ? 1 : 0
 }
 

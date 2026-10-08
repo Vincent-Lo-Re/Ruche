@@ -313,8 +313,6 @@ describe("liste des pages : publication et corbeille", () => {
   it("« Supprimer » met la page à la corbeille après confirmation, avec « Annuler »", async () => {
     vi.mocked(api.listContents).mockResolvedValue([row({})])
     vi.mocked(publicationApi.trashContent).mockResolvedValue({
-      batch: "00000000-0000-4000-8000-0000000000b1",
-      trashed: 1,
       needsFileSync: false,
     })
     vi.mocked(publicationApi.restoreContent).mockResolvedValue({
@@ -360,8 +358,6 @@ describe("liste des pages : publication et corbeille", () => {
       row({ live_draft_rev: 4, first_published_at: "2026-09-01T08:00:00Z" }),
     ])
     vi.mocked(publicationApi.trashContent).mockResolvedValue({
-      batch: "00000000-0000-4000-8000-0000000000b1",
-      trashed: 1,
       needsFileSync: true,
     })
     await renderApp("/pages")
@@ -427,7 +423,7 @@ describe("éditeur", () => {
       false,
       expect.any(String)
     )
-    // Éditeur du Fil : le plan est ouvert d'office, avec la première ligne de chaque texte.
+    // Éditeur des contenus : le plan est ouvert d'office, avec la première ligne de chaque texte.
     expect(
       screen.getByRole("navigation", { name: texts.editor.outline.title })
     ).toHaveTextContent("Bonjour")
@@ -570,7 +566,7 @@ describe("éditeur", () => {
   })
 })
 
-describe("éditeur d'une page (éditeur du Fil)", () => {
+describe("éditeur d'une page (éditeur des contenus)", () => {
   const columns = texts.editor.columns
   const ready = texts.editor.article.ready
   const slug = texts.publication.settings.slug

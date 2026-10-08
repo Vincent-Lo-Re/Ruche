@@ -42,8 +42,8 @@ async function copyDraft(draft: Draft) {
   }
 }
 
-/** Ce qu'un brouillon sait du verrou sous lequel il s'écrit. */
-export type PartLock = {
+/** Ce que l'enregistrement du brouillon sait du verrou du contenu (tenu par useDraftSync). */
+type DraftLock = {
   phase: LockState["phase"]
   lost: boolean
   // La révision de ce brouillon dans la base, d'après les autres (null : rien à suivre).
@@ -52,14 +52,13 @@ export type PartLock = {
 }
 
 /**
- * Un brouillon et ses réglages, tenus à jour avec la base sous un verrou tenu ailleurs (celui du
- * contenu, dans useDraftSync) : l'enregistrement
- * automatique, la relecture quand quelqu'un d'autre a écrit, la reprise après « Reprendre la
- * main » (resumeSignal change), et « Copier mon texte » quand la main est perdue. session :
- * l'ouverture de l'éditeur qui tient le verrou. afterSave : ce qui est relu après chaque
- * enregistrement (listes, plans…).
+ * Le brouillon d'un contenu et ses réglages, tenus à jour avec la base sous le verrou du contenu
+ * (tenu par useDraftSync) : l'enregistrement automatique, la relecture quand quelqu'un d'autre a
+ * écrit, la reprise après « Reprendre la main » (resumeSignal change), et « Copier mon texte »
+ * quand la main est perdue. session : l'ouverture de l'éditeur qui tient le verrou. afterSave :
+ * ce qui est relu après chaque enregistrement (listes, plans…).
  */
-export function usePartDraft({
+export function useDraftSaving({
   initial,
   session,
   lock,
@@ -68,7 +67,7 @@ export function usePartDraft({
 }: {
   initial: Content
   session: string
-  lock: PartLock
+  lock: DraftLock
   resumeSignal: number
   afterSave: () => void
 }) {

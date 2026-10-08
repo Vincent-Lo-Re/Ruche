@@ -43,7 +43,7 @@ export function ListEmpty({
   return (
     <Empty className="bg-card ring-1 ring-foreground/10">
       <EmptyHeader>
-        <EmptyMedia variant="icon">
+        <EmptyMedia>
           <Icon />
         </EmptyMedia>
         <EmptyTitle>{title}</EmptyTitle>

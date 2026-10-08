@@ -306,7 +306,7 @@ test("publier une page, la modifier sans toucher à l'app, republier, revenir à
   const second = history.locator('[data-version="2"]')
   await expect(second).toContainText(labels.history.live)
   await expect(second).toContainText(labels.history.origins.manual)
-  await expect(second).toContainText(labels.history.by(admin.fullName))
+  await expect(second).toContainText(texts.common.by(admin.fullName))
   await expect(history.locator('[data-version="1"]')).not.toContainText(
     labels.history.live
   )
@@ -403,7 +403,7 @@ test("programmer : la tâche attend pendant qu'on écrit, publie le dernier brou
   const history = page.getByRole("dialog", { name: labels.history.title })
   const version = history.locator('[data-version="1"]')
   await expect(version).toContainText(labels.history.origins.scheduled)
-  await expect(version).toContainText(labels.history.by(admin.fullName))
+  await expect(version).toContainText(texts.common.by(admin.fullName))
   await page.keyboard.press("Escape")
   await expect(history).toHaveCount(0)
 

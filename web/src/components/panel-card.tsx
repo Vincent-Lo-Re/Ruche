@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card"
 
 /**
- * Une carte avec son titre et son icône : les colonnes de l'éditeur du Fil (onglet Article) et
+ * Une carte avec son titre et son icône : les colonnes de l'éditeur des contenus (onglet Article) et
  * la fiche d'un fichier (Médiathèque). C'est la `Card` de shadcn, en petit (`size="sm"`).
  */
 export function PanelCard({

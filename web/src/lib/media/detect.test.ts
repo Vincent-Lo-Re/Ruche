@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { detectFormat, normalizeAudioType } from "@/lib/media/detect"
+import { detectFormat } from "@/lib/media/detect"
 
 const bytes = (...values: (number | string)[]) =>
   new Uint8Array(
@@ -45,30 +45,5 @@ describe("reconnaissance des fichiers", () => {
     expect(detectFormat(iso("isom"), "film.mp4", "video/mp4")).toBe("video")
     expect(detectFormat(bytes("hello"), "notes.txt", "text/plain")).toBeNull()
     expect(detectFormat(bytes("PK"), "archive.lottie", "")).toBeNull()
-  })
-})
-
-describe("normalisation des types audio", () => {
-  it("donne audio/mp4 pour un M4A annoncé audio/x-m4a (Safari, macOS)", () => {
-    expect(normalizeAudioType(iso("M4A "), "voix.m4a", "audio/x-m4a")).toBe(
-      "audio/mp4"
-    )
-    expect(normalizeAudioType(iso("mp42"), "voix.m4a", "audio/m4a")).toBe(
-      "audio/mp4"
-    )
-  })
-
-  it("donne audio/mpeg pour un MP3 annoncé audio/mp3", () => {
-    expect(normalizeAudioType(bytes("ID3", 4, 0), "son.mp3", "audio/mp3")).toBe(
-      "audio/mpeg"
-    )
-    expect(normalizeAudioType(bytes(0xff, 0xfb, 0x90), "son.mp3", "")).toBe(
-      "audio/mpeg"
-    )
-  })
-
-  it("refuse un fichier dont les octets ne sont pas un audio accepté", () => {
-    expect(normalizeAudioType(bytes("OggS"), "son.ogg", "audio/ogg")).toBeNull()
-    expect(normalizeAudioType(bytes("RIFF"), "son.wav", "audio/wav")).toBeNull()
   })
 })

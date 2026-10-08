@@ -129,7 +129,7 @@ export function LockBanner({
 }
 
 /**
- * Éditeur du Fil : le cadenas, à côté de Concentration, tant qu'on est en lecture seule. Il
+ * Éditeur des contenus : le cadenas, à côté de Concentration, tant qu'on est en lecture seule. Il
  * rouvre la fenêtre qui dit qui écrit.
  */
 export function LockButton({
@@ -162,7 +162,7 @@ export function LockButton({
 }
 
 /**
- * Éditeur du Fil : la fenêtre de la lecture seule (ADMIN § 4). Ce qui s'est passé, « Copier mon
+ * Éditeur des contenus : la fenêtre de la lecture seule (ADMIN § 4). Ce qui s'est passé, « Copier mon
  * texte » s'il restait du texte pas encore enregistré, ce que ferait la prise de main, puis
  * « (Re)prendre la main » et « Rester en lecture seule ». Échap vaut « Rester » ; un clic sur le
  * fond ne la ferme pas. La prise de main se fait sans seconde confirmation : la fenêtre dit déjà

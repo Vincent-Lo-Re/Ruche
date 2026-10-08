@@ -23,7 +23,7 @@ export const en = {
     actions: "Actions",
     clearSearch: "Clear search",
     // « Modifié le 27 sept. 2026 à 14h30 par Anne »
-    savedBy: (name: string) => `by ${name}`,
+    by: (name: string) => `by ${name}`,
     loading: "Loading…",
     signOut: "Sign out",
     tooManyAttempts: "Too many attempts. Try again in a minute.",
@@ -734,7 +734,6 @@ export const en = {
     },
     itemTypes: {
       file: "File",
-      content: "Content",
     },
     // Sorte d'un contenu dans la corbeille.
     contentKinds: {
@@ -743,10 +742,6 @@ export const en = {
       page: "Page",
       template: "Block template",
     },
-    // Ce qui est parti avec un élément (même lot) : restauré ou effacé avec lui.
-    batch: (count: number) =>
-      count === 1 ? "with 1 other item" : `with ${count} other items`,
-    batchList: (names: string) => `Moved to the Trash together: ${names}.`,
     eraseSelection: (count: number) => `Delete permanently (${count})`,
     confirmSelection: {
       title: (count: number) =>
@@ -770,7 +765,6 @@ export const en = {
       deletedAt: "Moved to Trash",
       purgeAt: "Auto-delete",
     },
-    deletedBy: (name: string) => `by ${name}`,
     purgeOn: (date: string) => `after ${date}`,
     purgeRefused: "Can't delete: still in use",
     purgeRefusedHint:
@@ -1243,9 +1237,6 @@ export const en = {
     sections: {
       article: "Blog posts",
       episode: "Podcast episodes",
-      chapter: "Method chapters",
-      lesson: "Method lessons",
-      exercise: "Method exercises",
       page: "Pages",
     },
     list: {
@@ -1358,7 +1349,7 @@ export const en = {
     editor: {
       nameLabel: "Template name",
       namePlaceholder: "Template name",
-      // La carte « Sorte » de la colonne de droite (éditeur du Fil) : un point de départ dit pour
+      // La carte « Sorte » de la colonne de droite (éditeur des contenus) : un point de départ dit pour
       // quelle section il sert.
       starterFor: (section: string) => `Starter for ${section}`,
       sharedLimit:
@@ -1513,7 +1504,7 @@ export const en = {
       title: "Outline",
       empty: "No blocks yet.",
       select: (label: string) => `Go to ${label}`,
-      // Le plan de l'éditeur du Fil (ADMIN § 4, « Les finitions »).
+      // Le plan de l'éditeur des contenus (ADMIN § 4, « Les finitions »).
       count: (count: number) => (count === 1 ? "1 block" : `${count} blocks`),
       // Une ligne de section : son aspect, puis le nombre de ses blocs.
       box: { fill: "Box with background", border: "Box with border" },
@@ -1636,7 +1627,7 @@ export const en = {
       openInLibrary: "Open file details in the Media library",
       openFileHint: "(opens in a new tab)",
     },
-    // Éditeur du Fil (ADMIN § 4) : le nom des deux colonnes (lecteurs d'écran), le titre de la
+    // Éditeur des contenus (ADMIN § 4) : le nom des deux colonnes (lecteurs d'écran), le titre de la
     // glissière des Blocs, et celui de la colonne de droite (l'Article, l'Épisode).
     columns: {
       left: "Outline and Blocks",
@@ -1654,7 +1645,7 @@ export const en = {
         template: "Template",
       },
     },
-    // Le mode Concentration de l'éditeur du Fil : les deux colonnes se cachent.
+    // Le mode Concentration de l'éditeur des contenus : les deux colonnes se cachent.
     focusMode: {
       label: "Focus mode",
       exit: "Exit Focus mode",
@@ -1662,7 +1653,7 @@ export const en = {
       off: "Focus mode off. The columns are visible again.",
       shortcut: { apple: "⌘ .", other: "Ctrl + ." },
     },
-    // L'aperçu de l'éditeur du Fil : la barre d'outils à droite du téléphone, et ce que montre la
+    // L'aperçu de l'éditeur des contenus : la barre d'outils à droite du téléphone, et ce que montre la
     // Lecture (le rendu de l'app reste provisoire tant qu'elle n'est pas dessinée).
     preview: {
       tools: "Preview options",
@@ -1719,12 +1710,12 @@ export const en = {
       // En Lecture, on ne prend pas la main : rien ne se modifie.
       reading: "You're in Preview. Switch to Edit to make changes.",
     },
-    // Les Blocs de l'éditeur du Fil (en glissière par-dessus le Plan), et le panneau « Mes blocs ».
+    // Les Blocs de l'éditeur des contenus (en glissière par-dessus le Plan), et le panneau « Mes blocs ».
     library: {
       hint: "Click a block to add it below the selected one (or at the end), or drag it onto the phone.",
       basics: "Basic blocks",
       addLabel: (label: string) => `Add ${label} block`,
-      // La glissière des Blocs, par-dessus le Plan (éditeur du Fil).
+      // La glissière des Blocs, par-dessus le Plan (éditeur des contenus).
       close: "Close Blocks",
       // La cible d'un ajout : « Ajouter dans la section ».
       target: {
@@ -1825,7 +1816,7 @@ export const en = {
     settings: {
       label: "Block settings",
       title: (label: string) => `Settings for ${label}`,
-      // Éditeur du Fil : la barre d'icônes en bas de la glissière du bloc.
+      // Éditeur des contenus : la barre d'icônes en bas de la glissière du bloc.
       actions: "Block actions",
       readOnly: "Read-only: you can't make changes.",
       text: "Type directly on the phone. Select words to make them bold, italic, or a link.",
@@ -2036,7 +2027,7 @@ export const en = {
       // L'état n'a pas pu être lu (réseau) : « Publier » attend qu'il le soit.
       unknownHint: "Couldn't load the publishing status. Click to try again.",
     },
-    // Éditeur du Fil : la pastille à côté de « Publier » (la phrase entière dans l'infobulle).
+    // Éditeur des contenus : la pastille à côté de « Publier » (la phrase entière dans l'infobulle).
     short: {
       draft: "Draft",
       withdrawn: "Unpublished",
@@ -2162,7 +2153,6 @@ export const en = {
         "Published versions, newest first. Restoring a version copies it into the draft without changing anything in the app.",
       empty: "No published versions yet.",
       version: (number: number) => `Version ${number}`,
-      by: (name: string) => `by ${name}`,
       live: "Published",
       origins: {
         manual: "Published manually",

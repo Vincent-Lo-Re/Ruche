@@ -149,7 +149,7 @@ describe("ce qui manque pour publier", () => {
   })
 })
 
-describe("prêt à publier (éditeur du Fil)", () => {
+describe("prêt à publier (éditeur des contenus)", () => {
   it("le titre, l'image de présentation, puis le niveau d'accès", () => {
     expect(
       readyItems(

@@ -28,8 +28,6 @@ const photo: api.TrashItem = {
   id: "00000000-0000-4000-8000-00000000000a",
   kind: "image",
   title: "photo.jpg",
-  trash_batch: null,
-  batch_root: true,
   deleted_at: "2026-09-27T12:30:00Z",
   deleted_by_name: "Anne Admin",
   purge_at: "2026-10-27T13:30:00Z",
@@ -61,9 +59,7 @@ describe("Corbeille", () => {
     const row = (await screen.findByText(photoName)).closest("tr")!
     expect(within(row).getByText("Fichier · Image")).toBeVisible()
     expect(within(row).getByText("27 sept. 2026 à 14h30")).toBeVisible()
-    expect(
-      within(row).getByText(texts.trash.deletedBy("Anne Admin"))
-    ).toBeVisible()
+    expect(within(row).getByText(texts.common.by("Anne Admin"))).toBeVisible()
     expect(
       within(row).getByText(texts.trash.purgeOn("27 oct. 2026"))
     ).toBeVisible()
@@ -209,33 +205,19 @@ describe("Corbeille : contenus", () => {
     id: "00000000-0000-4000-8000-00000000000c",
     kind: "page",
     title: "Mentions légales",
-    trash_batch: "00000000-0000-4000-8000-0000000000b1",
   }
   const article: api.TrashItem = {
     ...page,
     id: "00000000-0000-4000-8000-00000000000d",
     kind: "article",
     title: "Premier article",
-    trash_batch: "00000000-0000-4000-8000-0000000000b2",
-  }
-  // Parti avec l'article (même lot) : restauré ou effacé avec lui.
-  const withArticle: api.TrashItem = {
-    ...article,
-    id: "00000000-0000-4000-8000-00000000000e",
-    title: "Suite",
-    batch_root: false,
   }
 
   beforeEach(() => {
-    vi.mocked(api.listTrash).mockResolvedValue([
-      page,
-      photo,
-      article,
-      withArticle,
-    ])
+    vi.mocked(api.listTrash).mockResolvedValue([page, photo, article])
   })
 
-  it("filtre par type, avec les seuls types présents ; un lot reste sous sa tête", async () => {
+  it("filtre par type, avec les seuls types présents", async () => {
     await renderApp("/trash")
     await screen.findByText(page.title!)
     const filters = screen.getByRole("group", {
@@ -246,9 +228,7 @@ describe("Corbeille : contenus", () => {
         .getAllByRole("button")
         .map((button) => button.textContent)
     ).toEqual(["Tout", "Blog", "Pages", "Médiathèque"])
-    // Ce qui est parti avec l'article n'a pas sa propre ligne.
     expect(screen.getAllByRole("row")).toHaveLength(4)
-    expect(screen.getByText(texts.trash.batch(1))).toBeVisible()
 
     fireEvent.click(
       within(filters).getByRole("button", { name: texts.trash.filters.article })

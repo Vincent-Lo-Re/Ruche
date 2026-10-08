@@ -1,5 +1,5 @@
 /**
- * Le profil de chaque sorte de contenu (docs/ADMINISTRATION.md, § 4, « Le builder du Fil
+ * Le profil de chaque sorte de contenu (docs/ADMINISTRATION.md, § 4, « Le builder des contenus
  * partout ») : ce qu'elle demande pour être publiée et ce que son éditeur montre. Décrit une
  * seule fois ici : l'éditeur, les listes et « ce qui manque pour publier » le lisent, au lieu de
  * tester la sorte. Sans React.

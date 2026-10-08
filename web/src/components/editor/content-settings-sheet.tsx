@@ -308,7 +308,7 @@ export function AddCategory({
 }: {
   section: CategorySection
   onAdded: (category: Category) => void
-  // Ouvert par « Nouvelle » (éditeur du Fil) : le curseur va dans le champ.
+  // Ouvert par « Nouvelle » (éditeur des contenus) : le curseur va dans le champ.
   autoFocus?: boolean
 }) {
   const queryClient = useQueryClient()

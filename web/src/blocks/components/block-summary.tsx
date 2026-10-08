@@ -13,7 +13,7 @@ const labels = texts.editor.outline
 const SharedIcon = sections.templates.icon
 
 /**
- * Un bloc résumé sur une ligne (plan de l'éditeur du Fil, bloc qu'on glisse) : le contenu
+ * Un bloc résumé sur une ligne (plan de l'éditeur des contenus, bloc qu'on glisse) : le contenu
  * plutôt que le type (l'icône le dit) ; la première ligne d'un texte, la vignette et le nom du
  * fichier d'une image, l'aspect et le nombre de blocs d'une section, le nom d'un bloc partagé. Le nom complet (« Texte « … » ») reste celui des lecteurs
  * d'écran, là où la ligne est un bouton.

@@ -1,5 +1,5 @@
 /**
- * Le mode Concentration de l'éditeur du Fil (docs/ADMINISTRATION.md, § 4) : ⌘ . sur Mac,
+ * Le mode Concentration de l'éditeur des contenus (docs/ADMINISTRATION.md, § 4) : ⌘ . sur Mac,
  * Ctrl + . ailleurs, le met ou l'enlève ; Échap l'enlève. Sans React.
  */
 

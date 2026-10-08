@@ -174,9 +174,6 @@ describe("éditeurs", () => {
     expect(contentEditorPath("episode", "e")).toBe("/podcasts/e")
     expect(contentEditorPath("page", "p")).toBe("/pages/p")
     expect(contentEditorPath("template", "t")).toBe("/templates/t")
-    // Une sorte sans éditeur (les anciennes méthodes, en cours de refonte).
-    expect(contentEditorPath("method", "m")).toBeNull()
-    expect(contentEditorPath("inconnu", "x")).toBeNull()
     expect(mediaFilePath("f")).toBe("/media?file=f")
   })
 })

@@ -35,6 +35,7 @@ import {
   type UseState,
 } from "@/lib/contents/category-removal"
 import { cn } from "cn"
+import { displayTitle } from "@/lib/titles"
 import { texts } from "@/texts"
 
 const labels = texts.categories
@@ -115,9 +116,7 @@ function RemoveButton({
         <Button
           variant="outline"
           size="sm"
-          aria-label={words.removeFrom(
-            use.title?.trim() || texts.common.untitled
-          )}
+          aria-label={words.removeFrom(displayTitle(use.title))}
           disabled={disabled || unavailable}
           onClick={onRemove}
         >

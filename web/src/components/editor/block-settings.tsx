@@ -259,7 +259,7 @@ function canSaveAs(
 }
 
 /**
- * Éditeur du Fil : les actions du bloc choisi en icônes (leur nom dans l'infobulle), fixées en
+ * Éditeur des contenus : les actions du bloc choisi en icônes (leur nom dans l'infobulle), fixées en
  * bas de sa glissière : la place (Monter, Descendre), la copie (Dupliquer, Enregistrer comme
  * modèle…), Modifier le modèle et Détacher pour un bloc partagé, et à l'écart, Supprimer. Mêmes icônes que le menu du plan.
  * Désactivées sans perdre le focus (aria-disabled) : on peut appuyer plusieurs fois de suite au

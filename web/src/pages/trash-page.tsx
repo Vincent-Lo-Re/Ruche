@@ -61,21 +61,15 @@ import {
 import { isMediaKind } from "@/lib/media/constants"
 import { trashRead } from "@/lib/reads"
 import { contentEditorPath, sections } from "@/navigation"
-import {
-  filterTrash,
-  groupTrash,
-  trashFilters,
-  trashTitle,
-  trashTypeLabel,
-  type TrashEntry,
-} from "@/lib/trash"
+import { filterTrash, trashFilters, trashTypeLabel } from "@/lib/trash"
+import { displayTitle } from "@/lib/titles"
 import { texts } from "@/texts"
 
 // Ce qui attend une confirmation : tout vider, effacer la sélection, ou un seul élément.
 type Confirmation =
-  | { scope: "all"; entries: TrashEntry[] }
-  | { scope: "selection"; entries: TrashEntry[] }
-  | { scope: "item"; entry: TrashEntry }
+  | { scope: "all"; items: TrashItem[] }
+  | { scope: "selection"; items: TrashItem[] }
+  | { scope: "item"; item: TrashItem }
 
 const keyOf = (item: TrashItem) => `${item.item_type}-${item.id}`
 
@@ -112,7 +106,7 @@ export function TrashPage() {
   const restore = useMutation({
     mutationFn: restoreTrashItem,
     onSuccess: ({ addressRemoved }, item) => {
-      const name = trashTitle(item)
+      const name = displayTitle(item.title)
       // Un contenu restauré s'ouvre depuis le message.
       const path =
         item.item_type === "content"
@@ -147,11 +141,8 @@ export function TrashPage() {
   })
 
   const erase = useMutation({
-    // Les têtes de lot suffisent : effacer un élément efface ce qui est parti avec lui.
-    mutationFn: (entries: TrashEntry[]) =>
-      emptyTrash(
-        entries.map(({ item }) => ({ type: item.item_type, id: item.id }))
-      ),
+    mutationFn: (items: TrashItem[]) =>
+      emptyTrash(items.map((item) => ({ type: item.item_type, id: item.id }))),
     onSuccess: (count) => {
       toast.success(texts.trash.emptied(count))
       setSelected(new Set())
@@ -171,13 +162,12 @@ export function TrashPage() {
   })
 
   const items = trash.data ?? []
-  const entries = groupTrash(items)
   const filters = trashFilters(items)
   // Un filtre dont le dernier élément vient de partir revient à « Tout ».
   const activeFilter = filters.includes(filter) ? filter : "all"
-  const shown = filterTrash(entries, activeFilter)
-  const shownKeys = new Set(shown.map(({ item }) => keyOf(item)))
-  const selection = shown.filter(({ item }) => selected.has(keyOf(item)))
+  const shown = filterTrash(items, activeFilter)
+  const shownKeys = new Set(shown.map(keyOf))
+  const selection = shown.filter((item) => selected.has(keyOf(item)))
   const busy = restore.isPending || erase.isPending
 
   const toggle = (item: TrashItem, checked: boolean) =>
@@ -192,9 +182,7 @@ export function TrashPage() {
   const confirm = () => {
     if (!confirmation) return
     erase.mutate(
-      confirmation.scope === "item"
-        ? [confirmation.entry]
-        : confirmation.entries
+      confirmation.scope === "item" ? [confirmation.item] : confirmation.items
     )
   }
 
@@ -211,7 +199,7 @@ export function TrashPage() {
                 variant="destructive"
                 disabled={busy}
                 onClick={() =>
-                  setConfirmation({ scope: "selection", entries: selection })
+                  setConfirmation({ scope: "selection", items: selection })
                 }
               >
                 <Eraser />
@@ -220,8 +208,8 @@ export function TrashPage() {
             )}
             <Button
               variant="destructive"
-              disabled={entries.length === 0 || busy}
-              onClick={() => setConfirmation({ scope: "all", entries })}
+              disabled={items.length === 0 || busy}
+              onClick={() => setConfirmation({ scope: "all", items })}
             >
               <Trash2 />
               {texts.trash.empty}
@@ -270,7 +258,7 @@ export function TrashPage() {
               </AlertDescription>
             </Alert>
           )}
-          {entries.length === 0 ? (
+          {items.length === 0 ? (
             <ListEmpty
               icon={Trash2}
               title={texts.trash.emptyState.title}
@@ -309,15 +297,15 @@ export function TrashPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {shown.map((entry) => (
+                  {shown.map((item) => (
                     <TrashRow
-                      key={keyOf(entry.item)}
-                      entry={entry}
-                      checked={selected.has(keyOf(entry.item))}
+                      key={keyOf(item)}
+                      item={item}
+                      checked={selected.has(keyOf(item))}
                       disabled={busy}
-                      onCheck={(checked) => toggle(entry.item, checked)}
-                      onRestore={() => restore.mutate(entry.item)}
-                      onErase={() => setConfirmation({ scope: "item", entry })}
+                      onCheck={(checked) => toggle(item, checked)}
+                      onRestore={() => restore.mutate(item)}
+                      onErase={() => setConfirmation({ scope: "item", item })}
                     />
                   ))}
                 </TableBody>
@@ -366,17 +354,17 @@ function ConfirmationText({ confirmation }: { confirmation: Confirmation }) {
   if (confirmation.scope === "all") {
     title = texts.trash.confirmEmpty.title
     description = texts.trash.confirmEmpty.description(
-      confirmation.entries.length
+      confirmation.items.length
     )
   } else if (confirmation.scope === "selection") {
-    title = texts.trash.confirmSelection.title(confirmation.entries.length)
+    title = texts.trash.confirmSelection.title(confirmation.items.length)
     description = texts.trash.confirmSelection.description(
-      confirmation.entries.length
+      confirmation.items.length
     )
   } else {
     title = texts.trash.confirmErase.title
     description = texts.trash.confirmErase.description(
-      trashTitle(confirmation.entry.item)
+      displayTitle(confirmation.item.title)
     )
   }
   return (
@@ -388,22 +376,21 @@ function ConfirmationText({ confirmation }: { confirmation: Confirmation }) {
 }
 
 function TrashRow({
-  entry,
+  item,
   checked,
   disabled,
   onCheck,
   onRestore,
   onErase,
 }: {
-  entry: TrashEntry
+  item: TrashItem
   checked: boolean
   disabled: boolean
   onCheck: (checked: boolean) => void
   onRestore: () => void
   onErase: () => void
 }) {
-  const { item, batch } = entry
-  const name = trashTitle(item)
+  const name = displayTitle(item.title)
   const Icon =
     item.item_type === "file" && isMediaKind(item.kind)
       ? kindIcons[item.kind]
@@ -428,27 +415,13 @@ function TrashRow({
             <TooltipContent>{name}</TooltipContent>
           </Tooltip>
         </div>
-        {batch.length > 0 && (
-          <Tooltip>
-            <TooltipTrigger
-              render={
-                <p className="truncate pl-6 text-xs text-muted-foreground" />
-              }
-            >
-              {texts.trash.batch(batch.length)}
-            </TooltipTrigger>
-            <TooltipContent>
-              {texts.trash.batchList(batch.map(trashTitle).join(", "))}
-            </TooltipContent>
-          </Tooltip>
-        )}
       </TableCell>
       <TableCell>{trashTypeLabel(item)}</TableCell>
       <TableCell>
         <div>{formatDateTime(item.deleted_at)}</div>
         {item.deleted_by_name && (
           <div className="text-muted-foreground">
-            {texts.trash.deletedBy(item.deleted_by_name)}
+            {texts.common.by(item.deleted_by_name)}
           </div>
         )}
       </TableCell>

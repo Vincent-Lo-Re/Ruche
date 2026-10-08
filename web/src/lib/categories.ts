@@ -11,6 +11,7 @@ import { isLockAlive } from "@/lib/editor/edit-lock"
 import { displayName, type PersonName } from "@/lib/people"
 import type { ContentUse } from "@/lib/uses-export"
 import { supabase } from "@/lib/supabase"
+import type { ContentKind } from "@/lib/contents/api"
 import { texts } from "@/texts"
 
 /** La section d'une catégorie : Blog (articles) ou Podcasts (épisodes). */
@@ -204,7 +205,7 @@ export async function getCategoryUses(
     const lock = row.lock
     byId.set(row.id, {
       content_id: row.id,
-      kind: row.kind,
+      kind: row.kind as ContentKind,
       title: row.title,
       in_draft: inDraft || (known?.in_draft ?? false),
       in_app: row.live?.category_ids.includes(categoryId) ?? false,

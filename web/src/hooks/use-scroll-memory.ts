@@ -40,7 +40,7 @@ export function useScrollMemory() {
     }
   }, [])
 
-  // Les réglages de la page, gardés pour un lien de retour (« ← Le Fil » d'un éditeur).
+  // Les réglages de la page, gardés pour un lien de retour (« ← Blog » d'un éditeur).
   useEffect(() => {
     rememberSearch(location.pathname, location.search)
   }, [location.pathname, location.search])

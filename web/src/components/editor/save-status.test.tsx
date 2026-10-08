@@ -68,7 +68,7 @@ describe("indicateur d'enregistrement", () => {
     expect(indicator).not.toHaveAttribute("title")
   })
 
-  it("en icône seule (éditeur du Fil) : l'état sans l'heure, déjà dans « Modifié à … »", () => {
+  it("en icône seule (éditeur des contenus) : l'état sans l'heure, déjà dans « Modifié à … »", () => {
     render(<SaveStatus state={state("saved")} visible compact />)
     const indicator = document.querySelector<HTMLElement>(
       '[data-save-status="saved"]'

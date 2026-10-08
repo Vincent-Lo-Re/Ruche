@@ -24,7 +24,7 @@ export const fiche: HelpFiche = {
   notes: [
     "Si quelqu'un reprend la main pendant que tu écris, une fenêtre te le dit. « Copier mon texte » garde ce qui n'était pas encore enregistré.",
     "Si tu écris le même contenu dans un autre onglet, « Reprendre la main ici » fait passer l'autre onglet en lecture seule.",
-    "Un onglet resté caché plus de 30 minutes libère le brouillon pour l'équipe : « Reprendre l'écriture » te rend la main.",
+    "Un onglet resté caché plus de 30 minutes libère le brouillon pour l'équipe : « Reprendre la main » te la rend.",
     "En Lecture, tu ne prends jamais la main : tu la prends en passant en Édition.",
   ],
 }

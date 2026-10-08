@@ -752,4 +752,4 @@ function TrashBar({
   )
 }
 
-/** L'icône de la section d'un contenu (Le Fil, Pages…), comme dans le menu. */
+/** L'icône de la section d'un contenu (Blog, Pages…), comme dans le menu. */

@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/item"
 import type { TemplateUse } from "@/lib/contents/templates"
 import { contentEditorPath } from "@/navigation"
+import { displayTitle } from "@/lib/titles"
 import { texts } from "@/texts"
 
 /** Les brouillons qui utilisent un modèle, avec un lien vers leur éditeur. */
@@ -24,7 +25,7 @@ export function UsesList({
       <p className="text-sm font-medium">{title}</p>
       <ItemGroup className="max-h-48 overflow-y-auto">
         {uses.map((use) => {
-          const name = use.title.trim() || texts.common.untitled
+          const name = displayTitle(use.title)
           const path = use.inTrash ? null : contentEditorPath(use.kind, use.id)
           return (
             <Item

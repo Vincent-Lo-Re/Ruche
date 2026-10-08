@@ -112,14 +112,10 @@ import { kickFiles } from "@/lib/media/api"
 import { accessLevelsRead, contentListRead, startersRead } from "@/lib/reads"
 import { refreshAfterContentTrash } from "@/lib/refresh"
 import { editorPath, sections, type SectionKey } from "@/navigation"
+import { displayTitle } from "@/lib/titles"
 import { texts } from "@/texts"
 
 const labels = texts.contentList
-
-/** Le titre d'un contenu, ou « Sans titre ». */
-function titleOf(item: ContentListItem): string {
-  return item.title.trim() || texts.common.untitled
-}
 
 /**
  * Liste des contenus d'une section (Pages, Blog, Podcasts) : recherche, filtres par état de
@@ -200,7 +196,7 @@ export function ContentListPage({
   const bulk = useContentsSelection({
     shown,
     words: { ...kindLabels, undo: labels.undo },
-    nameOf: titleOf,
+    nameOf: (item) => displayTitle(item.title),
   })
   const { selection } = bulk
   const filtering =
@@ -212,7 +208,7 @@ export function ContentListPage({
 
   // « Annuler » dans le message : le contenu revient en brouillon, sans être republié.
   const undo = async (item: ContentListItem) => {
-    const name = titleOf(item)
+    const name = displayTitle(item.title)
     try {
       const { addressRemoved } = await restoreContent(item.id)
       if (addressRemoved)
@@ -230,7 +226,7 @@ export function ContentListPage({
     onSuccess: (result, item) => {
       setToTrash(null)
       bulk.toggle(item, false)
-      toast.success(labels.trashed(titleOf(item)), {
+      toast.success(labels.trashed(displayTitle(item.title)), {
         action: { label: labels.undo, onClick: () => void undo(item) },
       })
       // Ses fichiers redeviennent peut-être protégés : tout de suite.
@@ -339,7 +335,7 @@ export function ContentListPage({
         )}
         <KeptNotice
           kept={bulk.kept}
-          nameOf={titleOf}
+          nameOf={(item) => displayTitle(item.title)}
           words={kindLabels}
           onClose={bulk.closeKept}
         />
@@ -491,7 +487,9 @@ export function ContentListPage({
       <TrashDialog
         open={toTrash !== null}
         title={kindLabels.confirmTrashTitle}
-        description={toTrash ? kindLabels.confirmTrash(titleOf(toTrash)) : ""}
+        description={
+          toTrash ? kindLabels.confirmTrash(displayTitle(toTrash.title)) : ""
+        }
         confirmLabel={labels.confirmTrash.confirm}
         pending={trash.isPending}
         onCancel={() => setToTrash(null)}
@@ -506,7 +504,7 @@ export function ContentListPage({
         }
         description={
           selection.items.length === 1
-            ? kindLabels.confirmTrash(titleOf(selection.items[0]))
+            ? kindLabels.confirmTrash(displayTitle(selection.items[0].title))
             : kindLabels.confirmTrashMany
         }
         confirmLabel={labels.confirmTrash.confirm}
@@ -692,7 +690,7 @@ function ContentTable({
         <TableBody>
           {items.map((item) => {
             const status = itemStatus(item, now)
-            const name = titleOf(item)
+            const name = displayTitle(item.title)
             const cells = (
               <>
                 <TableCell>
@@ -763,7 +761,10 @@ function ContentTable({
   )
   return order ? (
     <SortableList
-      items={items.map((item) => ({ id: item.id, name: titleOf(item) }))}
+      items={items.map((item) => ({
+        id: item.id,
+        name: displayTitle(item.title),
+      }))}
       words={labels.order.dnd}
       onReorder={order.onReorder}
     >

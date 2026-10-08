@@ -271,11 +271,7 @@ export async function revertToVersion(
   }
 }
 
-export type Trashed = {
-  batch: string
-  trashed: number
-  needsFileSync: boolean
-}
+export type Trashed = { needsFileSync: boolean }
 
 /** Met un contenu à la corbeille (il sort de l'app, sa programmation est annulée). */
 export async function trashContent(contentId: string): Promise<Trashed> {
@@ -283,16 +279,12 @@ export async function trashContent(contentId: string): Promise<Trashed> {
     .rpc("trash", { content_id: contentId })
     .single()
   if (error) throw toContentError(error, status)
-  return {
-    batch: data.trash_batch,
-    trashed: data.trashed,
-    needsFileSync: data.needs_file_sync,
-  }
+  return { needsFileSync: data.needs_file_sync }
 }
 
 type Restored = { restored: number; addressRemoved: boolean }
 
-/** Restaure un contenu (et tout son lot) en brouillon, sans le republier ([D18]). */
+/** Restaure un contenu en brouillon, sans le republier ([D18]). */
 export async function restoreContent(contentId: string): Promise<Restored> {
   const { data, error, status } = await supabase
     .rpc("restore", { content_id: contentId })

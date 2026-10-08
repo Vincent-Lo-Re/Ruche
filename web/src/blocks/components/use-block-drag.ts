@@ -38,7 +38,7 @@ export const DraggingTypeContext = createContext<BlockType | null>(null)
 /**
  * Le déplacement des blocs par glisser-déposer (souris et clavier, annonces en français), avec
  * les règles de blocks/dnd.ts : le même pour l'aperçu (BlockCanvas) et pour le plan de
- * l'éditeur du Fil. Le bloc change de conteneur pendant le survol ; Échap remet le brouillon
+ * l'éditeur des contenus. Le bloc change de conteneur pendant le survol ; Échap remet le brouillon
  * du début.
  */
 export function useBlockDrag({

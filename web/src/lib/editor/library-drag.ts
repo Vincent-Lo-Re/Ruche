@@ -1,5 +1,5 @@
 /**
- * Glisser un bloc des Blocs dans l'aperçu (éditeur du Fil, docs/ADMINISTRATION.md,
+ * Glisser un bloc des Blocs dans l'aperçu (éditeur des contenus, docs/ADMINISTRATION.md,
  * § 4) : ce que porte le glisser-déposer du navigateur, et la place où le bloc tombe. Sans React.
  */
 

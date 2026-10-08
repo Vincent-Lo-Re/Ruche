@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react"
 
-import { usePartDraft } from "@/components/editor/use-part-draft"
+import { useDraftSaving } from "@/components/editor/use-draft-saving"
 import { useEditLock } from "@/hooks/use-edit-lock"
 import type { Content } from "@/lib/contents/api"
 
 /**
  * Le brouillon d'un éditeur et ses réglages, tenus à jour avec la base : le verrou « un seul à
- * la fois » du contenu (lib/editor/edit-lock.ts), et tout ce que fait usePartDraft
+ * la fois » du contenu (lib/editor/edit-lock.ts), et tout ce que fait useDraftSaving
  * (enregistrement automatique, relecture, reprise de la main, « Copier mon texte »). afterSave :
  * ce que l'éditeur relit après chaque enregistrement (listes, plans…). writing : faux en
  * Lecture, où l'on ne prend pas la main.
@@ -22,7 +22,7 @@ export function useDraftSync({
 }) {
   // Cette ouverture de l'éditeur : le verrou est tenu par elle, pas seulement par le membre.
   const [editorSession] = useState(() => crypto.randomUUID())
-  // Avant de rendre la main : terminer l'enregistrement en attente (connu après usePartDraft).
+  // Avant de rendre la main : terminer l'enregistrement en attente (connu après useDraftSaving).
   const flush = useRef<() => Promise<void>>(() => Promise.resolve())
   const lock = useEditLock(
     initial.id,
@@ -32,7 +32,7 @@ export function useDraftSync({
   )
   // Change à chaque « Prendre la main » ou « Reprendre la main » : l'enregistrement reprend.
   const [resumeSignal, setResumeSignal] = useState(0)
-  const part = usePartDraft({
+  const part = useDraftSaving({
     initial,
     session: editorSession,
     lock: {

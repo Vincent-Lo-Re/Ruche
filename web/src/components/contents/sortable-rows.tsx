@@ -1,11 +1,9 @@
-import { useSortable } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
 import { cn } from "cn"
-import { GripVertical } from "lucide-react"
 import type { ComponentProps } from "react"
 
-import { Button } from "@/components/ui/button"
+import { DragHandle } from "@/components/list-sorting"
 import { TableCell, TableRow } from "@/components/ui/table"
+import { useSortableItem } from "@/hooks/use-sortable-item"
 import { texts } from "@/texts"
 
 const labels = texts.contentList.order
@@ -23,24 +21,16 @@ export function SortableRow({
   name: string
   disabled: boolean
 }) {
-  const {
-    setNodeRef,
-    setActivatorNodeRef,
-    listeners,
-    attributes,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { setNodeRef, isDragging, style, handle } = useSortableItem({
     id,
     disabled,
-    attributes: { roleDescription: labels.dnd.roleDescription },
+    roleDescription: labels.dnd.roleDescription,
   })
   return (
     <TableRow
       ref={setNodeRef}
       // eslint-disable-next-line no-restricted-syntax -- position pendant un glisser-déposer (dnd-kit)
-      style={{ transform: CSS.Translate.toString(transform), transition }}
+      style={style}
       className={cn(
         isDragging && "relative z-10 bg-background shadow-md",
         className
@@ -48,18 +38,11 @@ export function SortableRow({
       {...props}
     >
       <TableCell className="w-0 pr-0">
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          ref={setActivatorNodeRef}
-          {...attributes}
-          {...listeners}
+        <DragHandle
+          handle={handle}
+          label={labels.handle(name)}
           disabled={disabled}
-          aria-label={labels.handle(name)}
-          className="cursor-grab text-muted-foreground disabled:cursor-default active:cursor-grabbing"
-        >
-          <GripVertical aria-hidden />
-        </Button>
+        />
       </TableCell>
       {children}
     </TableRow>

@@ -1,5 +1,5 @@
 /**
- * Éditeur du Fil (docs/ADMINISTRATION.md, § 4) : ajouter un bloc ouvre les Blocs. Ils ajoutent
+ * Éditeur des contenus (docs/ADMINISTRATION.md, § 4) : ajouter un bloc ouvre les Blocs. Ils ajoutent
  * sous le bloc choisi, ou, après « Ajouter dans la section », à la fin de cette section. Sans React.
  */
 

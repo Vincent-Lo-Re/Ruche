@@ -60,7 +60,7 @@ import { texts } from "@/texts"
 const labels = texts.editor.preview
 
 /**
- * L'aperçu de l'éditeur du Fil (ADMIN § 4) : la barre de mise en forme à gauche, le téléphone,
+ * L'aperçu de l'éditeur des contenus (ADMIN § 4) : la barre de mise en forme à gauche, le téléphone,
  * et à droite la barre de l'aperçu. Le téléphone tient dans la hauteur de la fenêtre ; l'article
  * défile dedans.
  */
