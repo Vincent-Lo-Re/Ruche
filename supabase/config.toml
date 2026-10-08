@@ -157,8 +157,8 @@ max_indexes = 5
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
-# Local : l'admin (serveur Vite). En ligne, chaque installation donne la sienne
-# (SUPABASE_AUTH_SITE_URL de installation/supabase.env, voir la fin de ce fichier).
+# Local : l'admin (serveur Vite). En ligne, chaque installation donne la sienne ([remotes.*],
+# à la fin de ce fichier).
 site_url = "http://127.0.0.1:5173"
 # The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
 # external_url = ""
@@ -463,9 +463,39 @@ enabled = true
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":180,\"commaStyle\":\"trailing\"}"
 
 # ---------------------------------------------------------------------------------------------
-# En ligne : ce fichier ne garde que les valeurs locales. Chaque installation de Ruche (son projet
-# Supabase, l'adresse de son admin…) a ses réglages dans un fichier de variables, comme
-# installation/supabase.env pour la démo de Ruche : chaque SUPABASE_<SECTION>_<CLÉ> y remplace la
-# valeur d'ici au moment de `supabase config push` (procédure : installation/README.md). Relire
-# `npx supabase config diff` avant chaque push.
+# En ligne : chaque installation de Ruche a un bloc [remotes.<nom>] à son project_id. Ses valeurs
+# remplacent celles du dessus lors d'un `supabase config push` vers ce projet ; elles sont
+# ignorées en local. Les listes sont remplacées, pas complétées. Tout ce qui n'est pas repris ici
+# est poussé tel quel : relire `npx supabase config diff` avant chaque push. Le bloc d'un client
+# vit dans son propre dépôt et s'ajoute ici, dans sa copie de déploiement (installation/README.md).
 # ---------------------------------------------------------------------------------------------
+
+# La démo de Ruche (projet Supabase lnhjalrrvbokxwimmfxx).
+[remotes.demo]
+project_id = "lnhjalrrvbokxwimmfxx"
+
+[remotes.demo.auth]
+# L'admin en ligne : les liens des e-mails (invitation, code) y mènent.
+site_url = "https://admin.ruche.website"
+# L'admin en ligne, son adresse chez Vercel et les adresses de test de Vercel.
+additional_redirect_urls = [
+  "https://admin.ruche.website/**",
+  "https://ruche-nu.vercel.app/**",
+  "https://ruche-*-vincent-lo-re.vercel.app/**",
+]
+
+[remotes.demo.auth.email]
+# Délai minimal entre deux e-mails pour une même personne.
+max_frequency = "60s"
+# En ligne, on garde la confirmation des adresses (réglage d'origine du projet).
+enable_confirmations = true
+
+# Réglages d'origine du projet en ligne, gardés tels quels : sans ces lignes, `config push` les
+# remplacerait par les valeurs locales.
+[remotes.demo.db.pooler]
+default_pool_size = 15
+max_client_conn = 200
+
+[remotes.demo.storage.analytics]
+enabled = true
+max_namespaces = 10
