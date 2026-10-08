@@ -1,8 +1,14 @@
 # Sauvegarde de la base en ligne, chaque semaine (l'offre gratuite de Supabase n'en fait pas).
+#
+# UNIQUEMENT DANS UN DÉPÔT PRIVÉ : sur un dépôt public, n'importe quel compte GitHub peut
+# télécharger les artifacts, donc toutes les données et les adresses e-mail des comptes. Le dépôt
+# Ruche est public : ce workflow y reste désactivé (Actions), comme modèle ; chaque installation
+# l'active dans son propre dépôt, privé.
+#
 # Elle ne tourne que depuis main : chaque lundi à 03:30 GMT, ou à la main (Actions › « Sauvegarde
 # de la base » › Run workflow).
 #
-# Ce qui est gardé, en fichiers SQL et CSV, dans un « artifact » du dépôt (privé) pendant 90 jours :
+# Ce qui est gardé, en fichiers SQL et CSV, dans un « artifact » du dépôt (privé, voir plus haut) pendant 90 jours :
 # - roles.sql, structure.sql : rôles et structure des schémas du projet (public, private…) ;
 # - donnees.sql : les données de ces schémas (contenus, brouillons, versions, fichiers de la
 #   médiathèque tels que la base les décrit, formules, catégories, équipe…) ;
