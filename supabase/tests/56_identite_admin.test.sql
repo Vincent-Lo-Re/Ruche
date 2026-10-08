@@ -6,7 +6,7 @@
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(58);
+select plan(64);
 
 select pg_temp.create_people();
 
@@ -290,6 +290,31 @@ select is(
 );
 select pg_temp.as_anon();
 select is((select language from public.admin_brand()), 'fr', 'anon : la langue de l''admin');
+select pg_temp.as_person('admin');
+
+-- Le site web du client : vide au départ (pas de lien « Site web ») ; un admin l'enregistre (une
+-- adresse https), un éditeur non ; tout le monde la lit par admin_brand().
+select is((select website_url from public.admin_brand()), null, 'pas de site web au départ');
+select pg_temp.as_person('editor');
+select is(
+  pg_temp.affected($$update public.admin_identity set website_url = 'https://example.com'$$), 0,
+  'éditeur : ne change pas le site web'
+);
+select pg_temp.as_person('admin');
+select throws_ok(
+  $$update public.admin_identity set website_url = 'http://example.com'$$, '23514', null,
+  'un site web en http est refusé'
+);
+select throws_ok(
+  $$update public.admin_identity set website_url = 'https://example com'$$, '23514', null,
+  'un site web mal écrit est refusé'
+);
+select is(
+  pg_temp.affected($$update public.admin_identity set website_url = 'https://example.com/fr'$$), 1,
+  'admin : enregistre le site web'
+);
+select pg_temp.as_anon();
+select is((select website_url from public.admin_brand()), 'https://example.com/fr', 'anon : le site web');
 select pg_temp.as_person('admin');
 
 -- Une seule ligne : ni ajout ni suppression, même pour un admin.

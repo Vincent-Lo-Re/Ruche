@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://declikora.app/blocks/blocks.schema.json",
+  "$id": "https://github.com/Vincent-Lo-Re/Ruche/blob/main/blocks/blocks.schema.json",
   "$comment": "Forme des blocs, écrite à la main (docs/ARCHITECTURE-CONTENUS.md, § 2). Source unique, lue par Ajv (admin, app) et par pg_jsonschema 0.3.3 (base). Après toute modification : cd web && npm run blocks:generate. Chaque variante (draft, template, published) est un document à part : ses mots-clés sont ceux de definitions.<variante>, avec toutes les definitions à côté. RÈGLES : draft-07 seulement ; aucun oneOf, anyOf ni allOf (dans pg_jsonschema 0.3.3, des branches qui descendent dans le même sous-arbre rendent la validation exponentielle : avec oneOf, le temps double à chaque niveau de liste, mesuré à 1 s pour 12 niveaux) : une union choisit sa branche selon « type » par if/then/else, avec tsType pour les types TypeScript ; additionalProperties false partout ; pas de format (non vérifié par pg_jsonschema), des pattern ; on ne fait qu'ajouter, jamais durcir une règle en place.",
   "definitions": {
     "uuid": {

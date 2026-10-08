@@ -40,7 +40,8 @@ const webRoot = fileURLToPath(new URL("../", import.meta.url))
 const BANNER =
   "Généré par web/scripts/blocks-generate.mjs (npm run blocks:generate) depuis blocks/. Ne pas modifier."
 const VARIANTS = ["draft", "template", "published"]
-const BASE_ID = "https://declikora.app/blocks/"
+const BASE_ID =
+  "https://github.com/Vincent-Lo-Re/Ruche/blob/main/blocks/generated/"
 const MIGRATIONS = repo("supabase/migrations")
 const HASH_MARKER = "-- blocks-schema-sha256: "
 

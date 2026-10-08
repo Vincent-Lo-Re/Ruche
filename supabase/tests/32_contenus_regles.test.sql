@@ -637,7 +637,7 @@ select throws_ok(
   $$update public.contents set slug = 'autre' where id = pg_temp.cid('page2')$$,
   'P0001', 'dans_la_corbeille', 'ses réglages non plus'
 );
-select set_config('declikora.detach_all', 'on', true);
+select set_config('ruche.detach_all', 'on', true);
 select lives_ok(
   $$update public.contents set draft = '{"v":1,"title":"Détaché","blocks":[]}', draft_rev = draft_rev + 1
     where id = pg_temp.cid('page2')$$,
@@ -647,7 +647,7 @@ select throws_ok(
   $$update public.contents set slug = 'autre' where id = pg_temp.cid('page2')$$,
   'P0001', 'dans_la_corbeille', '« Détacher partout » ne change que le brouillon'
 );
-select set_config('declikora.detach_all', '', true);
+select set_config('ruche.detach_all', '', true);
 select pg_temp.as_person('editor');
 select throws_ok(
   $$select pg_temp.save('page2', pg_temp.draft('[]'))$$, 'P0001', 'dans_la_corbeille',

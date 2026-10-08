@@ -72,7 +72,7 @@
                     {
                       "type": "link",
                       "attrs": {
-                        "href": "https://declikora.app/aide?x=1#y"
+                        "href": "https://example.com/aide?x=1#y"
                       }
                     }
                   ]
@@ -88,7 +88,7 @@
                     {
                       "type": "link",
                       "attrs": {
-                        "href": "mailto:bonjour@declikora.app"
+                        "href": "mailto:bonjour@example.com"
                       }
                     }
                   ]

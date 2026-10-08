@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://declikora.app/blocks/published.schema.json",
+  "$id": "https://github.com/Vincent-Lo-Re/Ruche/blob/main/blocks/generated/published.schema.json",
   "$comment": "Généré par web/scripts/blocks-generate.mjs (npm run blocks:generate) depuis blocks/. Ne pas modifier. Variante « published ». Variante « published » : le corps figé d'une version publiée (§ 2.4), ce que lit l'app. Blocs liés résolus en copies, fichier obligatoire dans chaque image, texte alternatif résolu.",
   "type": "object",
   "additionalProperties": false,

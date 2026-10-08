@@ -760,7 +760,7 @@ select is(
   'les versions publiées ne changent pas'
 );
 select is(
-  coalesce(current_setting('declikora.detach_all', true), ''), '',
+  coalesce(current_setting('ruche.detach_all', true), ''), '',
   'le passage du garde de corbeille est refermé après le geste'
 );
 select pg_temp.as_postgres();
