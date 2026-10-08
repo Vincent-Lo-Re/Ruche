@@ -985,7 +985,7 @@ export const en = {
       settingsFailed: (message: string) =>
         `Your content was created, but its settings weren't saved: ${message} You can fix them in the editor.`,
     },
-    // Ordre des listes (Le Fil, Radio Éclaircies, [D47]) : glisser-déposer.
+    // Ordre des listes (Blog, Podcasts, [D47]) : glisser-déposer.
     order: {
       column: "Order",
       handle: (title: string) => `Move “${title}”`,

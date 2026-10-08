@@ -1705,7 +1705,7 @@ describe("éditeur du Fil : en-têtes des colonnes et lecture seule", () => {
   })
 })
 
-describe("éditeur d'un épisode (Radio Éclaircies, dans l'éditeur du Fil)", () => {
+describe("éditeur d'un épisode (Podcasts, dans l'éditeur des contenus)", () => {
   const episodeTab = () => articleTab("episode")
   const audioCard = () =>
     within(episodeTab()).getByRole("region", { name: words.audio.label })

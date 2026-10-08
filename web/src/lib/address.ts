@@ -49,7 +49,7 @@ function writeText(params: URLSearchParams, name: string, value: string) {
 
 const SEARCH = "q"
 
-// --- Le Fil, Radio Éclaircies, Pages ------------------------------------------------------
+// --- Blog, Podcasts, Pages ------------------------------------------------------------
 
 const stateChoice: Choice<StateFilter> = {
   name: "status",

@@ -150,7 +150,7 @@ export function ContentListPage({
   const categories = useCategories(categorySection)
   // Les formules : réglages d'une ligne.
   const levels = useQuery(accessLevelsRead())
-  // Le Fil, Radio Éclaircies : l'image de présentation de chacun, en vignette (celles
+  // Blog, Podcasts : l'image de présentation de chacun, en vignette (celles
   // de toute la liste : une recherche ou un filtre ne les relit pas).
   const coverFor = useCovers(
     contentProfile(kind).cover === "required" ? (list.data ?? []) : []
@@ -275,7 +275,7 @@ export function ContentListPage({
     },
     onError: (error) => checkAccess(error),
   })
-  // Le Fil, Radio Éclaircies : ranger par glisser-déposer ([D47]). La liste change
+  // Blog, Podcasts : ranger par glisser-déposer ([D47]). La liste change
   // tout de suite ; si l'enregistrement échoue, elle reprend son ordre.
   const reorder = useMutation({
     mutationFn: (ids: string[]) =>
@@ -652,7 +652,7 @@ function ContentTable({
   trashing: boolean
   onTrash: (item: ContentListItem) => void
   onSettings: (item: ContentListItem) => void
-  // Le Fil, Radio Éclaircies : le glisser-déposer ([D47]) ; disabled pendant une
+  // Blog, Podcasts : le glisser-déposer ([D47]) ; disabled pendant une
   // recherche, un filtre ou un enregistrement (on ne range que la liste complète).
   order?: { disabled: boolean; onReorder: (ids: string[]) => void }
   // L'image de présentation de chacun (celles de toute la liste, lues en une fois).
@@ -660,7 +660,7 @@ function ContentTable({
 }) {
   const profile = contentProfile(kind)
   const withCategories = profile.categories !== null
-  // Le Fil, Radio Éclaircies : l'image de présentation de chacun, en vignette.
+  // Blog, Podcasts : l'image de présentation de chacun, en vignette.
   const withCover = profile.cover === "required"
   const table = (
     <ListCard>

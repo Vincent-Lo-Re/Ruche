@@ -653,7 +653,7 @@ begin
 
     if root.kind = 'page' and root.slug is not null then
       -- Deux restaurations en même temps avec la même adresse : l'une attend l'autre.
-      perform pg_advisory_xact_lock(hashtext('declikora.page_slug:' || root.slug));
+      perform pg_advisory_xact_lock(hashtext('ruche.page_slug:' || root.slug));
       if exists (
         select 1 from public.contents c
         where c.kind = 'page' and c.slug = root.slug and c.deleted_at is null and c.id <> root.id

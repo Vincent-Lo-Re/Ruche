@@ -678,7 +678,7 @@ begin
         detail = 'Choisis l''adresse de la page avant de la publier.';
     end if;
     -- Deux pages publiées en même temps avec la même adresse : l'une attend l'autre.
-    perform pg_advisory_xact_lock(hashtext('declikora.page_slug:' || target.slug));
+    perform pg_advisory_xact_lock(hashtext('ruche.page_slug:' || target.slug));
     if exists (
       select 1
       from private.live l
@@ -1068,7 +1068,7 @@ begin
   new.name := normalize(btrim(new.name), NFC);
   if tg_op = 'INSERT' and new.rank is null then
     -- Deux ajouts en même temps ne prennent pas le même rang.
-    perform pg_advisory_xact_lock(hashtext('declikora.access_levels'));
+    perform pg_advisory_xact_lock(hashtext('ruche.access_levels'));
     select coalesce(max(a.rank), 0) + 1 into new.rank from public.access_levels a;
   end if;
   return new;
@@ -1718,7 +1718,7 @@ begin
   perform private.require_admin();
 
   -- Un rangement à la fois.
-  perform pg_advisory_xact_lock(hashtext('declikora.access_levels'));
+  perform pg_advisory_xact_lock(hashtext('ruche.access_levels'));
   perform 1 from public.access_levels a order by a.id for update;
 
   if access_levels_reorder.ids is null

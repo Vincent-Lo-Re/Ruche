@@ -113,8 +113,8 @@ describe("choix de l'envoi", () => {
   })
 
   it("vise le nom d'hôte direct du stockage en ligne, la passerelle en local", () => {
-    expect(resumableEndpoint("https://kajocxepxgaquculhrky.supabase.co")).toBe(
-      "https://kajocxepxgaquculhrky.storage.supabase.co/storage/v1/upload/resumable"
+    expect(resumableEndpoint("https://abcdefghij.supabase.co")).toBe(
+      "https://abcdefghij.storage.supabase.co/storage/v1/upload/resumable"
     )
     expect(resumableEndpoint("http://127.0.0.1:54321")).toBe(
       "http://127.0.0.1:54321/storage/v1/upload/resumable"

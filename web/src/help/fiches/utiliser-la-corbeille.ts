@@ -16,7 +16,7 @@ export const fiche: HelpFiche = {
     "30 jours",
   ],
   steps: [
-    "Ouvre « Corbeille » dans le menu ; filtre par type si besoin (Médiathèque, Pages, Le Fil, Radio Éclaircies, Modèles de bloc).",
+    "Ouvre « Corbeille » dans le menu ; filtre par type si besoin (Médiathèque, Pages, Blog, Podcasts, Modèles de bloc).",
     "Pour récupérer un élément, clique sur « Restaurer » sur sa ligne.",
     "Pour effacer un élément tout de suite, clique sur « Effacer définitivement », puis confirme.",
     "Pour tout effacer, clique sur « Vider la corbeille », puis confirme.",

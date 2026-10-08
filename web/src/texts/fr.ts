@@ -1005,7 +1005,7 @@ export const fr: Texts = {
       settingsFailed: (message: string) =>
         `Le contenu est créé, mais ses réglages n'ont pas été enregistrés : ${message} Corrige-les dans l'éditeur.`,
     },
-    // Ordre des listes (Le Fil, Radio Éclaircies, [D47]) : glisser-déposer.
+    // Ordre des listes (Blog, Podcasts, [D47]) : glisser-déposer.
     order: {
       column: "Ordre",
       handle: (title: string) => `Déplacer « ${title} »`,

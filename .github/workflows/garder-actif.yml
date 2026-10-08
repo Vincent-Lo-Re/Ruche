@@ -1,12 +1,13 @@
 # Garder le projet Supabase gratuit actif (docs/ARCHITECTURE-CONTENUS.md, § 3.9, [D19]).
 #
 # Supabase met en pause un projet gratuit qui n'a pas reçu assez de requêtes vers sa base en
-# une semaine. Une fois par jour, ce workflow fait UNE requête légère à la base de PRODUCTION :
+# une semaine. Une fois par jour, ce workflow fait UNE requête légère à la base de la démo de Ruche :
 # la fonction public.ping(), qui répond « true » sans rien lire ni écrire, appelée avec la clé
 # publishable (publique, déjà dans l'admin). Aucun secret.
 #
 # Un workflow planifié ne tourne que depuis la branche par défaut (main), en UTC ; GitHub peut
 # le retarder aux heures chargées (d'où 06:17 et non 06:00). À retirer au passage à l'offre Pro.
+# Une installation de Ruche pour un client a le sien, dans son propre dépôt.
 name: Garder le projet actif
 
 on:
@@ -22,10 +23,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Appel de ping() sur le projet « Declikora »
+      - name: Appel de ping() sur la démo de Ruche
         env:
-          SUPABASE_URL: https://kajocxepxgaquculhrky.supabase.co
-          SUPABASE_PUBLISHABLE_KEY: sb_publishable_nwCD7WH9Btl4RDEWktB4zw_lcRYwrI_
+          SUPABASE_URL: https://lnhjalrrvbokxwimmfxx.supabase.co
+          SUPABASE_PUBLISHABLE_KEY: sb_publishable_vtIupNGGwB-FALliOqgP8A_KqNHOUof
         run: |
           answer=$(curl --fail --silent --show-error --retry 3 --retry-delay 20 --max-time 30 \
             "$SUPABASE_URL/rest/v1/rpc/ping" \

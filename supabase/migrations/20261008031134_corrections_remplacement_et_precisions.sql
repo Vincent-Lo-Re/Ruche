@@ -39,7 +39,7 @@ begin
 
   -- Le brouillon d'un contenu à la Corbeille change aussi : la même permission que « Détacher
   -- partout » (contents_trash_guard n'accepte alors que le brouillon), le temps de la boucle.
-  perform set_config('declikora.detach_all', 'on', true);
+  perform set_config('ruche.detach_all', 'on', true);
 
   for target in
     select c.id, c.title from public.contents c
@@ -70,7 +70,7 @@ begin
     replaced := replaced + 1;
   end loop;
 
-  perform set_config('declikora.detach_all', '', true);
+  perform set_config('ruche.detach_all', '', true);
 
   return jsonb_build_object('replaced', replaced, 'kept', kept);
 end;
@@ -952,7 +952,7 @@ begin
   end if;
 
   -- Le garde de corbeille laisse passer ces changements du brouillon (§ 3.2, cas 3).
-  perform set_config('declikora.detach_all', 'on', true);
+  perform set_config('ruche.detach_all', 'on', true);
 
   for target in
     select c.id, c.draft from public.contents c where c.id = any (users) order by c.id
@@ -989,6 +989,6 @@ begin
     return query select target.id, new_rev;
   end loop;
 
-  perform set_config('declikora.detach_all', '', true);
+  perform set_config('ruche.detach_all', '', true);
 end;
 $$;

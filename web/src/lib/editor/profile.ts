@@ -33,7 +33,7 @@ export type ContentProfile = {
 }
 
 /**
- * Celles qui ont une carte dans une liste de l'app (le Fil, Radio Éclaircies) : leur image de
+ * Celles qui ont une carte dans une liste de l'app (Blog, Podcasts) : leur image de
  * présentation est exigée ([D45]), et la colonne de droite montre cette carte.
  */
 export type ListedKind = Extract<ContentKind, "article" | "episode">

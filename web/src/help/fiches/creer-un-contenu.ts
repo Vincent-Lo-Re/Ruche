@@ -16,7 +16,7 @@ export const fiche: HelpFiche = {
     "écrire",
   ],
   steps: [
-    "Ouvre « Le Fil », « Radio Éclaircies » ou « Pages » dans le menu.",
+    "Ouvre « Blog », « Podcasts » ou « Pages » dans le menu.",
     "Clique sur « Nouvel article », « Nouvel épisode » ou « Nouvelle page ».",
     "Écris le titre : il suffit pour commencer.",
     "Si la liste en propose, choisis un « Point de départ » : le contenu s'ouvre avec une structure déjà en place.",
@@ -27,6 +27,6 @@ export const fiche: HelpFiche = {
     "Tout ce que tu écris est enregistré automatiquement, quelques secondes après chaque changement.",
     "Le niveau d'accès se choisit ensuite, dans l'éditeur : il n'y a pas de niveau par défaut.",
     "L'adresse d'une page vient de son titre. Si une autre page l'a déjà, la création est bloquée : change le titre. Ensuite, l'adresse ne suit plus le titre, et elle se modifie dans la carte « Adresse de la page ».",
-    "Dans Le Fil et Radio Éclaircies, un contenu neuf arrive en tête de liste. Range la liste avec la poignée en tête de ligne : l'app montre les contenus en ligne dans cet ordre.",
+    "Dans le Blog et les Podcasts, un contenu neuf arrive en tête de liste. Range la liste avec la poignée en tête de ligne : l'app montre les contenus en ligne dans cet ordre.",
   ],
 }

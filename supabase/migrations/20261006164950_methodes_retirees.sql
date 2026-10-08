@@ -229,8 +229,8 @@ begin
 end;
 $$;
 
--- Un contenu neuf arrive en tête de sa liste (une place avant la première) : Le Fil et Radio
--- Éclaircies.
+-- Un contenu neuf arrive en tête de sa liste (une place avant la première) : le Blog et les
+-- Podcasts.
 create or replace function private.contents_list_position()
 returns trigger
 language plpgsql
@@ -300,7 +300,7 @@ begin
 end;
 $$;
 
--- Range la liste d'une section ([D47]) : Le Fil, Radio Éclaircies.
+-- Range la liste d'une section ([D47]) : le Blog, les Podcasts.
 create or replace function public.contents_reorder(kind text, ids uuid[])
 returns table (id uuid, list_position integer)
 language plpgsql
@@ -320,7 +320,7 @@ begin
   end if;
 
   -- Un rangement à la fois par sorte.
-  perform pg_advisory_xact_lock(hashtext('declikora.list:' || contents_reorder.kind));
+  perform pg_advisory_xact_lock(hashtext('ruche.list:' || contents_reorder.kind));
   perform 1 from public.contents c
   where c.kind = contents_reorder.kind and c.deleted_at is null
   order by c.id
@@ -1300,7 +1300,7 @@ begin
         detail = 'Choisis l''adresse de la page avant de la publier.';
     end if;
     -- Deux pages publiées en même temps avec la même adresse : l'une attend l'autre.
-    perform pg_advisory_xact_lock(hashtext('declikora.page_slug:' || target.slug));
+    perform pg_advisory_xact_lock(hashtext('ruche.page_slug:' || target.slug));
     if exists (
       select 1
       from private.live l
@@ -1580,7 +1580,7 @@ begin
 
     if root.kind = 'page' and root.slug is not null then
       -- Deux restaurations en même temps avec la même adresse : l'une attend l'autre.
-      perform pg_advisory_xact_lock(hashtext('declikora.page_slug:' || root.slug));
+      perform pg_advisory_xact_lock(hashtext('ruche.page_slug:' || root.slug));
       if exists (
         select 1 from public.contents c
         where c.kind = 'page' and c.slug = root.slug and c.deleted_at is null and c.id <> root.id
@@ -2160,7 +2160,7 @@ begin
   end if;
 
   -- Le garde de corbeille laisse passer ces changements du brouillon (§ 3.2, cas 3).
-  perform set_config('declikora.detach_all', 'on', true);
+  perform set_config('ruche.detach_all', 'on', true);
 
   for target in
     select c.id, c.draft from public.contents c where c.id = any (users) order by c.id
@@ -2197,7 +2197,7 @@ begin
     return query select target.id, new_rev;
   end loop;
 
-  perform set_config('declikora.detach_all', '', true);
+  perform set_config('ruche.detach_all', '', true);
 end;
 $$;
 
