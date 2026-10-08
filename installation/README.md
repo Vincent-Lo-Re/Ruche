@@ -11,6 +11,14 @@ valeurs. Le code de Ruche ne nomme aucune installation.
 
 Aucun secret dans ces fichiers : le dépôt est public.
 
+## La démo de Ruche en ligne
+
+- Admin : https://admin.ruche.website (projet Vercel « ruche », domaine `ruche.website` acheté chez
+  Vercel, DNS chez Vercel), aussi https://ruche-nu.vercel.app.
+- Base : projet Supabase `lnhjalrrvbokxwimmfxx`.
+- E-mails : compte Brevo de Ruche, domaine `ruche.website` authentifié (code Brevo, DKIM `brevo1`
+  et `brevo2`, DMARC, dans les DNS de Vercel), expéditeur `ne-pas-repondre@ruche.website`.
+
 ## Ce qui se fait tout seul
 
 Le projet Supabase est relié au dépôt GitHub (intégration GitHub, branche `main`, « Deploy to
