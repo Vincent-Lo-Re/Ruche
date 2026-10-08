@@ -279,7 +279,7 @@ describe("Médiathèque", () => {
       screen.getByRole("columnheader", { name: texts.media.columns.size })
     ).toBeVisible()
     // La préférence est gardée pour la prochaine visite.
-    expect(localStorage.getItem("declikora:mediatheque:affichage")).toBe("list")
+    expect(localStorage.getItem("ruche:mediatheque:affichage")).toBe("list")
   })
 
   it("dit quand la médiathèque est vide", async () => {
@@ -789,7 +789,7 @@ describe("Sélection en masse", () => {
     })
     vi.mocked(api.restoreMedia).mockResolvedValue(photo)
     // En liste : les mêmes cases, dans la première colonne.
-    localStorage.setItem("declikora:mediatheque:affichage", "list")
+    localStorage.setItem("ruche:mediatheque:affichage", "list")
     await renderApp("/media")
     await screen.findByText(photo.name)
 

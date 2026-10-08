@@ -18,10 +18,11 @@ import { texts } from "@/texts"
 const labels = texts.settings.adminIdentity
 
 /**
- * Le nom de la marque et son adresse de contact (onglet « Identité de l'admin » des Paramètres,
- * admins), carte de la section « Marque » (son titre et son explication sont à gauche,
- * SettingsSection) : les deux champs côte à côte, « Enregistrer » dans le pied gris. Le nom
- * s'affiche dans l'admin (vide : le nom à défaut) ; l'adresse aide sur l'écran de connexion.
+ * Le nom de la marque, son adresse de contact et son site web (onglet « Identité de l'admin » des
+ * Paramètres, admins), carte de la section « Marque » (son titre et son explication sont à
+ * gauche, SettingsSection) : le nom et l'adresse côte à côte, le site web dessous, « Enregistrer »
+ * dans le pied gris. Le nom s'affiche dans l'admin (vide : le nom à défaut) ; l'adresse aide sur
+ * l'écran de connexion ; le site web est le lien « Site web » du header (vide : pas de lien).
  */
 export function AdminIdentityCard() {
   const brand = useQuery(adminBrandRead())
@@ -29,6 +30,7 @@ export function AdminIdentityCard() {
     <BrandDetailsForm
       name={brand.data.name}
       contactEmail={brand.data.contactEmail}
+      websiteUrl={brand.data.websiteUrl}
     />
   ) : (
     <Card>
@@ -42,20 +44,34 @@ export function AdminIdentityCard() {
 function BrandDetailsForm({
   name,
   contactEmail,
+  websiteUrl,
 }: {
   name: string | null
   contactEmail: string | null
+  websiteUrl: string | null
 }) {
   const queryClient = useQueryClient()
   const form = useForm({
     resolver: zodResolver(adminNameSchema),
-    defaultValues: { name: name ?? "", contactEmail: contactEmail ?? "" },
+    defaultValues: {
+      name: name ?? "",
+      contactEmail: contactEmail ?? "",
+      websiteUrl: websiteUrl ?? "",
+    },
   })
 
   const save = useMutation({
-    // Vides : la base garde null (le nom à défaut, pas d'adresse).
-    mutationFn: (values: { name: string; contactEmail: string }) =>
-      saveBrandDetails(values.name || null, values.contactEmail || null),
+    // Vides : la base garde null (le nom à défaut, pas d'adresse, pas de lien).
+    mutationFn: (values: {
+      name: string
+      contactEmail: string
+      websiteUrl: string
+    }) =>
+      saveBrandDetails({
+        name: values.name || null,
+        contactEmail: values.contactEmail || null,
+        websiteUrl: values.websiteUrl || null,
+      }),
     onSuccess: async (_, values) => {
       form.reset(values)
       await queryClient.invalidateQueries({ queryKey: adminBrandKey })
@@ -98,6 +114,29 @@ function BrandDetailsForm({
                   type="email"
                   autoComplete="email"
                   placeholder={labels.emailPlaceholder}
+                  aria-invalid={fieldState.invalid}
+                />
+                <FieldError errors={[fieldState.error]} />
+              </Field>
+            )}
+          />
+          <Controller
+            name="websiteUrl"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field
+                data-invalid={fieldState.invalid}
+                className="@lg:col-span-2"
+              >
+                <FieldLabel htmlFor="admin-website">
+                  {labels.website}
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id="admin-website"
+                  type="url"
+                  autoComplete="url"
+                  placeholder={labels.websitePlaceholder}
                   aria-invalid={fieldState.invalid}
                 />
                 <FieldError errors={[fieldState.error]} />

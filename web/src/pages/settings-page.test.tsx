@@ -67,6 +67,7 @@ const brand = (name: string | null): identityApi.AdminBrand => ({
   monogramMotion: true,
   monogramMotions: ["trace", "glint", "breathe"],
   contactEmail: null,
+  websiteUrl: null,
   language: "en",
   variants: {},
 })
@@ -179,7 +180,11 @@ describe("Paramètres : le nom de la marque", () => {
 
     // Sans les espaces autour ; puis relu pour toute l'admin.
     await waitFor(() =>
-      expect(identityApi.saveBrandDetails).toHaveBeenCalledWith("Essaim", null)
+      expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
+        name: "Essaim",
+        contactEmail: null,
+        websiteUrl: null,
+      })
     )
     expect(await screen.findByText(identity.saved)).toBeVisible()
     // Une autre marque sans logo : son nom en texte, plus le logotype de Ruche.
@@ -206,7 +211,11 @@ describe("Paramètres : le nom de la marque", () => {
       screen.getByRole("button", { name: texts.settings.adminIdentity.save })
     )
     await waitFor(() =>
-      expect(identityApi.saveBrandDetails).toHaveBeenCalledWith(null, null)
+      expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
+        name: null,
+        contactEmail: null,
+        websiteUrl: null,
+      })
     )
   })
 })
@@ -229,10 +238,34 @@ describe("Paramètres : l'adresse de contact de la marque", () => {
       screen.getByRole("button", { name: texts.settings.adminIdentity.save })
     )
     await waitFor(() =>
-      expect(identityApi.saveBrandDetails).toHaveBeenCalledWith(
-        null,
-        "aide@exemple.fr"
-      )
+      expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
+        name: null,
+        contactEmail: "aide@exemple.fr",
+        websiteUrl: null,
+      })
+    )
+  })
+})
+
+describe("Paramètres : le site web du client", () => {
+  const identity = texts.settings.adminIdentity
+
+  it("une adresse sans https est refusée ; une bonne part avec le reste", async () => {
+    await renderApp("/settings")
+    const field = await screen.findByLabelText(identity.website)
+    fireEvent.change(field, { target: { value: "http://example.com" } })
+    fireEvent.click(screen.getByRole("button", { name: identity.save }))
+    expect(await screen.findByText(identity.invalidWebsite)).toBeVisible()
+    expect(identityApi.saveBrandDetails).not.toHaveBeenCalled()
+
+    fireEvent.change(field, { target: { value: " https://example.com/fr " } })
+    fireEvent.click(screen.getByRole("button", { name: identity.save }))
+    await waitFor(() =>
+      expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
+        name: null,
+        contactEmail: null,
+        websiteUrl: "https://example.com/fr",
+      })
     )
   })
 })

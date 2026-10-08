@@ -30,7 +30,7 @@ function field(value: string): string {
 /**
  * Le CSV des utilisations : une ligne par contenu (titre, section, dans un brouillon et en ligne,
  * ou copié pour un modèle copié, à la Corbeille quand on le sait, adresse de son éditeur). origin : l'adresse de l'admin
- * (« https://admin.declikora.app »), pour des liens qui s'ouvrent hors de l'admin.
+ * (« https://admin.example.com »), pour des liens qui s'ouvrent hors de l'admin.
  */
 export function usesCsv(uses: readonly ContentUse[], origin: string): string {
   const { csv } = words

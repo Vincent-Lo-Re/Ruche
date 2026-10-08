@@ -149,7 +149,7 @@ async function sendResumable(request: TransferRequest): Promise<void> {
       uploadDataDuringCreation: true,
       removeFingerprintOnSuccess: true,
       // Une empreinte par chemin : on ne reprend jamais l'envoi d'un autre fichier.
-      fingerprint: async () => `declikora-envoi:${path}`,
+      fingerprint: async () => `ruche-envoi:${path}`,
       metadata: {
         bucketName: PROTECTED_BUCKET,
         objectName: path,

@@ -4,13 +4,13 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest"
 let dates: typeof import("@/lib/dates")
 
 beforeAll(async () => {
-  localStorage.setItem("declikora-langue", "en")
+  localStorage.setItem("ruche-langue", "en")
   vi.resetModules()
   dates = await import("@/lib/dates")
 })
 
 afterAll(() => {
-  localStorage.setItem("declikora-langue", "fr")
+  localStorage.setItem("ruche-langue", "fr")
   vi.resetModules()
 })
 

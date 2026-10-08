@@ -67,6 +67,8 @@ export type AdminBrand = { name: string | null } & Record<
     monogramMotions: Motion[]
     /** L'adresse de contact de la marque, sur l'écran de connexion (ou null). */
     contactEmail: string | null
+    /** Le site web du client, où mène « Site web » dans le header (ou null : pas de lien). */
+    websiteUrl: string | null
     /** La langue de toute l'admin (Paramètres › Avancé). */
     language: Language
   }
@@ -79,6 +81,7 @@ type BrandRow = Pick<
   | "login_monogram_motion"
   | "login_monogram_motions"
   | "contact_email"
+  | "website_url"
   | "language"
 >
 
@@ -130,6 +133,7 @@ export async function getAdminBrand(): Promise<AdminBrand> {
       isMotion
     ),
     contactEmail: row.contact_email ?? null,
+    websiteUrl: row.website_url ?? null,
     language: isLanguage(row.language) ? row.language : "en",
     variants: Object.fromEntries(
       variants.data.map((variant) => [
@@ -153,14 +157,19 @@ async function updateIdentity(values: Partial<BrandRow>): Promise<void> {
 }
 
 /**
- * Change le nom de la marque et son adresse de contact (admins) ; null : le nom à défaut, ou pas
- * d'adresse.
+ * Change le nom de la marque, son adresse de contact et son site web (admins) ; null : le nom à
+ * défaut, pas d'adresse, pas de lien « Site web ».
  */
-export function saveBrandDetails(
-  name: string | null,
+export function saveBrandDetails(details: {
+  name: string | null
   contactEmail: string | null
-): Promise<void> {
-  return updateIdentity({ name, contact_email: contactEmail })
+  websiteUrl: string | null
+}): Promise<void> {
+  return updateIdentity({
+    name: details.name,
+    contact_email: details.contactEmail,
+    website_url: details.websiteUrl,
+  })
 }
 
 /** Change la langue de toute l'admin (admins). */

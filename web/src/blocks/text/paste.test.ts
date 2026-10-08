@@ -72,16 +72,16 @@ describe("contenu collé dans un bloc Texte", () => {
 
   it("ne garde des liens que l'adresse, et seulement https:// ou mailto:", () => {
     const doc = paste(
-      '<p><a href="https://declikora.app" target="_blank" rel="nofollow" class="x" title="t">bon</a> ' +
+      '<p><a href="https://example.com" target="_blank" rel="nofollow" class="x" title="t">bon</a> ' +
         '<a href="javascript:alert(1)">piège</a> <a href="http://pas-sur.fr">http</a> ' +
-        '<a href="mailto:bonjour@declikora.app">e-mail</a></p>'
+        '<a href="mailto:bonjour@example.com">e-mail</a></p>'
     )
     const marks = JSON.stringify(doc)
     expect(marks).toContain(
-      '{"type":"link","attrs":{"href":"https://declikora.app"}}'
+      '{"type":"link","attrs":{"href":"https://example.com"}}'
     )
     expect(marks).toContain(
-      '{"type":"link","attrs":{"href":"mailto:bonjour@declikora.app"}}'
+      '{"type":"link","attrs":{"href":"mailto:bonjour@example.com"}}'
     )
     expect(marks).not.toContain("javascript:")
     expect(marks).not.toContain("http://")
@@ -112,8 +112,6 @@ describe("contenu collé dans un bloc Texte", () => {
     expect(current.commands.setLink({ href: "javascript:alert(1)" })).toBe(
       false
     )
-    expect(current.commands.setLink({ href: "https://declikora.app" })).toBe(
-      true
-    )
+    expect(current.commands.setLink({ href: "https://example.com" })).toBe(true)
   })
 })

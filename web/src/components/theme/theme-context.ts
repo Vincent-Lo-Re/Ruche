@@ -3,7 +3,7 @@ import { createContext, useContext } from "react"
 export type Theme = "light" | "dark" | "system"
 
 // Même clé que public/theme.js, qui applique le thème avant l'affichage.
-export const THEME_STORAGE_KEY = "declikora-theme"
+export const THEME_STORAGE_KEY = "ruche-theme"
 
 export function isTheme(value: unknown): value is Theme {
   return value === "light" || value === "dark" || value === "system"

@@ -5,7 +5,7 @@
 // Le stockage peut être indisponible (navigation privée, données bloquées) : la connexion
 // marche alors quand même, sans cette reprise.
 
-const storageKey = "declikora.connexion"
+const storageKey = "ruche.connexion"
 
 // Durée de validité d'un code : auth.email.otp_expiry dans supabase/config.toml.
 const codeValidityMs = 10 * 60 * 1000

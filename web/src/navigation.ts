@@ -69,9 +69,6 @@ export const menu = {
 // largeur ») ; Équipe et Paramètres pour les admins seulement.
 export const header: SectionKey[] = ["account", "team", "settings"]
 
-// Le site public, ouvert par « Site web » dans un nouvel onglet.
-export const siteUrl = "https://declikora.fr"
-
 /** Adresse de l'éditeur d'un contenu : « /pages/<id> ». */
 export function editorPath(section: SectionKey, contentId: string): string {
   return `${sections[section].path}/${contentId}`

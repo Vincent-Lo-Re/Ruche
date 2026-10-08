@@ -50,6 +50,7 @@ describe("le nom de la marque", () => {
       monogramMotion: true,
       monogramMotions: ["trace", "glint", "breathe"],
       contactEmail: null,
+      websiteUrl: null,
       language: "en",
       variants: {
         "logotype:zinc-blue:dark": "bleu",
@@ -168,6 +169,7 @@ describe("le nom de la marque", () => {
       monogramMotion: true,
       monogramMotions: ["trace", "glint", "breathe"],
       contactEmail: null,
+      websiteUrl: null,
       language: "en",
       variants: {},
     }

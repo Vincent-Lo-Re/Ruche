@@ -2267,10 +2267,10 @@ export const en = {
     },
     // Onglet « Identité de l'admin » : le nom de la marque, pour toute l'équipe.
     adminIdentity: {
-      // La carte de la marque : son nom et son adresse de contact.
+      // La carte de la marque : son nom, son adresse de contact et son site web.
       title: "Brand",
       description:
-        "The name your team sees in the menu, the browser tab, and on the sign-in screen. Your contact email is shown on the sign-in screen so anyone who's lost their phone or invitation can reach you.",
+        "The name your team sees in the menu, the browser tab, and on the sign-in screen. Your contact email is shown on the sign-in screen so anyone who's lost their phone or invitation can reach you. Your website is linked at the top of every page; leave it empty to hide the link.",
       name: "Brand name",
       save: "Save",
       nameTooLong: "The name can't be longer than 40 characters.",
@@ -2278,6 +2278,10 @@ export const en = {
       email: "Contact email",
       emailPlaceholder: "contact@example.com",
       invalidEmail: "Enter a valid email address.",
+      // Le site web, ouvert par « Website » dans le header ; vide : pas de lien.
+      website: "Website",
+      websitePlaceholder: "https://example.com",
+      invalidWebsite: "Enter a web address that starts with https://.",
       saved: "Brand settings saved.",
       loadFailed: "Couldn't load brand settings.",
       // Le logotype et le monogramme, chacun pour fond clair et pour fond sombre : une carte

@@ -46,6 +46,9 @@ export const profileSchema = z.object({
 
 // Le nom de la marque : mêmes limites que la base (table admin_identity) ; vide : « Ruche ».
 const ADMIN_NAME_MAX = 40
+// Le site web du client : une adresse https, comme l'exige la base.
+const WEBSITE_MAX = 2048
+const WEBSITE_PATTERN = /^https:\/\/[^\s/?#]+\.[^\s/?#]+(\/\S*)?$/
 
 export const adminNameSchema = z.object({
   name: z
@@ -57,6 +60,15 @@ export const adminNameSchema = z.object({
     z.literal(""),
     email(texts.settings.adminIdentity.invalidEmail),
   ]),
+  // Vide : pas de lien « Site web ». Même règle que la base (admin_identity.website_url).
+  websiteUrl: z
+    .string()
+    .trim()
+    .refine(
+      (url) =>
+        url === "" || (url.length <= WEBSITE_MAX && WEBSITE_PATTERN.test(url)),
+      texts.settings.adminIdentity.invalidWebsite
+    ),
 })
 
 export const inviteSchema = z.object({

@@ -3,6 +3,7 @@ import { NavLink, useLocation } from "react-router"
 
 import { useAuth } from "@/auth/auth-context"
 import { HelpSearch } from "@/components/help/help-search"
+import { useBrand } from "@/hooks/use-brand-name"
 import { ThemeMenu } from "@/components/theme/theme-menu"
 import {
   NavigationMenu,
@@ -11,23 +12,19 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
-import {
-  adminOnlySections,
-  header,
-  isInSection,
-  sections,
-  siteUrl,
-} from "@/navigation"
+import { adminOnlySections, header, isInSection, sections } from "@/navigation"
 import { texts } from "@/texts"
 
 /**
  * Le header, sur toute la largeur des pages avec le menu (ADMIN § 7, « Un header sur toute la
- * largeur ») : à gauche « Site web », Mon compte, Équipe et Paramètres (le NavigationMenu de
- * shadcn ; Équipe et Paramètres pour les admins) ; à droite la recherche de l'aide et le thème.
+ * largeur ») : à gauche « Site web » (le site du client, réglé dans Paramètres ; sans site, pas
+ * de lien), Mon compte, Équipe et Paramètres (le NavigationMenu de shadcn ; Équipe et Paramètres
+ * pour les admins) ; à droite la recherche de l'aide et le thème.
  */
 export function AppHeader() {
   const { profile } = useAuth()
   const { pathname } = useLocation()
+  const websiteUrl = useBrand()?.websiteUrl
   const links =
     profile?.role === "admin"
       ? header
@@ -37,18 +34,20 @@ export function AppHeader() {
     <header className="flex h-(--header-height) w-full shrink-0 items-center gap-4 bg-background px-(--page-gap)">
       <NavigationMenu aria-label={texts.header.label}>
         <NavigationMenuList>
-          <NavigationMenuItem>
-            <NavigationMenuLink
-              href={siteUrl}
-              target="_blank"
-              rel="noopener"
-              className={navigationMenuTriggerStyle()}
-            >
-              {texts.header.website}
-              <ExternalLink aria-hidden className="size-3.5" />
-              <span className="sr-only"> {texts.header.newTab}</span>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
+          {websiteUrl && (
+            <NavigationMenuItem>
+              <NavigationMenuLink
+                href={websiteUrl}
+                target="_blank"
+                rel="noopener"
+                className={navigationMenuTriggerStyle()}
+              >
+                {texts.header.website}
+                <ExternalLink aria-hidden className="size-3.5" />
+                <span className="sr-only"> {texts.header.newTab}</span>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          )}
           {links.map((key) => (
             <NavigationMenuItem key={key}>
               <NavigationMenuLink

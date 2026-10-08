@@ -19,8 +19,8 @@ const DEFAULT_LANGUAGE: Language = isLanguage(
   : "en"
 
 // La langue choisie par le membre, et celle de toute l'admin, retenues à la dernière visite.
-const MEMBER_KEY = "declikora-langue"
-const ADMIN_KEY = "declikora-langue-admin"
+const MEMBER_KEY = "ruche-langue"
+const ADMIN_KEY = "ruche-langue-admin"
 
 function read(key: string): Language | null {
   try {

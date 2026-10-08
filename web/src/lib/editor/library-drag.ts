@@ -6,7 +6,7 @@
 import type { InsertableType } from "@/blocks/registry"
 
 // Le type des données glissées : l'aperçu n'accepte que lui (pas un fichier, pas du texte).
-export const LIBRARY_DRAG_TYPE = "application/x-declikora-bloc"
+export const LIBRARY_DRAG_TYPE = "application/x-ruche-bloc"
 
 export type LibraryDrag =
   { kind: "block"; type: InsertableType } | { kind: "template"; id: string }

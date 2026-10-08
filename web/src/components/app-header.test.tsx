@@ -1,10 +1,36 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react"
-import { afterEach, describe, expect, it } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { helpFiches } from "@/help/fiches"
-import { siteUrl } from "@/navigation"
+import * as identityApi from "@/lib/admin-identity"
 import { fakeAuth, renderApp } from "@/test/render"
 import { texts } from "@/texts"
+
+vi.mock("@/lib/admin-identity", async (importOriginal) => ({
+  ...(await importOriginal<typeof identityApi>()),
+  getAdminBrand: vi.fn(),
+}))
+
+const brand = (websiteUrl: string | null): identityApi.AdminBrand => ({
+  name: null,
+  "logotype-light": null,
+  "logotype-dark": null,
+  "monogram-light": null,
+  "monogram-dark": null,
+  loginImage: null,
+  monogramMotion: true,
+  monogramMotions: ["breathe"],
+  contactEmail: null,
+  websiteUrl,
+  language: "fr",
+  variants: {},
+})
+
+beforeEach(() => {
+  vi.mocked(identityApi.getAdminBrand).mockResolvedValue(
+    brand("https://example.com")
+  )
+})
 
 afterEach(() => {
   localStorage.clear()
@@ -15,14 +41,14 @@ const headerNav = () =>
   screen.getByRole("navigation", { name: texts.header.label })
 
 describe("header (ADMIN § 7, « Un header sur toute la largeur »)", () => {
-  it("à gauche : « Site web » dans un nouvel onglet, puis Mon compte, Équipe et Paramètres", async () => {
+  it("à gauche : « Site web » (le site réglé dans Paramètres) dans un nouvel onglet, puis Mon compte, Équipe et Paramètres", async () => {
     await renderApp("/account", fakeAuth({ role: "admin" }))
 
     const site = await within(headerNav()).findByRole("link", {
       name: new RegExp(`^${texts.header.website}`),
     })
     expect(site).toHaveTextContent(texts.header.newTab)
-    expect(site).toHaveAttribute("href", siteUrl)
+    expect(site).toHaveAttribute("href", "https://example.com")
     expect(site).toHaveAttribute("target", "_blank")
     // La page ouverte est marquée dans le header.
     expect(
@@ -33,6 +59,17 @@ describe("header (ADMIN § 7, « Un header sur toute la largeur »)", () => {
       "data-slot",
       "sidebar-wrapper"
     )
+  })
+
+  it("sans site web réglé, pas de lien « Site web »", async () => {
+    vi.mocked(identityApi.getAdminBrand).mockResolvedValue(brand(null))
+    await renderApp("/account", fakeAuth({ role: "admin" }))
+    await within(headerNav()).findByRole("link", { name: "Mon compte" })
+    expect(
+      within(headerNav()).queryByRole("link", {
+        name: new RegExp(`^${texts.header.website}`),
+      })
+    ).toBeNull()
   })
 
   it("à droite : le thème change au clic, sans menu (Clair, Sombre, Automatique)", async () => {

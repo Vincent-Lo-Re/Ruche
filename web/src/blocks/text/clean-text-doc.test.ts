@@ -39,9 +39,7 @@ describe("cleanTextDoc", () => {
             {
               type: "text",
               text: "lien",
-              marks: [
-                { type: "link", attrs: { href: "https://declikora.app" } },
-              ],
+              marks: [{ type: "link", attrs: { href: "https://example.com" } }],
             },
           ],
         },
@@ -219,9 +217,9 @@ describe("cleanTextDoc", () => {
 
 describe("adresses des liens", () => {
   it("n'accepte que https:// et mailto:, sans espace", () => {
-    expect(isAllowedHref("https://declikora.app")).toBe(true)
-    expect(isAllowedHref("mailto:bonjour@declikora.app")).toBe(true)
-    expect(isAllowedHref("http://declikora.app")).toBe(false)
+    expect(isAllowedHref("https://example.com")).toBe(true)
+    expect(isAllowedHref("mailto:bonjour@example.com")).toBe(true)
+    expect(isAllowedHref("http://example.com")).toBe(false)
     expect(isAllowedHref("javascript:alert(1)")).toBe(false)
     expect(isAllowedHref("/aide")).toBe(false)
     expect(isAllowedHref("https://a b")).toBe(false)
@@ -229,8 +227,8 @@ describe("adresses des liens", () => {
   })
 
   it("corrige la casse du début et les espaces autour", () => {
-    expect(normalizeHref("  HTTPS://declikora.app/Aide ")).toBe(
-      "https://declikora.app/Aide"
+    expect(normalizeHref("  HTTPS://example.com/Aide ")).toBe(
+      "https://example.com/Aide"
     )
     expect(normalizeHref("MailTo:x@y.fr")).toBe("mailto:x@y.fr")
     expect(normalizeHref("javascript:alert(1)")).toBeNull()

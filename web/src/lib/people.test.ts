@@ -25,9 +25,7 @@ describe("initial", () => {
   })
 
   it("sans nom, la première lettre de l'e-mail", () => {
-    expect(initial({ full_name: null, email: "vincent@declikora.test" })).toBe(
-      "V"
-    )
+    expect(initial({ full_name: null, email: "vera@example.com" })).toBe("V")
     expect(initial({ full_name: "   ", email: "zoe@x.fr" })).toBe("Z")
   })
 })

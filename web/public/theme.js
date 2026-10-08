@@ -3,7 +3,7 @@
 ;(function () {
   var theme = "system"
   try {
-    theme = localStorage.getItem("declikora-theme") || "system"
+    theme = localStorage.getItem("ruche-theme") || "system"
   } catch (e) {
     // Stockage indisponible : on suit l'ordinateur.
   }

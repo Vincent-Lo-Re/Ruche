@@ -2316,10 +2316,10 @@ export const fr: Texts = {
     },
     // Onglet « Identité de l'admin » : le nom de la marque, pour toute l'équipe.
     adminIdentity: {
-      // La carte de la marque : son nom et son adresse de contact.
+      // La carte de la marque : son nom, son adresse de contact et son site web.
       title: "Marque",
       description:
-        "Le nom que ton équipe voit dans le menu, l'onglet du navigateur et l'écran de connexion. L'adresse e-mail de contact s'affiche sur l'écran de connexion, pour que qui a perdu son téléphone ou son invitation puisse te joindre.",
+        "Le nom que ton équipe voit dans le menu, l'onglet du navigateur et l'écran de connexion. L'adresse e-mail de contact s'affiche sur l'écran de connexion, pour que qui a perdu son téléphone ou son invitation puisse te joindre. Le site web est accessible en haut de chaque page ; laisse-le vide pour masquer le lien.",
       name: "Le nom de ta marque",
       save: "Enregistrer",
       nameTooLong: "Le nom ne doit pas dépasser 40 caractères.",
@@ -2327,6 +2327,10 @@ export const fr: Texts = {
       email: "Adresse e-mail de contact",
       emailPlaceholder: "contact@exemple.fr",
       invalidEmail: "Saisis une adresse e-mail valide.",
+      // Le site web, ouvert par « Site web » dans le header ; vide : pas de lien.
+      website: "Site web",
+      websitePlaceholder: "https://exemple.fr",
+      invalidWebsite: "Saisis une adresse web qui commence par https://.",
       saved: "Marque enregistrée.",
       loadFailed: "La marque n'a pas pu être chargée.",
       // Le logotype et le monogramme, chacun pour fond clair et pour fond sombre : une carte

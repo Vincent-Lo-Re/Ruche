@@ -1248,7 +1248,7 @@ export type Palette = { base: BaseColor; accent: AccentColor }
 export const DEFAULT_PALETTE: Palette = { base: "neutral", accent: "none" }
 
 // La clé du choix, sur le navigateur de chacun (comme le thème clair ou sombre).
-export const PALETTE_STORAGE_KEY = "declikora-couleurs"
+export const PALETTE_STORAGE_KEY = "ruche-couleurs"
 
 function isPalette(value: unknown): value is Palette {
   if (typeof value !== "object" || value === null) return false
@@ -1320,7 +1320,7 @@ export function savePalette(palette: Palette) {
   }
 }
 
-const STYLE_ID = "declikora-couleurs"
+const STYLE_ID = "ruche-couleurs"
 
 /** Pose les couleurs sur la page : une balise style, après index.css, qu'elle surcharge. */
 export function applyPalette(palette: Palette) {
