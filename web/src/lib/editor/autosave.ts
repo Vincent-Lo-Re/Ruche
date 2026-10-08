@@ -35,8 +35,6 @@ type AutosaveOptions<T> = {
   save: (value: T, baseRev: number) => Promise<SavedDraft>
   rev: number
   savedAt: string | null
-  debounceMs?: number
-  maxWaitMs?: number
   // Attentes entre deux essais hors ligne ; la dernière se répète.
   retryDelaysMs?: number[]
   onSaved?: (result: SavedDraft, value: T) => void
@@ -95,8 +93,6 @@ export class AutosaveController<T> {
 
   constructor(options: AutosaveOptions<T>) {
     this.options = {
-      debounceMs: AUTOSAVE_DEBOUNCE_MS,
-      maxWaitMs: AUTOSAVE_MAX_WAIT_MS,
       retryDelaysMs: AUTOSAVE_RETRY_DELAYS_MS,
       ...options,
     }
@@ -172,7 +168,7 @@ export class AutosaveController<T> {
     const sinceFirst = Date.now() - (this.firstChangeAt ?? Date.now())
     const wait = Math.max(
       0,
-      Math.min(this.options.debounceMs, this.options.maxWaitMs - sinceFirst)
+      Math.min(AUTOSAVE_DEBOUNCE_MS, AUTOSAVE_MAX_WAIT_MS - sinceFirst)
     )
     this.timer = setTimeout(() => {
       this.timer = null

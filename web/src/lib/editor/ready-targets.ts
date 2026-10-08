@@ -1,4 +1,4 @@
-// Éditeur du Fil : où mènent les lignes de « Prêt à publier ? » et les refus de publication. Le
+// Éditeur des contenus : où mènent les lignes de « Prêt à publier ? » et les refus de publication. Le
 // réglage qui reçoit le curseur, et la zone qui s'allume (la carte qui le contient, ou le champ du
 // titre lui-même). Les composants posent ces identifiants ; sans React.
 

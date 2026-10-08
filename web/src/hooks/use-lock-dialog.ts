@@ -3,7 +3,7 @@ import { useState } from "react"
 import { opensOnItsOwn, type LockSituation } from "@/lib/editor/lock-view"
 
 /**
- * La fenêtre du cadenas (éditeur du Fil) : ouverte d'elle-même une seule fois par perte de main,
+ * La fenêtre du cadenas (éditeur des contenus) : ouverte d'elle-même une seule fois par perte de main,
  * puis à la demande (le cadenas). Elle reste ouverte si la situation change pendant qu'on la lit
  * (la personne qui avait la main quitte l'éditeur…), et se ferme dès qu'on écrit de nouveau.
  */

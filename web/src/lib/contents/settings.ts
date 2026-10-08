@@ -75,21 +75,10 @@ async function withBorrowedLock<T>(
 }
 
 /**
- * Ce qu'on choisit à la création ou dans les réglages d'une liste : le niveau d'accès, les
- * catégories et l'adresse. Le reste (cases d'un chapitre ou d'une leçon) garde sa valeur.
+ * Ce qu'on choisit à la création ou dans les réglages d'une liste : tous les réglages d'un contenu
+ * (niveau d'accès, catégories, adresse).
  */
-export type SettingsChoices = Pick<
-  ContentSettings,
-  "accessChosen" | "accessLevelId" | "slug" | "categoryIds"
->
-
-/** Les choix, par-dessus les réglages actuels du contenu. */
-function withChoices(
-  content: Content,
-  choices: SettingsChoices
-): ContentSettings {
-  return { ...settingsOf(content), ...choices }
-}
+export type SettingsChoices = ContentSettings
 
 /**
  * « Réglages » depuis une liste : le titre et les réglages voulus, comparés au contenu relu sous
@@ -103,10 +92,7 @@ export function saveFromList(
   choices: SettingsChoices
 ): Promise<boolean> {
   return withBorrowedLock(contentId, myId, words, async (content, session) => {
-    const payload = settingsDiff(
-      settingsOf(content),
-      withChoices(content, choices)
-    )
+    const payload = settingsDiff(settingsOf(content), choices)
     const titleChanged = content.draft.title !== title
     if (!payload && !titleChanged) return false
     await saveDraft(
@@ -184,10 +170,7 @@ export async function createWithSettings(
   choices: SettingsChoices
 ): Promise<{ content: Content; settingsError: unknown }> {
   const created = await createContent(kind, title, fromTemplateId)
-  const payload = settingsDiff(
-    settingsOf(created),
-    withChoices(created, choices)
-  )
+  const payload = settingsDiff(settingsOf(created), choices)
   if (!payload) return { content: created, settingsError: null }
   const session = crypto.randomUUID()
   try {

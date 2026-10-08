@@ -31,7 +31,7 @@ import { RETURN_STATE, returnAddress } from "@/lib/scroll-memory"
 import { sections, type SectionKey } from "@/navigation"
 import { texts } from "@/texts"
 
-// Ce qui entoure l'éditeur plein écran du Fil (editor-page.tsx) : le retour vers la liste, un contenu introuvable, la
+// Ce qui entoure l'éditeur plein écran des contenus (editor-page.tsx) : le retour vers la liste, un contenu introuvable, la
 // glissière des Blocs, la pastille de la Concentration et la fenêtre « Quitter ».
 
 /**
@@ -105,7 +105,7 @@ export function EditorNotFound({
       </header>
       <Empty className="m-10 border border-dashed">
         <EmptyHeader>
-          <EmptyMedia variant="icon">
+          <EmptyMedia>
             <FileQuestion />
           </EmptyMedia>
           <EmptyTitle>{texts.editor.notFound.title}</EmptyTitle>

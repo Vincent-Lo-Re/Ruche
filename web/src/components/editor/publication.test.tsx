@@ -135,7 +135,7 @@ function publishButton() {
   return screen.getByRole("button", { name: labels.actions.publish })
 }
 
-/** La carte « Adresse de la page », dans la colonne de droite (éditeur du Fil), et son champ. */
+/** La carte « Adresse de la page », dans la colonne de droite (éditeur des contenus), et son champ. */
 function addressCard() {
   return screen.getByRole("region", { name: labels.settings.slug.label })
 }

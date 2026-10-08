@@ -126,7 +126,7 @@ export function HistorySheet({
             ) : versions.data.length === 0 ? (
               <Empty className="border border-dashed">
                 <EmptyHeader>
-                  <EmptyMedia variant="icon">
+                  <EmptyMedia>
                     <History />
                   </EmptyMedia>
                   <EmptyDescription>{labels.empty}</EmptyDescription>
@@ -157,7 +157,7 @@ export function HistorySheet({
                         <ItemDescription>
                           {formatDateTime(version.published_at)}
                           {version.published_by_name &&
-                            ` ${labels.by(version.published_by_name)}`}
+                            ` ${texts.common.by(version.published_by_name)}`}
                         </ItemDescription>
                         {categories.data && (
                           <VersionCategories

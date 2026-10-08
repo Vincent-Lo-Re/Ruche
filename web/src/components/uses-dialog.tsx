@@ -1,10 +1,5 @@
 import type { UseQueryResult } from "@tanstack/react-query"
-import {
-  Download,
-  FileText,
-  Link as LinkIcon,
-  TriangleAlert,
-} from "lucide-react"
+import { Download, Link as LinkIcon, TriangleAlert } from "lucide-react"
 import type { ReactNode } from "react"
 import { Link } from "react-router"
 import { toast } from "sonner"
@@ -39,6 +34,8 @@ import {
 } from "@/components/ui/tooltip"
 import { downloadUsesCsv, type ContentUse } from "@/lib/uses-export"
 import { contentEditorPath, contentSection, sections } from "@/navigation"
+import { displayTitle } from "@/lib/titles"
+import type { ContentKind } from "@/lib/contents/api"
 import { texts } from "@/texts"
 
 const words = texts.uses
@@ -47,9 +44,8 @@ const words = texts.uses
 // ouvre la fenêtre, la fenêtre, et l'export en CSV (lib/uses-export.ts). Les mêmes partout.
 
 /** L'icône de la section d'un contenu (Blog, Podcasts, Pages, Modèles de bloc). */
-export function SectionIcon({ kind }: { kind: string }) {
-  const section = contentSection(kind)
-  const Icon = section ? sections[section].icon : FileText
+export function SectionIcon({ kind }: { kind: ContentKind }) {
+  const Icon = sections[contentSection(kind)].icon
   return <Icon aria-hidden className="size-4 shrink-0 text-muted-foreground" />
 }
 
@@ -61,18 +57,14 @@ export function UseTitle({
   use: ContentUse
   onNavigate?: () => void
 }) {
-  const title = use.title?.trim() || texts.common.untitled
-  const path = contentEditorPath(use.kind, use.content_id)
-  return path ? (
+  return (
     <Link
-      to={path}
+      to={contentEditorPath(use.kind, use.content_id)}
       onClick={onNavigate}
       className="underline-offset-4 hover:underline"
     >
-      {title}
+      {displayTitle(use.title)}
     </Link>
-  ) : (
-    title
   )
 }
 
@@ -279,7 +271,7 @@ export function UsesDialog<T extends ContentUse>({
                         <TableCell className="w-0">
                           <Checkbox
                             aria-label={texts.selection.select(
-                              use.title?.trim() || texts.common.untitled
+                              displayTitle(use.title)
                             )}
                             checked={selection.selected.has(use.content_id)}
                             disabled={!selection.selectable(use)}

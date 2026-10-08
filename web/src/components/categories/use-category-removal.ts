@@ -8,11 +8,10 @@ import { categoryKeys, type Category, type CategoryUse } from "@/lib/categories"
 import { ContentError, contentKeys } from "@/lib/contents/api"
 import { removeCategory } from "@/lib/contents/settings"
 import { errorMessage } from "@/lib/errors"
+import { displayTitle } from "@/lib/titles"
 import { texts } from "@/texts"
 
 const words = texts.categories.uses
-
-const titleOf = (use: CategoryUse) => use.title?.trim() || texts.common.untitled
 
 /**
  * Retirer une catégorie de contenus, depuis la fenêtre de ses utilisations : les lignes cochées,
@@ -46,7 +45,7 @@ export function useCategoryRemoval(category: Category) {
             toRepublish += 1
             if (done.publishError)
               notRepublished.push(
-                words.notRepublished(titleOf(use), done.publishError)
+                words.notRepublished(displayTitle(use.title), done.publishError)
               )
           }
         } catch (error) {
@@ -55,7 +54,7 @@ export function useCategoryRemoval(category: Category) {
             error instanceof ContentError && error.detail
               ? error.detail
               : errorMessage(error)
-          kept.push(texts.selection.keptItem(titleOf(use), detail))
+          kept.push(texts.selection.keptItem(displayTitle(use.title), detail))
         }
       }
       return { removed, republished, toRepublish, kept, notRepublished }

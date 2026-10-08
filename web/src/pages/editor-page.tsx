@@ -807,7 +807,7 @@ function ContentEditor({
         {announcement}
       </p>
 
-      {/* La mise en page du Fil (ADMIN § 4) : à gauche le plan des blocs, au centre le téléphone,
+      {/* La mise en page de l'éditeur des contenus (ADMIN § 4) : à gauche le plan des blocs, au centre le téléphone,
           à droite tout ce qui concerne le contenu. */}
       <div className="flex min-h-0 flex-1">
         <aside

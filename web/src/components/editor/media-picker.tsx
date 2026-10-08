@@ -3,6 +3,7 @@ import { AudioLines, Upload } from "lucide-react"
 import { useEffect, useRef, useState, type ComponentProps } from "react"
 
 import { LoadState } from "@/components/load-state"
+import { acceptByKind } from "@/components/media/media-kinds"
 import { MediaThumbnail } from "@/components/media/media-visuals"
 import { usePreviewUrls } from "@/components/media/use-preview-urls"
 import {
@@ -44,15 +45,6 @@ const pickerLabels = {
   image: texts.editor.picker,
   audio: { ...texts.editor.picker, ...texts.editor.audioPicker },
 }
-
-// Les audios qu'accepte la médiathèque (MP3, M4A) ; même remarque que pour les images.
-const acceptedAudios = [
-  ".mp3",
-  ".m4a",
-  "audio/mpeg",
-  "audio/mp4",
-  "audio/x-m4a",
-].join(",")
 
 // Ce que propose le sélecteur de fichiers : les photos et images seulement, celles que le bloc
 // Image accepte (le navigateur en fait un filtre, pas une règle : un autre fichier est signalé).
@@ -296,7 +288,7 @@ function PickerUpload({
       <input
         ref={input}
         type="file"
-        accept={kind === "audio" ? acceptedAudios : acceptedImages}
+        accept={kind === "audio" ? acceptByKind.audio : acceptedImages}
         className="sr-only"
         tabIndex={-1}
         aria-label={labels.uploadInput}

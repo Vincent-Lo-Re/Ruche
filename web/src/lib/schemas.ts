@@ -1,6 +1,7 @@
 import { z } from "zod"
 
 import { ALT_MAX, TITLE_MAX } from "@/blocks/draft"
+import { templateSections, templateSorts } from "@/lib/contents/templates"
 import { texts } from "@/texts"
 
 // Formulaires de l'admin : ce qui est saisi, et les messages en cas d'erreur.
@@ -119,10 +120,8 @@ export const templateSchema = z
       .trim()
       .min(1, texts.templates.create.nameRequired)
       .max(TITLE_MAX, texts.templates.create.nameTooLong),
-    sort: z.enum(["style", "shared", "starter"]),
-    templateFor: z
-      .enum(["article", "episode", "chapter", "lesson", "exercise", "page"])
-      .nullable(),
+    sort: z.enum(templateSorts),
+    templateFor: z.enum(templateSections).nullable(),
   })
   .refine((value) => value.sort !== "starter" || value.templateFor !== null, {
     path: ["templateFor"],

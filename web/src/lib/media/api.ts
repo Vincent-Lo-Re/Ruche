@@ -11,7 +11,7 @@ import {
   type MediaKind,
 } from "@/lib/media/constants"
 import type { PreparedFile } from "@/lib/media/prepare"
-import { isContentKind } from "@/lib/contents/api"
+import type { ContentKind } from "@/lib/contents/api"
 import { restoreContent } from "@/lib/contents/publication"
 import { supabase } from "@/lib/supabase"
 import { describeFacts } from "@/lib/error-facts"
@@ -195,6 +195,7 @@ export function previewKey(media: Pick<Media, "is_public" | "path">): string {
 // gardent leur adresse (le navigateur ne les télécharge pas de nouveau).
 const previewCache = new Map<string, { url: string; expiresAt: number }>()
 
+/** Vide les liens gardés : pour les tests seulement, chacun repart d'une mémoire vide. */
 export function clearPreviewCache() {
   previewCache.clear()
 }
@@ -248,13 +249,13 @@ export async function getMediaUses(mediaId: string): Promise<MediaUse[]> {
     media_id: mediaId,
   })
   if (error) throw toMediaError(error)
-  return data
+  return data as MediaUse[]
 }
 
 /** Un contenu en ligne dont la version garde un ancien texte de ce fichier ([D30]). */
 type MediaOutdated = {
   content_id: string
-  kind: string
+  kind: ContentKind
   title: string
   version_id: string
   version_number: number
@@ -269,7 +270,7 @@ export async function getMediaOutdated(
     media_id: mediaId,
   })
   if (error) throw toMediaError(error)
-  return data
+  return data as MediaOutdated[]
 }
 
 /**
@@ -320,15 +321,12 @@ export async function replaceMediaLive(
   return data.length
 }
 
-export type TrashItem = {
-  item_type: "file" | "content"
+export type TrashItem = (
+  | { item_type: "file"; kind: string }
+  | { item_type: "content"; kind: ContentKind }
+) & {
   id: string
-  kind: string
   title: string | null
-  // Contenus : le lot (ce qui part et revient ensemble).
-  trash_batch: string | null
-  // Vrai pour l'élément qu'on a mis à la corbeille (et pour chaque fichier).
-  batch_root: boolean
   deleted_at: string
   deleted_by_name: string | null
   purge_at: string
@@ -340,14 +338,11 @@ export async function listTrash(): Promise<TrashItem[]> {
   const { data, error } = await supabase
     .from("trash_items")
     .select(
-      "item_type, id, kind, title, trash_batch, batch_root, deleted_at, deleted_by_name, purge_at, purge_error"
+      "item_type, id, kind, title, deleted_at, deleted_by_name, purge_at, purge_error"
     )
     .order("deleted_at", { ascending: false })
   if (error) throw toMediaError(error)
-  // Les sortes que l'admin ne connaît pas (les anciennes méthodes) n'y sont pas montrées.
-  return (data as TrashItem[]).filter(
-    (item) => item.item_type === "file" || isContentKind(item.kind)
-  )
+  return data as TrashItem[]
 }
 
 // ---------------------------------------------------------------------------------------------

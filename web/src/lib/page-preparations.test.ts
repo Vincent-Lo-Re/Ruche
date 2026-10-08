@@ -220,7 +220,7 @@ describe("l'éditeur arrive avec son brouillon, ses cartes et ses images", () =>
 })
 
 describe("les listes", () => {
-  it("Le Fil : les articles, leurs catégories, les formules et les images du premier écran", async () => {
+  it("Blog : les articles, leurs catégories, les formules et les images du premier écran", async () => {
     vi.mocked(api.listContents).mockResolvedValue(
       Array.from({ length: 30 }, (_, index) => ({
         id: `article-${index}`,

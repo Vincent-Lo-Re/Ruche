@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Files, FileText, RefreshCw, TriangleAlert } from "lucide-react"
+import { Files, RefreshCw, TriangleAlert } from "lucide-react"
 import { useState } from "react"
 import { Link } from "react-router"
 import { toast } from "sonner"
@@ -41,13 +41,14 @@ import { formatDateTime } from "@/lib/dates"
 import { kickFiles, mediaKeys } from "@/lib/media/api"
 import { templateOutdatedRead } from "@/lib/reads"
 import { contentEditorPath, contentSection, sections } from "@/navigation"
+import { displayTitle } from "@/lib/titles"
 import { texts } from "@/texts"
 
 const labels = texts.templates.editor
 const sorts = texts.templates.sorts
 
 /**
- * La sorte d'un modèle, en bas de la colonne de droite de son éditeur (éditeur du Fil) : son
+ * La sorte d'un modèle, en bas de la colonne de droite de son éditeur (éditeur des contenus) : son
  * icône et son nom, à la place de l'état de publication (un modèle ne se publie pas).
  */
 export function TemplateSortBadge({ sort }: { sort: TemplateSort }) {
@@ -151,8 +152,8 @@ export function TemplateUsesCard({ templateId }: { templateId: string }) {
         <ItemGroup data-template-uses={uses.data.length}>
           {uses.data.map((use) => {
             const section = contentSection(use.kind)
-            const Icon = section ? sections[section].icon : FileText
-            const name = use.title.trim() || texts.common.untitled
+            const Icon = sections[section].icon
+            const name = displayTitle(use.title)
             const path = use.inTrash
               ? null
               : contentEditorPath(use.kind, use.id)
@@ -233,7 +234,7 @@ export function TemplateUsesCard({ templateId }: { templateId: string }) {
               >
                 <ItemContent className="min-w-0">
                   <ItemTitle className="block w-full truncate font-normal">
-                    {item.title?.trim() || texts.common.untitled}
+                    {displayTitle(item.title)}
                   </ItemTitle>
                   <ItemDescription>
                     {labels.outdated.version(

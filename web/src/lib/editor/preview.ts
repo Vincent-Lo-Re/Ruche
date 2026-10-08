@@ -1,5 +1,7 @@
+import { readChoice, writeChoice, type Choice } from "@/lib/address"
+
 /**
- * L'aperçu de l'éditeur du Fil (docs/ADMINISTRATION.md, § 4) : le téléphone montré, Édition ou
+ * L'aperçu de l'éditeur des contenus (docs/ADMINISTRATION.md, § 4) : le téléphone montré, Édition ou
  * Lecture, Clair ou Sombre, Grand texte, et en Lecture, le lecteur imité. Sans React.
  */
 
@@ -41,21 +43,23 @@ export const defaultPreview: PreviewSettings = {
 
 // Les réglages gardés dans l'adresse de l'éditeur, d'un écran à l'autre (QCM du 04/10/2026) :
 // seulement ceux qui diffèrent de defaultPreview, en mots anglais courants comme les adresses de
-// navigation.ts (« ?mode=read&device=android&theme=dark »).
-type ChoiceKey = Exclude<keyof PreviewSettings, "largeText">
-const searchWords: {
-  [K in ChoiceKey]: { name: string; values: Record<PreviewSettings[K], string> }
-} = {
-  mode: { name: "mode", values: { edit: "edit", read: "read" } },
-  device: { name: "device", values: { ios: "ios", android: "android" } },
-  theme: { name: "theme", values: { light: "light", dark: "dark" } },
-  reader: {
-    name: "reader",
-    values: { subscriber: "subscriber", visitor: "visitor" },
-  },
-  fit: { name: "fit", values: { adjust: "adjust", full: "full" } },
+// navigation.ts (« ?mode=read&device=android&theme=dark »), chaque mot étant la valeur elle-même.
+function choice<T extends string>(
+  name: string,
+  values: readonly T[],
+  fallback: T
+): Choice<T> {
+  const words = {} as Record<T, string>
+  for (const value of values) words[value] = value
+  return { name, words, fallback }
 }
-const choiceKeys = Object.keys(searchWords) as ChoiceKey[]
+const searchChoices = {
+  mode: choice("mode", previewModes, defaultPreview.mode),
+  device: choice("device", devices, defaultPreview.device),
+  theme: choice("theme", previewThemes, defaultPreview.theme),
+  reader: choice("reader", previewReaders, defaultPreview.reader),
+  fit: choice("fit", previewFits, defaultPreview.fit),
+}
 const largeTextWord = { name: "text", value: "large" }
 
 /** Les réglages du téléphone lus dans l'adresse ; un mot inconnu vaut le réglage de départ. */
@@ -63,19 +67,13 @@ export function previewFromSearch(
   search: string | URLSearchParams
 ): PreviewSettings {
   const params = new URLSearchParams(search)
-  const pick = <K extends ChoiceKey>(key: K): PreviewSettings[K] => {
-    const { name, values } = searchWords[key]
-    const word = params.get(name)
-    const keys = Object.keys(values) as PreviewSettings[K][]
-    return keys.find((value) => values[value] === word) ?? defaultPreview[key]
-  }
   return {
-    device: pick("device"),
-    mode: pick("mode"),
-    theme: pick("theme"),
+    device: readChoice(params, searchChoices.device),
+    mode: readChoice(params, searchChoices.mode),
+    theme: readChoice(params, searchChoices.theme),
     largeText: params.get(largeTextWord.name) === largeTextWord.value,
-    reader: pick("reader"),
-    fit: pick("fit"),
+    reader: readChoice(params, searchChoices.reader),
+    fit: readChoice(params, searchChoices.fit),
   }
 }
 
@@ -88,15 +86,11 @@ export function withPreview(
   preview: PreviewSettings
 ): URLSearchParams {
   const params = new URLSearchParams(search)
-  const word = <K extends ChoiceKey>(key: K): string | null =>
-    preview[key] === defaultPreview[key]
-      ? null
-      : searchWords[key].values[preview[key]]
-  for (const key of choiceKeys) {
-    const value = word(key)
-    if (value === null) params.delete(searchWords[key].name)
-    else params.set(searchWords[key].name, value)
-  }
+  writeChoice(params, searchChoices.mode, preview.mode)
+  writeChoice(params, searchChoices.device, preview.device)
+  writeChoice(params, searchChoices.theme, preview.theme)
+  writeChoice(params, searchChoices.reader, preview.reader)
+  writeChoice(params, searchChoices.fit, preview.fit)
   if (preview.largeText) params.set(largeTextWord.name, largeTextWord.value)
   else params.delete(largeTextWord.name)
   return params

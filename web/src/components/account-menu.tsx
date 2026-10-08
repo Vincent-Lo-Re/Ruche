@@ -38,7 +38,7 @@ export function AccountMenu() {
           l'initiale. Les espaces séparent ces mots à la lecture (une grille ou une rangée ne les
           affiche pas).
         */}
-        <Avatar size="lg" aria-hidden>
+        <Avatar aria-hidden>
           <AvatarFallback>{initial(profile)}</AvatarFallback>
         </Avatar>
         <span className="grid min-w-0 flex-1 leading-tight">

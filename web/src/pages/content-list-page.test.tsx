@@ -720,8 +720,6 @@ describe("Blog", () => {
   it("« Supprimer » met l'article à la corbeille, avec « Annuler »", async () => {
     vi.mocked(api.listContents).mockResolvedValue([articles[2]])
     vi.mocked(publicationApi.trashContent).mockResolvedValue({
-      batch: "lot",
-      trashed: 1,
       needsFileSync: true,
     })
     vi.mocked(publicationApi.restoreContent).mockResolvedValue({
@@ -762,7 +760,7 @@ describe("Blog", () => {
       if (id === articles[1].id) {
         throw new api.ContentError("verrou_tenu", { detail: writing })
       }
-      return { batch: "lot", trashed: 1, needsFileSync: false }
+      return { needsFileSync: false }
     })
     vi.mocked(publicationApi.restoreContent).mockResolvedValue({
       restored: 1,

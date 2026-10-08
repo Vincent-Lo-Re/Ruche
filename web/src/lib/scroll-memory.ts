@@ -42,7 +42,7 @@ export function takeOpened(): string | null {
   return id
 }
 
-/** L'état d'un lien qui revient sur ses pas (« ← Le Fil » d'un éditeur, par exemple). */
+/** L'état d'un lien qui revient sur ses pas (« ← Blog » d'un éditeur, par exemple). */
 export const RETURN_STATE = { retour: true } as const
 
 /** Une arrivée qui revient sur ses pas : le retour du navigateur, ou un lien de retour. */

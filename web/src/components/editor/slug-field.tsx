@@ -26,7 +26,7 @@ type Status =
  * dernière touche, si une autre page l'a déjà (« Libre », ou le nom de cette page). Une adresse
  * libre part aussitôt avec le brouillon (onCommit) ; quitter le champ ou Entrée vérifient sans
  * attendre. « Reprendre le titre » propose l'adresse tirée du titre, et l'adresse en ligne est
- * rappelée dessous. Dans la carte de l'éditeur du Fil (inCard), le titre de la carte nomme le
+ * rappelée dessous. Dans la carte de l'éditeur des contenus (inCard), le titre de la carte nomme le
  * champ et l'aide est dans son infobulle.
  */
 export function SlugField({

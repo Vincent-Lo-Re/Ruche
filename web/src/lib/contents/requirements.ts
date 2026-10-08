@@ -78,7 +78,7 @@ export function publishChecks(
 }
 
 /**
- * Une ligne de « Prêt à publier ? » (éditeur du Fil) : le titre, l'image de présentation, l'audio,
+ * Une ligne de « Prêt à publier ? » (éditeur des contenus) : le titre, l'image de présentation, l'audio,
  * l'adresse d'une page, le niveau d'accès.
  */
 export type ReadyItem = {

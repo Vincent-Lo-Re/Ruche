@@ -12,7 +12,7 @@ import type { Media } from "@/lib/media/constants"
 import { renderApp, testProfile } from "@/test/render"
 import { texts } from "@/texts"
 
-// L'éditeur d'un article et d'un épisode (l'éditeur du Fil) : image de présentation, catégories,
+// L'éditeur d'un article et d'un épisode (l'éditeur des contenus) : image de présentation, catégories,
 // audio et sa durée, [D45] (ce qui manque pour publier) et [D46] (transcription conseillée). La
 // base, Realtime et Storage sont simulés.
 
@@ -225,12 +225,12 @@ const article = texts.editor.article
 const preview = texts.editor.preview
 const outline = texts.editor.outline
 
-/** L'Article (ou l'Épisode), dans la colonne de droite (éditeur du Fil). */
+/** L'Article (ou l'Épisode), dans la colonne de droite (éditeur des contenus). */
 function articleTab(kind: "article" | "episode" = "article") {
   return screen.getByRole("region", { name: columns.content[kind] })
 }
 
-/** Les Blocs, en glissière par-dessus le Plan (éditeur du Fil). */
+/** Les Blocs, en glissière par-dessus le Plan (éditeur des contenus). */
 function blocksPanel() {
   return screen.getByRole("region", { name: columns.blocks })
 }
@@ -249,7 +249,7 @@ async function pick(list: HTMLElement, option: string) {
   await waitFor(() => expect(screen.queryByRole("listbox")).toBeNull())
 }
 
-describe("éditeur d'un article (Le Fil)", () => {
+describe("éditeur d'un article (Blog)", () => {
   it("s'ouvre à /blog/<id> avec le plan à gauche et l'Article à droite", async () => {
     vi.mocked(api.getContent).mockResolvedValue(contentOf(ARTICLE, "article"))
     await renderApp(`/blog/${ARTICLE}`)
@@ -302,7 +302,7 @@ describe("éditeur d'un article (Le Fil)", () => {
     expect(screen.queryByLabelText(/Résumé/)).toBeNull()
   })
 
-  it("choisit l'image de présentation dans l'aperçu ; la carte du Fil n'a pas de résumé", async () => {
+  it("choisit l'image de présentation dans l'aperçu ; la carte de la liste n'a pas de résumé", async () => {
     vi.mocked(api.getContent).mockResolvedValue(contentOf(ARTICLE, "article"))
     vi.mocked(mediaApi.listMedia).mockResolvedValue([plage])
     await renderApp(`/blog/${ARTICLE}`)
@@ -1483,7 +1483,7 @@ describe("éditeur d'un article (Le Fil)", () => {
   })
 })
 
-describe("éditeur du Fil : en-têtes des colonnes et lecture seule", () => {
+describe("éditeur des contenus : en-têtes des colonnes et lecture seule", () => {
   const CLAIRE = "00000000-0000-4000-8000-00000000c1a1"
   const claire: api.LockRow = {
     ...mine,
@@ -2042,7 +2042,7 @@ describe("éditeur d'un épisode (Podcasts, dans l'éditeur des contenus)", () =
   })
 })
 
-describe("éditeur du Fil : le builder relu sur un article complet (03/10/2026)", () => {
+describe("éditeur des contenus : le builder relu sur un article complet (03/10/2026)", () => {
   const TEXT = "00000000-0000-4000-8000-0000000000d1"
   const IMAGE = "00000000-0000-4000-8000-0000000000d2"
   const BOX = "00000000-0000-4000-8000-0000000000d3"
@@ -2380,7 +2380,7 @@ describe("éditeur du Fil : le builder relu sur un article complet (03/10/2026)"
     fireEvent.click(
       within(bar).getByRole("button", { name: texts.editor.settings.remove })
     )
-    // L'aperçu du Fil n'a pas de poignée : c'est la ligne du plan du bloc suivant.
+    // L'aperçu des contenus n'a pas de poignée : c'est la ligne du plan du bloc suivant.
     await waitFor(() =>
       expect(document.activeElement).toBe(
         document.querySelector(`[data-outline-id="${BOX}"]`)
@@ -2403,7 +2403,7 @@ describe("éditeur du Fil : le builder relu sur un article complet (03/10/2026)"
   })
 })
 
-describe("éditeur du Fil : une adresse d'aperçu qui ne vient pas", () => {
+describe("éditeur des contenus : une adresse d'aperçu qui ne vient pas", () => {
   it("l'image le dit, avec « Réessayer », au lieu de « Chargement… » sans fin", async () => {
     vi.mocked(api.getContent).mockResolvedValue(
       contentOf(ARTICLE, "article", {
@@ -2442,7 +2442,7 @@ describe("éditeur du Fil : une adresse d'aperçu qui ne vient pas", () => {
   })
 })
 
-describe("éditeur du Fil : un brouillon changé ailleurs qui ne se relit pas", () => {
+describe("éditeur des contenus : un brouillon changé ailleurs qui ne se relit pas", () => {
   it("le dit au-dessus du téléphone, puis le relit au nouvel essai", async () => {
     // Quelqu'un a écrit entre l'ouverture et la prise du verrou (révision 6) : à relire.
     vi.mocked(api.getContent)
@@ -2468,7 +2468,7 @@ describe("éditeur du Fil : un brouillon changé ailleurs qui ne se relit pas", 
   }, 10_000)
 })
 
-describe("éditeur du Fil : le dernier bloc supprimé", () => {
+describe("éditeur des contenus : le dernier bloc supprimé", () => {
   it("le focus va à « Ajouter un bloc », en bas de la colonne de gauche ; son « Annuler » part avec l'éditeur", async () => {
     vi.mocked(api.getContent).mockResolvedValue(
       contentOf(ARTICLE, "article", {

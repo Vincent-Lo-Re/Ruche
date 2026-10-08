@@ -1,10 +1,5 @@
 import { DndContext, DragOverlay, useDroppable } from "@dnd-kit/core"
-import {
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { cn } from "cn"
 import {
   BookmarkPlus,
@@ -70,6 +65,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { useSortableItem } from "@/hooks/use-sortable-item"
 import type { BlockWarning } from "@/lib/editor/outline"
 import { texts } from "@/texts"
 
@@ -89,7 +85,7 @@ export type OutlineSelection = {
 }
 
 /**
- * Le plan de l'éditeur du Fil (ADMIN § 4, « Les finitions », « Le plan retouché ») : les blocs
+ * Le plan de l'éditeur des contenus (ADMIN § 4, « Les finitions », « Le plan retouché ») : les blocs
  * seulement (l'image de présentation se règle dans la colonne de droite), chacun par son contenu
  * (l'icône dit le type), une vignette par image, les sections repliables, ce qui manque en icône
  * (le détail dans son infobulle), un menu ⋮ par ligne, et le survol partagé avec l'aperçu.
@@ -368,18 +364,10 @@ function Row(props: RowProps) {
 function SortableRow(props: RowProps) {
   const { block, container, shared } = props
   const draggingType = useContext(DraggingTypeContext)
-  const {
-    setNodeRef,
-    setActivatorNodeRef,
-    listeners,
-    attributes,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { setNodeRef, isDragging, style, handle } = useSortableItem({
     id: block.id,
     data: { kind: "block", type: block.type, container } satisfies DropData,
-    attributes: { roleDescription: texts.editor.dnd.roleDescription },
+    roleDescription: texts.editor.dnd.roleDescription,
     disabled: {
       draggable: !shared.sortable,
       // Pendant le déplacement d'une section, les blocs des sections ne sont plus des cibles.
@@ -396,15 +384,13 @@ function SortableRow(props: RowProps) {
       {...props}
       rowRef={setNodeRef}
       // La position pendant un glisser-déposer (dnd-kit), posée en style par la ligne.
-      rowStyle={{ transform: CSS.Translate.toString(transform), transition }}
+      rowStyle={style}
       dragging={isDragging}
       handle={
         shared.sortable && (
           <Button
             variant="ghost"
-            ref={setActivatorNodeRef}
-            {...attributes}
-            {...listeners}
+            {...handle}
             aria-label={texts.editor.handle(label)}
             // Au début de la ligne, centrée sur elle ; toujours devinée (pâle), franche au survol.
             className="absolute top-1/2 left-0 h-7 w-4 -translate-y-1/2 cursor-grab touch-none p-0 text-muted-foreground opacity-50 group-hover/menu-item:text-foreground group-hover/menu-item:opacity-100 focus-visible:opacity-100 active:cursor-grabbing"

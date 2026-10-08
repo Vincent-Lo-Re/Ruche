@@ -257,7 +257,7 @@ describe("Blog : l'onglet Catégories", () => {
 
   it("« Retirer » suit l'état de chaque contenu : republié, brouillon seulement, ou indisponible", async () => {
     const use = {
-      kind: "article",
+      kind: "article" as const,
       in_draft: true,
       in_app: true,
       in_trash: false,

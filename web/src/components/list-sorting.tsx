@@ -15,7 +15,11 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
+import { GripVertical } from "lucide-react"
 import type { ReactNode } from "react"
+
+import { Button } from "@/components/ui/button"
+import type { useSortableItem } from "@/hooks/use-sortable-item"
 
 type Named = { id: string; name: string }
 
@@ -103,5 +107,29 @@ export function SortableList({
         {children}
       </SortableContext>
     </DndContext>
+  )
+}
+
+/** La poignée d'une ligne rangée (listes de contenus, Formules), nommée d'après la ligne. */
+export function DragHandle({
+  handle,
+  label,
+  disabled,
+}: {
+  handle: ReturnType<typeof useSortableItem>["handle"]
+  label: string
+  disabled?: boolean
+}) {
+  return (
+    <Button
+      variant="ghost"
+      size="icon-sm"
+      {...handle}
+      disabled={disabled}
+      aria-label={label}
+      className="cursor-grab text-muted-foreground disabled:cursor-default active:cursor-grabbing"
+    >
+      <GripVertical aria-hidden />
+    </Button>
   )
 }

@@ -283,8 +283,6 @@ describe("section Modèles", () => {
       }
     )
     vi.mocked(publicationApi.trashContent).mockResolvedValue({
-      batch: "00000000-0000-4000-8000-0000000000b1",
-      trashed: 1,
       needsFileSync: false,
     })
     await renderApp("/templates")
@@ -335,8 +333,6 @@ describe("section Modèles", () => {
 
   it("une mise en forme se supprime après une simple confirmation, avec « Annuler »", async () => {
     vi.mocked(publicationApi.trashContent).mockResolvedValue({
-      batch: "00000000-0000-4000-8000-0000000000b1",
-      trashed: 1,
       needsFileSync: false,
     })
     vi.mocked(publicationApi.restoreContent).mockResolvedValue({
@@ -377,7 +373,7 @@ describe("section Modèles", () => {
       if (id === CONTACT) {
         throw new api.ContentError("modele_utilise", { detail: used })
       }
-      return { batch: "lot", trashed: 1, needsFileSync: false }
+      return { needsFileSync: false }
     })
     vi.mocked(publicationApi.restoreContent).mockResolvedValue({
       restored: 1,

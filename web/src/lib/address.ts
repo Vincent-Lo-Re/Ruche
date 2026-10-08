@@ -17,13 +17,13 @@ import type { MediaFilters } from "@/lib/media/api"
 import type { TrashFilter } from "@/lib/trash"
 
 /** Un réglage à choix : son nom dans l'adresse, le mot de chaque valeur, sa valeur de départ. */
-type Choice<T extends string> = {
+export type Choice<T extends string> = {
   name: string
   words: Record<T, string>
   fallback: T
 }
 
-function readChoice<T extends string>(
+export function readChoice<T extends string>(
   params: URLSearchParams,
   { name, words, fallback }: Choice<T>
 ): T {
@@ -32,7 +32,7 @@ function readChoice<T extends string>(
   return values.find((value) => words[value] === word) ?? fallback
 }
 
-function writeChoice<T extends string>(
+export function writeChoice<T extends string>(
   params: URLSearchParams,
   { name, words, fallback }: Choice<T>,
   value: T

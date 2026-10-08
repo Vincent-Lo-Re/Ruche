@@ -28,7 +28,7 @@ export function AppProviders({
               {children}
               {/*
             Au-dessus de la fenêtre des envois quand elle est ouverte (--upload-window-space,
-            index.css), et du bas de la colonne de droite de l'éditeur du Fil, où sont « Publier »
+            index.css), et du bas de la colonne de droite de l'éditeur des contenus, où sont « Publier »
             et son menu (--feed-footer-space). Sonner n'accepte cet écart qu'en réglage :
             --spacing × 6 = ses 24 px.
           */}

@@ -28,7 +28,7 @@ export function SaveStatus({
   state: AutosaveState
   // Faux en lecture seule sans rien à enregistrer : seule la région annoncée reste.
   visible: boolean
-  // Éditeur du Fil : l'icône seule, l'état dans l'infobulle (l'heure est juste à côté, dans
+  // Éditeur des contenus : l'icône seule, l'état dans l'infobulle (l'heure est juste à côté, dans
   // « Modifié à … »).
   compact?: boolean
 }) {

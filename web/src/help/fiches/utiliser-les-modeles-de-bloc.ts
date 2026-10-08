@@ -24,7 +24,7 @@ export const fiche: HelpFiche = {
   ],
   notes: [
     "Une mise en forme est recopiée : modifier le modèle ne change pas les contenus déjà écrits.",
-    "Un bloc partagé contient un seul bloc. Corrigé dans le modèle, il l'est dans tous les brouillons qui l'utilisent ; l'app ne change qu'après « Mettre à jour ces contenus dans l'app ». « Détacher » en fait une copie ordinaire dans un contenu.",
+    "Un bloc partagé contient un seul bloc. Corrigé dans le modèle, il l'est dans tous les brouillons qui l'utilisent ; l'app ne change qu'après « Mettre à jour ces contenus dans l'app » (ou « ce contenu »). « Détacher » en fait une copie ordinaire dans un contenu.",
     "Un bloc partagé encore utilisé ne va pas à la corbeille : « Détacher partout » en fait d'abord des copies ordinaires.",
     "Tu peux aussi créer un modèle depuis un contenu : « Choisir des blocs » dans le Plan, ou « Enregistrer comme modèle… » sur un bloc.",
   ],

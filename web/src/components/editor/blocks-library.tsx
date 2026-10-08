@@ -106,7 +106,7 @@ function startDrag(event: DragEvent, drag: LibraryDrag) {
 export const LIBRARY_FIRST_ID = "blocs-premier"
 
 /**
- * Les Blocs de l'éditeur du Fil (ADMIN § 4), en glissière par-dessus le Plan : Texte, Image et
+ * Les Blocs de l'éditeur des contenus (ADMIN § 4), en glissière par-dessus le Plan : Texte, Image et
  * Section, puis « Mes blocs » (mises en forme et blocs partagés), qui glisse à son tour
  * par-dessus. Un clic ajoute le bloc sous le bloc choisi (ou à la fin de la section visée), ou à
  * la fin.

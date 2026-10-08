@@ -165,7 +165,7 @@ function scheduleText(schedule: ScheduleState): string | null {
 }
 
 /**
- * Éditeur du Fil : l'état de publication en pastille à côté de « Publier » (« Brouillon »,
+ * Éditeur des contenus : l'état de publication en pastille à côté de « Publier » (« Brouillon »,
  * « Programmé »…), la phrase entière dans l'infobulle (« En ligne · Programmé le… »). Le détail
  * d'une programmation est dans son bandeau.
  */
@@ -239,8 +239,8 @@ function UnknownStatus({ pub }: { pub: PublicationControls }) {
 }
 
 /**
- * « Publier » et le menu de ses autres actions (programmer, retirer de l'app ; dans l'éditeur du
- * Fil, l'historique).
+ * « Publier » et le menu de ses autres actions (programmer, retirer de l'app ; dans l'éditeur des
+ * contenus, l'historique).
  */
 export function PublishButton({
   pub,
@@ -251,7 +251,7 @@ export function PublishButton({
   pub: PublicationControls
   disabled: boolean
   alwaysPublishable?: boolean
-  // Éditeur du Fil : « Historique » dans le menu (ailleurs, une icône à côté).
+  // Éditeur des contenus : « Historique » dans le menu (ailleurs, une icône à côté).
   onHistory?: () => void
 }) {
   const { status } = pub

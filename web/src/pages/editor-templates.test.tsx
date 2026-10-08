@@ -447,7 +447,7 @@ describe("« Enregistrer comme modèle »", () => {
     await editable()
     const saveAs = texts.templates.saveAs
 
-    // Le plan est ouvert d'office (éditeur du Fil).
+    // Le plan est ouvert d'office (éditeur des contenus).
     const outline = screen.getByRole("navigation", {
       name: texts.editor.outline.title,
     })
@@ -598,7 +598,7 @@ describe("éditeur d'un modèle", () => {
     await waitFor(() => expect(title).not.toHaveAttribute("readonly"))
   }
 
-  it("bloc partagé, dans l'éditeur du Fil : sa sorte, un seul bloc, « Utilisé dans », « Mettre à jour ces contenus dans l'app »", async () => {
+  it("bloc partagé, dans l'éditeur des contenus : sa sorte, un seul bloc, « Utilisé dans », « Mettre à jour ces contenus dans l'app »", async () => {
     vi.mocked(api.getContent).mockResolvedValue(
       template("shared", [contactBox])
     )

@@ -566,7 +566,7 @@ export function MediaPage() {
           {/* L'Empty de shadcn, en pointillés, au centre de l'écran. */}
           <Empty className="w-auto flex-none border bg-background px-12 py-10">
             <EmptyHeader>
-              <EmptyMedia variant="icon">
+              <EmptyMedia>
                 <UploadCloud />
               </EmptyMedia>
               <EmptyTitle>{texts.media.dropTitle}</EmptyTitle>

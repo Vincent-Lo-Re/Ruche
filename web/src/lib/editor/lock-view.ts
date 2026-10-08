@@ -1,5 +1,5 @@
 /**
- * Éditeur du Fil : ce que disent le cadenas et sa fenêtre quand on ne tient pas la main
+ * Éditeur des contenus : ce que disent le cadenas et sa fenêtre quand on ne tient pas la main
  * (docs/ADMINISTRATION.md, § 4, « Un seul membre à la fois sur un brouillon »). Sans React.
  */
 

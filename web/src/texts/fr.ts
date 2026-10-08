@@ -24,7 +24,7 @@ export const fr: Texts = {
     actions: "Actions",
     clearSearch: "Effacer la recherche",
     // « Modifié le 27 sept. 2026 à 14h30 par Anne »
-    savedBy: (name: string) => `par ${name}`,
+    by: (name: string) => `par ${name}`,
     loading: "Chargement…",
     signOut: "Se déconnecter",
     tooManyAttempts: "Trop d'essais. Attends une minute avant de réessayer.",
@@ -751,7 +751,6 @@ export const fr: Texts = {
     },
     itemTypes: {
       file: "Fichier",
-      content: "Contenu",
     },
     // Sorte d'un contenu dans la corbeille.
     contentKinds: {
@@ -760,10 +759,6 @@ export const fr: Texts = {
       page: "Page",
       template: "Modèle de bloc",
     },
-    // Ce qui est parti avec un élément (même lot) : restauré ou effacé avec lui.
-    batch: (count: number) =>
-      count === 1 ? "avec 1 autre élément" : `avec ${count} autres éléments`,
-    batchList: (names: string) => `Dans le même lot : ${names}.`,
     eraseSelection: (count: number) => `Supprimer définitivement (${count})`,
     confirmSelection: {
       title: (count: number) =>
@@ -787,7 +782,6 @@ export const fr: Texts = {
       deletedAt: "Mis à la corbeille le",
       purgeAt: "Effacement automatique",
     },
-    deletedBy: (name: string) => `par ${name}`,
     purgeOn: (date: string) => `après le ${date}`,
     purgeRefused: "Suppression impossible : encore utilisé",
     purgeRefusedHint:
@@ -1275,9 +1269,6 @@ export const fr: Texts = {
     sections: {
       article: "Blog (article)",
       episode: "Podcasts (épisode)",
-      chapter: "Méthodes (chapitre)",
-      lesson: "Méthodes (leçon)",
-      exercise: "Méthodes (exercice)",
       page: "Pages",
     },
     list: {
@@ -1389,7 +1380,7 @@ export const fr: Texts = {
     editor: {
       nameLabel: "Nom du modèle",
       namePlaceholder: "Nom du modèle",
-      // La carte « Sorte » de la colonne de droite (éditeur du Fil) : un point de départ dit pour
+      // La carte « Sorte » de la colonne de droite (éditeur des contenus) : un point de départ dit pour
       // quelle section il sert.
       starterFor: (section: string) => `Pour créer : ${section}`,
       sharedLimit:
@@ -1547,7 +1538,7 @@ export const fr: Texts = {
       title: "Plan",
       empty: "Aucun bloc pour l'instant.",
       select: (label: string) => `Aller à ${label}`,
-      // Le plan de l'éditeur du Fil (ADMIN § 4, « Les finitions »).
+      // Le plan de l'éditeur des contenus (ADMIN § 4, « Les finitions »).
       count: (count: number) => (count === 1 ? "1 bloc" : `${count} blocs`),
       // Une ligne de section : son aspect, puis le nombre de ses blocs.
       box: { fill: "Encadré avec fond", border: "Encadré avec bordure" },
@@ -1670,7 +1661,7 @@ export const fr: Texts = {
       openInLibrary: "Ouvrir sa fiche dans la Médiathèque",
       openFileHint: "(nouvel onglet)",
     },
-    // Éditeur du Fil (ADMIN § 4) : le nom des deux colonnes (lecteurs d'écran), le titre de la
+    // Éditeur des contenus (ADMIN § 4) : le nom des deux colonnes (lecteurs d'écran), le titre de la
     // glissière des Blocs, et celui de la colonne de droite (l'Article, l'Épisode).
     columns: {
       left: "Plan et Blocs",
@@ -1688,7 +1679,7 @@ export const fr: Texts = {
         template: "Modèle",
       },
     },
-    // Le mode Concentration de l'éditeur du Fil : les deux colonnes se cachent.
+    // Le mode Concentration de l'éditeur des contenus : les deux colonnes se cachent.
     focusMode: {
       label: "Concentration",
       exit: "Quitter la Concentration",
@@ -1696,7 +1687,7 @@ export const fr: Texts = {
       off: "Concentration quittée : les colonnes sont de retour.",
       shortcut: { apple: "⌘ .", other: "Ctrl + ." },
     },
-    // L'aperçu de l'éditeur du Fil : la barre d'outils à droite du téléphone, et ce que montre la
+    // L'aperçu de l'éditeur des contenus : la barre d'outils à droite du téléphone, et ce que montre la
     // Lecture (le rendu de l'app reste provisoire tant qu'elle n'est pas dessinée).
     preview: {
       tools: "Options de l'aperçu",
@@ -1753,12 +1744,12 @@ export const fr: Texts = {
       // En Lecture, on ne prend pas la main : rien ne se modifie.
       reading: "En Lecture : passe en Édition pour modifier.",
     },
-    // Les Blocs de l'éditeur du Fil (en glissière par-dessus le Plan), et le panneau « Mes blocs ».
+    // Les Blocs de l'éditeur des contenus (en glissière par-dessus le Plan), et le panneau « Mes blocs ».
     library: {
       hint: "Clique sur un bloc pour l'ajouter sous le bloc choisi (ou à la fin), ou glisse-le dans le téléphone.",
       basics: "Blocs de base",
       addLabel: (label: string) => `Ajouter un bloc ${label}`,
-      // La glissière des Blocs, par-dessus le Plan (éditeur du Fil).
+      // La glissière des Blocs, par-dessus le Plan (éditeur des contenus).
       close: "Fermer les Blocs",
       // La cible d'un ajout : « Ajouter dans la section ».
       target: {
@@ -1859,7 +1850,7 @@ export const fr: Texts = {
     settings: {
       label: "Réglages du bloc",
       title: (label: string) => `Réglages : ${label}`,
-      // Éditeur du Fil : la barre d'icônes en bas de la glissière du bloc.
+      // Éditeur des contenus : la barre d'icônes en bas de la glissière du bloc.
       actions: "Actions du bloc",
       readOnly: "Lecture seule : tu ne peux rien modifier.",
       text: "Écris directement dans l'aperçu. Sélectionne des mots pour les mettre en gras, en italique ou en lien.",
@@ -2078,7 +2069,7 @@ export const fr: Texts = {
       unknownHint:
         "L'état de publication n'a pas pu être lu : clique pour réessayer.",
     },
-    // Éditeur du Fil : la pastille à côté de « Publier » (la phrase entière dans l'infobulle).
+    // Éditeur des contenus : la pastille à côté de « Publier » (la phrase entière dans l'infobulle).
     short: {
       draft: "Brouillon",
       withdrawn: "Retiré",
@@ -2209,7 +2200,6 @@ export const fr: Texts = {
         "Les versions publiées, de la plus récente à la plus ancienne. Revenir à une version la recopie dans le brouillon, sans rien changer dans l'app.",
       empty: "Aucune version publiée pour l'instant.",
       version: (number: number) => `Version n° ${number}`,
-      by: (name: string) => `par ${name}`,
       live: "En ligne",
       origins: {
         manual: "Publiée",

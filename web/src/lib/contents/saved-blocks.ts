@@ -1,4 +1,4 @@
-// « Mes blocs » de l'éditeur du Fil (ADMIN § 4), sans React : les modèles qui s'insèrent dans un
+// « Mes blocs » de l'éditeur des contenus (ADMIN § 4), sans React : les modèles qui s'insèrent dans un
 // article (mises en forme et blocs partagés), filtrés et cherchés, et le nombre de contenus qui
 // citent chaque bloc partagé.
 

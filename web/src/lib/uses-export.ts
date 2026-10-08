@@ -1,7 +1,9 @@
 // Où un fichier ou une catégorie est utilisé : les contenus qui le citent, et leur export en CSV
 // (Excel, Numbers, Google Sheets), dans la langue de l'admin. Sans React.
 
+import type { ContentKind } from "@/lib/contents/api"
 import { contentEditorPath, contentSection } from "@/navigation"
+import { displayTitle } from "@/lib/titles"
 import { texts } from "@/texts"
 
 /**
@@ -10,7 +12,7 @@ import { texts } from "@/texts"
  */
 export type ContentUse = {
   content_id: string
-  kind: string
+  kind: ContentKind
   title: string
   in_draft: boolean
   in_app: boolean
@@ -46,16 +48,14 @@ export function usesCsv(uses: readonly ContentUse[], origin: string): string {
     csv.url,
   ]
   const rows = uses.map((use) => {
-    const section = contentSection(use.kind)
-    const path = contentEditorPath(use.kind, use.content_id)
     return [
-      use.title?.trim() || texts.common.untitled,
-      section ? texts.sections[section].title : "",
+      displayTitle(use.title),
+      texts.sections[contentSection(use.kind)].title,
       ...(copies
         ? [yesNo(use.copied ?? false)]
         : [yesNo(use.in_draft), yesNo(use.in_app)]),
       ...(withTrash ? [yesNo(use.in_trash ?? false)] : []),
-      path ? `${origin}${path}` : "",
+      `${origin}${contentEditorPath(use.kind, use.content_id)}`,
     ]
   })
   // Fins de ligne CRLF, comme le veut le format.

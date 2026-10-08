@@ -15,7 +15,7 @@ export function SmallScreenNotice() {
     <div className="flex min-h-svh items-center justify-center p-6 lg:hidden">
       <Empty>
         <EmptyHeader>
-          <EmptyMedia variant="icon">
+          <EmptyMedia>
             <Monitor />
           </EmptyMedia>
           <EmptyTitle>{texts.smallScreen.title}</EmptyTitle>

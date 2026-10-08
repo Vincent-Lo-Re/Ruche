@@ -84,6 +84,7 @@ import { READY_IDS, showReadySetting } from "@/lib/editor/ready-targets"
 import { focusSoon } from "@/lib/focus"
 import { locale } from "@/lib/language"
 import { formatDuration } from "@/lib/media/format"
+import { displayTitle } from "@/lib/titles"
 import { texts } from "@/texts"
 
 const labels = texts.editor.article
@@ -108,7 +109,7 @@ const statTrigger =
   "flex items-center gap-1 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
 
 /**
- * L'Article (l'Épisode, la Page), dans la colonne de droite de l'éditeur du Fil (ADMIN § 4) :
+ * L'Article (l'Épisode, la Page), dans la colonne de droite de l'éditeur des contenus (ADMIN § 4) :
  * ce qui manque pour publier, la carte de la liste (image de présentation), l'audio d'un
  * épisode, l'adresse d'une page, le niveau d'accès et les catégories. Tout part avec le
  * brouillon.
@@ -243,7 +244,7 @@ export function ArticlePanel({
 }
 
 /**
- * La section fixe en bas de la colonne de droite (éditeur du Fil) : l'état de l'enregistrement
+ * La section fixe en bas de la colonne de droite (éditeur des contenus) : l'état de l'enregistrement
  * (une icône), le temps de lecture (un épisode : la durée de son audio) et les mots, la dernière
  * modification (le détail dans les infobulles), puis les actions (le cadenas, l'état de
  * publication et « Publier »).
@@ -519,7 +520,7 @@ function CoverCard({
         </ItemMedia>
         <ItemContent className="min-w-0">
           <ItemTitle className="line-clamp-3">
-            {draft.title.trim() || texts.common.untitled}
+            {displayTitle(draft.title)}
           </ItemTitle>
         </ItemContent>
       </Item>
