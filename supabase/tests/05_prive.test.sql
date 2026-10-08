@@ -3,7 +3,7 @@
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(22);
+select plan(20);
 
 select has_schema('private', 'le schéma private existe');
 select ok(
@@ -141,26 +141,6 @@ select is(
   ),
   array['categories_reorder(text,uuid[]):false:true:true'],
   'categories_* (étape 7) : authenticated seulement, security definer'
-);
-
--- Les fonctions internes de l'étape 7 ne sont appelables ni par anon ni par authenticated (déjà
--- couvert par la liste fermée ci-dessus ; rappel explicite pour les nouvelles).
-select ok(
-  not has_function_privilege('anon', 'private.check_publish_requirements(text,jsonb)', 'execute')
-    and not has_function_privilege('authenticated', 'private.check_publish_requirements(text,jsonb)', 'execute')
-    and not has_function_privilege('authenticated', 'private.cover_required(text)', 'execute')
-    and not has_function_privilege('authenticated', 'private.feed_cursor(integer,uuid)', 'execute'),
-  'private : check_publish_requirements, cover_required et feed_cursor ne sont pas exécutables par l''API'
-);
-
--- Les fonctions internes de la publication ne sont pas appelables par l'API (déjà couvert par la
--- liste fermée ci-dessus ; rappel explicite après le retrait des méthodes, qui a changé la
--- signature de version_hash et d'insert_version).
-select ok(
-  not has_function_privilege('authenticated', 'private.prepare_version(public.contents,jsonb)', 'execute')
-    and not has_function_privilege('authenticated', 'private.insert_version(public.versions,text,uuid)', 'execute')
-    and not has_function_privilege('authenticated', 'private.version_hash(jsonb,jsonb)', 'execute'),
-  'private : prepare_version, insert_version et version_hash ne sont pas exécutables par l''API'
 );
 
 -- Les fonctions de déclencheur et les fonctions files_* ne sont pas appelables par l'API.

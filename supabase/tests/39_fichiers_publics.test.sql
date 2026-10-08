@@ -12,7 +12,7 @@
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(74);
+select plan(73);
 
 select pg_temp.create_people();
 select pg_temp.empty_media_library();
@@ -406,12 +406,6 @@ select is(
     where v.content_id = pg_temp.cid('a') and v.number = 4),
   true,
   'media_push : tout le reste de la version en ligne est recopié'
-);
-select is(
-  (select body_hash = encode(sha256(convert_to(jsonb_build_array(body, files)::text, 'UTF8')), 'hex')
-    from public.versions where content_id = pg_temp.cid('a') and number = 4),
-  true,
-  'media_push : empreinte recalculée'
 );
 select ok(
   (select extensions.jsonb_matches_schema(private.blocks_schema('published'), body)

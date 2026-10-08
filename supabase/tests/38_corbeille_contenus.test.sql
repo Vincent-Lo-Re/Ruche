@@ -66,19 +66,19 @@ select public.lock_release(pg_temp.cid('article'));
 select public.lock_take(pg_temp.cid('article'));
 -- Son propre verrou ne gêne pas : l'éditeur 2 le met à la corbeille.
 select results_eq(
-  format('select trashed, needs_file_sync from public.trash(%L)', pg_temp.cid('article')),
-  $$values (1, true)$$,
-  'trash : un élément, et la photo doit redevenir protégée (needs_file_sync)'
+  format('select needs_file_sync from public.trash(%L)', pg_temp.cid('article')),
+  $$values (true)$$,
+  'trash : la photo doit redevenir protégée (needs_file_sync)'
 );
 select pg_temp.as_postgres();
 select is(
   (select array[
       (live_version_id is null)::text, (scheduled_at is null)::text, (scheduled_by is null)::text,
       (scheduled_rev is null)::text, (schedule_error is null)::text, (deleted_at is not null)::text,
-      (trash_batch is not null)::text, deleted_by::text
+      deleted_by::text
     ]
     from public.contents where id = pg_temp.cid('article')),
-  array['true', 'true', 'true', 'true', 'true', 'true', 'true', pg_temp.person_id('editor2')::text],
+  array['true', 'true', 'true', 'true', 'true', 'true', pg_temp.person_id('editor2')::text],
   'trash : retiré de l''app, programmation annulée, dans la corbeille avec son auteur'
 );
 select is(
@@ -98,12 +98,9 @@ select pg_temp.as_anon();
 select is(public.app_content(pg_temp.cid('article')), null, 'trash : l''app ne voit plus l''article');
 select pg_temp.as_person('editor');
 select results_eq(
-  format('select trash_batch, trashed, needs_file_sync from public.trash(%L)', pg_temp.cid('article')),
-  format(
-    'values (%L::uuid, 0, false)',
-    (select trash_batch from public.contents where id = pg_temp.cid('article'))
-  ),
-  'trash : rejouable (même lot, rien de plus)'
+  format('select needs_file_sync from public.trash(%L)', pg_temp.cid('article')),
+  $$values (false)$$,
+  'trash : rejouable (rien de plus)'
 );
 select throws_ok(
   format('select public.trash(%L)', '20000000-0000-4000-8000-0000000000ff'), 'P0001', 'contenu_introuvable',
@@ -119,12 +116,12 @@ select throws_ok(
 );
 select results_eq(
   format(
-    $$select item_type, kind, title, batch_root, deleted_by_name,
+    $$select item_type, kind, title, deleted_by_name,
         purge_at = deleted_at + interval '30 days'
       from public.trash_items where id = %L$$,
     pg_temp.cid('article')
   ),
-  $$values ('content', 'article', 'Café', true, 'editeur2@tests.local', true)$$,
+  $$values ('content', 'article', 'Café', 'editeur2@tests.local', true)$$,
   'trash_items : le contenu, son auteur et la date d''effacement automatique'
 );
 
@@ -140,11 +137,11 @@ select results_eq(
 select pg_temp.as_postgres();
 select is(
   (select array[
-      (deleted_at is null)::text, (deleted_by is null)::text, (trash_batch is null)::text,
+      (deleted_at is null)::text, (deleted_by is null)::text,
       (live_version_id is null)::text, (scheduled_at is null)::text
     ]
     from public.contents where id = pg_temp.cid('article')),
-  array['true', 'true', 'true', 'true', 'true'],
+  array['true', 'true', 'true', 'true'],
   'restore : hors de la corbeille, toujours hors de l''app, sans programmation'
 );
 select pg_temp.as_anon();
@@ -234,7 +231,7 @@ select is(
   'empty_trash : le brouillon qui citait le modèle est effacé'
 );
 select is(
-  (select trashed from public.trash(pg_temp.cid('tpl'))), 1, 'le modèle part alors à la corbeille'
+  (select count(*)::int from public.trash(pg_temp.cid('tpl'))), 1, 'le modèle part alors à la corbeille'
 );
 select is(
   (select kind from public.trash_items where id = pg_temp.cid('tpl')), 'template',

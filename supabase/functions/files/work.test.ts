@@ -8,7 +8,6 @@ import {
   type Orphan,
   PROTECTED_BUCKET,
   PUBLIC_BUCKET,
-  runAudit,
   runClean,
   runKick,
   type Store,
@@ -373,7 +372,6 @@ Deno.test("contrôle et nettoyage des orphelins", async () => {
   const store = new FakeStore()
   store.put(PROTECTED_BUCKET, "x/reste.png", "x")
   store.put(PUBLIC_BUCKET, "y/reste.png", "y")
-  assertEquals(await runAudit(db), { mode: "audit", orphans: 2 })
   const summary = await runClean(db, store)
   assertEquals(summary.removed, 2)
   assertEquals(store.objects.size, 0)

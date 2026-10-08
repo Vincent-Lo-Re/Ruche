@@ -1,12 +1,12 @@
 -- L'ancien système des méthodes retiré de la base (06/10/2026 ; docs/ADMINISTRATION.md, § 1,
 -- « Méthodes, refaites en écrans ») : plus de méthode, de chapitre, de leçon ni d'exercice ;
 -- plus de parent, de place, de « Montrer dans l'app », de « Leçon gratuite », de plan figé ni de
--- révision de toute la méthode ; plus de fonctions des méthodes. Les points de départ d'un
--- chapitre, d'une leçon ou d'un exercice restent (pour les méthodes refaites).
+-- révision de toute la méthode ; plus de fonctions des méthodes. Depuis le 08/10/2026, plus de
+-- point de départ d'un chapitre, d'une leçon ou d'un exercice non plus.
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(25);
+select plan(24);
 
 select pg_temp.create_people();
 select pg_temp.empty_media_library();
@@ -35,17 +35,13 @@ select throws_ok(
   'un exercice non plus'
 );
 
--- Le point de départ d'une leçon reste, pour les méthodes refaites.
-select lives_ok(
-  $$insert into ids (name, id)
-    select 'depart_lecon', (public.content_create(
+-- Plus de point de départ d'une leçon (ni d'un chapitre ou d'un exercice).
+select throws_ok(
+  $$select public.content_create(
       kind => 'template', title => 'Leçon type', template_sort => 'starter', template_for => 'lesson'
-    )).id$$,
-  'un point de départ des leçons se crée encore'
-);
-select is(
-  (select template_for from public.contents where id = pg_temp.cid('depart_lecon')), 'lesson',
-  'il garde sa section : lesson'
+    )$$,
+  'P0001', 'sorte_invalide',
+  'un point de départ des leçons ne se crée plus'
 );
 
 -- ---------------------------------------------------------------------------------------------
@@ -94,8 +90,8 @@ select throws_ok(
 
 select pg_temp.as_postgres();
 select throws_ok(
-  $$insert into public.versions (content_id, number, origin, body, body_hash, draft_rev)
-    values (pg_temp.cid('article'), 1, 'outline', '{}', repeat('0', 64), 1)$$,
+  $$insert into public.versions (content_id, number, origin, body, draft_rev)
+    values (pg_temp.cid('article'), 1, 'outline', '{}', 1)$$,
   '23514', 'new row for relation "versions" violates check constraint "versions_origin_check"',
   'une version n''a plus l''origine « outline »'
 );

@@ -8,7 +8,7 @@
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(170);
+select plan(169);
 
 select pg_temp.create_people();
 select pg_temp.empty_media_library();
@@ -228,7 +228,6 @@ select is(
   (pg_temp.live('article')).category_ids, array[pg_temp.catid('sommeil')],
   'version : les catégories du brouillon sont figées'
 );
-select ok((pg_temp.live('article')).body_hash ~ '^[0-9a-f]{64}$', 'version : empreinte SHA-256');
 select is(
   (pg_temp.live('article')).body -> 'blocks' -> 1,
   pg_temp.image_block('00000000-0000-4000-8000-000000000002', pg_temp.mid('fond'), '')
@@ -447,21 +446,21 @@ select is(
   'bloc lié : copie du modèle, id du bloc lié, marqueur templateId, id intérieurs tirés du bloc lié'
 );
 select is((pg_temp.live('lie')).template_ids, array[pg_temp.cid('tpl')], 'version : modèles cités');
-create temporary table first_hash on commit drop as select (pg_temp.live('lie')).body_hash as hash;
+create temporary table first_body on commit drop as select (pg_temp.live('lie')).body as body;
 select lives_ok($$select pg_temp.publish('lie')$$, 'republier sans rien changer');
 select is(
-  (pg_temp.live('lie')).body_hash, (select hash from first_hash),
-  'empreinte identique d''une publication à l''autre (copies stables)'
+  (pg_temp.live('lie')).body, (select body from first_body),
+  'corps identique d''une publication à l''autre (copies stables)'
 );
 select pg_temp.as_postgres();
-update public.contents set deleted_at = now(), trash_batch = gen_random_uuid() where id = pg_temp.cid('tpl');
+update public.contents set deleted_at = now() where id = pg_temp.cid('tpl');
 select pg_temp.as_person('editor');
 select throws_ok(
   $$select pg_temp.publish('lie')$$, 'P0001', 'modele_indisponible',
   'modèle dans la corbeille : la publication est refusée'
 );
 select pg_temp.as_postgres();
-update public.contents set deleted_at = null, trash_batch = null where id = pg_temp.cid('tpl');
+update public.contents set deleted_at = null where id = pg_temp.cid('tpl');
 
 -- ---------------------------------------------------------------------------------------------
 -- Une version ne change jamais ; un contenu ne pointe que vers ses versions
@@ -628,7 +627,7 @@ select is(
 
 -- Un contenu dans la corbeille disparaît de l'app.
 select pg_temp.as_postgres();
-update public.contents set deleted_at = now(), trash_batch = gen_random_uuid() where id = pg_temp.cid('ep');
+update public.contents set deleted_at = now() where id = pg_temp.cid('ep');
 select pg_temp.as_anon();
 select ok(public.app_content(pg_temp.cid('ep')) is null, 'app : un contenu dans la corbeille n''existe plus');
 select pg_temp.as_person('editor');
@@ -796,7 +795,7 @@ select is(
   'retour : la révision est recopiée dans le verrou (Realtime)'
 );
 select pg_temp.as_postgres();
-update public.contents set deleted_at = now(), trash_batch = gen_random_uuid() where id = pg_temp.cid('tpl');
+update public.contents set deleted_at = now() where id = pg_temp.cid('tpl');
 select pg_temp.as_person('editor');
 select is(
   (select warnings from public.revert_to_version((select id from rv1))),
@@ -814,7 +813,7 @@ select is(
   'retour : copie ordinaire, sans le marqueur templateId'
 );
 select pg_temp.as_postgres();
-update public.contents set deleted_at = null, trash_batch = null where id = pg_temp.cid('tpl');
+update public.contents set deleted_at = null where id = pg_temp.cid('tpl');
 update public.media set deleted_at = null where id = pg_temp.mid('vieux');
 
 -- Page : l'adresse de la version revient, sauf si une autre page l'a prise entre-temps.

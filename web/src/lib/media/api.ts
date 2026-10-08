@@ -460,17 +460,14 @@ export async function emptyTrash(
 // Fonction serveur « files »
 // ---------------------------------------------------------------------------------------------
 
-type FilesMode = "kick" | "audit" | "clean"
+type FilesMode = "kick" | "clean"
 
 type KickSummary = { mode: "kick"; remaining: number }
-type AuditSummary = { mode: "audit"; orphans: number }
 type CleanSummary = { mode: "clean"; removed: number; orphans: number }
 
 type FilesSummary<M extends FilesMode> = M extends "kick"
   ? KickSummary
-  : M extends "audit"
-    ? AuditSummary
-    : CleanSummary
+  : CleanSummary
 
 /** Appelle la fonction « files » avec la session du membre (effet immédiat, sans frein). */
 export async function callFiles<M extends FilesMode>(

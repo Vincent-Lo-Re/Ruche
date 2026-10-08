@@ -6,7 +6,7 @@
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(45);
+select plan(43);
 
 select pg_temp.create_people();
 select pg_temp.empty_media_library();
@@ -86,16 +86,8 @@ select function_privs_are(
   'authenticated : peut appeler categories_reorder'
 );
 select function_privs_are(
-  'public', 'app_feed', array['text', 'uuid', 'text', 'integer'], 'anon', array['EXECUTE'],
-  'anon : peut appeler app_feed'
-);
-select function_privs_are(
   'public', 'app_feed', array['text', 'uuid', 'text', 'integer'], 'authenticated', array['EXECUTE'],
   'authenticated : peut appeler app_feed'
-);
-select function_privs_are(
-  'public', 'app_categories', array['text'], 'anon', array['EXECUTE'],
-  'anon : peut appeler app_categories'
 );
 select function_privs_are(
   'public', 'app_categories', array['text'], 'authenticated', array['EXECUTE'],

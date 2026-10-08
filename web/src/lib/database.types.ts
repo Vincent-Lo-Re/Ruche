@@ -203,12 +203,10 @@ export type Database = {
           scheduled_at: string | null
           scheduled_by: string | null
           scheduled_rev: number | null
-          scheduled_set_at: string | null
           slug: string | null
           template_for: string | null
           template_sort: string | null
           title: string | null
-          trash_batch: string | null
         }
         ComputedFields: never
         Insert: {
@@ -233,12 +231,10 @@ export type Database = {
           scheduled_at?: string | null
           scheduled_by?: string | null
           scheduled_rev?: number | null
-          scheduled_set_at?: string | null
           slug?: string | null
           template_for?: string | null
           template_sort?: string | null
           title?: never
-          trash_batch?: string | null
         }
         Update: {
           access_chosen?: boolean
@@ -262,12 +258,10 @@ export type Database = {
           scheduled_at?: string | null
           scheduled_by?: string | null
           scheduled_rev?: number | null
-          scheduled_set_at?: string | null
           slug?: string | null
           template_for?: string | null
           template_sort?: string | null
           title?: never
-          trash_batch?: string | null
         }
         Relationships: [
           {
@@ -574,7 +568,6 @@ export type Database = {
           access_level_id: string | null
           block_types: string[]
           body: NonNullable<Json>
-          body_hash: string
           category_ids: string[]
           content_id: string
           cover_media_id: string | null
@@ -595,7 +588,6 @@ export type Database = {
           access_level_id?: string | null
           block_types?: string[]
           body: NonNullable<Json>
-          body_hash: string
           category_ids?: string[]
           content_id: string
           cover_media_id?: string | null
@@ -615,7 +607,6 @@ export type Database = {
           access_level_id?: string | null
           block_types?: string[]
           body?: NonNullable<Json>
-          body_hash?: string
           category_ids?: string[]
           content_id?: string
           cover_media_id?: string | null
@@ -652,7 +643,6 @@ export type Database = {
     Views: {
       trash_items: {
         Row: {
-          batch_root: boolean | null
           deleted_at: string | null
           deleted_by_name: string | null
           id: string | null
@@ -661,7 +651,6 @@ export type Database = {
           purge_at: string | null
           purge_error: string | null
           title: string | null
-          trash_batch: string | null
         }
         ComputedFields: never
         Relationships: []
@@ -787,12 +776,10 @@ export type Database = {
           scheduled_at: string | null
           scheduled_by: string | null
           scheduled_rev: number | null
-          scheduled_set_at: string | null
           slug: string | null
           template_for: string | null
           template_sort: string | null
           title: string | null
-          trash_batch: string | null
         }
         SetofOptions: {
           from: "*"
@@ -1166,12 +1153,10 @@ export type Database = {
           scheduled_at: string | null
           scheduled_by: string | null
           scheduled_rev: number | null
-          scheduled_set_at: string | null
           slug: string | null
           template_for: string | null
           template_sort: string | null
           title: string | null
-          trash_batch: string | null
         }
         SetofOptions: {
           from: "*"
@@ -1210,8 +1195,6 @@ export type Database = {
         Args: { content_id: string }
         Returns: {
           needs_file_sync: boolean
-          trash_batch: string
-          trashed: number
         }[]
       }
       unpublish: { Args: { content_id: string }; Returns: boolean }

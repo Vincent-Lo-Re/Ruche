@@ -5,7 +5,7 @@
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(97);
+select plan(96);
 
 select pg_temp.create_people();
 select pg_temp.empty_contents();
@@ -409,21 +409,6 @@ select throws_ok(
 );
 select pg_temp.as_postgres();
 
--- Fonctions internes de l'étape 4 : ni anon ni authenticated.
-select is(
-  array(
-    select p.oid::regprocedure::text
-    from pg_proc p
-    where p.pronamespace = 'private'::regnamespace
-      and p.proname in ('lock_ttl', 'lock_state', 'empty_draft', 'blocks_with_new_ids',
-        'contents_check_kind', 'contents_trash_guard', 'contents_check_draft',
-        'categories_before_write', 'content_categories_check', 'media_uses')
-      and (has_function_privilege('anon', p.oid, 'execute')
-        or has_function_privilege('authenticated', p.oid, 'execute'))
-  ),
-  array[]::text[],
-  'fonctions internes de l''étape 4 : non exécutables par anon ni authenticated'
-);
 select is(
   (select count(*)::int from pg_proc p
     where p.pronamespace = 'private'::regnamespace

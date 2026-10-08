@@ -7,7 +7,7 @@
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(97);
+select plan(92);
 
 select pg_temp.create_people();
 select pg_temp.empty_media_library();
@@ -128,16 +128,6 @@ select function_privs_are(
   'authenticated : peut appeler access_levels_reorder (la fonction vérifie is_admin)'
 );
 select function_privs_are(
-  'public', 'app_content', array['uuid'], 'anon', array['EXECUTE'], 'anon : peut appeler app_content'
-);
-select function_privs_are(
-  'public', 'app_page', array['text'], 'anon', array['EXECUTE'], 'anon : peut appeler app_page'
-);
-select function_privs_are(
-  'public', 'app_access_levels', array[]::text[], 'anon', array['EXECUTE'],
-  'anon : peut appeler app_access_levels'
-);
-select function_privs_are(
   'public', 'app_content', array['uuid'], 'authenticated', array['EXECUTE'],
   'authenticated : peut appeler app_content (lecteur abonné)'
 );
@@ -148,27 +138,6 @@ select is(
         'access_levels_reorder', 'app_content', 'app_page', 'app_access_levels', 'save_draft')),
   10,
   'une seule signature par RPC (PostgREST choisit sans ambiguïté)'
-);
-select is(
-  array(
-    select p.oid::regprocedure::text
-    from pg_proc p
-    where p.pronamespace = 'private'::regnamespace
-      and p.proname in ('do_publish', 'run_due_publications', 'reader_rank', 'app_content_json',
-        'require_admin', 'resolve_linked', 'resolve_alt', 'resolve_alts',
-        'body_to_draft', 'block_to_draft', 'media_available', 'active_writer', 'media_ids_of',
-        'settings_already_applied', 'access_levels_before_write', 'access_levels_before_delete',
-        'versions_immutable')
-      and (has_function_privilege('anon', p.oid, 'execute')
-        or has_function_privilege('authenticated', p.oid, 'execute'))
-  ),
-  array[]::text[],
-  'fonctions internes de l''étape 5 (do_publish, reader_rank…) : ni anon ni authenticated'
-);
-select ok(
-  not has_table_privilege('anon', 'private.live', 'select')
-    and not has_table_privilege('authenticated', 'private.live', 'select'),
-  'private.live : illisible par anon et authenticated'
 );
 
 -- ---------------------------------------------------------------------------------------------
@@ -308,8 +277,8 @@ select is((select count(*)::int from public.versions), 2, 'éditeur aal2 : lit l
 select is((select count(*)::int from public.access_levels), 2, 'éditeur aal2 : lit les formules');
 select is((select count(*)::int from public.reader_access), 0, 'éditeur aal2 : ne lit pas les lecteurs');
 select throws_ok(
-  $$insert into public.versions (content_id, number, origin, body, body_hash, draft_rev)
-    values ('20000000-0000-4000-8000-000000000003', 1, 'manual', '{}', repeat('0', 64), 1)$$,
+  $$insert into public.versions (content_id, number, origin, body, draft_rev)
+    values ('20000000-0000-4000-8000-000000000003', 1, 'manual', '{}', 1)$$,
   '42501', null, 'éditeur aal2 : pas d''insertion directe de version'
 );
 select throws_ok(

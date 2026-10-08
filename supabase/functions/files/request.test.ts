@@ -5,7 +5,7 @@ Deno.test("mode : « kick » par défaut, liste fermée", () => {
   assertEquals(parseMode(undefined), "kick")
   assertEquals(parseMode({}), "kick")
   assertEquals(parseMode({ mode: "kick" }), "kick")
-  assertEquals(parseMode({ mode: "audit" }), "audit")
+  assertEquals(parseMode({ mode: "audit" }), null)
   assertEquals(parseMode({ mode: "clean" }), "clean")
   assertEquals(parseMode({ mode: "tout" }), null)
   assertEquals(parseMode([]), null)
