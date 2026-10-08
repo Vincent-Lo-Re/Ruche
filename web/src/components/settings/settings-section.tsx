@@ -1,7 +1,7 @@
 import type { ReactNode } from "react"
 
 /**
- * Une section de réglages (Paramètres), comme les pages de réglages des exemples de shadcn : à
+ * Une section de réglages (Paramètres, Mon compte), comme les pages de réglages des exemples de shadcn : à
  * gauche son titre et sa phrase, à droite sa carte ; dans un cadre étroit (tablette, téléphone),
  * le titre passe au-dessus. Le cadre est un conteneur (@container) : la mise en page suit sa
  * largeur, pas celle de la fenêtre.
