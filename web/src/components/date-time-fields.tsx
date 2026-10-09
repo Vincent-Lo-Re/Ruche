@@ -17,11 +17,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import {
+  dayInputPlaceholder,
   formatDayInput,
   formatTimeInput,
   parseDayInput,
   parseTimeInput,
+  timeInputPlaceholder,
 } from "@/lib/dates"
+import { weekStartsOn } from "@/lib/regional-format"
 import { texts } from "@/texts"
 
 const labels = texts.dates
@@ -59,7 +62,7 @@ export function DayField({ value, onChange, onBlur, ...props }: FieldProps) {
         value={value}
         inputMode="numeric"
         autoComplete="off"
-        placeholder={labels.dayPlaceholder}
+        placeholder={dayInputPlaceholder}
         onChange={(event) => onChange(event.target.value)}
         onBlur={(event) => {
           // « 5/3/2099 » devient « 05/03/2099 ».
@@ -85,6 +88,8 @@ export function DayField({ value, onChange, onBlur, ...props }: FieldProps) {
             <Calendar
               mode="single"
               locale={language === "fr" ? fr : enUS}
+              // Les noms des mois suivent la langue ; le premier jour de la semaine, le format.
+              weekStartsOn={weekStartsOn}
               selected={selected}
               defaultMonth={selected}
               onSelect={(date) => {
@@ -110,7 +115,7 @@ export function TimeField({ value, onChange, onBlur, ...props }: FieldProps) {
       {...props}
       value={value}
       autoComplete="off"
-      placeholder={labels.timePlaceholder}
+      placeholder={timeInputPlaceholder}
       onChange={(event) => onChange(event.target.value)}
       onBlur={(event) => {
         const time = parseTimeInput(value)

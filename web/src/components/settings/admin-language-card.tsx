@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
-import { LanguageSelect } from "@/components/language-select"
+import { ListSelect } from "@/components/list-select"
 import { LoadState } from "@/components/load-state"
 import { Card, CardContent } from "@/components/ui/card"
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
@@ -40,7 +40,7 @@ export function AdminLanguageCard() {
         {brand.isSuccess ? (
           <Field>
             <FieldLabel htmlFor="admin-language">{labels.label}</FieldLabel>
-            <LanguageSelect
+            <ListSelect
               id="admin-language"
               items={items}
               value={save.isPending ? save.variables : brand.data.language}

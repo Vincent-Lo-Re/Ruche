@@ -6,13 +6,13 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-type LanguageItem = { value: string; label: string }
+type ListItem = { value: string; label: string }
 
 /**
- * La liste de choix d'une langue, sur toute la largeur : celle du membre (Mon compte) et celle de
- * toute l'admin (Paramètres › Avancé).
+ * Une liste de choix sur toute la largeur : la langue et le format régional, du membre (Mon
+ * compte) et de toute l'admin (Paramètres › Avancé).
  */
-export function LanguageSelect({
+export function ListSelect({
   id,
   items,
   value,
@@ -20,7 +20,7 @@ export function LanguageSelect({
   onValueChange,
 }: {
   id: string
-  items: LanguageItem[]
+  items: ListItem[]
   value: string
   disabled: boolean
   onValueChange: (value: string) => void

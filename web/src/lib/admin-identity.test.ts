@@ -53,6 +53,7 @@ describe("le nom de la marque", () => {
       websiteUrl: null,
       language: "en",
       timeZone: "Europe/Paris",
+      locale: null,
       variants: {
         "logotype:zinc-blue:dark": "bleu",
         "logotype:neutral-none:dark": "origine-sombre",
@@ -173,6 +174,7 @@ describe("le nom de la marque", () => {
       websiteUrl: null,
       language: "en",
       timeZone: "Europe/Paris",
+      locale: null,
       variants: {},
     }
     const origin = brandFileFor(empty, "monogram", "dark")!

@@ -8,7 +8,7 @@ import { toast } from "sonner"
 
 import { profileQueryKey, useAuth, type Profile } from "@/auth/auth-context"
 import { EmailChangeDialog } from "@/components/account/email-change-dialog"
-import { LanguageSelect } from "@/components/language-select"
+import { ListSelect } from "@/components/list-select"
 import { PageHeader } from "@/components/page-header"
 import { RoleBadge } from "@/components/role-badge"
 import { SettingsSection } from "@/components/settings/settings-section"
@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/card"
 import {
   Field,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -41,15 +42,25 @@ import {
   ItemTitle,
 } from "@/components/ui/item"
 import { Spinner } from "@/components/ui/spinner"
-import { saveFullName, saveLanguage } from "@/lib/auth"
-import { formatDateTime } from "@/lib/dates"
+import { saveFormat, saveFullName, saveLanguage } from "@/lib/auth"
+import { formatDateTime, formatSample } from "@/lib/dates"
 import {
   applyMemberLanguage,
   isLanguage,
+  language,
   LANGUAGES,
   memberLanguage,
   type Language,
 } from "@/lib/language"
+import {
+  applyMemberFormat,
+  isRegionalFormat,
+  languageFormat,
+  memberFormat,
+  REGIONAL_FORMATS,
+  regionalFormatName,
+  type RegionalFormat,
+} from "@/lib/regional-format"
 import { profileSchema } from "@/lib/schemas"
 import { sections } from "@/navigation"
 import { texts } from "@/texts"
@@ -75,6 +86,7 @@ export function AccountPage() {
         {profile && <ProfileCard profile={profile} />}
         <MfaCard factor={factor} />
         <LanguageCard />
+        <FormatCard />
       </div>
       <div className="mt-8 grid items-start gap-6 xl:grid-cols-2">
         <Section
@@ -293,7 +305,7 @@ function LanguageCard() {
         <CardContent>
           <Field>
             <FieldLabel htmlFor="account-language">{labels.label}</FieldLabel>
-            <LanguageSelect
+            <ListSelect
               id="account-language"
               items={items}
               value={current}
@@ -303,6 +315,62 @@ function LanguageCard() {
                 if (next !== chosen) save.mutate(next)
               }}
             />
+          </Field>
+        </CardContent>
+      </Card>
+    </SettingsSection>
+  )
+}
+
+/**
+ * Le format régional de ce membre (ou celui de toute l'admin) : l'écriture des dates, des heures
+ * et des nombres, rangée sur son compte, avec un exemple ; la page se recharge s'il change.
+ */
+function FormatCard() {
+  const labels = texts.account.format
+  const { session } = useAuth()
+  const brand = useBrand()
+  const chosen = memberFormat(session?.user.user_metadata)
+  const save = useMutation({
+    mutationFn: saveFormat,
+    onSuccess: (_, next) => applyMemberFormat(next),
+    onError: () => toast.error(labels.failed),
+  })
+  // Celui de toute l'admin, sinon celui de la langue du membre.
+  const adminFormat = brand?.locale ?? languageFormat(language)
+  const items = [
+    {
+      value: ADMIN_CHOICE,
+      label: labels.sameAsAdmin(regionalFormatName(adminFormat)),
+    },
+    ...REGIONAL_FORMATS.map((value) => ({
+      value,
+      label: regionalFormatName(value),
+    })),
+  ]
+  const current: RegionalFormat | null = save.isPending
+    ? (save.variables ?? null)
+    : chosen
+
+  return (
+    <SettingsSection title={labels.title} description={labels.description}>
+      <Card>
+        <CardContent>
+          <Field>
+            <FieldLabel htmlFor="account-format">{labels.label}</FieldLabel>
+            <ListSelect
+              id="account-format"
+              items={items}
+              value={current ?? ADMIN_CHOICE}
+              disabled={save.isPending}
+              onValueChange={(value) => {
+                const next = isRegionalFormat(value) ? value : null
+                if (next !== chosen) save.mutate(next)
+              }}
+            />
+            <FieldDescription>
+              {texts.dates.sample(formatSample(current ?? adminFormat))}
+            </FieldDescription>
           </Field>
         </CardContent>
       </Card>

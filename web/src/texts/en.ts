@@ -278,6 +278,14 @@ export const en = {
       sameAsAdmin: (language: string) => `Same as the admin (${language})`,
       failed: "Your language couldn't be saved. Try again.",
     },
+    format: {
+      title: "Regional format",
+      description: "How dates, times, and numbers are written, for you only.",
+      label: "Regional format",
+      // Le membre suit le format de toute l'admin (Paramètres › Avancé), entre parenthèses.
+      sameAsAdmin: (format: string) => `Same as the admin (${format})`,
+      failed: "Your regional format couldn't be saved. Try again.",
+    },
     mfa: {
       title: "Two-step verification",
       description:
@@ -2407,6 +2415,15 @@ export const en = {
         saved: "Admin language saved.",
         loadFailed: "The admin language couldn't be loaded.",
       },
+      format: {
+        title: "Regional format",
+        description:
+          "How dates, times, and numbers are written across the admin, for the whole team. Each member can choose their own in My account.",
+        label: "Admin regional format",
+        // Pas de format choisi : chacun a celui de sa langue.
+        sameAsLanguage: "Based on each person's language",
+        saved: "Regional format saved.",
+      },
       timeZone: {
         title: "Time zone",
         description:
@@ -2622,13 +2639,11 @@ export const en = {
   },
 
   dates: {
-    // Entre la date et l'heure : « 27 sept. 2026 à 18h42 »
-    at: "at",
-    // Entre les heures et les minutes : « 18h42 »
-    hour: ":",
-    // Champs « Jour » et « Heure » (fenêtre « Programmer »).
-    dayPlaceholder: "mm/dd/yyyy",
-    timePlaceholder: "8:00 AM",
+    // Ce qu'on tape dans « Jour » (fenêtre « Programmer »), dans l'ordre du format régional :
+    // « dd/mm/yyyy », « mm/dd/yyyy ».
+    fields: { day: "dd", month: "mm", year: "yyyy" },
+    // Sous la liste d'un format régional : « Example: Sep 27, 2026, 2:30 PM · 1,234.5 ».
+    sample: (sample: string) => `Example: ${sample}`,
     pickDay: "Pick a date from the calendar",
   },
 } as const

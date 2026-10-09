@@ -34,6 +34,7 @@ vi.mock("@/lib/admin-identity", async (importOriginal) => {
     saveMonogramMotions: vi.fn(),
     saveAdminLanguage: vi.fn(),
     saveAdminTimeZone: vi.fn(),
+    saveAdminFormat: vi.fn(),
   }
 })
 
@@ -71,6 +72,7 @@ const brand = (name: string | null): identityApi.AdminBrand => ({
   websiteUrl: null,
   language: "en",
   timeZone: "Europe/Paris",
+  locale: null,
   variants: {},
 })
 
@@ -87,6 +89,7 @@ beforeEach(() => {
   vi.mocked(identityApi.saveMonogramMotions).mockResolvedValue()
   vi.mocked(identityApi.saveAdminLanguage).mockResolvedValue()
   vi.mocked(identityApi.saveAdminTimeZone).mockResolvedValue()
+  vi.mocked(identityApi.saveAdminFormat).mockResolvedValue()
 })
 
 afterEach(() => vi.clearAllMocks())
@@ -145,6 +148,32 @@ describe("Paramètres : le fuseau horaire de l'admin (Avancé)", () => {
 
     await waitFor(() =>
       expect(identityApi.saveAdminTimeZone).toHaveBeenCalledWith("Asia/Tokyo")
+    )
+    expect(await screen.findByText(words.saved)).toBeVisible()
+  })
+})
+
+describe("Paramètres : le format régional de l'admin (Avancé)", () => {
+  it("selon la langue au départ, avec un exemple ; un admin choisit le Royaume-Uni", async () => {
+    await renderApp("/settings?tab=advanced")
+    const words = texts.settings.advanced.format
+
+    const choice = await screen.findByRole("combobox", { name: words.label })
+    expect(choice).toHaveTextContent(words.sameAsLanguage)
+    // L'exemple, celui de la langue de qui regarde (le français ici).
+    expect(
+      screen.getByText(/^Exemple : 27 sept\. 2026 à 14h30 · 1\s234,5$/u)
+    ).toBeVisible()
+
+    fireEvent.click(choice)
+    const british = await screen.findByRole("option", {
+      name: "Anglais (Royaume-Uni)",
+    })
+    fireEvent.pointerDown(british, { pointerType: "mouse" })
+    fireEvent.click(british)
+
+    await waitFor(() =>
+      expect(identityApi.saveAdminFormat).toHaveBeenCalledWith("en-GB")
     )
     expect(await screen.findByText(words.saved)).toBeVisible()
   })

@@ -10,6 +10,7 @@ import {
 } from "@/lib/auth-errors"
 import { brandName, getAdminBrand } from "@/lib/admin-identity"
 import type { Language } from "@/lib/language"
+import type { RegionalFormat } from "@/lib/regional-format"
 import { detachedAuth, supabase } from "@/lib/supabase"
 import { texts } from "@/texts"
 
@@ -129,6 +130,15 @@ export async function saveFullName(
  */
 export async function saveLanguage(language: Language | null): Promise<void> {
   const { error } = await supabase.auth.updateUser({ data: { language } })
+  if (error) throw error
+}
+
+/**
+ * Enregistre le format régional du membre sur son compte (Mon compte ; null : celui de l'admin) :
+ * il le suit d'un navigateur à l'autre.
+ */
+export async function saveFormat(format: RegionalFormat | null): Promise<void> {
+  const { error } = await supabase.auth.updateUser({ data: { locale: format } })
   if (error) throw error
 }
 

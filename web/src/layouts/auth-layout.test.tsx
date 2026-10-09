@@ -26,6 +26,7 @@ const brand = (
   websiteUrl: null,
   language: "en",
   timeZone: "Europe/Paris",
+  locale: null,
   variants: {},
 })
 

@@ -82,7 +82,7 @@ import {
 } from "@/lib/editor/profile"
 import { READY_IDS, showReadySetting } from "@/lib/editor/ready-targets"
 import { focusSoon } from "@/lib/focus"
-import { locale } from "@/lib/language"
+import { locale } from "@/lib/regional-format"
 import { formatDuration } from "@/lib/media/format"
 import { displayTitle } from "@/lib/titles"
 import { texts } from "@/texts"

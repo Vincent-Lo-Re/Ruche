@@ -1,4 +1,4 @@
-import { locale } from "@/lib/language"
+import { locale } from "@/lib/regional-format"
 import { texts } from "@/texts"
 
 // Affichage des tailles, durées et dimensions, dans la langue de l'admin (unités dans

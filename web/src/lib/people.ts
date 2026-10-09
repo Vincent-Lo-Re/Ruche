@@ -1,4 +1,4 @@
-import { locale } from "@/lib/language"
+import { locale } from "@/lib/regional-format"
 
 /** Le nom et l'e-mail d'un membre, tels que les lectures les donnent (profiles). */
 export type PersonName = { full_name: string | null; email: string }

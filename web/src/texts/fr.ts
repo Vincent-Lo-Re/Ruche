@@ -282,6 +282,15 @@ export const fr: Texts = {
       sameAsAdmin: (language: string) => `Comme l'admin (${language})`,
       failed: "Ta langue n'a pas pu être enregistrée. Réessaie.",
     },
+    format: {
+      title: "Format régional",
+      description:
+        "L'écriture des dates, des heures et des nombres, pour toi seulement.",
+      label: "Format régional",
+      // Le membre suit le format de toute l'admin (Paramètres › Avancé), entre parenthèses.
+      sameAsAdmin: (format: string) => `Comme l'admin (${format})`,
+      failed: "Ton format régional n'a pas pu être enregistré. Réessaie.",
+    },
     mfa: {
       title: "Double vérification",
       description:
@@ -2451,6 +2460,15 @@ export const fr: Texts = {
         saved: "Langue de l'admin enregistrée.",
         loadFailed: "La langue de l'admin n'a pas pu être chargée.",
       },
+      format: {
+        title: "Format régional",
+        description:
+          "L'écriture des dates, des heures et des nombres dans l'admin, pour toute l'équipe. Chaque membre peut choisir le sien dans Mon compte.",
+        label: "Format régional de l'admin",
+        // Pas de format choisi : chacun a celui de sa langue.
+        sameAsLanguage: "Selon la langue de chacun",
+        saved: "Format régional enregistré.",
+      },
       timeZone: {
         title: "Fuseau horaire",
         description:
@@ -2674,13 +2692,11 @@ export const fr: Texts = {
   },
 
   dates: {
-    // Entre la date et l'heure : « 27 sept. 2026 à 18h42 »
-    at: "à",
-    // Entre les heures et les minutes : « 18h42 »
-    hour: "h",
-    // Champs « Jour » et « Heure » (fenêtre « Programmer »).
-    dayPlaceholder: "jj/mm/aaaa",
-    timePlaceholder: "08h00",
+    // Ce qu'on tape dans « Jour » (fenêtre « Programmer »), dans l'ordre du format régional :
+    // « jj/mm/aaaa », « mm/jj/aaaa ».
+    fields: { day: "jj", month: "mm", year: "aaaa" },
+    // Sous la liste d'un format régional : « Exemple : 27 sept. 2026 à 14:30 · 1 234,5 ».
+    sample: (sample: string) => `Exemple : ${sample}`,
     pickDay: "Choisir le jour dans le calendrier",
   },
 }

@@ -157,6 +157,25 @@ describe("Mon compte", () => {
     })
   })
 
+  it("le format régional : rangé sur le compte du membre, avec un exemple", async () => {
+    const updateUser = vi.spyOn(supabase.auth, "updateUser").mockResolvedValue({
+      data: { user: null },
+      error: new Error("hors ligne"),
+    } as never)
+    await renderApp("/account", fakeAuth({ role: "editor" }))
+    const labels = texts.account.format
+
+    fireEvent.click(screen.getByRole("combobox", { name: labels.label }))
+    const swiss = await screen.findByRole("option", {
+      name: "Français (Suisse)",
+    })
+    fireEvent.pointerDown(swiss, { pointerType: "mouse" })
+    fireEvent.click(swiss)
+
+    expect(await screen.findByText(labels.failed)).toBeVisible()
+    expect(updateUser).toHaveBeenCalledWith({ data: { locale: "fr-CH" } })
+  })
+
   it("refuse un nom trop long sans rien envoyer", async () => {
     const from = vi.spyOn(supabase, "from")
     await renderApp("/account")

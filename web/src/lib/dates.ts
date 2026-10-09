@@ -1,42 +1,65 @@
-import { language, locale } from "@/lib/language"
+import { locale } from "@/lib/regional-format"
 import { timeZone } from "@/lib/time-zone"
 import { texts } from "@/texts"
 
 // Toutes les dates de l'administration sont à l'heure de son fuseau (Paramètres › Avancé, Paris
-// au départ : lib/time-zone.ts), quelle que soit la langue ; seule leur écriture change
-// (« 27 sept. 2026 à 14h30 », « Sep 27, 2026, 2:30 PM »).
-const french = language === "fr"
+// au départ : lib/time-zone.ts) et s'écrivent dans son format régional (lib/regional-format.ts :
+// « 27 sept. 2026 à 14h30 », « Sep 27, 2026, 2:30 PM », « 27 Sept 2026, 14:30 »). C'est le
+// navigateur (Intl) qui sait écrire chaque format ; deux règles de la maison s'y ajoutent pour la
+// France, que les navigateurs n'écrivent pas tous de même : « 14h30 », et « à » avant l'heure.
+// Entre les heures et les minutes, en France : « 14h30 ».
+const FRENCH_HOUR_MARK = "h"
+// Entre la date et l'heure, en France : « 27 sept. 2026 à 14h30 ».
+const FRENCH_AT = " à "
 
-const dateFormat = new Intl.DateTimeFormat(locale, {
-  day: "numeric",
-  month: "short",
-  year: "numeric",
-  timeZone,
-})
-
-const timeFormat = new Intl.DateTimeFormat("fr-FR", {
-  hour: "2-digit",
-  minute: "2-digit",
-  hourCycle: "h23",
-  timeZone,
-})
-
-// En anglais, l'heure sur 12 heures : « 6:42 PM ».
-const englishTimeFormat = new Intl.DateTimeFormat("en-US", {
-  hour: "numeric",
-  minute: "2-digit",
-  hour12: true,
-  timeZone,
-})
-
-/** L'heure à l'heure du fuseau : « 18h42 », « 09h05 » ; « 6:42 PM » en anglais. */
-function formatTime(value: Date): string {
-  if (!french) return englishTimeFormat.format(value)
-  const parts = timeFormat.formatToParts(value)
-  const hour = parts.find((part) => part.type === "hour")?.value ?? ""
-  const minute = parts.find((part) => part.type === "minute")?.value ?? ""
-  return `${hour}${texts.dates.hour}${minute}`
+/** Les écritures d'un format régional dans un fuseau, avec les règles maison de la France. */
+function writersFor(format: string, zone: string) {
+  const french = format === "fr-FR"
+  const dateFormat = new Intl.DateTimeFormat(format, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: zone,
+  })
+  const dateTimeFormat = new Intl.DateTimeFormat(format, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: zone,
+  })
+  const timeFormat = new Intl.DateTimeFormat(format, {
+    hour: french ? "2-digit" : "numeric",
+    minute: "2-digit",
+    timeZone: zone,
+  })
+  // Un format Intl, avec « 14h30 » en France au lieu de « 14:30 ».
+  const write = (intl: Intl.DateTimeFormat, value: Date) => {
+    const parts = intl.formatToParts(value)
+    return parts
+      .map((part, index) =>
+        french &&
+        part.type === "literal" &&
+        parts[index - 1]?.type === "hour" &&
+        parts[index + 1]?.type === "minute"
+          ? FRENCH_HOUR_MARK
+          : part.value
+      )
+      .join("")
+  }
+  return {
+    date: (value: Date) => dateFormat.format(value),
+    time: (value: Date) => write(timeFormat, value),
+    dateTime: (value: Date) =>
+      french
+        ? `${dateFormat.format(value)}${FRENCH_AT}${write(timeFormat, value)}`
+        : write(dateTimeFormat, value),
+  }
 }
+
+const writers = writersFor(locale, timeZone)
+const frenchHour = locale === "fr-FR"
 
 const dayFormat = new Intl.DateTimeFormat(locale, {
   day: "numeric",
@@ -44,9 +67,18 @@ const dayFormat = new Intl.DateTimeFormat(locale, {
   timeZone,
 })
 
+// L'exemple d'un format régional : le 27 septembre 2026 à 14 h 30, et un nombre.
+const SAMPLE = new Date(Date.UTC(2026, 8, 27, 14, 30))
+
+/** « 27 sept. 2026 à 14h30 · 1 234,5 » : un format tel que l'admin l'écrit (sous sa liste). */
+export function formatSample(format: string): string {
+  const date = writersFor(format, "UTC").dateTime(SAMPLE)
+  return `${date} · ${new Intl.NumberFormat(format).format(1234.5)}`
+}
+
 /**
- * Une date courte, à l'heure du fuseau : l'heure seule le jour même (« 16h31 »), sinon le jour
- * (« 3 oct. »). `today` dit lequel.
+ * Une date courte : l'heure seule le jour même (« 16h31 »), sinon le jour (« 3 oct. »). `today`
+ * dit lequel.
  */
 export function formatShortDateTime(
   date: Date | string,
@@ -56,44 +88,78 @@ export function formatShortDateTime(
   const today = toZoneParts(value).date === toZoneParts(now).date
   return {
     today,
-    text: today ? formatTime(value) : dayFormat.format(value),
+    text: today ? writers.time(value) : dayFormat.format(value),
   }
 }
 
-/** Le jour seul, à l'heure du fuseau : « 27 sept. 2026 », « Sep 27, 2026 » en anglais. */
+/** Le jour seul : « 27 sept. 2026 », « Sep 27, 2026 ». */
 export function formatDate(date: Date | string): string {
-  return dateFormat.format(typeof date === "string" ? new Date(date) : date)
+  return writers.date(typeof date === "string" ? new Date(date) : date)
 }
 
-/** « 27 sept. 2026 à 18h42 », « Sep 27, 2026, 6:42 PM » en anglais, à l'heure du fuseau. */
+/** « 27 sept. 2026 à 18h42 », « Sep 27, 2026, 6:42 PM », « 27 Sept 2026, 18:42 ». */
 export function formatDateTime(date: Date | string): string {
-  const value = typeof date === "string" ? new Date(date) : date
-  if (!french) return `${dateFormat.format(value)}, ${formatTime(value)}`
-  return `${dateFormat.format(value)} ${texts.dates.at} ${formatTime(value)}`
+  return writers.dateTime(typeof date === "string" ? new Date(date) : date)
 }
 
 // ---------------------------------------------------------------------------------------------
-// Saisie d'un jour et d'une heure (fenêtre « Programmer ») : à la française, « 25/10/2099 » et
-// « 08h00 » ; à l'américaine en anglais, « 10/25/2099 » et « 8:00 AM ». Les calculs gardent les
-// formats ISO (« 2099-10-25 », « 08:00 »).
+// Saisie d'un jour et d'une heure (fenêtre « Programmer ») : dans l'ordre et avec le séparateur
+// du format régional, « 25/10/2099 », « 10/25/2099 », « 25.10.2099 » ; l'heure comme il l'écrit,
+// « 08h00 », « 8:00 AM », « 08:00 ». Toute heure bien écrite est comprise, quel que soit le
+// format. Les calculs gardent les formats ISO (« 2099-10-25 », « 08:00 »).
 // ---------------------------------------------------------------------------------------------
 
-const DAY_INPUT = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
-const TIME_INPUT = /^(\d{1,2})\s*[h:]\s*(\d{2})?$/i
-// « 8:00 AM », « 8 am », « 8:00pm », « 8 p.m. », ou sur 24 heures « 14:30 ».
-const ENGLISH_TIME_INPUT = /^(\d{1,2})(?::(\d{2}))?\s*(?:([ap])\.?\s*m\.?)?$/i
+type DayField = "day" | "month" | "year"
+
+// L'ordre des champs du jour et leur séparateur dans le format régional.
+const dayLayout = (() => {
+  const parts = new Intl.DateTimeFormat(locale, {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "UTC",
+  }).formatToParts(new Date(Date.UTC(2099, 9, 25)))
+  const order = parts
+    .map((part) => part.type)
+    .filter((type): type is DayField => ["day", "month", "year"].includes(type))
+  const separator =
+    parts.find((part) => part.type === "literal")?.value.trim() || "/"
+  return { order, separator }
+})()
+
+// L'heure du format sur 12 heures (« 8:00 AM ») ou sur 24.
+const twelveHours = ["h11", "h12"].includes(
+  new Intl.DateTimeFormat(locale, { hour: "numeric" }).resolvedOptions()
+    .hourCycle ?? ""
+)
+
+const DAY_INPUT = /^(\d{1,4})\s*[/.-]\s*(\d{1,2})\s*[/.-]\s*(\d{1,4})$/
+// « 8h05 », « 08:05 », « 8 h 05 », « 8h », ou sur 12 heures « 8:00 AM », « 8 pm », « 8 p.m. ».
+const TIME_INPUT =
+  /^(\d{1,2})(?:\s*[h:.]\s*(\d{2})?)?\s*(?:([ap])\.?\s*m\.?)?$/i
 
 const pad = (value: number) => String(value).padStart(2, "0")
 
+/** Ce qu'on tape dans « Jour » : « jj/mm/aaaa », « mm/dd/yyyy », « tt.mm.jjjj »… */
+export const dayInputPlaceholder = dayLayout.order
+  .map((field) => texts.dates.fields[field])
+  .join(dayLayout.separator)
+
+/** Un exemple d'heure : « 08h00 », « 8:00 AM », « 08:00 ». */
+export const timeInputPlaceholder = formatTimeInput("08:00")
+
 /**
- * « 25/10/2099 » (ou « 5/3/2099 ») → « 2099-10-25 » ; en anglais, « 10/25/2099 ». Null si ce
- * n'est pas un jour qui existe.
+ * « 25/10/2099 » (ou « 5/3/2099 », dans l'ordre du format) → « 2099-10-25 ». Null si ce n'est pas
+ * un jour qui existe.
  */
 export function parseDayInput(text: string): string | null {
   const match = DAY_INPUT.exec(text.trim())
   if (!match) return null
-  const [first, second, year] = match.slice(1).map(Number)
-  const [day, month] = french ? [first, second] : [second, first]
+  const values = Object.fromEntries(
+    dayLayout.order.map((field, index) => [field, Number(match[index + 1])])
+  ) as Record<DayField, number>
+  const { day, month, year } = values
+  if (year < 1000) return null
   const check = new Date(Date.UTC(year, month - 1, day))
   if (
     check.getUTCFullYear() !== year ||
@@ -105,28 +171,19 @@ export function parseDayInput(text: string): string | null {
   return `${year}-${pad(month)}-${pad(day)}`
 }
 
-/** « 2099-10-25 » → « 25/10/2099 » ; « 10/25/2099 » en anglais. */
+/** « 2099-10-25 » → « 25/10/2099 », « 10/25/2099 », « 25.10.2099 » selon le format. */
 export function formatDayInput(iso: string): string {
   const [year, month, day] = iso.split("-")
-  return french ? `${day}/${month}/${year}` : `${month}/${day}/${year}`
+  const values: Record<DayField, string> = { day, month, year }
+  return dayLayout.order.map((field) => values[field]).join(dayLayout.separator)
 }
 
 /**
- * « 8h05 », « 08h05 », « 8h », « 08:05 » → « 08:05 » ; en anglais, « 8:05 AM », « 8 pm »,
- * « 20:05 ». Null sinon.
+ * « 8h05 », « 08:05 », « 8 h », « 8:05 AM », « 8 pm », « 20:05 » → « 08:05 », quel que soit le
+ * format. Null sinon.
  */
 export function parseTimeInput(text: string): string | null {
-  if (!french) return parseEnglishTime(text)
   const match = TIME_INPUT.exec(text.trim())
-  if (!match) return null
-  const hours = Number(match[1])
-  const minutes = Number(match[2] ?? "0")
-  if (hours > 23 || minutes > 59) return null
-  return `${pad(hours)}:${pad(minutes)}`
-}
-
-function parseEnglishTime(text: string): string | null {
-  const match = ENGLISH_TIME_INPUT.exec(text.trim())
   if (!match) return null
   const [, hourText, minuteText, half] = match
   let hours = Number(hourText)
@@ -135,21 +192,21 @@ function parseEnglishTime(text: string): string | null {
   if (half) {
     if (hours < 1 || hours > 12) return null
     hours = (hours % 12) + (half.toLowerCase() === "p" ? 12 : 0)
-  } else if (minuteText === undefined || hours > 23) {
-    // Sans AM ni PM, seulement l'heure sur 24 heures avec ses minutes (« 14:30 »).
+  } else if (hours > 23 || (twelveHours && minuteText === undefined)) {
+    // Sur 12 heures, « 8 » seul ne dit pas le matin ou le soir.
     return null
   }
   return `${pad(hours)}:${pad(minutes)}`
 }
 
-/** « 08:05 » → « 08h05 » ; « 8:05 AM » en anglais. */
+/** « 08:05 » → « 08h05 », « 8:05 AM », « 08:05 » selon le format. */
 export function formatTimeInput(time: string): string {
   const [hours, minutes] = time.split(":")
-  if (!french) {
+  if (twelveHours) {
     const hour = Number(hours)
     return `${hour % 12 || 12}:${minutes} ${hour < 12 ? "AM" : "PM"}`
   }
-  return `${hours}${texts.dates.hour}${minutes}`
+  return `${hours}${frenchHour ? FRENCH_HOUR_MARK : ":"}${minutes}`
 }
 
 // ---------------------------------------------------------------------------------------------

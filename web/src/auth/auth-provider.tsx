@@ -10,6 +10,7 @@ import {
 } from "@/auth/auth-context"
 import { assuranceLevel, verifiedTotpFactor } from "@/auth/session"
 import { applyMemberLanguage, memberLanguage } from "@/lib/language"
+import { applyMemberFormat, memberFormat } from "@/lib/regional-format"
 import { supabase } from "@/lib/supabase"
 
 async function fetchProfile(userId: string): Promise<Profile | null> {
@@ -49,6 +50,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (userId) applyMemberLanguage(chosenLanguage)
   }, [userId, chosenLanguage])
+  // De même pour son format régional.
+  const chosenFormat = memberFormat(session?.user.user_metadata)
+  useEffect(() => {
+    if (userId) applyMemberFormat(chosenFormat)
+  }, [userId, chosenFormat])
   const profileQuery = useQuery({
     queryKey: profileQueryKey(userId),
     queryFn: () => fetchProfile(userId!),

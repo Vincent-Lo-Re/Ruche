@@ -24,6 +24,7 @@ const brand = (websiteUrl: string | null): identityApi.AdminBrand => ({
   websiteUrl,
   language: "fr",
   timeZone: "Europe/Paris",
+  locale: null,
   variants: {},
 })
 
