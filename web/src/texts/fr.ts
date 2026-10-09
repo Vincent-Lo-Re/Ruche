@@ -2374,7 +2374,7 @@ export const fr: Texts = {
         // La section des logos : une carte, deux groupes de deux cases (fond clair, fond sombre).
         title: "Logos",
         description: [
-          "Envoie ton logotype* et ton monogramme** pour les fonds clairs et sombres (SVG, PNG ou WebP, 1 Mo au plus). Une seule version suffit : elle sert sur les deux fonds.",
+          "Envoie ton logotype* et ton monogramme** pour les fonds clairs et sombres (SVG, PNG ou WebP).",
           "* Sans logotype, le nom de ta marque s'affiche en texte.",
           "** Sans monogramme, ce sont tes initiales.",
         ],

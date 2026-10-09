@@ -2324,7 +2324,7 @@ export const en = {
         // La section des logos : une carte, deux groupes de deux cases (fond clair, fond sombre).
         title: "Logos",
         description: [
-          "Upload your logotype* and monogram** for light and dark backgrounds (SVG, PNG, or WebP, up to 1 MB). One version is enough: it's used on both.",
+          "Upload your logotype* and monogram** for light and dark backgrounds (SVG, PNG, or WebP).",
           "* Without a logotype, your brand name is shown as text.",
           "** Without a monogram, your initials are shown.",
         ],
