@@ -162,7 +162,7 @@ function MfaCard({ factor }: { factor: Factor | null }) {
           {factor && (
             <Item variant="muted" className="flex-1 items-center py-4">
               <ItemMedia variant="icon" className="self-center!">
-                <ShieldCheck className="text-status-live" />
+                <ShieldCheck className="size-8! text-status-live" />
               </ItemMedia>
               <ItemContent>
                 <ItemTitle className="text-status-live">
