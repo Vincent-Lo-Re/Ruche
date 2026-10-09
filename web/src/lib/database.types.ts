@@ -130,6 +130,31 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_terms: {
+        Row: {
+          key: string
+          language: string
+          name: string
+          traits: NonNullable<Json>
+          updated_at: string
+        }
+        ComputedFields: never
+        Insert: {
+          key: string
+          language: string
+          name: string
+          traits?: NonNullable<Json>
+          updated_at?: string
+        }
+        Update: {
+          key?: string
+          language?: string
+          name?: string
+          traits?: NonNullable<Json>
+          updated_at?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
