@@ -37,7 +37,7 @@ export function RequireTeamMember() {
   )
 }
 
-/** Sections réservées aux admins (Équipe, Paramètres). */
+/** Sections réservées aux admins (Paramètres). */
 export function RequireAdmin() {
   const { profile } = useAuth()
   return profile?.role === "admin" ? <Outlet /> : <AdminOnlyPage />

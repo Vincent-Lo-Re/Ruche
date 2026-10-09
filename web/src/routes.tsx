@@ -180,15 +180,16 @@ export const routes: RouteObject[] = [
                     (m) => <m.TrashPage />,
                     prepareTrash
                   ),
+                  // La team : en lecture seule pour un éditeur (pages/team-page.tsx).
+                  page(
+                    sections.team.path,
+                    () => import("@/pages/team-page"),
+                    (m) => <m.TeamPage />,
+                    prepareTeam
+                  ),
                   {
                     element: <RequireAdmin />,
                     children: [
-                      page(
-                        sections.team.path,
-                        () => import("@/pages/team-page"),
-                        (m) => <m.TeamPage />,
-                        prepareTeam
-                      ),
                       page(
                         sections.settings.path,
                         () => import("@/pages/settings-page"),

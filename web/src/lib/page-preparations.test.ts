@@ -250,10 +250,8 @@ describe("les listes", () => {
     expect(mediaApi.getLatestAudit).toHaveBeenCalled()
   })
 
-  it("l'Équipe n'est lue que pour un admin", async () => {
+  it("la team est lue pour tout membre de l'équipe, éditeur compris", async () => {
     await prepareTeam(args())
-    expect(teamApi.listMembers).not.toHaveBeenCalled()
-    await prepareTeam(args({}, "", { id: "admin-1", role: "admin" }))
     expect(teamApi.listMembers).toHaveBeenCalled()
   })
 })

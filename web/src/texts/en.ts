@@ -369,6 +369,7 @@ export const en = {
     // Erreurs renvoyées par la fonction serveur « equipe », selon leur code.
     errors: {
       non_connecte: "You've been signed out. Sign in again to continue.",
+      reserve_a_l_equipe: "Only team members can do this.",
       reserve_aux_admins: "Only admins can do this.",
       soi_meme: "You can't do this to your own account. Ask another admin.",
       demande_invalide: "This request isn't valid. Check what you entered.",
