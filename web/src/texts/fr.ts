@@ -2348,10 +2348,13 @@ export const fr: Texts = {
       // La carte de la marque : son nom, son adresse de contact et son site web.
       title: "Marque",
       description:
-        "Le nom que ton équipe voit dans le menu, l'onglet du navigateur et l'écran de connexion. L'adresse e-mail de contact s'affiche sur l'écran de connexion, pour que qui a perdu son téléphone ou son invitation puisse te joindre. Le site web est accessible en haut de chaque page ; laisse-le vide pour masquer le lien.",
+        "Le nom que ton équipe voit dans le menu, l'onglet du navigateur et l'écran de connexion. Les initiales remplacent le monogramme tant qu'il n'est pas envoyé. L'adresse e-mail de contact s'affiche sur l'écran de connexion, pour que qui a perdu son téléphone ou son invitation puisse te joindre. Le site web est accessible en haut de chaque page ; laisse-le vide pour masquer le lien.",
       name: "Le nom de ta marque",
       save: "Enregistrer",
       nameTooLong: "Le nom ne doit pas dépasser 40 caractères.",
+      // Les initiales, à la place d'un monogramme pas encore envoyé (onglet, connexion).
+      initials: "Initiales",
+      initialsTooLong: "Les initiales font 1 à 3 caractères.",
       // L'adresse de contact, montrée sur l'écran de connexion à qui a besoin d'aide.
       email: "Adresse e-mail de contact",
       emailPlaceholder: "contact@exemple.fr",

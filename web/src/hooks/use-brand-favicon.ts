@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 
 import { usePalette } from "@/components/theme/palette-context"
 import { useBrand, useBrandName } from "@/hooks/use-brand-name"
-import { brandFileFor, faviconHref } from "@/lib/admin-identity"
+import { brandFileFor, brandMark, faviconHref } from "@/lib/admin-identity"
 import { presetOf } from "@/lib/palettes"
 
 const darkQuery = "(prefers-color-scheme: dark)"
@@ -10,8 +10,7 @@ const darkQuery = "(prefers-color-scheme: dark)"
 /**
  * Le favicon suit la marque dès qu'elle est lue : son monogramme (décliné aux couleurs de la
  * palette de ce membre s'il l'a été), dans la version qui va avec le thème de l'ordinateur (la
- * barre d'onglets le suit), sinon son initiale ; avant, celui de
- * « Ruche ».
+ * barre d'onglets le suit), sinon ses initiales (ou l'initiale du nom) ; avant, un carré vide.
  */
 export function useBrandFavicon() {
   const brand = useBrand()
@@ -24,7 +23,8 @@ export function useBrandFavicon() {
     dark ? "dark" : "light",
     preset
   )
-  const href = monogram ?? (name ? faviconHref(name) : null)
+  const href =
+    monogram ?? (name ? faviconHref(brandMark(brand?.initials, name)) : null)
   useEffect(() => {
     if (!href) return
     document.querySelector('link[rel="icon"]')?.setAttribute("href", href)

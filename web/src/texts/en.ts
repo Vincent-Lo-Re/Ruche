@@ -2298,10 +2298,13 @@ export const en = {
       // La carte de la marque : son nom, son adresse de contact et son site web.
       title: "Brand",
       description:
-        "The name your team sees in the menu, the browser tab, and on the sign-in screen. Your contact email is shown on the sign-in screen so anyone who's lost their phone or invitation can reach you. Your website is linked at the top of every page; leave it empty to hide the link.",
+        "The name your team sees in the menu, the browser tab, and on the sign-in screen. Your initials stand in for the monogram until you upload one. Your contact email is shown on the sign-in screen so anyone who's lost their phone or invitation can reach you. Your website is linked at the top of every page; leave it empty to hide the link.",
       name: "Brand name",
       save: "Save",
       nameTooLong: "The name can't be longer than 40 characters.",
+      // Les initiales, à la place d'un monogramme pas encore envoyé (onglet, connexion).
+      initials: "Initials",
+      initialsTooLong: "Initials are 1 to 3 characters.",
       // L'adresse de contact, montrée sur l'écran de connexion à qui a besoin d'aide.
       email: "Contact email",
       emailPlaceholder: "contact@example.com",

@@ -5,6 +5,7 @@ import {
   brandVariants,
   brandFileFor,
   brandInitial,
+  brandMark,
   brandName,
   faviconHref,
   prepareBrandFile,
@@ -32,9 +33,13 @@ describe("le nom de la marque", () => {
     expect(brandInitial("essaim")).toBe("E")
     expect(brandInitial("  Ruche")).toBe("R")
     expect(brandInitial("")).toBe("")
-    expect(decodeURIComponent(faviconHref("Essaim"))).toContain(">E</text>")
+    expect(
+      decodeURIComponent(faviconHref(brandMark(null, "Essaim")))
+    ).toContain(">E</text>")
     // Un caractère spécial ne casse pas l'image.
-    expect(decodeURIComponent(faviconHref("<b>"))).toContain(">&lt;</text>")
+    expect(decodeURIComponent(faviconHref(brandMark(null, "<b>")))).toContain(
+      ">&lt;</text>"
+    )
   })
 
   it("prend la version du fond, sinon l'autre, sinon rien", () => {
@@ -53,6 +58,7 @@ describe("le nom de la marque", () => {
       language: "en",
       timeZone: "Europe/Paris",
       locale: null,
+      initials: null,
       variants: {
         "logotype:zinc-blue:dark": "bleu",
         "logotype:neutral-none:dark": "origine-sombre",
@@ -174,6 +180,7 @@ describe("le nom de la marque", () => {
       language: "en",
       timeZone: "Europe/Paris",
       locale: null,
+      initials: null,
       variants: {},
     }
     expect(brandFileFor(empty, "monogram", "dark")).toBeNull()

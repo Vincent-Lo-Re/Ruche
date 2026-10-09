@@ -78,6 +78,8 @@ export type AdminBrand = { name: string | null } & Record<
     timeZone: string
     /** Le format régional de toute l'admin (Paramètres › Avancé) ; null : celui de la langue. */
     locale: RegionalFormat | null
+    /** Les initiales, à la place d'un monogramme pas envoyé ; null : la première lettre du nom. */
+    initials: string | null
   }
 
 type BrandRow = Pick<
@@ -92,6 +94,7 @@ type BrandRow = Pick<
   | "language"
   | "time_zone"
   | "locale"
+  | "initials"
 >
 
 const variantKey = (kind: BrandKind, palette: string, surface: BrandSurface) =>
@@ -146,6 +149,7 @@ export async function getAdminBrand(): Promise<AdminBrand> {
     language: isLanguage(row.language) ? row.language : "en",
     timeZone: isTimeZone(row.time_zone) ? row.time_zone : DEFAULT_TIME_ZONE,
     locale: isRegionalFormat(row.locale) ? row.locale : null,
+    initials: row.initials ?? null,
     variants: Object.fromEntries(
       variants.data.map((variant) => [
         variantKey(
@@ -175,9 +179,11 @@ export function saveBrandDetails(details: {
   name: string | null
   contactEmail: string | null
   websiteUrl: string | null
+  initials: string | null
 }): Promise<void> {
   return updateIdentity({
     name: details.name,
+    initials: details.initials,
     contact_email: details.contactEmail,
     website_url: details.websiteUrl,
   })
@@ -443,13 +449,24 @@ export function brandInitial(brand: string): string {
 }
 
 /**
- * Le favicon d'une marque sans monogramme : son initiale, dans un carré arrondi (public/favicon.svg,
- * un carré vide sans logo, sert pendant le chargement), en image data: (acceptée par la CSP, img-src).
+ * Ce qui tient lieu de monogramme quand aucun n'a été envoyé : les initiales choisies, sinon
+ * l'initiale du nom.
  */
-export function faviconHref(brand: string): string {
-  const initial = brandInitial(brand)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><style>rect{fill:#171717}text{fill:#fafafa}@media (prefers-color-scheme:dark){rect{fill:#fafafa}text{fill:#171717}}</style><rect width="32" height="32" rx="7"/><text x="16" y="22.5" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="600">${initial}</text></svg>`
+export function brandMark(
+  initials: string | null | undefined,
+  name: string
+): string {
+  return initials?.trim() || brandInitial(name)
+}
+
+/**
+ * Le favicon d'une marque sans monogramme : ses initiales (1 à 3 caractères, plus petites quand
+ * elles sont plusieurs), dans un carré arrondi (public/favicon.svg, un carré vide sans logo, sert
+ * pendant le chargement), en image data: (acceptée par la CSP, img-src).
+ */
+export function faviconHref(mark: string): string {
+  const text = mark.replace(/&/g, "&amp;").replace(/</g, "&lt;")
+  const size = [18, 18, 14, 11][Array.from(mark).length] ?? 11
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><style>rect{fill:#171717}text{fill:#fafafa}@media (prefers-color-scheme:dark){rect{fill:#fafafa}text{fill:#171717}}</style><rect width="32" height="32" rx="7"/><text x="16" y="${16 + size * 0.36}" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="${size}" font-weight="600">${text}</text></svg>`
   return `data:image/svg+xml,${encodeURIComponent(svg)}`
 }

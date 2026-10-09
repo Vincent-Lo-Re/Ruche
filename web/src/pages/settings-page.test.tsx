@@ -73,6 +73,7 @@ const brand = (name: string | null): identityApi.AdminBrand => ({
   language: "en",
   timeZone: "Europe/Paris",
   locale: null,
+  initials: null,
   variants: {},
 })
 
@@ -237,6 +238,7 @@ describe("Paramètres : le nom de la marque", () => {
     await waitFor(() =>
       expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
         name: "Essaim",
+        initials: null,
         contactEmail: null,
         websiteUrl: null,
       })
@@ -268,6 +270,7 @@ describe("Paramètres : le nom de la marque", () => {
     await waitFor(() =>
       expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
         name: null,
+        initials: null,
         contactEmail: null,
         websiteUrl: null,
       })
@@ -295,6 +298,7 @@ describe("Paramètres : l'adresse de contact de la marque", () => {
     await waitFor(() =>
       expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
         name: null,
+        initials: null,
         contactEmail: "aide@exemple.fr",
         websiteUrl: null,
       })
@@ -318,8 +322,33 @@ describe("Paramètres : le site web du client", () => {
     await waitFor(() =>
       expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
         name: null,
+        initials: null,
         contactEmail: null,
         websiteUrl: "https://example.com/fr",
+      })
+    )
+  })
+})
+
+describe("Paramètres : les initiales de la marque", () => {
+  const identity = texts.settings.adminIdentity
+
+  it("vides, la première lettre du nom en exemple ; choisies, elles partent avec le reste", async () => {
+    await renderApp("/settings")
+    const field = await screen.findByLabelText(identity.initials)
+    expect(field).toHaveAttribute("placeholder", "R")
+    fireEvent.change(screen.getByLabelText(identity.name), {
+      target: { value: "Essaim" },
+    })
+    expect(field).toHaveAttribute("placeholder", "E")
+    fireEvent.change(field, { target: { value: " ES " } })
+    fireEvent.click(screen.getByRole("button", { name: identity.save }))
+    await waitFor(() =>
+      expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
+        name: "Essaim",
+        initials: "ES",
+        contactEmail: null,
+        websiteUrl: null,
       })
     )
   })
