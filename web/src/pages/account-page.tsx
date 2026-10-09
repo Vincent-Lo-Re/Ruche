@@ -10,12 +10,12 @@ import { profileQueryKey, useAuth, type Profile } from "@/auth/auth-context"
 import { EmailChangeDialog } from "@/components/account/email-change-dialog"
 import { LanguageSelect } from "@/components/language-select"
 import { PageHeader } from "@/components/page-header"
+import { RoleBadge } from "@/components/role-badge"
 import { SettingsSection } from "@/components/settings/settings-section"
 import { useBrand } from "@/hooks/use-brand-name"
 import { PaletteChoice } from "@/components/theme/palette-choice"
 import { PalettePreview } from "@/components/theme/palette-preview"
 import { ThemeChoice } from "@/components/theme-choice"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ButtonGroup } from "@/components/ui/button-group"
 import {
@@ -164,7 +164,7 @@ function MfaCard({ factor }: { factor: Factor | null }) {
 /**
  * Le profil, sur le modèle de la carte « Account Access » de shadcn : le nom, avec « Enregistrer »
  * collé au champ ; l'adresse e-mail grisée, avec « Modifier » collé au champ, qui ouvre le
- * changement d'adresse (EmailChangeDialog). Le rôle est une pastille à côté du titre.
+ * changement d'adresse (EmailChangeDialog). Le rôle est une pastille à droite de l'intitulé « Nom ».
  */
 function ProfileCard({ profile }: { profile: Profile }) {
   const labels = texts.account.profile
@@ -191,16 +191,7 @@ function ProfileCard({ profile }: { profile: Profile }) {
   const onSubmit = form.handleSubmit(({ full_name }) => save.mutate(full_name))
 
   return (
-    <SettingsSection
-      title={labels.title}
-      description={labels.description}
-      badge={
-        <Badge variant="secondary">
-          <span className="sr-only">{labels.rolePrefix}</span>
-          {texts.roles[profile.role]}
-        </Badge>
-      }
-    >
+    <SettingsSection title={labels.title} description={labels.description}>
       <form onSubmit={onSubmit} noValidate>
         <Card>
           <CardContent>
@@ -210,9 +201,12 @@ function ProfileCard({ profile }: { profile: Profile }) {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="account-name">
-                      {labels.name}
-                    </FieldLabel>
+                    <div className="flex items-center justify-between gap-2">
+                      <FieldLabel htmlFor="account-name">
+                        {labels.name}
+                      </FieldLabel>
+                      <RoleBadge role={profile.role} />
+                    </div>
                     <ButtonGroup className="w-full">
                       <Input
                         {...field}
