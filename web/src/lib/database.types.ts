@@ -569,6 +569,37 @@ export type Database = {
           },
         ]
       }
+      terms: {
+        Row: {
+          elided: boolean
+          gender: string | null
+          key: string
+          language: string
+          name: string
+          plural: boolean
+          updated_at: string
+        }
+        ComputedFields: never
+        Insert: {
+          elided?: boolean
+          gender?: string | null
+          key: string
+          language: string
+          name: string
+          plural?: boolean
+          updated_at?: string
+        }
+        Update: {
+          elided?: boolean
+          gender?: string | null
+          key?: string
+          language?: string
+          name?: string
+          plural?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       versions: {
         Row: {
           access_level_id: string | null
@@ -738,6 +769,17 @@ export type Database = {
         }[]
       }
       app_page: { Args: { slug: string }; Returns: Json }
+      app_terms: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          elided: boolean
+          gender: string
+          key: string
+          language: string
+          name: string
+          plural: boolean
+        }[]
+      }
       categories_reorder: {
         Args: { ids: string[]; section: string }
         Returns: {
