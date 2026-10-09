@@ -241,7 +241,7 @@ export const fr: Texts = {
     profile: {
       title: "Profil",
       description:
-        "Ton nom permet à l'équipe de te reconnaître : dans la liste de l'équipe, dans l'historique et quand tu écris un contenu. Tes codes de connexion arrivent sur ton adresse e-mail. Pour la changer, clique sur « Modifier » : un code part à la nouvelle adresse pour la confirmer, et ton adresse actuelle reçoit une alerte.",
+        "Ton nom permet à l'équipe de te reconnaître. Tes codes de connexion arrivent sur ton adresse e-mail.",
       name: "Nom",
       namePlaceholder: "Prénom Nom",
       nameTooLong: "Le nom ne doit pas dépasser 100 caractères.",

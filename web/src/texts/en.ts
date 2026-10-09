@@ -237,7 +237,7 @@ export const en = {
     profile: {
       title: "Profile",
       description:
-        "Your name is how your team knows you: in the team list, in the version history, and when you're editing content. Your sign-in codes are sent to your email address. To change it, click Change: we'll send a code to the new address to confirm it, and your current address gets an alert.",
+        "Your name is how your team knows you. Your sign-in codes are sent to your email address.",
       name: "Name",
       namePlaceholder: "First and last name",
       nameTooLong: "The name can't be longer than 100 characters.",
