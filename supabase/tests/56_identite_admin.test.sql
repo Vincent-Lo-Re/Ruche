@@ -6,7 +6,7 @@
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(80);
+select plan(87);
 
 select pg_temp.create_people();
 
@@ -393,6 +393,40 @@ select is(
 );
 select pg_temp.as_anon();
 select is((select initials from public.admin_brand()), 'ES', 'anon : les initiales');
+
+-- Les noms du Blog et des Podcasts : un admin les écrit (en français, les trois formes ensemble),
+-- tout le monde les lit par admin_brand() ; un éditeur non.
+select pg_temp.as_person('admin');
+select is(
+  pg_temp.affected($$update public.admin_identity
+    set blog_name_fr = 'Le Fil', blog_le_fr = 'le Fil', blog_du_fr = 'du Fil',
+      blog_name_en = 'The Feed'$$), 1,
+  'admin : renomme le Blog'
+);
+select throws_ok(
+  $$update public.admin_identity set podcasts_name_fr = 'Épisodes'$$, '23514', null,
+  'une forme française sans les autres : refusée'
+);
+select throws_ok(
+  $$update public.admin_identity set blog_name_en = ' Feed'$$, '23514', null,
+  'des espaces autour : refusé'
+);
+select throws_ok(
+  $$update public.admin_identity set blog_name_en = repeat('x', 41)$$, '23514', null,
+  'plus de 40 caractères : refusé'
+);
+select is(
+  pg_temp.affected($$update public.admin_identity
+    set blog_name_fr = null, blog_le_fr = null, blog_du_fr = null$$), 1,
+  'admin : revient au nom d''origine'
+);
+select pg_temp.as_person('editor');
+select is(
+  pg_temp.affected($$update public.admin_identity set blog_name_en = 'News'$$), 0,
+  'éditeur : ne renomme pas'
+);
+select pg_temp.as_anon();
+select is((select blog_name_en from public.admin_brand()), 'The Feed', 'anon : le nom anglais');
 
 select * from finish();
 rollback;

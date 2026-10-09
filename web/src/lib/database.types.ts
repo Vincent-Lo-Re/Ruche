@@ -80,6 +80,10 @@ export type Database = {
       }
       admin_identity: {
         Row: {
+          blog_du_fr: string | null
+          blog_le_fr: string | null
+          blog_name_en: string | null
+          blog_name_fr: string | null
           contact_email: string | null
           id: boolean
           initials: string | null
@@ -93,11 +97,19 @@ export type Database = {
           monogram_dark: string | null
           monogram_light: string | null
           name: string | null
+          podcasts_du_fr: string | null
+          podcasts_le_fr: string | null
+          podcasts_name_en: string | null
+          podcasts_name_fr: string | null
           time_zone: string
           website_url: string | null
         }
         ComputedFields: never
         Insert: {
+          blog_du_fr?: string | null
+          blog_le_fr?: string | null
+          blog_name_en?: string | null
+          blog_name_fr?: string | null
           contact_email?: string | null
           id?: boolean
           initials?: string | null
@@ -111,10 +123,18 @@ export type Database = {
           monogram_dark?: string | null
           monogram_light?: string | null
           name?: string | null
+          podcasts_du_fr?: string | null
+          podcasts_le_fr?: string | null
+          podcasts_name_en?: string | null
+          podcasts_name_fr?: string | null
           time_zone?: string
           website_url?: string | null
         }
         Update: {
+          blog_du_fr?: string | null
+          blog_le_fr?: string | null
+          blog_name_en?: string | null
+          blog_name_fr?: string | null
           contact_email?: string | null
           id?: boolean
           initials?: string | null
@@ -128,6 +148,10 @@ export type Database = {
           monogram_dark?: string | null
           monogram_light?: string | null
           name?: string | null
+          podcasts_du_fr?: string | null
+          podcasts_le_fr?: string | null
+          podcasts_name_en?: string | null
+          podcasts_name_fr?: string | null
           time_zone?: string
           website_url?: string | null
         }
@@ -687,6 +711,10 @@ export type Database = {
       admin_brand: {
         Args: Record<PropertyKey, never>
         Returns: {
+          blog_du_fr: string
+          blog_le_fr: string
+          blog_name_en: string
+          blog_name_fr: string
           contact_email: string
           initials: string
           language: string
@@ -699,6 +727,10 @@ export type Database = {
           monogram_dark: string
           monogram_light: string
           name: string
+          podcasts_du_fr: string
+          podcasts_le_fr: string
+          podcasts_name_en: string
+          podcasts_name_fr: string
           time_zone: string
           website_url: string
         }[]
