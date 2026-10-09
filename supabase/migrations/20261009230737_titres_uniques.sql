@@ -499,9 +499,11 @@ begin
 end;
 $$;
 
--- restore : un titre repris entre-temps revient renommé (avertissement titre_renomme).
-create or replace function public.restore(content_id uuid)
-returns table (restored integer, warnings text[])
+-- restore : un titre repris entre-temps revient renommé (avertissement titre_renomme) ; le titre
+-- du contenu restauré est renvoyé (title), pour que l'admin le dise.
+drop function public.restore(uuid);
+create function public.restore(content_id uuid)
+returns table (restored integer, warnings text[], title text)
 language plpgsql
 security definer
 set search_path = ''
@@ -524,7 +526,7 @@ begin
   end if;
 
   if target.deleted_at is null then
-    return query select 0, notes;
+    return query select 0, notes, target.title;
     return;
   end if;
 
@@ -561,9 +563,12 @@ begin
     end
   where c.id = target.id;
 
-  return query select 1, notes;
+  return query select 1, notes, new_title;
 end;
 $$;
+
+revoke execute on function public.restore(uuid) from public, anon;
+grant execute on function public.restore(uuid) to authenticated;
 
 -- revert_to_version : le titre d'une version repris depuis par un autre contenu revient renommé
 -- (avertissement titre_renomme).

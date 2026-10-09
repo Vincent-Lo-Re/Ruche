@@ -99,9 +99,10 @@ select lives_ok(
   $$select pg_temp.create_content('b', 'article', content_title => 'Mon article')$$,
   'le titre d''un contenu à la corbeille est libre'
 );
-select is(
-  (select warnings from public.restore(pg_temp.cid('a'))), array['titre_renomme'],
-  'restore : le titre repris, avertissement titre_renomme'
+select results_eq(
+  format('select warnings, title from public.restore(%L)', pg_temp.cid('a')),
+  $$values (array['titre_renomme'], 'MON ARTICLE (2)')$$,
+  'restore : le titre repris, avertissement titre_renomme et le nouveau titre'
 );
 select is(
   (select title from public.contents where id = pg_temp.cid('a')), 'MON ARTICLE (2)',

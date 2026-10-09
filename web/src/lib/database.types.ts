@@ -1138,6 +1138,7 @@ export type Database = {
         Args: { content_id: string }
         Returns: {
           restored: number
+          title: string
           warnings: string[]
         }[]
       }
