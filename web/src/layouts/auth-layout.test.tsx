@@ -61,10 +61,11 @@ describe("pages de connexion (modèle login-04)", () => {
     vi.mocked(identityApi.getAdminBrand).mockResolvedValue(brand(null))
     await renderApp("/sign-in", fakeAuth("signed-out"))
 
-    // Sans logo envoyé : le nom en texte, en haut comme sur l'image (aucun logo de Ruche).
+    // Sans logo envoyé : le nom en texte en haut, l'initiale sur l'image (aucun logo de Ruche).
     await waitFor(() =>
-      expect(screen.getAllByText(texts.app.name).length).toBeGreaterThan(1)
+      expect(screen.getAllByText(texts.app.name).length).toBeGreaterThan(0)
     )
+    expect(screen.getByText("R")).toBeInTheDocument()
     expect(animatedMonogram()).toBeNull()
     expect(document.querySelector('img[alt=""]')).toHaveAttribute(
       "src",

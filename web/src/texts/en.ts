@@ -2297,8 +2297,11 @@ export const en = {
     adminIdentity: {
       // La carte de la marque : son nom, son adresse de contact et son site web.
       title: "Brand",
-      description:
-        "The name your team sees in the menu, the browser tab, and on the sign-in screen. Your initials stand in for the monogram until you upload one. Your contact email is shown on the sign-in screen so anyone who's lost their phone or invitation can reach you. Your website is linked at the top of every page; leave it empty to hide the link.",
+      description: [
+        "Fill in your brand details: its name, initials*, a contact email**, and your website.",
+        "* Shown in place of the monogram until you upload one.",
+        "** Shown on the sign-in screen for anyone who needs help.",
+      ],
       name: "Brand name",
       save: "Save",
       nameTooLong: "The name can't be longer than 40 characters.",
@@ -2320,8 +2323,11 @@ export const en = {
       files: {
         // La section des logos : une carte, deux groupes de deux cases (fond clair, fond sombre).
         title: "Logos",
-        description:
-          "Upload your logo for light and dark backgrounds (SVG, PNG, or WebP, up to 1 MB). Choose a file or drag it onto a slot. One version is enough: it's used on both backgrounds. With no logo, your brand name is shown instead, as text.",
+        description: [
+          "Upload your logotype* and monogram** for light and dark backgrounds (SVG, PNG, or WebP, up to 1 MB). One version is enough: it's used on both.",
+          "* Without a logotype, your brand name is shown as text.",
+          "** Without a monogram, your initials are shown.",
+        ],
         logotype: {
           title: "Logo",
           use: "menu and sign-in",
@@ -2369,8 +2375,11 @@ export const en = {
         // à côté, l'image et le monogramme animé.
         loginScreen: {
           title: "Sign-in screen",
-          description:
-            "The first thing your team sees when they sign in. Choose a background image, shown on wide screens (JPEG, PNG, or WebP, compressed automatically), or drag one onto the preview, then pick how the icon animates.",
+          description: [
+            "Customize the first screen your team sees: its background image* and the monogram animation**.",
+            "* JPEG, PNG, or WebP, resized and compressed automatically, shown on large screens. Choose it, or drag it onto the preview.",
+            "** Until you upload a monogram, your initials animate instead.",
+          ],
           preview: "Sign-in screen preview",
         },
         loginImage: {
