@@ -591,6 +591,39 @@ export type Database = {
           },
         ]
       }
+      terms: {
+        Row: {
+          key: string
+          language: string
+          name: string
+          traits: NonNullable<Json>
+          updated_at: string
+        }
+        ComputedFields: never
+        Insert: {
+          key: string
+          language: string
+          name: string
+          traits?: NonNullable<Json>
+          updated_at?: string
+        }
+        Update: {
+          key?: string
+          language?: string
+          name?: string
+          traits?: NonNullable<Json>
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "terms_language_fkey"
+            columns: ["language"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
       versions: {
         Row: {
           access_level_id: string | null
@@ -767,6 +800,15 @@ export type Database = {
         }[]
       }
       app_page: { Args: { slug: string }; Returns: Json }
+      app_terms: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          key: string
+          language: string
+          name: string
+          traits: Json
+        }[]
+      }
       categories_reorder: {
         Args: { ids: string[]; section: string }
         Returns: {

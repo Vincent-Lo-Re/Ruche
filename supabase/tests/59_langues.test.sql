@@ -8,8 +8,10 @@ begin;
 select plan(20);
 
 select pg_temp.create_people();
+select pg_temp.reset_languages();
 
--- Au départ : le français, par défaut.
+-- Au départ (la migration, ou reset_languages sur une base de développement) : le français, par
+-- défaut.
 select is(
   (select array_agg(code || ':' || is_default::text) from public.languages),
   array['fr:true'], 'au départ : le français, par défaut'
