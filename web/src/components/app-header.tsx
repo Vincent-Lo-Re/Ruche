@@ -64,8 +64,11 @@ export function AppHeader() {
       </NavigationMenu>
       <div className="ml-auto flex items-center gap-2">
         <HelpSearch />
-        <ThemeMenu />
-        <PaletteSheet />
+        {/* Les deux icônes côte à côte, plus serrées que la recherche. */}
+        <div className="flex items-center">
+          <ThemeMenu />
+          <PaletteSheet />
+        </div>
       </div>
     </header>
   )
