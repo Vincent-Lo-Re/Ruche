@@ -136,7 +136,7 @@ export const fr: Texts = {
     settings: {
       title: "Paramètres",
       description:
-        "Donne un visage à ton admin et à ton app, compose tes formules et ajuste les réglages avancés.",
+        "Donne un visage à ton admin et à ton app, compose tes formules, choisis les langues de ton app et ajuste les réglages avancés.",
     },
     account: {
       title: "Mon compte",
@@ -2335,7 +2335,39 @@ export const fr: Texts = {
       admin: "Identité de l'admin",
       app: "Identité de l'app",
       plans: "Formules",
+      languages: "Langues",
       advanced: "Avancé",
+    },
+    // Onglet « Langues » : les langues dans lesquelles l'app sert son contenu (ADMIN § 7 bis).
+    languages: {
+      title: "Langues de l'app",
+      description:
+        "Les langues dans lesquelles ton app propose son contenu. Un contenu sans traduction s'affiche dans la langue par défaut. La langue de l'admin elle-même est dans Avancé.",
+      default: "Par défaut",
+      // L'interrupteur d'une ligne, pour les lecteurs d'écran.
+      offered: (name: string) => `Proposer dans l'app : ${name}`,
+      actions: (name: string) => `Actions pour ${name}`,
+      makeDefault: "Choisir par défaut",
+      remove: "Retirer…",
+      empty: "Aucune langue pour l'instant.",
+      loadFailed: "Les langues n'ont pas pu être chargées.",
+      addTitle: "Ajouter une langue",
+      addDescription:
+        "Elle est proposée dans l'app tout de suite. Tu peux l'arrêter le temps de traduire son contenu.",
+      pick: "Langue",
+      search: "Chercher une langue",
+      noMatch: "Aucune langue trouvée.",
+      add: "Ajouter",
+      added: (name: string) => `${name} ajouté.`,
+      defaultChanged: (name: string) =>
+        `${name} est maintenant la langue par défaut.`,
+      confirmRemove: {
+        title: "Retirer cette langue ?",
+        description: (name: string) =>
+          `L'app ne proposera plus cette langue : ${name}.`,
+        confirm: "Retirer",
+      },
+      removed: (name: string) => `${name} retiré.`,
     },
     // Onglet « Identité de l'admin » : le nom de la marque, pour toute l'équipe.
     adminIdentity: {

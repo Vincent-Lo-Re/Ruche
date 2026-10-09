@@ -133,7 +133,7 @@ export const en = {
     settings: {
       title: "Settings",
       description:
-        "Brand your admin and app, set up your plans, and adjust advanced settings.",
+        "Brand your admin and app, set up your plans, choose your app's languages, and adjust advanced settings.",
     },
     account: {
       title: "My account",
@@ -2285,7 +2285,37 @@ export const en = {
       admin: "Admin branding",
       app: "App branding",
       plans: "Plans",
+      languages: "Languages",
       advanced: "Advanced",
+    },
+    // Onglet « Langues » : les langues dans lesquelles l'app sert son contenu (ADMIN § 7 bis).
+    languages: {
+      title: "App languages",
+      description:
+        "The languages your app offers its content in. Content that isn't translated is shown in the default language. The language of the admin itself is in Advanced.",
+      default: "Default",
+      // L'interrupteur d'une ligne, pour les lecteurs d'écran.
+      offered: (name: string) => `Offer ${name} in the app`,
+      actions: (name: string) => `Actions for ${name}`,
+      makeDefault: "Make default",
+      remove: "Remove…",
+      empty: "No languages yet.",
+      loadFailed: "The languages couldn't be loaded.",
+      addTitle: "Add a language",
+      addDescription:
+        "It's offered in the app right away. You can turn it off until its content is translated.",
+      pick: "Language",
+      search: "Search for a language",
+      noMatch: "No language found.",
+      add: "Add",
+      added: (name: string) => `${name} added.`,
+      defaultChanged: (name: string) => `${name} is now the default language.`,
+      confirmRemove: {
+        title: "Remove this language?",
+        description: (name: string) => `The app will stop offering ${name}.`,
+        confirm: "Remove",
+      },
+      removed: (name: string) => `${name} removed.`,
     },
     // Onglet « Identité de l'admin » : le nom de la marque, pour toute l'équipe.
     adminIdentity: {
