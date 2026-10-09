@@ -2270,6 +2270,8 @@ export const fr: Texts = {
           "Le modèle d'un bloc partagé n'existe plus : ce bloc est devenu une copie ordinaire.",
         adresse_prise:
           "Une autre page a pris cette adresse entre-temps : le brouillon garde son adresse actuelle.",
+        formule_supprimee:
+          "La formule de cette version a été supprimée depuis : choisis de nouveau le niveau d'accès avant de publier.",
       },
       loadFailed: "L'historique n'a pas pu être chargé.",
     },
@@ -2532,7 +2534,7 @@ export const fr: Texts = {
       loadFailed: "Les formules n'ont pas pu être chargées.",
       errors: {
         formule_utilisee:
-          "Impossible de supprimer cette formule : un abonné l'a, un contenu l'utilise (même dans la Corbeille) ou une version publiée de l'historique l'a utilisée. Tu peux la renommer ou la déplacer à la place.",
+          "Impossible de supprimer cette formule : un abonné l'a, un brouillon l'utilise (même dans la Corbeille) ou un contenu en ligne l'utilise. Tu peux la renommer ou la déplacer à la place.",
         nom_en_double: "Une formule porte déjà ce nom.",
         reserve_aux_admins: "Les formules sont réservées aux admins.",
         reserve_a_l_equipe:

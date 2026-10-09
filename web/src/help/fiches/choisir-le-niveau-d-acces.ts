@@ -25,7 +25,7 @@ export const fiche: HelpFiche = {
   notes: [
     "Il n'y a pas de niveau par défaut : tant que tu n'as pas choisi, la liste dit « Choisis un niveau », et « Publier » le demande.",
     "Un abonné lit les contenus de sa formule et ceux des formules moins complètes. Changer l'ordre des formules change tout de suite ce que chaque abonné peut lire.",
-    "Une formule utilisée par un contenu, une version publiée ou un abonné ne se supprime pas : renomme-la ou déplace-la plutôt.",
+    "Une formule utilisée par un brouillon, un contenu en ligne ou un abonné ne se supprime pas : renomme-la ou déplace-la plutôt.",
     "Le niveau d'accès se change aussi depuis une liste : menu « … » de la ligne, puis « Réglages ».",
   ],
 }

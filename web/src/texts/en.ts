@@ -2221,6 +2221,8 @@ export const en = {
           "A synced block's template no longer exists, so the block is now a regular copy.",
         adresse_prise:
           "Another page now uses this URL, so the draft keeps its current one.",
+        formule_supprimee:
+          "This version's plan has been deleted since. Choose the access again before publishing.",
       },
       loadFailed: "Couldn't load the version history.",
     },
@@ -2481,7 +2483,7 @@ export const en = {
       loadFailed: "Couldn't load the plans.",
       errors: {
         formule_utilisee:
-          "This plan can't be deleted: a subscriber has it, content uses it (even in the Trash), or a published version in the history used it. You can rename or move it instead.",
+          "This plan can't be deleted: a subscriber has it, a draft uses it (even in the Trash), or live content uses it. You can rename or move it instead.",
         nom_en_double: "A plan with this name already exists.",
         reserve_aux_admins: "Only admins can manage plans.",
         reserve_a_l_equipe:
