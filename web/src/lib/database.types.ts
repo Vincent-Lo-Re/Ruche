@@ -91,6 +91,7 @@ export type Database = {
           monogram_dark: string | null
           monogram_light: string | null
           name: string | null
+          time_zone: string
           website_url: string | null
         }
         ComputedFields: never
@@ -106,6 +107,7 @@ export type Database = {
           monogram_dark?: string | null
           monogram_light?: string | null
           name?: string | null
+          time_zone?: string
           website_url?: string | null
         }
         Update: {
@@ -120,6 +122,7 @@ export type Database = {
           monogram_dark?: string | null
           monogram_light?: string | null
           name?: string | null
+          time_zone?: string
           website_url?: string | null
         }
         Relationships: []
@@ -685,6 +688,7 @@ export type Database = {
           monogram_dark: string
           monogram_light: string
           name: string
+          time_zone: string
           website_url: string
         }[]
       }

@@ -6,7 +6,7 @@
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(64);
+select plan(69);
 
 select pg_temp.create_people();
 
@@ -290,6 +290,27 @@ select is(
 );
 select pg_temp.as_anon();
 select is((select language from public.admin_brand()), 'fr', 'anon : la langue de l''admin');
+select pg_temp.as_person('admin');
+
+-- Le fuseau horaire de toute l'admin : Paris au départ ; un admin le change (un fuseau que
+-- Postgres connaît), un éditeur non ; tout le monde le lit par admin_brand().
+select is((select time_zone from public.admin_brand()), 'Europe/Paris', 'Paris au départ');
+select pg_temp.as_person('editor');
+select is(
+  pg_temp.affected($$update public.admin_identity set time_zone = 'America/Montreal'$$), 0,
+  'éditeur : ne change pas le fuseau horaire'
+);
+select pg_temp.as_person('admin');
+select throws_ok(
+  $$update public.admin_identity set time_zone = 'Europe/Atlantide'$$, '23514', 'fuseau_inconnu',
+  'un fuseau inconnu est refusé'
+);
+select is(
+  pg_temp.affected($$update public.admin_identity set time_zone = 'America/Montreal'$$), 1,
+  'admin : choisit le fuseau de Montréal'
+);
+select pg_temp.as_anon();
+select is((select time_zone from public.admin_brand()), 'America/Montreal', 'anon : le fuseau horaire');
 select pg_temp.as_person('admin');
 
 -- Le site web du client : vide au départ (pas de lien « Site web ») ; un admin l'enregistre (une
