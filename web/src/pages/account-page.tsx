@@ -15,6 +15,7 @@ import { useBrand } from "@/hooks/use-brand-name"
 import { PaletteChoice } from "@/components/theme/palette-choice"
 import { PalettePreview } from "@/components/theme/palette-preview"
 import { ThemeChoice } from "@/components/theme-choice"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ButtonGroup } from "@/components/ui/button-group"
 import {
@@ -162,8 +163,8 @@ function MfaCard({ factor }: { factor: Factor | null }) {
 
 /**
  * Le profil, sur le modèle de la carte « Account Access » de shadcn : le nom, avec « Enregistrer »
- * collé au champ ; l'adresse e-mail grisée, avec le rôle à droite et « Modifier » collé au champ,
- * qui ouvre le changement d'adresse (EmailChangeDialog).
+ * collé au champ ; l'adresse e-mail grisée, avec « Modifier » collé au champ, qui ouvre le
+ * changement d'adresse (EmailChangeDialog). Le rôle est une pastille à côté du titre.
  */
 function ProfileCard({ profile }: { profile: Profile }) {
   const labels = texts.account.profile
@@ -190,7 +191,16 @@ function ProfileCard({ profile }: { profile: Profile }) {
   const onSubmit = form.handleSubmit(({ full_name }) => save.mutate(full_name))
 
   return (
-    <SettingsSection title={labels.title} description={labels.description}>
+    <SettingsSection
+      title={labels.title}
+      description={labels.description}
+      badge={
+        <Badge variant="secondary">
+          <span className="sr-only">{labels.rolePrefix}</span>
+          {texts.roles[profile.role]}
+        </Badge>
+      }
+    >
       <form onSubmit={onSubmit} noValidate>
         <Card>
           <CardContent>
@@ -225,15 +235,7 @@ function ProfileCard({ profile }: { profile: Profile }) {
                 )}
               />
               <Field>
-                <div className="flex items-center justify-between">
-                  <FieldLabel htmlFor="account-email">
-                    {labels.email}
-                  </FieldLabel>
-                  <span className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
-                    <span className="sr-only">{labels.rolePrefix}</span>
-                    {texts.roles[profile.role]}
-                  </span>
-                </div>
+                <FieldLabel htmlFor="account-email">{labels.email}</FieldLabel>
                 <ButtonGroup className="w-full">
                   <Input
                     id="account-email"

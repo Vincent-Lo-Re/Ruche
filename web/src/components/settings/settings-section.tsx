@@ -9,17 +9,23 @@ import type { ReactNode } from "react"
  */
 export function SettingsSection({
   title,
+  badge,
   description,
   children,
 }: {
   title: string
+  // Une pastille à côté du titre (le rôle du membre, dans Mon compte).
+  badge?: ReactNode
   description: string | readonly string[]
   children: ReactNode
 }) {
   return (
     <section className="grid gap-4 @3xl:grid-cols-settings @3xl:gap-8">
       <div className="space-y-1">
-        <h2 className="font-medium">{title}</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="font-medium">{title}</h2>
+          {badge}
+        </div>
         <div className="space-y-2">
           {(typeof description === "string" ? [description] : description).map(
             (paragraph) => (
