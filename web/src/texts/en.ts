@@ -2464,7 +2464,7 @@ export const en = {
       terms: {
         title: "Terms",
         description:
-          "The words your team uses for the sections in the admin, in English and French. In the app, a section's name is translated with the content. Addresses like /blog don't change. Leave a name empty to keep the default.",
+          "Customize how sections are labeled in the admin, in English and French. These labels apply to the admin only: in the app, section names are translated with your content. Addresses like /blog don't change. Leave a field empty to use the default label.",
         languages: "Admin languages",
         sections: {
           blog: "Section for posts",

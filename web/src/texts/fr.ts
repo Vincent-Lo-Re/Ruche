@@ -2512,7 +2512,7 @@ export const fr: Texts = {
       terms: {
         title: "Termes",
         description:
-          "Les mots de ton équipe pour nommer les sections dans l'admin, en anglais et en français. Dans l'app, le nom d'une section se traduit avec le contenu. Les adresses comme /blog ne changent pas. Un nom laissé vide garde celui par défaut.",
+          "Personnalise le libellé des sections dans l'admin, en anglais et en français. Ces libellés ne valent que pour l'admin : dans l'app, le nom des sections se traduit avec ton contenu. Les adresses comme /blog ne changent pas. Laisse un champ vide pour garder le libellé par défaut.",
         languages: "Langues de l'admin",
         sections: {
           blog: "Section des articles",
