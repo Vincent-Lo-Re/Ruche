@@ -128,7 +128,7 @@ select function_privs_are(
   'authenticated : peut appeler access_levels_reorder (la fonction vérifie is_admin)'
 );
 select function_privs_are(
-  'public', 'app_content', array['uuid', 'text'], 'authenticated', array['EXECUTE'],
+  'public', 'app_content', array['uuid'], 'authenticated', array['EXECUTE'],
   'authenticated : peut appeler app_content (lecteur abonné)'
 );
 select is(

@@ -86,7 +86,7 @@ select function_privs_are(
   'authenticated : peut appeler categories_reorder'
 );
 select function_privs_are(
-  'public', 'app_feed', array['text', 'uuid', 'text', 'integer', 'text'], 'authenticated', array['EXECUTE'],
+  'public', 'app_feed', array['text', 'uuid', 'text', 'integer'], 'authenticated', array['EXECUTE'],
   'authenticated : peut appeler app_feed'
 );
 select function_privs_are(
@@ -112,7 +112,7 @@ select is(
   'security definer et search_path vide'
 );
 select is(
-  (select provolatile::text from pg_proc where oid = 'public.app_feed(text,uuid,text,integer,text)'::regprocedure),
+  (select provolatile::text from pg_proc where oid = 'public.app_feed(text,uuid,text,integer)'::regprocedure),
   's',
   'app_feed ne modifie rien (stable)'
 );
