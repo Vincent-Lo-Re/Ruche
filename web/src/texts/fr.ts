@@ -2,13 +2,6 @@
 
 import type { Texts } from "./en.ts"
 
-import { du, frenchTerm } from "./grammar/fr.ts"
-
-// Le nom des sections dans l'admin (Paramètres › Avancé, « Termes ») : « Blog » et « Podcasts » au
-// départ ; les accords (« du Blog », « des Podcasts ») suivent ses traits (texts/grammar/fr.ts).
-const blog = frenchTerm("blog")
-const podcasts = frenchTerm("podcasts")
-
 export const fr: Texts = {
   app: {
     // Le nom par défaut de l'admin ; un admin le remplace par celui de la marque (Paramètres).
@@ -110,11 +103,11 @@ export const fr: Texts = {
       description: "Bienvenue",
     },
     blog: {
-      title: blog.name,
+      title: "Blog",
       description: "Les articles et leurs catégories.",
     },
     podcasts: {
-      title: podcasts.name,
+      title: "Podcasts",
       description: "Les épisodes et leurs catégories.",
     },
     pages: {
@@ -143,7 +136,7 @@ export const fr: Texts = {
     settings: {
       title: "Paramètres",
       description:
-        "Donne un visage à ton admin et à ton app, compose tes formules, choisis les langues de ton app et ajuste les réglages avancés.",
+        "Donne un visage à ton admin et à ton app, compose tes formules et ajuste les réglages avancés.",
     },
     account: {
       title: "Mon compte",
@@ -784,8 +777,8 @@ export const fr: Texts = {
       all: "Tout",
       file: "Médiathèque",
       page: "Pages",
-      article: blog.name,
-      episode: podcasts.name,
+      article: "Blog",
+      episode: "Podcasts",
       template: "Modèles de bloc",
     },
     itemTypes: {
@@ -1306,8 +1299,8 @@ export const fr: Texts = {
     },
     // La section d'un point de départ ([D42]) : la sorte de contenu qu'il sert à créer.
     sections: {
-      article: `${blog.name} (article)`,
-      episode: `${podcasts.name} (épisode)`,
+      article: "Blog (article)",
+      episode: "Podcasts (épisode)",
       page: "Pages",
     },
     list: {
@@ -1849,8 +1842,8 @@ export const fr: Texts = {
       },
       feed: {
         title: {
-          article: `Dans la liste ${du(blog)}`,
-          episode: `Dans la liste ${du(podcasts)}`,
+          article: "Dans la liste du Blog",
+          episode: "Dans la liste des Podcasts",
         },
         choose: "Choisir",
         chooseLabel: "Choisir l'image de présentation",
@@ -2342,39 +2335,7 @@ export const fr: Texts = {
       admin: "Identité de l'admin",
       app: "Identité de l'app",
       plans: "Formules",
-      languages: "Langues",
       advanced: "Avancé",
-    },
-    // Onglet « Langues » : les langues dans lesquelles l'app sert son contenu (ADMIN § 7 bis).
-    languages: {
-      title: "Langues de l'app",
-      description:
-        "Les langues dans lesquelles ton app propose son contenu. Un contenu sans traduction s'affiche dans la langue par défaut. La langue de l'admin elle-même est dans Avancé.",
-      default: "Par défaut",
-      // L'interrupteur d'une ligne, pour les lecteurs d'écran.
-      offered: (name: string) => `Proposer dans l'app : ${name}`,
-      actions: (name: string) => `Actions pour ${name}`,
-      makeDefault: "Choisir par défaut",
-      remove: "Retirer…",
-      empty: "Aucune langue pour l'instant.",
-      loadFailed: "Les langues n'ont pas pu être chargées.",
-      addTitle: "Ajouter une langue",
-      addDescription:
-        "Elle est proposée dans l'app tout de suite. Tu peux l'arrêter le temps de traduire son contenu.",
-      pick: "Langue",
-      search: "Chercher une langue",
-      noMatch: "Aucune langue trouvée.",
-      add: "Ajouter",
-      added: (name: string) => `${name} ajouté.`,
-      defaultChanged: (name: string) =>
-        `${name} est maintenant la langue par défaut.`,
-      confirmRemove: {
-        title: "Retirer cette langue ?",
-        description: (name: string) =>
-          `L'app ne proposera plus cette langue : ${name}.`,
-        confirm: "Retirer",
-      },
-      removed: (name: string) => `${name} retiré.`,
     },
     // Onglet « Identité de l'admin » : le nom de la marque, pour toute l'équipe.
     adminIdentity: {
@@ -2507,28 +2468,6 @@ export const fr: Texts = {
         // Pas de format choisi : chacun a celui de sa langue.
         sameAsLanguage: "Selon la langue de chacun",
         saved: "Format régional enregistré.",
-      },
-      // Les termes de l'admin : les mots de l'équipe pour nommer les sections (ADMIN § 7 bis).
-      terms: {
-        title: "Termes",
-        description:
-          "Personnalise le libellé des sections dans l'admin, en anglais et en français. Ces libellés ne valent que pour l'admin : dans l'app, le nom des sections se traduit avec ton contenu. Les adresses comme /blog ne changent pas. Laisse un champ vide pour garder le libellé par défaut.",
-        languages: "Langues de l'admin",
-        sections: {
-          blog: "Section des articles",
-          podcasts: "Section des épisodes",
-        },
-        name: "Nom",
-        gender: "Genre",
-        genders: { masculine: "Masculin", feminine: "Féminin" },
-        number: "Nombre",
-        singular: "Singulier",
-        plural: "Pluriel",
-        // L'article s'élide : « l'Agenda ».
-        elided: "Élision (l')",
-        preview: (sample: string) => `Aperçu : ${sample}`,
-        saved: "Termes enregistrés.",
-        loadFailed: "Les termes n'ont pas pu être chargés.",
       },
       timeZone: {
         title: "Fuseau horaire",
@@ -2687,13 +2626,7 @@ export const fr: Texts = {
       title: "Aperçu",
       description:
         "La palette choisie s'applique à toute l'admin, pour toi seulement.",
-      nav: [
-        "Tableau de bord",
-        blog.name,
-        podcasts.name,
-        "Pages",
-        "Médiathèque",
-      ],
+      nav: ["Tableau de bord", "Blog", "Podcasts", "Pages", "Médiathèque"],
       initial: "C",
       member: "Camille",
       heading: "Tableau de bord",
@@ -2708,17 +2641,17 @@ export const fr: Texts = {
       rows: [
         {
           name: "Respirer avant de répondre",
-          meta: `${blog.name} · par Léa, il y a 2 h`,
+          meta: "Blog · par Léa, il y a 2 h",
           badge: "En ligne",
         },
         {
           name: "Le calme du matin",
-          meta: `${podcasts.name} · par Hugo, hier`,
+          meta: "Podcasts · par Hugo, hier",
           badge: "Programmé",
         },
         {
           name: "Trouver son rythme",
-          meta: `${blog.name} · par Camille, lundi`,
+          meta: "Blog · par Camille, lundi",
           badge: "Brouillon",
         },
       ],

@@ -2,9 +2,7 @@ import { fireEvent, screen, waitFor, within } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import * as levelsApi from "@/lib/access-levels"
-import * as languagesApi from "@/lib/app-languages"
 import * as identityApi from "@/lib/admin-identity"
-import * as termsApi from "@/lib/terms"
 import { fakeAuth, renderApp } from "@/test/render"
 import { texts } from "@/texts"
 
@@ -19,26 +17,6 @@ vi.mock("@/lib/access-levels", async (importOriginal) => {
     reorderAccessLevels: vi.fn(),
   }
 })
-
-vi.mock("@/lib/app-languages", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/lib/app-languages")>()),
-  listAppLanguages: vi.fn().mockResolvedValue([
-    { code: "fr", is_default: true, enabled: true },
-    { code: "en", is_default: false, enabled: true },
-  ]),
-  addAppLanguage: vi.fn().mockResolvedValue(undefined),
-  setAppLanguageEnabled: vi.fn().mockResolvedValue(undefined),
-  setDefaultAppLanguage: vi.fn().mockResolvedValue(undefined),
-  removeAppLanguage: vi.fn().mockResolvedValue(undefined),
-}))
-
-vi.mock("@/lib/terms", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/lib/terms")>()),
-  getTerms: vi.fn().mockResolvedValue([]),
-  saveTerms: vi.fn().mockResolvedValue(undefined),
-  // Les termes ne rechargent pas la page pendant les tests.
-  applyTerms: vi.fn(),
-}))
 
 vi.mock("@/lib/admin-identity", async (importOriginal) => {
   const actual = await importOriginal<typeof identityApi>()
@@ -201,122 +179,8 @@ describe("Paramètres : le format régional de l'admin (Avancé)", () => {
   })
 })
 
-describe("Paramètres : les langues de l'app", () => {
-  const words = texts.settings.languages
-
-  it("la langue par défaut d'abord, toujours proposée ; une autre s'arrête ou devient la langue par défaut", async () => {
-    await renderApp("/settings?tab=languages")
-
-    const french = (await screen.findByText("Français")).closest("tr")!
-    expect(within(french).getByText(words.default)).toBeVisible()
-    // La langue par défaut n'a ni interrupteur ni menu : sa pastille suffit.
-    expect(within(french).queryByRole("switch")).toBeNull()
-    expect(within(french).queryByRole("button")).toBeNull()
-
-    const english = screen.getByText("Anglais").closest("tr")!
-    expect(english).toHaveTextContent("Anglais · English")
-    fireEvent.click(
-      within(english).getByRole("switch", { name: words.offered("Anglais") })
-    )
-    await waitFor(() =>
-      expect(languagesApi.setAppLanguageEnabled).toHaveBeenCalledWith(
-        "en",
-        false
-      )
-    )
-
-    fireEvent.click(
-      within(english).getByRole("button", { name: words.actions("Anglais") })
-    )
-    fireEvent.click(
-      await screen.findByRole("menuitem", { name: words.makeDefault })
-    )
-    await waitFor(() =>
-      expect(languagesApi.setDefaultAppLanguage).toHaveBeenCalledWith("en")
-    )
-    expect(
-      await screen.findByText(words.defaultChanged("Anglais"))
-    ).toBeVisible()
-  })
-
-  it("ajoute une langue cherchée dans la liste", async () => {
-    await renderApp("/settings?tab=languages")
-
-    fireEvent.click(await screen.findByRole("combobox", { name: words.pick }))
-    fireEvent.change(await screen.findByPlaceholderText(words.search), {
-      target: { value: "Deutsch" },
-    })
-    fireEvent.click(await screen.findByRole("option", { name: /Allemand/ }))
-    fireEvent.click(screen.getByRole("button", { name: words.add }))
-
-    await waitFor(() =>
-      expect(languagesApi.addAppLanguage).toHaveBeenCalledWith("de")
-    )
-    expect(await screen.findByText(words.added("Allemand"))).toBeVisible()
-  })
-})
-
-describe("Paramètres : les termes de l'admin (Avancé)", () => {
-  it("un onglet par langue de l'admin ; l'aperçu accorde, les termes d'une langue sont enregistrés", async () => {
-    await renderApp("/settings?tab=advanced")
-    const words = texts.settings.advanced.terms
-
-    const tabs = await screen.findByRole("tablist", { name: words.languages })
-    // La langue de l'admin d'abord (le français dans les tests).
-    expect(
-      within(tabs)
-        .getAllByRole("tab")
-        .map((tab) => tab.textContent)
-    ).toEqual([texts.languages.fr, texts.languages.en])
-
-    const blog = screen.getByRole("group", { name: words.sections.blog })
-    // Sans terme, les traits du mot par défaut : « Podcasts » est au pluriel.
-    expect(
-      within(
-        screen.getByRole("group", { name: words.sections.podcasts })
-      ).getByText(
-        words.preview(
-          "Les Podcasts · dans la liste des Podcasts · aux Podcasts"
-        )
-      )
-    ).toBeVisible()
-
-    fireEvent.change(within(blog).getByLabelText(words.name), {
-      target: { value: "Actualités" },
-    })
-    for (const [field, option] of [
-      [words.gender, words.genders.feminine],
-      [words.number, words.plural],
-    ]) {
-      fireEvent.click(within(blog).getByRole("combobox", { name: field }))
-      const choice = await screen.findByRole("option", { name: option })
-      fireEvent.pointerDown(choice, { pointerType: "mouse" })
-      fireEvent.click(choice)
-    }
-    expect(
-      within(blog).getByText(
-        words.preview(
-          "Les Actualités · dans la liste des Actualités · aux Actualités"
-        )
-      )
-    ).toBeVisible()
-
-    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
-    await waitFor(() =>
-      expect(termsApi.saveTerms).toHaveBeenCalledWith("fr", [
-        {
-          key: "blog",
-          name: "Actualités",
-          traits: { gender: "feminine", plural: true, elided: false },
-        },
-      ])
-    )
-    expect(await screen.findByText(words.saved)).toBeVisible()
-  })
-})
-
 describe("Paramètres : les onglets", () => {
-  it("cinq onglets ; le premier s'ouvre au départ, l'onglet choisi va dans l'adresse", async () => {
+  it("quatre onglets ; le premier s'ouvre au départ, l'onglet choisi va dans l'adresse", async () => {
     const { router } = await renderApp("/settings")
 
     const tabs = await screen.findByRole("tablist", {
@@ -330,7 +194,6 @@ describe("Paramètres : les onglets", () => {
       texts.settings.tabs.admin,
       texts.settings.tabs.app,
       texts.settings.tabs.plans,
-      texts.settings.tabs.languages,
       texts.settings.tabs.advanced,
     ])
     expect(

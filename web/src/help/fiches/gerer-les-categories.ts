@@ -1,14 +1,11 @@
 import type { HelpFiche } from "@/help/types"
-import { capitalized, frenchTerm, le } from "@/texts/grammar/fr"
-
-const blog = frenchTerm("blog")
-const podcasts = frenchTerm("podcasts")
 
 export const fiche: HelpFiche = {
   slug: "gerer-les-categories",
   theme: "contenus",
   title: "Gérer les catégories",
-  summary: `${capitalized(le(blog))} et ${le(podcasts)} ont chacun leurs catégories, que l'app utilise pour filtrer les contenus.`,
+  summary:
+    "Le Blog et les Podcasts ont chacun leurs catégories, que l'app utilise pour filtrer les contenus.",
   keywords: [
     "catégorie",
     "filtre",
@@ -19,7 +16,7 @@ export const fiche: HelpFiche = {
     "étiquette",
   ],
   steps: [
-    `Ouvre « ${blog.name} » ou « ${podcasts.name} », puis clique sur « Catégories ».`,
+    "Ouvre « Blog » ou « Podcasts », puis clique sur « Catégories ».",
     "Pour en ajouter une, clique sur « Nouvelle catégorie » en haut de la page, écris son nom, puis clique sur « Enregistrer ».",
     "Range-les avec la poignée, à la souris ou au clavier : l'app les montre dans cet ordre.",
     "Pour renommer ou supprimer une catégorie, ouvre le menu « … » de sa ligne et choisis « Modifier » ou « Supprimer définitivement ». Pour en supprimer plusieurs, coche-les, puis clique sur « Supprimer définitivement (n) ».",

@@ -13,10 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { texts } from "@/texts"
 
-/**
- * Confirmation d'une mise à la corbeille (une ligne, ou les lignes cochées : listes de contenus,
- * Modèles de bloc) ou d'un retrait définitif (une formule, une catégorie, une langue de l'app).
- */
+/** Confirmation d'une mise à la corbeille (une ligne, ou les lignes cochées) : listes de contenus, Modèles de bloc. */
 export function TrashDialog({
   open,
   title,
@@ -25,7 +22,6 @@ export function TrashDialog({
   pending,
   onCancel,
   onConfirm,
-  finalFocus,
 }: {
   open: boolean
   title: string
@@ -34,8 +30,6 @@ export function TrashDialog({
   pending: boolean
   onCancel: () => void
   onConfirm: () => void
-  // Faux : le focus est placé ailleurs après la confirmation (la liste relue).
-  finalFocus?: () => boolean
 }) {
   return (
     <AlertDialog
@@ -45,7 +39,7 @@ export function TrashDialog({
       }}
     >
       {open && (
-        <AlertDialogContent finalFocus={finalFocus}>
+        <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{title}</AlertDialogTitle>
             <AlertDialogDescription>{description}</AlertDialogDescription>

@@ -39,8 +39,6 @@ import {
 } from "@/lib/media/api"
 import type { Media } from "@/lib/media/constants"
 import { listMembers, teamQueryKey } from "@/lib/team"
-import { appLanguagesKey, listAppLanguages } from "@/lib/app-languages"
-import { getTerms, termsKey } from "@/lib/terms"
 
 /*
  * Les lectures (TanStack Query) qu'une page fait en arrivant. La page et sa préparation
@@ -155,12 +153,6 @@ export const trashRead = () =>
 
 export const teamRead = () =>
   queryOptions({ queryKey: teamQueryKey, queryFn: listMembers })
-
-export const appLanguagesRead = () =>
-  queryOptions({ queryKey: appLanguagesKey, queryFn: listAppLanguages })
-
-export const termsRead = () =>
-  queryOptions({ queryKey: termsKey, queryFn: getTerms })
 
 /** Vrai si le fichier a un objet dans le stockage qu'on peut montrer. */
 export function hasPreview(media: Media): boolean {

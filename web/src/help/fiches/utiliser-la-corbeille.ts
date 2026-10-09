@@ -1,8 +1,4 @@
 import type { HelpFiche } from "@/help/types"
-import { frenchTerm } from "@/texts/grammar/fr"
-
-const blog = frenchTerm("blog")
-const podcasts = frenchTerm("podcasts")
 
 export const fiche: HelpFiche = {
   slug: "utiliser-la-corbeille",
@@ -20,7 +16,7 @@ export const fiche: HelpFiche = {
     "30 jours",
   ],
   steps: [
-    `Ouvre « Corbeille » dans le menu ; filtre par type si besoin (Médiathèque, Pages, ${blog.name}, ${podcasts.name}, Modèles de bloc).`,
+    "Ouvre « Corbeille » dans le menu ; filtre par type si besoin (Médiathèque, Pages, Blog, Podcasts, Modèles de bloc).",
     "Pour récupérer un élément, clique sur « Restaurer » sur sa ligne.",
     "Pour effacer un élément tout de suite, clique sur « Supprimer définitivement », puis confirme. Pour en effacer plusieurs, coche-les, puis clique sur « Supprimer définitivement (n) ».",
     "Pour tout effacer, clique sur « Vider la corbeille », puis confirme.",
