@@ -200,9 +200,9 @@ describe("Paramètres : les langues de l'app", () => {
 
     const french = (await screen.findByText("Français")).closest("tr")!
     expect(within(french).getByText(words.default)).toBeVisible()
-    expect(
-      within(french).getByRole("switch", { name: words.offered("Français") })
-    ).toHaveAttribute("aria-disabled", "true")
+    // La langue par défaut n'a ni interrupteur ni menu : sa pastille suffit.
+    expect(within(french).queryByRole("switch")).toBeNull()
+    expect(within(french).queryByRole("button")).toBeNull()
 
     const english = screen.getByText("Anglais").closest("tr")!
     expect(english).toHaveTextContent("Anglais · English")

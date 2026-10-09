@@ -69,8 +69,8 @@ function LanguageLabel({ code }: { code: string }) {
 
 /**
  * Les langues de l'app (Paramètres › Langues, admins ; ADMIN § 7 bis) : la liste au centre (la
- * langue par défaut d'abord, avec sa pastille ; un interrupteur pour proposer une langue dans
- * l'app ; un menu « … » pour la choisir par défaut ou la retirer), l'ajout dans une colonne à
+ * langue par défaut d'abord, avec sa pastille seule ; pour les autres, un interrupteur pour les
+ * proposer dans l'app et un menu « … » pour les choisir par défaut ou les retirer), l'ajout dans une colonne à
  * droite, comme les Formules.
  */
 export function AppLanguagesCard() {
@@ -184,41 +184,45 @@ function LanguageRow({
       <TableCell className="w-28">
         {is_default && <Badge variant="secondary">{labels.default}</Badge>}
       </TableCell>
+      {/* La langue par défaut est toujours proposée, et ne se retire pas : sa pastille suffit. */}
       <TableCell className="w-14">
-        <Switch
-          checked={enabled}
-          // La langue par défaut est toujours proposée.
-          disabled={disabled || is_default}
-          aria-label={labels.offered(name)}
-          onCheckedChange={onToggle}
-        />
+        {!is_default && (
+          <Switch
+            checked={enabled}
+            disabled={disabled}
+            aria-label={labels.offered(name)}
+            onCheckedChange={onToggle}
+          />
+        )}
       </TableCell>
       <TableCell className="w-12 text-right">
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={labels.actions(name)}
-                disabled={disabled || is_default}
-              />
-            }
-          >
-            <Ellipsis />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={onMakeDefault}>
-              <Star />
-              {labels.makeDefault}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive" onClick={onRemove}>
-              <Trash2 />
-              {labels.remove}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {!is_default && (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={labels.actions(name)}
+                  disabled={disabled}
+                />
+              }
+            >
+              <Ellipsis />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={onMakeDefault}>
+                <Star />
+                {labels.makeDefault}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem variant="destructive" onClick={onRemove}>
+                <Trash2 />
+                {labels.remove}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </TableCell>
     </TableRow>
   )

@@ -133,7 +133,7 @@ export const en = {
     settings: {
       title: "Settings",
       description:
-        "Brand your admin and app, set up your plans, and adjust advanced settings.",
+        "Brand your admin and app, set up your plans, choose your app's languages, and adjust advanced settings.",
     },
     account: {
       title: "My account",

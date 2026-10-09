@@ -136,7 +136,7 @@ export const fr: Texts = {
     settings: {
       title: "Paramètres",
       description:
-        "Donne un visage à ton admin et à ton app, compose tes formules et ajuste les réglages avancés.",
+        "Donne un visage à ton admin et à ton app, compose tes formules, choisis les langues de ton app et ajuste les réglages avancés.",
     },
     account: {
       title: "Mon compte",
