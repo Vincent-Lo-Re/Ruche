@@ -357,6 +357,28 @@ export type Database = {
           },
         ]
       }
+      languages: {
+        Row: {
+          code: string
+          created_at: string
+          enabled: boolean
+          is_default: boolean
+        }
+        ComputedFields: never
+        Insert: {
+          code: string
+          created_at?: string
+          enabled?: boolean
+          is_default?: boolean
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          enabled?: boolean
+          is_default?: boolean
+        }
+        Relationships: []
+      }
       media: {
         Row: {
           alt: string | null
@@ -737,6 +759,13 @@ export type Database = {
           media_id: string
         }[]
       }
+      app_languages: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          code: string
+          is_default: boolean
+        }[]
+      }
       app_page: { Args: { slug: string }; Returns: Json }
       categories_reorder: {
         Args: { ids: string[]; section: string }
@@ -853,6 +882,10 @@ export type Database = {
       }
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean }
       is_staff: { Args: Record<PropertyKey, never>; Returns: boolean }
+      languages_set_default: {
+        Args: { language_code: string }
+        Returns: undefined
+      }
       lock_heartbeat: {
         Args: { content_id: string; editor_session?: string }
         Returns: boolean
