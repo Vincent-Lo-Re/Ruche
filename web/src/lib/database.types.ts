@@ -211,6 +211,116 @@ export type Database = {
           },
         ]
       }
+      content_translations: {
+        Row: {
+          audio: Json | null
+          audio_media_id: string | null
+          content_id: string
+          created_at: string
+          created_by: string | null
+          draft_rev: number
+          draft_saved_at: string
+          draft_saved_by: string | null
+          first_published_at: string | null
+          language: string
+          live_version_id: string | null
+          machine_blocks: string[]
+          schedule_error: string | null
+          scheduled_at: string | null
+          scheduled_by: string | null
+          scheduled_rev: number | null
+          source_marks: NonNullable<Json>
+          texts: NonNullable<Json>
+          title: string
+        }
+        ComputedFields: never
+        Insert: {
+          audio?: Json | null
+          audio_media_id?: never
+          content_id: string
+          created_at?: string
+          created_by?: string | null
+          draft_rev?: number
+          draft_saved_at?: string
+          draft_saved_by?: string | null
+          first_published_at?: string | null
+          language: string
+          live_version_id?: string | null
+          machine_blocks?: string[]
+          schedule_error?: string | null
+          scheduled_at?: string | null
+          scheduled_by?: string | null
+          scheduled_rev?: number | null
+          source_marks?: NonNullable<Json>
+          texts?: NonNullable<Json>
+          title?: string
+        }
+        Update: {
+          audio?: Json | null
+          audio_media_id?: never
+          content_id?: string
+          created_at?: string
+          created_by?: string | null
+          draft_rev?: number
+          draft_saved_at?: string
+          draft_saved_by?: string | null
+          first_published_at?: string | null
+          language?: string
+          live_version_id?: string | null
+          machine_blocks?: string[]
+          schedule_error?: string | null
+          scheduled_at?: string | null
+          scheduled_by?: string | null
+          scheduled_rev?: number | null
+          source_marks?: NonNullable<Json>
+          texts?: NonNullable<Json>
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_translations_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "contents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_translations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_translations_draft_saved_by_fkey"
+            columns: ["draft_saved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_translations_language_fkey"
+            columns: ["language"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "content_translations_live_version_fkey"
+            columns: ["live_version_id", "content_id", "language"]
+            isOneToOne: false
+            referencedRelation: "versions"
+            referencedColumns: ["id", "content_id", "language"]
+          },
+          {
+            foreignKeyName: "content_translations_scheduled_by_fkey"
+            columns: ["scheduled_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contents: {
         Row: {
           access_chosen: boolean
@@ -235,9 +345,11 @@ export type Database = {
           scheduled_by: string | null
           scheduled_rev: number | null
           slug: string | null
+          source_language: string
           template_for: string | null
           template_sort: string | null
           title: string | null
+          untranslated: string
         }
         ComputedFields: never
         Insert: {
@@ -263,9 +375,11 @@ export type Database = {
           scheduled_by?: string | null
           scheduled_rev?: number | null
           slug?: string | null
+          source_language?: string
           template_for?: string | null
           template_sort?: string | null
           title?: never
+          untranslated?: string
         }
         Update: {
           access_chosen?: boolean
@@ -290,9 +404,11 @@ export type Database = {
           scheduled_by?: string | null
           scheduled_rev?: number | null
           slug?: string | null
+          source_language?: string
           template_for?: string | null
           template_sort?: string | null
           title?: never
+          untranslated?: string
         }
         Relationships: [
           {
@@ -336,6 +452,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contents_source_language_fkey"
+            columns: ["source_language"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["code"]
           },
         ]
       }
@@ -616,6 +739,52 @@ export type Database = {
           },
         ]
       }
+      translation_locks: {
+        Row: {
+          content_id: string
+          draft_rev: number
+          heartbeat_at: string
+          holder_id: string | null
+          holder_session: string | null
+          language: string
+          taken_at: string | null
+        }
+        ComputedFields: never
+        Insert: {
+          content_id: string
+          draft_rev?: number
+          heartbeat_at?: string
+          holder_id?: string | null
+          holder_session?: string | null
+          language: string
+          taken_at?: string | null
+        }
+        Update: {
+          content_id?: string
+          draft_rev?: number
+          heartbeat_at?: string
+          holder_id?: string | null
+          holder_session?: string | null
+          language?: string
+          taken_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "translation_locks_content_id_language_fkey"
+            columns: ["content_id", "language"]
+            isOneToOne: true
+            referencedRelation: "content_translations"
+            referencedColumns: ["content_id", "language"]
+          },
+          {
+            foreignKeyName: "translation_locks_holder_id_fkey"
+            columns: ["holder_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       versions: {
         Row: {
           access_level_id: string | null
@@ -627,6 +796,7 @@ export type Database = {
           draft_rev: number
           files: NonNullable<Json>
           id: string
+          language: string | null
           media_ids: string[]
           number: number
           origin: string
@@ -634,6 +804,7 @@ export type Database = {
           published_by: string | null
           published_by_name: string | null
           slug: string | null
+          source_rev: number | null
           template_ids: string[]
         }
         ComputedFields: never
@@ -647,6 +818,7 @@ export type Database = {
           draft_rev: number
           files?: NonNullable<Json>
           id?: string
+          language?: string | null
           media_ids?: string[]
           number: number
           origin: string
@@ -654,6 +826,7 @@ export type Database = {
           published_by?: string | null
           published_by_name?: string | null
           slug?: string | null
+          source_rev?: number | null
           template_ids?: string[]
         }
         Update: {
@@ -666,6 +839,7 @@ export type Database = {
           draft_rev?: number
           files?: NonNullable<Json>
           id?: string
+          language?: string | null
           media_ids?: string[]
           number?: number
           origin?: string
@@ -673,6 +847,7 @@ export type Database = {
           published_by?: string | null
           published_by_name?: string | null
           slug?: string | null
+          source_rev?: number | null
           template_ids?: string[]
         }
         Relationships: [
@@ -767,11 +942,15 @@ export type Database = {
           name: string
         }[]
       }
-      app_content: { Args: { content_id: string }; Returns: Json }
+      app_content: {
+        Args: { content_id: string; language?: string }
+        Returns: Json
+      }
       app_feed: {
         Args: {
           before?: string
           category_id?: string
+          language?: string
           lim?: number
           section: string
         }
@@ -791,7 +970,7 @@ export type Database = {
           is_default: boolean
         }[]
       }
-      app_page: { Args: { slug: string }; Returns: Json }
+      app_page: { Args: { language?: string; slug: string }; Returns: Json }
       categories_reorder: {
         Args: { ids: string[]; section: string }
         Returns: {
@@ -839,9 +1018,11 @@ export type Database = {
           scheduled_by: string | null
           scheduled_rev: number | null
           slug: string | null
+          source_language: string
           template_for: string | null
           template_sort: string | null
           title: string | null
+          untranslated: string
         }
         SetofOptions: {
           from: "*"
@@ -1032,6 +1213,7 @@ export type Database = {
         Returns: {
           content_id: string
           kind: string
+          language: string
           published_at: string
           title: string
           version_id: string
@@ -1220,9 +1402,11 @@ export type Database = {
           scheduled_by: string | null
           scheduled_rev: number | null
           slug: string | null
+          source_language: string
           template_for: string | null
           template_sort: string | null
           title: string | null
+          untranslated: string
         }
         SetofOptions: {
           from: "*"
@@ -1243,6 +1427,7 @@ export type Database = {
         Returns: {
           content_id: string
           kind: string
+          language: string
           published_at: string
           title: string
           version_id: string
@@ -1256,6 +1441,128 @@ export type Database = {
           version_id: string
           version_number: number
         }[]
+      }
+      translation_create: {
+        Args: { content_id: string; editor_session?: string; language: string }
+        Returns: {
+          audio: Json | null
+          audio_media_id: string | null
+          content_id: string
+          created_at: string
+          created_by: string | null
+          draft_rev: number
+          draft_saved_at: string
+          draft_saved_by: string | null
+          first_published_at: string | null
+          language: string
+          live_version_id: string | null
+          machine_blocks: string[]
+          schedule_error: string | null
+          scheduled_at: string | null
+          scheduled_by: string | null
+          scheduled_rev: number | null
+          source_marks: NonNullable<Json>
+          texts: NonNullable<Json>
+          title: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "content_translations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      translation_delete: {
+        Args: { content_id: string; language: string }
+        Returns: {
+          needs_file_sync: boolean
+        }[]
+      }
+      translation_lock_heartbeat: {
+        Args: { content_id: string; editor_session?: string; language: string }
+        Returns: boolean
+      }
+      translation_lock_release: {
+        Args: { content_id: string; editor_session?: string; language: string }
+        Returns: boolean
+      }
+      translation_lock_status: {
+        Args: { content_id: string; editor_session?: string; language: string }
+        Returns: {
+          draft_rev: number
+          heartbeat_at: string
+          holder_id: string
+          holder_name: string
+          is_active: boolean
+          mine: boolean
+          taken_at: string
+        }[]
+      }
+      translation_lock_take: {
+        Args: {
+          content_id: string
+          editor_session?: string
+          force?: boolean
+          language: string
+        }
+        Returns: {
+          draft_rev: number
+          heartbeat_at: string
+          holder_id: string
+          holder_name: string
+          is_active: boolean
+          mine: boolean
+          taken_at: string
+        }[]
+      }
+      translation_publish: {
+        Args: { content_id: string; expected_rev: number; language: string }
+        Returns: {
+          needs_file_sync: boolean
+          published_at: string
+          version_id: string
+          version_number: number
+        }[]
+      }
+      translation_save: {
+        Args: {
+          audio?: Json
+          base_rev: number
+          content_id: string
+          editor_session?: string
+          language: string
+          machine?: string[]
+          reviewed?: string[]
+          texts: Json
+          title: string
+        }
+        Returns: {
+          draft_rev: number
+          draft_saved_at: string
+        }[]
+      }
+      translation_schedule: {
+        Args: { at: string; content_id: string; language: string }
+        Returns: string
+      }
+      translation_state: {
+        Args: { content_id: string }
+        Returns: {
+          language: string
+          machine: string[]
+          missing: string[]
+          modified: boolean
+          ready: boolean
+          review: string[]
+        }[]
+      }
+      translation_unpublish: {
+        Args: { content_id: string; language: string }
+        Returns: boolean
+      }
+      translation_unschedule: {
+        Args: { content_id: string; language: string }
+        Returns: boolean
       }
       trash: {
         Args: { content_id: string }

@@ -159,13 +159,15 @@ end;
 $$;
 
 -- Part des langues de départ, le français seul et par défaut (la base de développement peut en
--- contenir d'autres, ajoutées depuis l'admin locale) ; les termes partent avec elles. Tout est
--- annulé par le rollback de fin de fichier. À appeler en postgres.
+-- contenir d'autres, ajoutées depuis l'admin locale) ; les termes partent avec elles, et les
+-- contenus aussi (une langue utilisée par un contenu ne se retire pas : pg_temp.empty_contents).
+-- Tout est annulé par le rollback de fin de fichier. À appeler en postgres.
 create function pg_temp.reset_languages()
 returns void
 language plpgsql
 as $$
 begin
+  perform pg_temp.empty_contents();
   update public.languages set is_default = false;
   delete from public.languages;
   insert into public.languages (code, is_default) values ('fr', true);

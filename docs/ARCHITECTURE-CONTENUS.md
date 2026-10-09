@@ -611,6 +611,8 @@ Des RPC `security definer`, `stable`, exécutables par `anon` et `authenticated`
 
 ---
 
+**Depuis les traductions (09/10/2026, ADMIN § 7 bis)**, les trois lectures prennent la langue du lecteur : `app_feed(section, category_id, before, lim, language)`, `app_content(content_id, language)`, `app_page(slug, language)` (`language` facultatif : une langue active de l'installation, sinon la langue par défaut). Chaque contenu répond dans cette langue s'il y est en ligne ; sinon, selon son réglage `untranslated`, dans la langue par défaut (puis sa langue d'origine) ou pas du tout. Chaque réponse porte `language`, la langue servie.
+
 ## 6. Plan de construction par étape (3 à 7) : migrations, écrans, tests
 
 > **En bref** : chaque étape livre quelque chose d'utilisable et testé. Les fondations qui serviront à tout (tiroirs de fichiers, fonction serveur, tâches planifiées, corbeille, tests automatiques sur GitHub) sont posées dès l'étape 3, pour ne rien refaire ensuite.
