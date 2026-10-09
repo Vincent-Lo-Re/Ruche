@@ -1,5 +1,6 @@
 import {
   CreditCard,
+  Languages,
   PanelsTopLeft,
   Smartphone,
   Wrench,
@@ -11,6 +12,7 @@ import { PageHeader } from "@/components/page-header"
 import { AccessLevelsCard } from "@/components/settings/access-levels-card"
 import { AdminIdentityCard } from "@/components/settings/admin-identity-card"
 import { AdminFormatCard } from "@/components/settings/admin-format-card"
+import { AppLanguagesCard } from "@/components/settings/app-languages-card"
 import { AdminLanguageCard } from "@/components/settings/admin-language-card"
 import { AdminTimeZoneCard } from "@/components/settings/admin-time-zone-card"
 import { BrandLogosCard } from "@/components/settings/brand-logos-card"
@@ -33,12 +35,13 @@ const tabIcons: Record<SettingsTab, LucideIcon> = {
   admin: PanelsTopLeft,
   app: Smartphone,
   plans: CreditCard,
+  languages: Languages,
   advanced: Wrench,
 }
 
 /**
- * Paramètres (admins seulement, ADMIN § 7) : quatre onglets, l'identité de l'admin, l'identité de
- * l'app, les formules d'abonnement et les réglages avancés. L'onglet ouvert est dans l'adresse
+ * Paramètres (admins seulement, ADMIN § 7) : cinq onglets, l'identité de l'admin, l'identité de
+ * l'app, les formules d'abonnement, les langues de l'app et les réglages avancés. L'onglet ouvert est dans l'adresse
  * (« ?tab=plans »). Sont remplis : le nom de la marque, le logotype et le monogramme (Identité de l'admin), les
  * formules et la langue de l'admin (Avancé).
  */
@@ -96,6 +99,8 @@ export function SettingsPage() {
               </div>
             ) : value === "plans" ? (
               <AccessLevelsCard />
+            ) : value === "languages" ? (
+              <AppLanguagesCard />
             ) : value === "advanced" ? (
               <div className="@container space-y-8 pt-4">
                 <SettingsSection
