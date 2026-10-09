@@ -69,7 +69,15 @@ create function pg_temp.save(content_name text, draft jsonb, settings jsonb defa
 returns integer
 language sql
 as $$
-  select (public.save_draft(pg_temp.cid(content_name), pg_temp.rev(content_name), draft, settings)).draft_rev
+  select (public.save_draft(
+    pg_temp.cid(content_name),
+    pg_temp.rev(content_name),
+    case when draft ->> 'title' = 'Titre'
+      then jsonb_set(draft, '{title}', to_jsonb('Titre ' || content_name))
+      else draft
+    end,
+    settings
+  )).draft_rev
 $$;
 
 -- Un brouillon avec ces blocs.
