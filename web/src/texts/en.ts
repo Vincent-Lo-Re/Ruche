@@ -2483,15 +2483,16 @@ export const en = {
         title: "Section names",
         description: [
           "Rename the Blog and Podcasts in each admin language, for the whole team*. The page reloads after saving.",
-          "* In French, write three forms by hand: the name alone (menu, page titles), with “le”, and with “du”, so every sentence reads right. Leave them empty to keep the original name.",
+          "* In French, write three forms by hand: the name alone (menu, page titles), with its article (le Fil, la Gazette, l'Agenda, les Épisodes), and with “de” (du Fil, de la Gazette, de l'Agenda, des Épisodes), so every sentence reads right. Leave them empty to keep the original name.",
         ],
         // Les noms d'origine, en tête de chaque bloc.
         sections: { blog: "Blog", podcasts: "Podcasts" },
         french: "French",
         english: "English",
         name: "Name",
-        le: "With “le”",
-        du: "With “du”",
+        // La forme avec l'article qui va au nom, puis avec « de » (du, de la, de l', des).
+        le: "With its article (le, la, l', les)",
+        du: "With “de” (du, de la, de l', des)",
         // Sous chaque champ, un exemple qui suit ce qui est écrit, dans la langue du nom (pas dans
         // celle de l'admin) : en français, une phrase de l'admin pour chaque forme.
         exampleName: (name: string) => `Example: “${name} (article)”`,

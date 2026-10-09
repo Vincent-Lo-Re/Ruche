@@ -2527,14 +2527,14 @@ export const fr: Texts = {
         title: "Noms des sections",
         description: [
           "Renomme le Blog et les Podcasts dans chaque langue de l'admin, pour toute l'équipe*. La page se recharge après l'enregistrement.",
-          "* En français, écris trois formes à la main : le nom seul (menu, titres des pages), avec « le » et avec « du », pour que chaque phrase reste juste. Vides : le nom d'origine.",
+          "* En français, écris trois formes à la main : le nom seul (menu, titres des pages), avec son article (le Fil, la Gazette, l'Agenda, les Épisodes) et avec « de » (du Fil, de la Gazette, de l'Agenda, des Épisodes), pour que chaque phrase reste juste. Vides : le nom d'origine.",
         ],
         sections: { blog: "Blog", podcasts: "Podcasts" },
         french: "Français",
         english: "Anglais",
         name: "Nom",
-        le: "Avec « le »",
-        du: "Avec « du »",
+        le: "Avec son article (le, la, l', les)",
+        du: "Avec « de » (du, de la, de l', des)",
         exampleName: (name: string) => `Exemple : « ${name} (article) »`,
         exampleLe: (le: string) =>
           `Exemple : « Dans ${le}, un contenu neuf arrive en tête de liste »`,
