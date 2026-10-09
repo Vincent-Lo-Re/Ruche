@@ -236,8 +236,10 @@ export const en = {
   account: {
     profile: {
       title: "Profile",
-      description:
-        "Your name is how your team knows you. Your sign-in codes are sent to your email address.",
+      description: [
+        "Your name is how your team knows you, in the team list and the version history.",
+        "Your sign-in codes are sent to your email address. A new address is confirmed with a code before it replaces the old one.",
+      ],
       name: "Name",
       namePlaceholder: "First and last name",
       nameTooLong: "The name can't be longer than 100 characters.",

@@ -240,8 +240,10 @@ export const fr: Texts = {
   account: {
     profile: {
       title: "Profil",
-      description:
-        "Ton nom permet à l'équipe de te reconnaître. Tes codes de connexion arrivent sur ton adresse e-mail.",
+      description: [
+        "Ton nom permet à l'équipe de te reconnaître, dans la liste de l'équipe et dans l'historique.",
+        "Tes codes de connexion arrivent sur ton adresse e-mail. Une nouvelle adresse se confirme par un code avant de remplacer l'ancienne.",
+      ],
       name: "Nom",
       namePlaceholder: "Prénom Nom",
       nameTooLong: "Le nom ne doit pas dépasser 100 caractères.",
