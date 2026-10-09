@@ -125,10 +125,11 @@ export const prepareMedia: Prepare = async ({ queryClient, search }) => {
 export const prepareTrash: Prepare = ({ queryClient }) =>
   ready(queryClient, trashRead())
 
-// Équipe et Paramètres : réservés aux admins (les autres voient « réservé aux admins »).
-export const prepareTeam: Prepare = async ({ queryClient, member }) => {
-  if (member.role === "admin") await ready(queryClient, teamRead())
-}
+// La team : lue par toute l'équipe (un éditeur la voit en lecture seule, 09/10/2026).
+export const prepareTeam: Prepare = ({ queryClient }) =>
+  ready(queryClient, teamRead())
+
+// Paramètres : réservés aux admins (les autres voient « réservé aux admins »).
 
 export const prepareSettings: Prepare = async ({ queryClient, member }) => {
   if (member.role !== "admin") return

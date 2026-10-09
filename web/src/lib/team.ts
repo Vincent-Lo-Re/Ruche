@@ -76,7 +76,9 @@ export async function toTeamError(error: unknown): Promise<TeamError> {
 export function isAccessLost(error: unknown): boolean {
   return (
     error instanceof TeamError &&
-    (error.code === "reserve_aux_admins" || error.code === "non_connecte")
+    (error.code === "reserve_a_l_equipe" ||
+      error.code === "reserve_aux_admins" ||
+      error.code === "non_connecte")
   )
 }
 

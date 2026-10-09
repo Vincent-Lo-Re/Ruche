@@ -130,8 +130,8 @@ export const fr: Texts = {
         "Ce qui a été mis à la corbeille, restaurable pendant 30 jours.",
     },
     team: {
-      title: "Équipe",
-      description: "Les membres de l'équipe et leurs rôles.",
+      title: "La team",
+      description: "Les membres de la team et leurs rôles.",
     },
     settings: {
       title: "Paramètres",
@@ -375,6 +375,7 @@ export const fr: Texts = {
     // Erreurs renvoyées par la fonction serveur « equipe », selon leur code.
     errors: {
       non_connecte: "Tu as été déconnecté. Reconnecte-toi pour continuer.",
+      reserve_a_l_equipe: "Cette action est réservée à l'équipe.",
       reserve_aux_admins: "Cette action est réservée aux admins.",
       soi_meme:
         "Tu ne peux pas faire ça sur ton propre compte. Demande à un autre admin.",

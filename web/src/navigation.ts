@@ -45,7 +45,7 @@ export const authPaths = {
 } as const
 
 // Sections réservées aux admins : cachées dans le menu d'un éditeur.
-export const adminOnlySections: readonly SectionKey[] = ["team", "settings"]
+export const adminOnlySections: readonly SectionKey[] = ["settings"]
 
 // Rangement du menu de gauche : l'accueil, puis les groupes. Le compte, l'équipe et les
 // paramètres sont dans le header (`header`).

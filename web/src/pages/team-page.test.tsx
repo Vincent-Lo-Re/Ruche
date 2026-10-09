@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 import { profileQueryKey } from "@/auth/auth-context"
 import { teamQueryKey, type Member } from "@/lib/team"
 import { supabase } from "@/lib/supabase"
-import { renderApp, testProfile } from "@/test/render"
+import { fakeAuth, renderApp, testProfile } from "@/test/render"
 import { texts } from "@/texts"
 
 afterEach(() => vi.restoreAllMocks())
@@ -76,7 +76,7 @@ function mockTeam(...responses: InvokeResult[]) {
   return invoke
 }
 
-describe("Équipe", () => {
+describe("La team", () => {
   it("liste les membres avec leur état", async () => {
     mockTeam()
     await renderApp("/team")
@@ -121,6 +121,17 @@ describe("Équipe", () => {
     ).toBeVisible()
     const anne = screen.getByText(me.email).closest("tr")!
     expect(within(anne).queryByRole("button")).toBeNull()
+  })
+
+  it("un éditeur voit la team en lecture seule : ni invitation, ni renvoi, ni actions", async () => {
+    mockTeam()
+    await renderApp("/team", fakeAuth({ role: "editor" }))
+
+    const nina = (await screen.findByText(invited.email)).closest("tr")!
+    expect(within(nina).getByText(texts.team.status.expired)).toBeVisible()
+    expect(within(nina).queryByRole("button")).toBeNull()
+    expect(screen.queryByRole("button", { name: texts.team.invite })).toBeNull()
+    expect(screen.queryByText(texts.team.singleAdmin)).toBeNull()
   })
 
   it("conseille un deuxième admin quand il n'y en a qu'un", async () => {

@@ -79,10 +79,14 @@ const successMessages: Record<
   remove: texts.team.done.removed,
 }
 
-/** Équipe (réservée aux admins) : membres, invitations, rôles et double vérification. */
+/**
+ * La team : membres, invitations, rôles et double vérification. Un admin y fait tout ; un éditeur
+ * la voit en lecture seule, sans invitation, renvoi ni menu d'actions (09/10/2026).
+ */
 export function TeamPage() {
   const { title, description } = texts.sections.team
   const { profile } = useAuth()
+  const isAdmin = profile?.role === "admin"
   const queryClient = useQueryClient()
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null)
 
@@ -112,7 +116,7 @@ export function TeamPage() {
         icon={sections.team.icon}
         title={title}
         description={description}
-        actions={<InviteDialog />}
+        actions={isAdmin ? <InviteDialog /> : undefined}
       />
 
       {members.data === undefined ? (
@@ -137,7 +141,7 @@ export function TeamPage() {
               </AlertDescription>
             </Alert>
           )}
-          {countActiveAdmins(members.data) < 2 && (
+          {isAdmin && countActiveAdmins(members.data) < 2 && (
             <Alert role="status">
               <ShieldAlert />
               <AlertDescription>{texts.team.singleAdmin}</AlertDescription>
@@ -152,9 +156,11 @@ export function TeamPage() {
                   <TableHead>{texts.team.columns.status}</TableHead>
                   <TableHead>{texts.team.columns.lastSignIn}</TableHead>
                   <TableHead>{texts.team.columns.mfa}</TableHead>
-                  <TableHead className="w-12">
-                    <span className="sr-only">{texts.common.actions}</span>
-                  </TableHead>
+                  {isAdmin && (
+                    <TableHead className="w-12">
+                      <span className="sr-only">{texts.common.actions}</span>
+                    </TableHead>
+                  )}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -200,8 +206,8 @@ export function TeamPage() {
                           >
                             {texts.team.status[state]}
                           </Badge>
-                          {/* Lien expiré : on met le renvoi en avant. */}
-                          {expired && (
+                          {/* Lien expiré : on met le renvoi en avant (admins). */}
+                          {isAdmin && expired && (
                             <Button
                               variant="link"
                               size="sm"
@@ -229,19 +235,21 @@ export function TeamPage() {
                           ? texts.team.mfaOn
                           : texts.team.mfaOff}
                       </TableCell>
-                      <TableCell>
-                        {/* Sur son propre compte : aucune action (un autre admin s'en charge). */}
-                        {!isMe && (
-                          <MemberActions
-                            member={member}
-                            disabled={action.isPending}
-                            onAction={(request) => action.mutate(request)}
-                            onConfirm={(kind) =>
-                              setConfirmation({ action: kind, member })
-                            }
-                          />
-                        )}
-                      </TableCell>
+                      {isAdmin && (
+                        <TableCell>
+                          {/* Sur son propre compte : aucune action (un autre admin s'en charge). */}
+                          {!isMe && (
+                            <MemberActions
+                              member={member}
+                              disabled={action.isPending}
+                              onAction={(request) => action.mutate(request)}
+                              onConfirm={(kind) =>
+                                setConfirmation({ action: kind, member })
+                              }
+                            />
+                          )}
+                        </TableCell>
+                      )}
                     </TableRow>
                   )
                 })}

@@ -28,7 +28,7 @@ import {
 } from "./support/fixtures.ts"
 import { accessToken, callTeamFunction } from "./support/team-api.ts"
 
-test("un admin invite un éditeur, qui rejoint l'équipe sans voir Équipe", async ({
+test("un admin invite un éditeur, qui rejoint l'équipe et voit La team en lecture seule", async ({
   page,
   browser,
   team,
@@ -70,7 +70,7 @@ test("un admin invite un éditeur, qui rejoint l'équipe sans voir Équipe", asy
     .click()
   await verifySecondFactor(editorPage, editor)
 
-  // L'éditeur arrive sur l'accueil, sans Équipe ni Paramètres dans le menu.
+  // L'éditeur arrive sur l'accueil : La team dans le header, sans Paramètres.
   await expect(editorPage).toHaveURL(/\/$/)
   await expect(
     editorPage.getByRole("heading", { name: texts.sections.home.title })
@@ -78,14 +78,24 @@ test("un admin invite un éditeur, qui rejoint l'équipe sans voir Équipe", asy
   const editorMenu = headerMenu(editorPage)
   await expect(accountMenuButton(editorPage)).toBeVisible()
   await expect(
-    editorMenu.getByRole("link", { name: texts.sections.team.title })
-  ).toHaveCount(0)
-  await expect(
     editorMenu.getByRole("link", { name: texts.sections.settings.title })
   ).toHaveCount(0)
 
-  // Et s'il tape l'adresse : « Réservé aux admins ».
-  await editorPage.goto("/team")
+  // La team, en lecture seule : la liste, sans invitation ni actions.
+  await editorMenu
+    .getByRole("link", { name: texts.sections.team.title })
+    .click()
+  await expect(editorPage).toHaveURL(/\/team$/)
+  await expect(editorPage.getByText(editor.email)).toBeVisible()
+  await expect(
+    editorPage.getByRole("button", { name: texts.team.invite })
+  ).toHaveCount(0)
+  await expect(
+    editorPage.getByRole("main").getByRole("table").getByRole("button")
+  ).toHaveCount(0)
+
+  // Les Paramètres, s'il tape l'adresse : « Réservé aux admins ».
+  await editorPage.goto("/settings")
   await expect(
     editorPage.getByRole("heading", { name: texts.adminOnly.title })
   ).toBeVisible()

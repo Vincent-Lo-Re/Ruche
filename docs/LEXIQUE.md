@@ -28,7 +28,7 @@
 | Modèles de bloc | Block templates | Section des modèles réutilisables. | Modèles de blocs, Modèles (seul, dans un titre), gabarits / Patterns, Templates (seul) |
 | Médiathèque | Media library | Section de tous les fichiers envoyés. | Médias, bibliothèque / Media (seul), Assets, Files |
 | Corbeille | Trash | Ce qu'on supprime y reste 30 jours avant l'effacement. | Poubelle / Bin, Recycle bin |
-| Équipe | Team | Les membres et leurs rôles (admins seulement). | Utilisateurs / Users |
+| La team | Team | Les membres et leurs rôles (admins seulement). Le nom de la section depuis le 09/10/2026 (avant, « Équipe ») ; « l'équipe » reste dans les phrases. | Utilisateurs / Users |
 | Paramètres | Settings | Les réglages de toute l'admin (admins seulement). | Configuration / Preferences |
 | Mon compte | My account | Profil, double vérification et thème de chaque membre. | Profil (seul) / Profile (seul) |
 | Contenus (groupe du menu) | Content | Blog, Podcasts, Pages. | — / Contents |
@@ -44,8 +44,8 @@
 |---|---|---|---|
 | membre | member | Une personne de l'équipe qui a accès à l'admin. | utilisateur, collaborateur / user |
 | rôle | role | Ce qu'un membre peut faire : Admin ou Éditeur. | droits, profil / permissions |
-| Admin (rôle) | Admin | Peut tout faire, Équipe et Paramètres compris. | administrateur / Administrator, Owner |
-| Éditeur (rôle) | Editor | Écrit, publie et range, sans Équipe ni Paramètres. | rédacteur, auteur / Author, Contributor |
+| Admin (rôle) | Admin | Peut tout faire, La team et Paramètres compris. | administrateur / Administrator, Owner |
+| Éditeur (rôle) | Editor | Écrit, publie et range, sans La team ni Paramètres. | rédacteur, auteur / Author, Contributor |
 | inviter, invitation | invite, invitation | Un admin ajoute une personne par un e-mail avec un lien valable 10 minutes. | inscription / sign up |
 | renvoyer l'invitation | resend invitation | Envoyer un nouveau lien. | relancer / reinvite |
 | retirer de l'équipe | remove from team | Supprimer l'accès et le compte d'un membre. | supprimer le membre / delete user |

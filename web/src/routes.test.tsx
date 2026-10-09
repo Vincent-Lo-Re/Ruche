@@ -44,7 +44,7 @@ describe("menu", () => {
       within(header)
         .getAllByRole("link")
         .map((link) => link.textContent)
-    ).toEqual(["Mon compte", "Équipe", "Paramètres"])
+    ).toEqual(["Mon compte", "La team", "Paramètres"])
   })
 
   it("mène aux adresses en français", async () => {
@@ -134,29 +134,25 @@ describe("déconnexion", () => {
 })
 
 describe("rôles", () => {
-  it("cache Équipe et Paramètres dans le menu d'un éditeur", async () => {
+  it("cache Paramètres dans le header d'un éditeur, qui garde Mon compte et La team", async () => {
     await renderApp("/", fakeAuth({ role: "editor" }))
 
-    // Le header garde Mon compte.
     const header = screen.getByRole("navigation", { name: texts.header.label })
     expect(
       within(header)
         .getAllByRole("link")
         .map((link) => link.textContent)
-    ).toEqual(["Mon compte"])
-    expect(screen.queryByRole("link", { name: "Équipe" })).toBeNull()
+    ).toEqual(["Mon compte", "La team"])
+    expect(screen.queryByRole("link", { name: "Paramètres" })).toBeNull()
   })
 
-  it.each(["/team", "/settings"])(
-    "affiche « Réservé aux admins » à un éditeur sur %s",
-    async (path) => {
-      await renderApp(path, fakeAuth({ role: "editor" }))
+  it("affiche « Réservé aux admins » à un éditeur sur /settings", async () => {
+    await renderApp("/settings", fakeAuth({ role: "editor" }))
 
-      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-        texts.adminOnly.title
-      )
-    }
-  )
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      texts.adminOnly.title
+    )
+  })
 
   it("ouvre les Paramètres à un admin", async () => {
     await renderApp("/settings")
