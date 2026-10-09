@@ -2,6 +2,13 @@
 
 import type { Texts } from "./en.ts"
 
+import { du, frenchTerm } from "./grammar/fr.ts"
+
+// Le nom des sections dans l'admin (Paramètres › Avancé, « Termes ») : « Blog » et « Podcasts » au
+// départ ; les accords (« du Blog », « des Podcasts ») suivent ses traits (texts/grammar/fr.ts).
+const blog = frenchTerm("blog")
+const podcasts = frenchTerm("podcasts")
+
 export const fr: Texts = {
   app: {
     // Le nom par défaut de l'admin ; un admin le remplace par celui de la marque (Paramètres).
@@ -103,11 +110,11 @@ export const fr: Texts = {
       description: "Bienvenue",
     },
     blog: {
-      title: "Blog",
+      title: blog.name,
       description: "Les articles et leurs catégories.",
     },
     podcasts: {
-      title: "Podcasts",
+      title: podcasts.name,
       description: "Les épisodes et leurs catégories.",
     },
     pages: {
@@ -777,8 +784,8 @@ export const fr: Texts = {
       all: "Tout",
       file: "Médiathèque",
       page: "Pages",
-      article: "Blog",
-      episode: "Podcasts",
+      article: blog.name,
+      episode: podcasts.name,
       template: "Modèles de bloc",
     },
     itemTypes: {
@@ -1299,8 +1306,8 @@ export const fr: Texts = {
     },
     // La section d'un point de départ ([D42]) : la sorte de contenu qu'il sert à créer.
     sections: {
-      article: "Blog (article)",
-      episode: "Podcasts (épisode)",
+      article: `${blog.name} (article)`,
+      episode: `${podcasts.name} (épisode)`,
       page: "Pages",
     },
     list: {
@@ -1842,8 +1849,8 @@ export const fr: Texts = {
       },
       feed: {
         title: {
-          article: "Dans la liste du Blog",
-          episode: "Dans la liste des Podcasts",
+          article: `Dans la liste ${du(blog)}`,
+          episode: `Dans la liste ${du(podcasts)}`,
         },
         choose: "Choisir",
         chooseLabel: "Choisir l'image de présentation",
@@ -2501,6 +2508,28 @@ export const fr: Texts = {
         sameAsLanguage: "Selon la langue de chacun",
         saved: "Format régional enregistré.",
       },
+      // Les termes de l'admin : les mots de l'équipe pour nommer les sections (ADMIN § 7 bis).
+      terms: {
+        title: "Termes",
+        description:
+          "Les mots de ton équipe pour nommer les sections dans l'admin, en anglais et en français. Dans l'app, le nom d'une section se traduit avec le contenu. Les adresses comme /blog ne changent pas. Un nom laissé vide garde celui par défaut.",
+        languages: "Langues de l'admin",
+        sections: {
+          blog: "Section des articles",
+          podcasts: "Section des épisodes",
+        },
+        name: "Nom",
+        gender: "Genre",
+        genders: { masculine: "Masculin", feminine: "Féminin" },
+        number: "Nombre",
+        singular: "Singulier",
+        plural: "Pluriel",
+        // L'article s'élide : « l'Agenda ».
+        elided: "Élision (l')",
+        preview: (sample: string) => `Aperçu : ${sample}`,
+        saved: "Termes enregistrés.",
+        loadFailed: "Les termes n'ont pas pu être chargés.",
+      },
       timeZone: {
         title: "Fuseau horaire",
         description:
@@ -2658,7 +2687,13 @@ export const fr: Texts = {
       title: "Aperçu",
       description:
         "La palette choisie s'applique à toute l'admin, pour toi seulement.",
-      nav: ["Tableau de bord", "Blog", "Podcasts", "Pages", "Médiathèque"],
+      nav: [
+        "Tableau de bord",
+        blog.name,
+        podcasts.name,
+        "Pages",
+        "Médiathèque",
+      ],
       initial: "C",
       member: "Camille",
       heading: "Tableau de bord",
@@ -2673,17 +2708,17 @@ export const fr: Texts = {
       rows: [
         {
           name: "Respirer avant de répondre",
-          meta: "Blog · par Léa, il y a 2 h",
+          meta: `${blog.name} · par Léa, il y a 2 h`,
           badge: "En ligne",
         },
         {
           name: "Le calme du matin",
-          meta: "Podcasts · par Hugo, hier",
+          meta: `${podcasts.name} · par Hugo, hier`,
           badge: "Programmé",
         },
         {
           name: "Trouver son rythme",
-          meta: "Blog · par Camille, lundi",
+          meta: `${blog.name} · par Camille, lundi`,
           badge: "Brouillon",
         },
       ],
