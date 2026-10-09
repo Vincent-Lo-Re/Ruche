@@ -13,7 +13,7 @@ import {
   PencilLine,
   RefreshCw,
   Ruler,
-  Trash2,
+  Eraser,
   TriangleAlert,
 } from "lucide-react"
 import {
@@ -744,7 +744,7 @@ function TrashBar({
           disabled={trash.isPending}
           onClick={() => trash.mutate()}
         >
-          {trash.isPending ? <Spinner /> : <Trash2 />}
+          {trash.isPending ? <Spinner /> : <Eraser />}
           {texts.media.detail.trash}
         </Button>
       </div>

@@ -57,7 +57,7 @@ describe("pages de connexion (modèle login-04)", () => {
     expect(animatedMonogram()).toBeNull()
   })
 
-  it("sans image, met celle de Ruche, sous le voile et le monogramme", async () => {
+  it("sans image, le fond sombre seul et les initiales (aucune image de Ruche)", async () => {
     vi.mocked(identityApi.getAdminBrand).mockResolvedValue(brand(null))
     await renderApp("/sign-in", fakeAuth("signed-out"))
 
@@ -67,10 +67,7 @@ describe("pages de connexion (modèle login-04)", () => {
     )
     expect(screen.getByText("R")).toBeInTheDocument()
     expect(animatedMonogram()).toBeNull()
-    expect(document.querySelector('img[alt=""]')).toHaveAttribute(
-      "src",
-      expect.stringContaining("connexion.webp")
-    )
+    expect(document.querySelector('img[alt=""]')).toBeNull()
     // Sous la carte, le © de l'année en cours.
     expect(
       screen.getByText(

@@ -50,6 +50,21 @@ describe("les couleurs d'un logo SVG", () => {
     ).toEqual({ main: null, accent: "#2563eb" })
   })
 
+  it("ne compte pas les formes qui ne se dessinent pas (découpe, masque, définition)", () => {
+    // Un export courant : des découpes sans couleur, le dessin en #171717.
+    const markup = svg(
+      '<defs><clipPath id="c"><path d="M0 0h9v9z"/><rect width="9" height="9"/></clipPath></defs>' +
+        '<g clip-path="url(#c)"><rect width="9" height="9" fill="none"/></g>' +
+        '<path fill="#171717" d="M1 1h2v2z"/>'
+    )
+    const colors = analyzeSvgColors(markup)
+    expect(colors).toEqual({ main: "#171717", accent: null })
+    // Décliné pour le fond sombre, le dessin change bien de couleur.
+    expect(
+      recolorSvg(markup, colors!, { main: "#fafafa", accent: "#fafafa" })
+    ).toContain('fill="#fafafa" d="M1 1h2v2z"')
+  })
+
   it("n'est pas modifiable avec une image, un dégradé, trop de couleurs ou une couleur inconnue", () => {
     expect(analyzeSvgColors(svg('<image href="logo.png"/>'))).toBeNull()
     expect(

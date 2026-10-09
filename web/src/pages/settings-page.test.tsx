@@ -648,7 +648,20 @@ describe("Paramètres : formules d'abonnement", () => {
 describe("Paramètres : l'image de l'écran de connexion", () => {
   const files = texts.settings.adminIdentity.files
 
-  it("une photo choisie est réduite puis envoyée ; l'image enregistrée se retire", async () => {
+  it("sans image, le fond sombre seul sous le monogramme (les initiales)", async () => {
+    await renderApp("/settings")
+    const input = await screen.findByLabelText(files.loginScreen.title)
+    const zone = document.querySelector(`label[for="${input.id}"]`)!
+    expect(zone).toHaveTextContent(files.loginImage.choose)
+    const preview = await screen.findByRole("img", {
+      name: files.loginScreen.preview,
+    })
+    expect(preview.querySelector('img[alt=""]')).toBeNull()
+    expect(preview).toHaveTextContent("R")
+    expect(screen.queryByRole("button", { name: files.remove })).toBeNull()
+  })
+
+  it("un clic sur l'aperçu envoie la photo, réduite ; l'image enregistrée se retire", async () => {
     const image = {
       path: "connexion/00000000-0000-4000-8000-000000000006.webp",
       url: "https://exemple.test/marque/connexion/photo.webp",
@@ -672,9 +685,10 @@ describe("Paramètres : l'image de l'écran de connexion", () => {
         image.url
       )
     )
+    // Pas de bouton à côté : l'aperçu lui-même choisit l'image.
     expect(
-      within(card).getByText(files.loginImage.formats, { exact: false })
-    ).toBeVisible()
+      within(card).queryByRole("button", { name: files.replace })
+    ).toBeNull()
 
     const photo = new File(["x"], "photo.jpg", { type: "image/jpeg" })
     fireEvent.change(screen.getByLabelText(files.loginScreen.title), {
@@ -743,6 +757,27 @@ describe("Paramètres : le monogramme animé de l'écran de connexion", () => {
     ).not.toHaveAttribute("aria-disabled")
     expect(
       within(group).getAllByRole("button", { name: motion.blocked.svg })
+    ).toHaveLength(3)
+  })
+
+  it("sans monogramme, grise et décoche ce qui ne se joue pas sur les initiales", async () => {
+    vi.mocked(identityApi.getAdminBrand).mockResolvedValue({
+      ...brand(null),
+      monogramMotion: true,
+      monogramMotions: ["trace", "sway"],
+    })
+    await renderApp("/settings")
+    const group = await screen.findByRole("list", { name: motion.group })
+    const trace = within(group).getByRole("checkbox", {
+      name: motion.motions.trace,
+    })
+    expect(trace).toHaveAttribute("aria-disabled", "true")
+    expect(trace).not.toBeChecked()
+    expect(
+      within(group).getByRole("checkbox", { name: motion.motions.sway })
+    ).toBeChecked()
+    expect(
+      within(group).getAllByRole("button", { name: motion.blocked.text })
     ).toHaveLength(3)
   })
 

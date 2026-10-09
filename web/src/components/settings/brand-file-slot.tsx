@@ -140,6 +140,7 @@ export function BrandFileSlot({
         onChoose={(chosen) => void choose(chosen)}
         onRemove={() => file && remove.mutate(file.path)}
         // L'aperçu sur le fond auquel la version est destinée, pas sur celui du thème.
+        dark={surface === "dark"}
         frameClassName={
           surface === "light" ? "bg-brand-light" : "bg-brand-dark"
         }

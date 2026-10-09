@@ -1,4 +1,4 @@
-import { CopyCheck, CopyMinus, Trash2, TriangleAlert, X } from "lucide-react"
+import { CopyCheck, CopyMinus, Eraser, TriangleAlert, X } from "lucide-react"
 import type { Ref } from "react"
 
 import {
@@ -117,7 +117,7 @@ export function BulkTrashButton({
   if (count === 0) return null
   return (
     <Button variant="destructive" disabled={pending} onClick={onClick}>
-      {pending ? <Spinner /> : <Trash2 />}
+      {pending ? <Spinner /> : <Eraser />}
       {texts.selection.trash(count)}
     </Button>
   )

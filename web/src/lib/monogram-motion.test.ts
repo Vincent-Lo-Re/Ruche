@@ -5,6 +5,7 @@ import {
   MOTIONS,
   motionBlocker,
   motionLoop,
+  penTiming,
   prepareAnimatedSvg,
 } from "@/lib/monogram-motion"
 
@@ -12,7 +13,7 @@ const mark =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" width="10" height="10"><g fill="none" stroke="oklch(0.985 0 0)"><line x1="0" y1="0" x2="5" y2="5"/></g><line x1="5" y1="5" x2="9" y2="9" stroke="#f4cd48"/><path fill="oklch(0.985 0 0)" d="M1 1h2v2H1z"/></svg>'
 
 describe("le monogramme animé de la connexion", () => {
-  it("marque les contours à tracer, les formes pleines et l'accent", () => {
+  it("dessine comme à la main : contours, puis bord des formes pleines, et l'accent", () => {
     const svg = prepareAnimatedSvg(mark)
     expect(svg?.glint).toBe(true)
     const root = new DOMParser().parseFromString(
@@ -24,7 +25,31 @@ describe("le monogramme animé de la connexion", () => {
       (shape) =>
         `${shape.localName}:${shape.getAttribute("data-motion")}${shape.hasAttribute("data-accent") ? "*" : ""}`
     )
-    expect(motions).toEqual(["line:trace", "line:trace*", "path:reveal"])
+    expect(motions).toEqual([
+      "line:trace",
+      "line:trace*",
+      "path:fill",
+      "path:pen",
+    ])
+    // Le trait d'une forme pleine : sa copie sans remplissage, à sa couleur.
+    const pen = root.querySelector('[data-motion="pen"]')!
+    expect(pen.getAttribute("style")).toContain(
+      "fill:none;stroke:oklch(0.985 0 0)"
+    )
+    expect(pen.getAttribute("stroke-width")).toBe("0.2")
+    expect(root.querySelectorAll("[data-pen]")).toHaveLength(3)
+  })
+
+  it("partage les 2 secondes du tracé selon la longueur des traits", () => {
+    expect(penTiming([100, 300])).toEqual([
+      { delay: 0, ms: 500 },
+      { delay: 500, ms: 1500 },
+    ])
+    // Une longueur inconnue compte comme la moyenne ; toutes inconnues, parts égales.
+    expect(penTiming([100, 0, 100]).map((step) => step.ms)).toEqual([
+      667, 667, 667,
+    ])
+    expect(penTiming([0, 0]).map((step) => step.delay)).toEqual([0, 1000])
   })
 
   it("n'anime qu'en entier un fichier non compatible", () => {

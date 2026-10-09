@@ -5,7 +5,6 @@ import {
   GalleryHorizontalEnd,
   ListFilter,
   RotateCcw,
-  Trash2,
   TriangleAlert,
 } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -211,7 +210,7 @@ export function TrashPage() {
               disabled={items.length === 0 || busy}
               onClick={() => setConfirmation({ scope: "all", items })}
             >
-              <Trash2 />
+              <Eraser />
               {texts.trash.empty}
             </Button>
           </>
@@ -260,7 +259,7 @@ export function TrashPage() {
           )}
           {items.length === 0 ? (
             <ListEmpty
-              icon={Trash2}
+              icon={Eraser}
               title={texts.trash.emptyState.title}
               description={texts.trash.emptyState.description}
             />

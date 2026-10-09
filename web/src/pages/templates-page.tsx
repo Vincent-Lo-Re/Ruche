@@ -6,7 +6,7 @@ import {
   type LucideIcon,
   Plus,
   SquarePen,
-  Trash2,
+  Eraser,
   TriangleAlert,
   Unlink,
 } from "lucide-react"
@@ -436,7 +436,7 @@ function RowActions({
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onClick={onTrash}>
-          <Trash2 />
+          <Eraser />
           {labels.trash}
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -578,7 +578,7 @@ function TrashTemplateDialog({
               disabled={busy || blocking === null}
               onClick={() => trash.mutate()}
             >
-              {trash.isPending ? <Spinner /> : <Trash2 />}
+              {trash.isPending ? <Spinner /> : <Eraser />}
               {labels.confirmTrash.confirm}
             </Button>
           )}

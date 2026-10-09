@@ -1,6 +1,5 @@
 import { Outlet } from "react-router"
 
-import defaultLoginImage from "@/assets/brand/connexion.webp"
 import { AnimatedMonogram } from "@/components/auth/animated-monogram"
 import { BrandLogo } from "@/components/brand-logo"
 import { Card, CardContent } from "@/components/ui/card"
@@ -48,17 +47,22 @@ export function AuthLayout() {
 
 function AuthAside() {
   const brand = useBrand()
-  // Pas encore lue : la colonne vide, sans montrer l'image par défaut puis la vraie.
+  // Pas encore lue : la colonne vide, sans montrer le fond seul puis l'image.
   if (!brand) return <div className="hidden w-1/2 bg-muted md:block" />
   return (
-    // Sous la classe dark : le voile prend le fond du menu (la carte sombre de la palette).
+    // Sous la classe dark : le fond et le voile prennent celui du menu (la carte sombre de la
+    // palette). Sans image envoyée, ce fond seul : aucune image de Ruche (09/10/2026).
     <div className="dark relative hidden w-1/2 items-center justify-center bg-card md:flex">
-      <img
-        src={brand.loginImage?.url ?? defaultLoginImage}
-        alt=""
-        className="absolute inset-0 size-full object-cover"
-      />
-      <div aria-hidden className="absolute inset-0 bg-card/70" />
+      {brand.loginImage && (
+        <>
+          <img
+            src={brand.loginImage.url}
+            alt=""
+            className="absolute inset-0 size-full object-cover"
+          />
+          <div aria-hidden className="absolute inset-0 bg-card/70" />
+        </>
+      )}
       <div className="relative">
         <AnimatedMonogram
           motions={brand.monogramMotion ? brand.monogramMotions : []}

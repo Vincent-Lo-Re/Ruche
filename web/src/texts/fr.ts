@@ -2374,7 +2374,7 @@ export const fr: Texts = {
         // La section des logos : une carte, deux groupes de deux cases (fond clair, fond sombre).
         title: "Logos",
         description: [
-          "Envoie ton logotype* et ton monogramme** pour les fonds clairs et sombres (SVG, PNG ou WebP).",
+          "Envoie ton logotype* et ton monogramme** pour les fonds clairs et sombres (SVG, PNG ou WebP, 1 Mo au plus chacun).",
           "* Sans logotype, le nom de ta marque s'affiche en texte.",
           "** Sans monogramme, ce sont tes initiales.",
         ],
@@ -2411,8 +2411,6 @@ export const fr: Texts = {
           done: "Logo enregistré et décliné pour les palettes.",
           // Sous le message : un fichier envoyé sans être décliné, ou retiré, emporte les déclinaisons.
           removed: "Ses déclinaisons par palette ont été retirées.",
-          status: (count: number) =>
-            `Décliné pour ${count} palette${count > 1 ? "s" : ""}`,
           // L'autre fond, vide : sa version tirée de ce fichier, proposée.
           other: {
             light: "Créer aussi la version pour fond clair",
@@ -2450,7 +2448,7 @@ export const fr: Texts = {
           title: "Écran de connexion",
           description: [
             "Personnalise le premier écran que voit ton équipe : son image de fond* et l'animation du monogramme**.",
-            "* JPEG, PNG ou WebP, réduite et allégée automatiquement, montrée sur les grands écrans. Choisis-la, ou glisse-la sur l'aperçu.",
+            "* JPEG, PNG ou WebP, réduite et allégée automatiquement, montrée sur les grands écrans. Clique sur l'aperçu pour la choisir, ou glisse-la dessus.",
             "** Tant qu'aucun monogramme n'est envoyé, ce sont tes initiales qui s'animent.",
           ],
           preview: "Aperçu de l'écran de connexion",
@@ -2459,7 +2457,6 @@ export const fr: Texts = {
           title: "Image de fond",
           formats: "JPEG, PNG ou WebP",
           // Une photo plus lourde est réduite à l'envoi : elle tient toujours dans 1 Mo.
-          maxSize: "Réduite et allégée automatiquement",
           choose: "Choisir",
         },
         monogramMotion: {
@@ -2482,6 +2479,7 @@ export const fr: Texts = {
           group: "Animations du monogramme",
           // Une animation grisée : ce que le monogramme pour fond sombre ne permet pas.
           blocked: {
+            text: "« Tracé », « Cascade » et « Lueur » : seulement avec un monogramme envoyé, pas avec tes initiales.",
             svg: "« Tracé », « Cascade » et « Lueur » : seulement avec un monogramme en SVG simple (quatre couleurs pleines au plus, sans dégradé ni image).",
             accent:
               "« Lueur » : seulement avec un monogramme qui a une couleur d'accent (une couleur vive à côté du noir, du blanc ou du gris).",

@@ -77,6 +77,32 @@ export default defineConfig([
     },
   },
   {
+    // Pas d'icône de corbeille dans l'admin (règle du 09/10/2026, docs/BONNES-PRATIQUES.md, § 2) :
+    // retirer, supprimer ou mettre à la corbeille prend la gomme (Eraser).
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "lucide-react",
+              importNames: [
+                "Trash",
+                "Trash2",
+                "TrashIcon",
+                "Trash2Icon",
+                "LucideTrash",
+                "LucideTrash2",
+              ],
+              message: "Pas d'icône de corbeille : la gomme (Eraser).",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     // Règles de l'interface (docs/BONNES-PRATIQUES.md, § 2). Les composants de shadcn/ui
     // (components/ui) gardent leur code d'origine. Une exception autorisée (valeur qui change en
     // direct : position d'un glisser-déposer, proportions d'un fichier) se marque sur sa ligne :

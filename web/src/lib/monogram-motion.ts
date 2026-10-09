@@ -38,13 +38,13 @@ export type MotionPhase = Motion | "rest"
 
 /** La durée de chaque animation (index.css) et des pauses, en millisecondes. */
 const PHASE_MS: Record<MotionPhase, number> = {
-  trace: 2_800,
+  trace: 3_200,
   cascade: 2_400,
-  glint: 2_400,
-  shine: 2_000,
+  glint: 2_000,
+  shine: 1_600,
   halo: 2_400,
   sway: 3_000,
-  breathe: 3_000,
+  breathe: 3_200,
   rest: 4_000,
 }
 
@@ -70,11 +70,28 @@ function paintOf(element: Element, property: "fill" | "stroke"): string | null {
 const painted = (value: string | null) =>
   value !== null && value !== "none" && value !== "transparent"
 
+/** Le tracé dure 2 secondes, partagé entre les traits selon leur longueur (penTiming). */
+const DRAW_MS = 2_000
+
+/** La taille du dessin (viewBox, sinon largeur et hauteur), pour l'épaisseur du trait. */
+function drawingSize(svg: Element): number | null {
+  const box = (svg.getAttribute("viewBox") ?? "").split(/[\s,]+/).map(Number)
+  const [width, height] =
+    box.length === 4
+      ? [box[2], box[3]]
+      : [Number(svg.getAttribute("width")), Number(svg.getAttribute("height"))]
+  const size = Math.max(width, height)
+  return Number.isFinite(size) && size > 0 ? size : null
+}
+
 /**
- * Prépare un SVG pour l'animation, s'il est compatible (couleurs modifiables) ; null sinon. Les
- * formes tracées (un contour) se dessinent l'une après l'autre (data-motion="trace", pathLength),
- * puis les formes pleines apparaissent (data-motion="reveal") ; celles de la couleur d'accent
- * portent data-accent (la lueur). La taille vient du cadre : largeur et hauteur retirées.
+ * Prépare un SVG pour l'animation, s'il est compatible (couleurs modifiables) ; null sinon. Le
+ * tracé dessine le monogramme d'une plume régulière, dans l'ordre du fichier : un contour se dessine
+ * (data-motion="trace") ; une forme pleine (data-motion="fill") reçoit une copie qui en trace le
+ * bord à sa couleur (data-motion="pen"), puis elle se remplit et le
+ * trait s'efface ; un texte apparaît (data-motion="reveal"). Ce qui se trace porte data-pen
+ * (pathLength 1, durée posée par penTiming). Les formes de la couleur d'accent portent
+ * data-accent (la lueur). La taille vient du cadre : largeur et hauteur retirées.
  */
 export function prepareAnimatedSvg(text: string): AnimatedSvg | null {
   let markup: string
@@ -89,6 +106,7 @@ export function prepareAnimatedSvg(text: string): AnimatedSvg | null {
     markup,
     "image/svg+xml"
   ).documentElement
+  const size = drawingSize(svg)
   svg.removeAttribute("width")
   svg.removeAttribute("height")
   svg.setAttribute("aria-hidden", "true")
@@ -98,26 +116,65 @@ export function prepareAnimatedSvg(text: string): AnimatedSvg | null {
   const accent = colors.accent
   let order = 0
   let glint = false
-  const shapes = [...svg.querySelectorAll(SHAPES)]
-  // Les contours d'abord, dans l'ordre du dessin ; les formes pleines ensuite.
-  const traced = shapes.filter((shape) => painted(paintOf(shape, "stroke")))
-  const filled = shapes.filter((shape) => !traced.includes(shape))
-  for (const shape of [...traced, ...filled]) {
-    const isTraced = traced.includes(shape)
-    shape.setAttribute("data-motion", isTraced ? "trace" : "reveal")
-    if (isTraced) shape.setAttribute("pathLength", "1")
+  for (const shape of svg.querySelectorAll(SHAPES)) {
+    const isTraced = painted(paintOf(shape, "stroke"))
+    const paint = paintOf(shape, isTraced ? "stroke" : "fill")
+    const motion = isTraced
+      ? "trace"
+      : shape.localName === "text"
+        ? "reveal"
+        : "fill"
+    shape.setAttribute("data-motion", motion)
     // Le rang, pour décaler chaque forme (index.css).
     shape.setAttribute(
       "style",
       `${shape.getAttribute("style") ?? ""};--motion-order:${order++}`
     )
-    const paint = paintOf(shape, isTraced ? "stroke" : "fill")
+    if (isTraced) {
+      shape.setAttribute("pathLength", "1")
+      shape.setAttribute("data-pen", "")
+    }
+    if (motion === "fill" && paint) {
+      // Le trait qui dessine le bord de la forme, à sa couleur, juste après elle.
+      const pen = shape.cloneNode(false) as Element
+      pen.removeAttribute("id")
+      pen.setAttribute("data-motion", "pen")
+      pen.setAttribute("data-pen", "")
+      pen.setAttribute("pathLength", "1")
+      pen.setAttribute("aria-hidden", "true")
+      pen.setAttribute(
+        "style",
+        `${pen.getAttribute("style")};fill:none;stroke:${paint}`
+      )
+      if (size) pen.setAttribute("stroke-width", String(size * 0.02))
+      shape.after(pen)
+    }
     if (accent && paint && normalizeColor(paint) === accent) {
       shape.setAttribute("data-accent", "")
       glint = true
     }
   }
   return { markup: new XMLSerializer().serializeToString(svg), glint }
+}
+
+/**
+ * Le moment et la durée du trait de chaque forme (dans l'ordre du fichier), en millisecondes :
+ * les traits se suivent, chacun le temps de sa longueur, en DRAW_MS en tout ; une longueur
+ * inconnue (0) compte comme la moyenne des autres, ou toutes égales.
+ */
+export function penTiming(lengths: readonly number[], totalMs = DRAW_MS) {
+  const known = lengths.filter((length) => length > 0)
+  const average =
+    known.length > 0 ? known.reduce((a, b) => a + b, 0) / known.length : 1
+  const sizes = lengths.map((length) => (length > 0 ? length : average))
+  const total = sizes.reduce((a, b) => a + b, 0)
+  let start = 0
+  return sizes.map((size) => {
+    const ms = (size / total) * totalMs
+    const timing = { delay: Math.round(start), ms: Math.round(ms) }
+    start += ms
+    return timing
+  })
 }
 
 /**
