@@ -12,8 +12,7 @@ select plan(169);
 
 select pg_temp.create_people();
 select pg_temp.empty_media_library();
--- Le français seul, par défaut (la langue servie à l'app), et aucun contenu.
-select pg_temp.reset_languages();
+select pg_temp.empty_contents();
 \ir aides/publication.inc
 
 select pg_temp.as_person('editor');
@@ -538,7 +537,6 @@ select is(
   public.app_content(pg_temp.cid('reserve')) - 'publishedAt' - 'firstPublishedAt',
   jsonb_build_object(
     'id', pg_temp.cid('reserve'), 'versionId', (pg_temp.live('reserve')).id, 'kind', 'article',
-    'language', 'fr',
     'title', 'Réservé',
     'cover', jsonb_build_object('mediaId', pg_temp.mid('photo')), 'slug', null,
     'level', jsonb_build_object('id', pg_temp.lid('complet'), 'name', 'Complet', 'rank', 2),
