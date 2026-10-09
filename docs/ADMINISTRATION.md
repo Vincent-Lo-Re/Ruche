@@ -219,7 +219,7 @@ Les sections 1 à 9 sont **décidées**. On coche chaque ligne quand elle est en
 
 ## 7 bis. Un service multilingue : mis de côté
 
-Le 09/10/2026, après avoir construit les langues de l'app (#16, #17), les termes de l'admin (#19, #20) et la base des traductions des contenus (#21), l'utilisateur a jugé la traduction pas pertinente pour le moment : tout a été retiré (#22 pour l'admin, puis la migration `…_retour_avant_langues.sql`), l'admin et la base reviennent au niveau de #14. L'éditeur des traductions, jamais fusionné, reste sur la branche `traductions-admin` ; sa maquette validée, `docs/maquettes/traduction-editeur.html`, y est aussi. Si le sujet revient, repartir de ces décisions (une traduction bloc par bloc sur la structure de la langue d'origine, un état et une publication par langue, la glissière « Traduire »), à redécider avant de reprendre.
+Le 09/10/2026, après avoir construit les langues de l'app (#16, #17), les termes de l'admin (#19, #20) et la base des traductions des contenus (#21), l'utilisateur a jugé la traduction pas pertinente pour le moment : tout a été retiré (#22 pour l'admin, puis la migration `…_retour_avant_langues.sql`), l'admin et la base reviennent au niveau de #14. L'éditeur des traductions, jamais fusionné, et sa maquette validée ont été supprimés avec leur branche lors du ménage du 09/10/2026. Si le sujet revient, repartir de ces décisions (une traduction bloc par bloc sur la structure de la langue d'origine, un état et une publication par langue, la glissière « Traduire »), à redécider avant de reprendre.
 
 ## 8. Mise en ligne et garde-fous
 
