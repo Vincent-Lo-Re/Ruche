@@ -2587,6 +2587,8 @@ export const en = {
     // Le bouton du header : le thème choisi, et celui qui vient au clic.
     switch: (current: string, next: string) =>
       `Theme: ${current}. Switch to ${next.toLowerCase()} theme`,
+    // Le bouton du header qui ouvre la glissière des palettes.
+    openPalettes: "Change colors",
   },
 
   smallScreen: {

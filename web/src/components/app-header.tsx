@@ -4,6 +4,7 @@ import { NavLink, useLocation } from "react-router"
 import { useAuth } from "@/auth/auth-context"
 import { HelpSearch } from "@/components/help/help-search"
 import { useBrand } from "@/hooks/use-brand-name"
+import { PaletteSheet } from "@/components/theme/palette-sheet"
 import { ThemeMenu } from "@/components/theme/theme-menu"
 import {
   NavigationMenu,
@@ -19,7 +20,7 @@ import { texts } from "@/texts"
  * Le header, sur toute la largeur des pages avec le menu (ADMIN § 7, « Un header sur toute la
  * largeur ») : à gauche « Site web » (le site du client, réglé dans Paramètres ; sans site, pas
  * de lien), Mon compte, Équipe et Paramètres (le NavigationMenu de shadcn ; Équipe et Paramètres
- * pour les admins) ; à droite la recherche de l'aide et le thème.
+ * pour les admins) ; à droite la recherche de l'aide, le thème et, en dernier, les palettes.
  */
 export function AppHeader() {
   const { profile } = useAuth()
@@ -64,6 +65,7 @@ export function AppHeader() {
       <div className="ml-auto flex items-center gap-2">
         <HelpSearch />
         <ThemeMenu />
+        <PaletteSheet />
       </div>
     </header>
   )

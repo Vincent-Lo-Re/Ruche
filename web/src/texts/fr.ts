@@ -2639,6 +2639,8 @@ export const fr: Texts = {
     // Le bouton du header : le thème choisi, et celui qui vient au clic.
     switch: (current: string, next: string) =>
       `Thème : ${current}. Passer en ${next.toLowerCase()}`,
+    // Le bouton du header qui ouvre la glissière des palettes.
+    openPalettes: "Changer les couleurs",
   },
 
   smallScreen: {
