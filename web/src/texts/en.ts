@@ -2492,8 +2492,12 @@ export const en = {
         name: "Name",
         le: "With “le”",
         du: "With “du”",
-        // Un exemple, dans la langue du nom (pas dans celle de l'admin).
-        exampleFr: (du: string) => `Example: “Dans la liste ${du}”`,
+        // Sous chaque champ, un exemple qui suit ce qui est écrit, dans la langue du nom (pas dans
+        // celle de l'admin) : en français, une phrase de l'admin pour chaque forme.
+        exampleName: (name: string) => `Example: “${name} (article)”`,
+        exampleLe: (le: string) =>
+          `Example: “Dans ${le}, un contenu neuf arrive en tête de liste”`,
+        exampleDu: (du: string) => `Example: “Dans la liste ${du}”`,
         exampleEn: (name: string) => `Example: “In the ${name} list”`,
         incomplete: "Fill in all three French forms, or none.",
         tooLong: "40 characters at most.",

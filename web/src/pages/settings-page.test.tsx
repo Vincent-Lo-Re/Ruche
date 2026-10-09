@@ -236,8 +236,10 @@ describe("Paramètres : les noms du Blog et des Podcasts", () => {
     fireEvent.change(le, { target: { value: "le Fil" } })
     fireEvent.change(du, { target: { value: "du Fil" } })
     fireEvent.change(en, { target: { value: "The Feed" } })
-    // L'exemple suit la forme « du ».
-    expect(within(blog).getByText(words.exampleFr("du Fil"))).toBeVisible()
+    // Sous chaque champ, l'exemple suit ce qui est écrit.
+    expect(within(blog).getByText(words.exampleName("Le Fil"))).toBeVisible()
+    expect(within(blog).getByText(words.exampleLe("le Fil"))).toBeVisible()
+    expect(within(blog).getByText(words.exampleDu("du Fil"))).toBeVisible()
     fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
     await waitFor(() =>
       expect(identityApi.saveSectionNames).toHaveBeenCalledWith({

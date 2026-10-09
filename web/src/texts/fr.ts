@@ -2535,7 +2535,10 @@ export const fr: Texts = {
         name: "Nom",
         le: "Avec « le »",
         du: "Avec « du »",
-        exampleFr: (du: string) => `Exemple : « Dans la liste ${du} »`,
+        exampleName: (name: string) => `Exemple : « ${name} (article) »`,
+        exampleLe: (le: string) =>
+          `Exemple : « Dans ${le}, un contenu neuf arrive en tête de liste »`,
+        exampleDu: (du: string) => `Exemple : « Dans la liste ${du} »`,
         exampleEn: (name: string) => `Exemple : « In the ${name} list »`,
         incomplete: "Remplis les trois formes françaises, ou aucune.",
         tooLong: "40 caractères au plus.",

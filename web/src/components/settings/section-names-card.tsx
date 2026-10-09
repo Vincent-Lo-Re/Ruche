@@ -9,7 +9,12 @@ import type { z } from "zod"
 import { LoadState } from "@/components/load-state"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Field, FieldError, FieldLabel } from "@/components/ui/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
@@ -56,8 +61,8 @@ function fromValues(values: Values): CustomSectionNames {
 
 /**
  * Les noms du Blog et des Podcasts (Paramètres › Avancé, admins) : pour chaque section, en
- * français trois formes écrites à la main (le nom, avec « le », avec « du »), avec un exemple de
- * phrase, et en anglais le nom ; vides, le nom d'origine (en gris). « Enregistrer » dans le pied
+ * français trois formes écrites à la main (le nom, avec « le », avec « du »), et en anglais le nom,
+ * chacune avec un exemple sous son champ, qui suit ce qui est écrit ; vides, le nom d'origine (en gris). « Enregistrer » dans le pied
  * gris ; la page se recharge ensuite pour que tous les textes les prennent (useAdminSectionNames).
  */
 export function SectionNamesCard() {
@@ -134,7 +139,8 @@ function SectionFields({
   const field = (
     key: "name" | "le" | "du" | "en",
     label: string,
-    placeholder: string
+    placeholder: string,
+    example: (form: string) => string
   ) => (
     <Controller
       name={`${section}.${key}`}
@@ -149,6 +155,10 @@ function SectionFields({
             placeholder={placeholder}
             aria-invalid={fieldState.invalid}
           />
+          {/* L'exemple suit ce qui est écrit, sinon la forme d'origine. */}
+          <FieldDescription>
+            {example(values[key].trim() || placeholder)}
+          </FieldDescription>
           <FieldError errors={[fieldState.error]} />
         </Field>
       )}
@@ -163,22 +173,16 @@ function SectionFields({
       <div className="space-y-2">
         <div className="text-xs text-muted-foreground">{labels.french}</div>
         <div className="grid gap-4 @lg:grid-cols-3">
-          {field("name", labels.name, fr.name)}
-          {field("le", labels.le, fr.le)}
-          {field("du", labels.du, fr.du)}
+          {field("name", labels.name, fr.name, labels.exampleName)}
+          {field("le", labels.le, fr.le, labels.exampleLe)}
+          {field("du", labels.du, fr.du, labels.exampleDu)}
         </div>
-        <p className="text-xs text-muted-foreground">
-          {labels.exampleFr(values.du || fr.du)}
-        </p>
       </div>
       <div className="space-y-2">
         <div className="text-xs text-muted-foreground">{labels.english}</div>
         <div className="grid gap-4 @lg:grid-cols-3">
-          {field("en", labels.name, en.name)}
+          {field("en", labels.name, en.name, labels.exampleEn)}
         </div>
-        <p className="text-xs text-muted-foreground">
-          {labels.exampleEn(values.en || en.name)}
-        </p>
       </div>
     </fieldset>
   )
