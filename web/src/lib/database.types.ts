@@ -82,6 +82,7 @@ export type Database = {
         Row: {
           contact_email: string | null
           id: boolean
+          initials: string | null
           language: string
           locale: string | null
           login_image: string | null
@@ -99,6 +100,7 @@ export type Database = {
         Insert: {
           contact_email?: string | null
           id?: boolean
+          initials?: string | null
           language?: string
           locale?: string | null
           login_image?: string | null
@@ -115,6 +117,7 @@ export type Database = {
         Update: {
           contact_email?: string | null
           id?: boolean
+          initials?: string | null
           language?: string
           locale?: string | null
           login_image?: string | null
@@ -685,6 +688,7 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: {
           contact_email: string
+          initials: string
           language: string
           locale: string
           login_image: string

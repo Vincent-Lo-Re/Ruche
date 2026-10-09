@@ -6,7 +6,7 @@
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(74);
+select plan(80);
 
 select pg_temp.create_people();
 
@@ -204,33 +204,40 @@ select is(
 );
 select pg_temp.as_person('admin');
 
--- Le monogramme animé de l'écran de connexion : activé au départ ; un admin le désactive, un
+-- Le monogramme animé de l'écran de connexion : immobile au départ ; un admin l'anime, un
 -- éditeur non ; tout le monde le lit par admin_brand().
+select is(
+  pg_temp.affected('update public.admin_identity set login_monogram_motion = default'), 1,
+  'admin : revient au réglage de départ'
+);
 select pg_temp.as_anon();
-select is((select login_monogram_motion from public.admin_brand()), true, 'monogramme animé au départ');
+select is((select login_monogram_motion from public.admin_brand()), false, 'monogramme immobile au départ');
 select pg_temp.as_person('editor');
 select is(
-  pg_temp.affected('update public.admin_identity set login_monogram_motion = false'), 0,
-  'éditeur : ne change pas le monogramme animé'
+  pg_temp.affected('update public.admin_identity set login_monogram_motion = true'), 0,
+  'éditeur : n''anime pas le monogramme'
 );
 select pg_temp.as_person('admin');
 select is(
-  pg_temp.affected('update public.admin_identity set login_monogram_motion = false'), 1,
-  'admin : désactive le monogramme animé'
+  pg_temp.affected('update public.admin_identity set login_monogram_motion = true'), 1,
+  'admin : anime le monogramme'
 );
 select pg_temp.as_anon();
-select is((select login_monogram_motion from public.admin_brand()), false, 'anon : monogramme immobile');
+select is((select login_monogram_motion from public.admin_brand()), true, 'anon : monogramme animé');
 select pg_temp.as_person('admin');
 
--- Ses animations : le tracé, la lueur et la respiration au départ ; un admin en coche d'autres,
--- parmi les sept connues, une au moins.
+-- Ses animations : aucune au départ ; un admin en coche parmi les sept connues, ou aucune.
 select is(
   pg_temp.affected('update public.admin_identity set login_monogram_motions = default'), 1,
   'admin : revient aux animations du départ'
 );
 select is(
-  (select login_monogram_motions from public.admin_brand()), array['trace', 'glint', 'breathe'],
-  'les animations du départ'
+  (select login_monogram_motions from public.admin_brand()), array[]::text[],
+  'aucune animation au départ'
+);
+select is(
+  pg_temp.affected($$update public.admin_identity set login_monogram_motions = array[]::text[]$$), 1,
+  'admin : ne coche aucune animation'
 );
 select is(
   pg_temp.affected($$update public.admin_identity set login_monogram_motions = array['shine', 'sway']$$), 1,
@@ -239,10 +246,6 @@ select is(
 select throws_ok(
   $$update public.admin_identity set login_monogram_motions = array['spin']$$, '23514', null,
   'une animation inconnue est refusée'
-);
-select throws_ok(
-  $$update public.admin_identity set login_monogram_motions = array[]::text[]$$, '23514', null,
-  'au moins une animation'
 );
 select pg_temp.as_anon();
 select is(
@@ -367,6 +370,29 @@ select throws_ok(
 select throws_ok(
   'delete from public.admin_identity', '42501', null, 'admin : pas de suppression'
 );
+
+-- Les initiales (1 à 3 caractères, sans espace autour) : un admin les change, tout le monde
+-- les lit par admin_brand() ; un éditeur non.
+select pg_temp.as_person('admin');
+select is(
+  pg_temp.affected($$update public.admin_identity set initials = 'ES'$$), 1,
+  'admin : change les initiales'
+);
+select throws_ok(
+  $$update public.admin_identity set initials = 'ABCD'$$, '23514', null,
+  'plus de 3 caractères : refusé'
+);
+select throws_ok(
+  $$update public.admin_identity set initials = ' E'$$, '23514', null,
+  'des espaces autour : refusé'
+);
+select pg_temp.as_person('editor');
+select is(
+  pg_temp.affected($$update public.admin_identity set initials = 'XX'$$), 0,
+  'éditeur : ne change pas les initiales'
+);
+select pg_temp.as_anon();
+select is((select initials from public.admin_brand()), 'ES', 'anon : les initiales');
 
 select * from finish();
 rollback;
