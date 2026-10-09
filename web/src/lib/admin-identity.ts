@@ -20,6 +20,7 @@ import { isLanguage, locale, type Language } from "@/lib/language"
 import { DEFAULT_MOTIONS, isMotion, type Motion } from "@/lib/monogram-motion"
 import { palettePresets, presetLogoColors, type PresetId } from "@/lib/palettes"
 import { supabase } from "@/lib/supabase"
+import { DEFAULT_TIME_ZONE, isTimeZone } from "@/lib/time-zone"
 import { texts } from "@/texts"
 
 export const adminBrandKey = ["admin-brand"] as const
@@ -71,6 +72,8 @@ export type AdminBrand = { name: string | null } & Record<
     websiteUrl: string | null
     /** La langue de toute l'admin (Paramètres › Avancé). */
     language: Language
+    /** Le fuseau horaire de toute l'admin (Paramètres › Avancé) : « Europe/Paris ». */
+    timeZone: string
   }
 
 type BrandRow = Pick<
@@ -83,6 +86,7 @@ type BrandRow = Pick<
   | "contact_email"
   | "website_url"
   | "language"
+  | "time_zone"
 >
 
 const variantKey = (kind: BrandKind, palette: string, surface: BrandSurface) =>
@@ -135,6 +139,7 @@ export async function getAdminBrand(): Promise<AdminBrand> {
     contactEmail: row.contact_email ?? null,
     websiteUrl: row.website_url ?? null,
     language: isLanguage(row.language) ? row.language : "en",
+    timeZone: isTimeZone(row.time_zone) ? row.time_zone : DEFAULT_TIME_ZONE,
     variants: Object.fromEntries(
       variants.data.map((variant) => [
         variantKey(
@@ -175,6 +180,11 @@ export function saveBrandDetails(details: {
 /** Change la langue de toute l'admin (admins). */
 export function saveAdminLanguage(language: Language): Promise<void> {
   return updateIdentity({ language })
+}
+
+/** Change le fuseau horaire de toute l'admin (admins). */
+export function saveAdminTimeZone(timeZone: string): Promise<void> {
+  return updateIdentity({ time_zone: timeZone })
 }
 
 /** Un fichier refusé avant l'envoi : son message est dans texts. */

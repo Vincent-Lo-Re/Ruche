@@ -520,7 +520,7 @@ describe("programmer (heure de Paris)", () => {
       { target: { value: date } }
     )
     fireEvent.change(
-      within(dialog).getByLabelText(labels.scheduleDialog.time),
+      within(dialog).getByLabelText(labels.scheduleDialog.time("Paris")),
       { target: { value: time } }
     )
   }

@@ -2198,10 +2198,11 @@ export const fr: Texts = {
     },
     scheduleDialog: {
       title: "Programmer la publication",
-      description:
-        "Choisis le jour et l'heure, à l'heure de Paris. À ce moment-là, le dernier brouillon enregistré partira dans l'app.",
+      // Avec la ville du fuseau de l'admin (Paramètres › Avancé) : « Paris ».
+      description: (city: string) =>
+        `Choisis le jour et l'heure (fuseau : ${city}). À ce moment-là, le dernier brouillon enregistré partira dans l'app.`,
       date: "Jour",
-      time: "Heure (Paris)",
+      time: (city: string) => `Heure (${city})`,
       summary: (date: string) => `Publication le ${date}.`,
       ambiguous:
         "Cette heure existe deux fois cette nuit-là (retour à l'heure d'hiver) : la publication partira à la première, encore en heure d'été.",
@@ -2449,6 +2450,16 @@ export const fr: Texts = {
         hint: "Les membres qui ont choisi leur langue dans Mon compte la gardent.",
         saved: "Langue de l'admin enregistrée.",
         loadFailed: "La langue de l'admin n'a pas pu être chargée.",
+      },
+      timeZone: {
+        title: "Fuseau horaire",
+        description:
+          "Les dates de l'admin s'affichent dans ce fuseau, et l'heure d'une publication programmée s'y comprend. Il vaut pour toute l'équipe.",
+        label: "Fuseau horaire de l'admin",
+        search: "Chercher une ville ou une région",
+        empty: "Aucun fuseau trouvé.",
+        saved: "Fuseau horaire enregistré.",
+        loadFailed: "Le fuseau horaire de l'admin n'a pas pu être chargé.",
       },
     },
     // Un onglet pas encore rempli.

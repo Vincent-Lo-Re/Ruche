@@ -23,6 +23,7 @@ const brand = (websiteUrl: string | null): identityApi.AdminBrand => ({
   contactEmail: null,
   websiteUrl,
   language: "fr",
+  timeZone: "Europe/Paris",
   variants: {},
 })
 

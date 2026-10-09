@@ -5,10 +5,10 @@ import {
   formatDayInput,
   formatShortDateTime,
   formatTimeInput,
-  parisToInstant,
+  zoneToInstant,
   parseDayInput,
   parseTimeInput,
-  toParisParts,
+  toZoneParts,
 } from "./dates"
 
 describe("formatDateTime", () => {
@@ -33,12 +33,12 @@ describe("formatDateTime", () => {
 
 describe("heure de Paris ↔ instant (programmation)", () => {
   it("convertit une heure d'été et une heure d'hiver", () => {
-    expect(parisToInstant("2026-10-03", "08:00")).toEqual({
+    expect(zoneToInstant("2026-10-03", "08:00")).toEqual({
       ok: true,
       instant: new Date("2026-10-03T06:00:00Z"),
       ambiguous: false,
     })
-    expect(parisToInstant("2026-12-24", "18:30")).toEqual({
+    expect(zoneToInstant("2026-12-24", "18:30")).toEqual({
       ok: true,
       instant: new Date("2026-12-24T17:30:00Z"),
       ambiguous: false,
@@ -46,35 +46,35 @@ describe("heure de Paris ↔ instant (programmation)", () => {
   })
 
   it("passage à l'heure d'été (29 mars 2026) : 2 h 30 n'existe pas", () => {
-    expect(parisToInstant("2026-03-29", "02:30")).toEqual({
+    expect(zoneToInstant("2026-03-29", "02:30")).toEqual({
       ok: false,
       reason: "nonexistent",
     })
-    expect(parisToInstant("2026-03-29", "02:00")).toEqual({
+    expect(zoneToInstant("2026-03-29", "02:00")).toEqual({
       ok: false,
       reason: "nonexistent",
     })
     // Juste avant et juste après le saut.
-    expect(parisToInstant("2026-03-29", "01:59")).toMatchObject({
+    expect(zoneToInstant("2026-03-29", "01:59")).toMatchObject({
       instant: new Date("2026-03-29T00:59:00Z"),
     })
-    expect(parisToInstant("2026-03-29", "03:00")).toMatchObject({
+    expect(zoneToInstant("2026-03-29", "03:00")).toMatchObject({
       instant: new Date("2026-03-29T01:00:00Z"),
     })
   })
 
   it("retour à l'heure d'hiver (25 oct. 2026) : 2 h 30 existe deux fois, la première est retenue", () => {
-    expect(parisToInstant("2026-10-25", "02:30")).toEqual({
+    expect(zoneToInstant("2026-10-25", "02:30")).toEqual({
       ok: true,
       instant: new Date("2026-10-25T00:30:00Z"),
       ambiguous: true,
     })
-    expect(parisToInstant("2026-10-25", "01:59")).toEqual({
+    expect(zoneToInstant("2026-10-25", "01:59")).toEqual({
       ok: true,
       instant: new Date("2026-10-24T23:59:00Z"),
       ambiguous: false,
     })
-    expect(parisToInstant("2026-10-25", "03:00")).toEqual({
+    expect(zoneToInstant("2026-10-25", "03:00")).toEqual({
       ok: true,
       instant: new Date("2026-10-25T02:00:00Z"),
       ambiguous: false,
@@ -82,43 +82,43 @@ describe("heure de Paris ↔ instant (programmation)", () => {
   })
 
   it("refuse un jour ou une heure qui n'existent pas", () => {
-    expect(parisToInstant("2026-04-31", "10:00")).toEqual({
+    expect(zoneToInstant("2026-04-31", "10:00")).toEqual({
       ok: false,
       reason: "invalid",
     })
-    expect(parisToInstant("2026-02-29", "10:00")).toEqual({
+    expect(zoneToInstant("2026-02-29", "10:00")).toEqual({
       ok: false,
       reason: "invalid",
     })
-    expect(parisToInstant("2026-10-03", "24:00")).toEqual({
+    expect(zoneToInstant("2026-10-03", "24:00")).toEqual({
       ok: false,
       reason: "invalid",
     })
-    expect(parisToInstant("", "08:00")).toEqual({
+    expect(zoneToInstant("", "08:00")).toEqual({
       ok: false,
       reason: "invalid",
     })
   })
 
   it("relit un instant à l'heure de Paris, aux deux côtés des changements d'heure", () => {
-    expect(toParisParts(new Date("2026-03-29T00:59:00Z"))).toEqual({
+    expect(toZoneParts(new Date("2026-03-29T00:59:00Z"))).toEqual({
       date: "2026-03-29",
       time: "01:59",
     })
-    expect(toParisParts(new Date("2026-03-29T01:00:00Z"))).toEqual({
+    expect(toZoneParts(new Date("2026-03-29T01:00:00Z"))).toEqual({
       date: "2026-03-29",
       time: "03:00",
     })
-    expect(toParisParts(new Date("2026-10-25T00:30:00Z"))).toEqual({
+    expect(toZoneParts(new Date("2026-10-25T00:30:00Z"))).toEqual({
       date: "2026-10-25",
       time: "02:30",
     })
-    expect(toParisParts(new Date("2026-10-25T01:30:00Z"))).toEqual({
+    expect(toZoneParts(new Date("2026-10-25T01:30:00Z"))).toEqual({
       date: "2026-10-25",
       time: "02:30",
     })
     // Minuit s'écrit 00:00, et le jour change à Paris avant de changer à Londres.
-    expect(toParisParts(new Date("2026-12-31T23:00:00Z"))).toEqual({
+    expect(toZoneParts(new Date("2026-12-31T23:00:00Z"))).toEqual({
       date: "2027-01-01",
       time: "00:00",
     })
@@ -128,8 +128,8 @@ describe("heure de Paris ↔ instant (programmation)", () => {
     const start = Date.UTC(2026, 0, 1)
     for (let t = start; t < start + 366 * 86_400_000; t += 15 * 60_000) {
       const instant = new Date(t)
-      const parts = toParisParts(instant)
-      const back = parisToInstant(parts.date, parts.time)
+      const parts = toZoneParts(instant)
+      const back = zoneToInstant(parts.date, parts.time)
       if (!back.ok) throw new Error(`${parts.date} ${parts.time}`)
       if (back.ambiguous) {
         // L'heure doublée d'octobre est ramenée à sa première occurrence (une heure plus tôt).
@@ -137,7 +137,7 @@ describe("heure de Paris ↔ instant (programmation)", () => {
       } else {
         expect(back.instant.getTime()).toBe(t)
       }
-      expect(toParisParts(back.instant)).toEqual(parts)
+      expect(toZoneParts(back.instant)).toEqual(parts)
     }
   })
 })
@@ -185,5 +185,59 @@ describe("formatShortDateTime", () => {
   it("juste avant minuit à Paris, c'est encore la veille", () => {
     // 21 h 59 UTC le 2 octobre = 23 h 59 à Paris, le 2.
     expect(formatShortDateTime("2026-10-02T21:59:00Z", now).today).toBe(false)
+  })
+})
+
+describe("d'autres fuseaux que Paris (Paramètres › Avancé)", () => {
+  it("Montréal : l'heure d'hiver, l'heure d'été, et le changement d'heure de mars", () => {
+    expect(zoneToInstant("2026-01-15", "08:00", "America/Montreal")).toEqual({
+      ok: true,
+      instant: new Date("2026-01-15T13:00:00Z"),
+      ambiguous: false,
+    })
+    expect(zoneToInstant("2026-07-15", "08:00", "America/Montreal")).toEqual({
+      ok: true,
+      instant: new Date("2026-07-15T12:00:00Z"),
+      ambiguous: false,
+    })
+    // Le 8 mars 2026, on passe de 2 h à 3 h à Montréal (deux semaines avant Paris).
+    expect(zoneToInstant("2026-03-08", "02:30", "America/Montreal")).toEqual({
+      ok: false,
+      reason: "nonexistent",
+    })
+    // Le 1er novembre 2026, 1 h 30 existe deux fois : la première, encore en heure d'été.
+    expect(zoneToInstant("2026-11-01", "01:30", "America/Montreal")).toEqual({
+      ok: true,
+      instant: new Date("2026-11-01T05:30:00Z"),
+      ambiguous: true,
+    })
+  })
+
+  it("Inde : un décalage d'une demi-heure, sans heure d'été", () => {
+    expect(zoneToInstant("2026-10-25", "08:00", "Asia/Kolkata")).toEqual({
+      ok: true,
+      instant: new Date("2026-10-25T02:30:00Z"),
+      ambiguous: false,
+    })
+    expect(
+      toZoneParts(new Date("2026-10-25T02:30:00Z"), "Asia/Kolkata")
+    ).toEqual({ date: "2026-10-25", time: "08:00" })
+  })
+
+  it("Lord Howe : un changement d'heure d'une demi-heure seulement", () => {
+    // Le 4 octobre 2026, on passe de 2 h à 2 h 30.
+    expect(zoneToInstant("2026-10-04", "02:15", "Australia/Lord_Howe")).toEqual(
+      {
+        ok: false,
+        reason: "nonexistent",
+      }
+    )
+    expect(zoneToInstant("2026-10-04", "02:30", "Australia/Lord_Howe")).toEqual(
+      {
+        ok: true,
+        instant: new Date("2026-10-03T15:30:00Z"),
+        ambiguous: false,
+      }
+    )
   })
 })

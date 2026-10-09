@@ -5,7 +5,7 @@ export const fiche: HelpFiche = {
   theme: "publication",
   title: "Programmer une publication",
   summary:
-    "Un contenu peut partir dans l'app tout seul, au jour et à l'heure choisis, à l'heure de Paris.",
+    "Un contenu peut partir dans l'app tout seul, au jour et à l'heure choisis, dans le fuseau horaire de l'admin (Paramètres › Avancé).",
   keywords: [
     "programmer",
     "planifier",
@@ -17,7 +17,7 @@ export const fiche: HelpFiche = {
   ],
   steps: [
     "Dans l'éditeur, ouvre le menu à côté de « Publier » et choisis « Programmer… ».",
-    "Choisis le « Jour » (25/10/2099, ou dans le calendrier) et l'« Heure (Paris) », par exemple 08h00.",
+    "Choisis le « Jour » (25/10/2099, ou dans le calendrier) et l'« Heure », par exemple 08h00 : elle se comprend dans le fuseau horaire de l'admin, rappelé entre parenthèses.",
     "Clique sur « Programmer » : un bandeau au-dessus du téléphone rappelle la date.",
     "Pour changer la date, choisis « Changer la programmation… » dans le même menu ; pour l'annuler, « Annuler la programmation ».",
   ],

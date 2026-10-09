@@ -1,9 +1,10 @@
 import { language, locale } from "@/lib/language"
+import { timeZone } from "@/lib/time-zone"
 import { texts } from "@/texts"
 
-// Toutes les dates de l'administration sont à l'heure de Paris, quelle que soit la langue ;
-// seule leur écriture change (« 27 sept. 2026 à 14h30 », « Sep 27, 2026, 2:30 PM »).
-const timeZone = "Europe/Paris"
+// Toutes les dates de l'administration sont à l'heure de son fuseau (Paramètres › Avancé, Paris
+// au départ : lib/time-zone.ts), quelle que soit la langue ; seule leur écriture change
+// (« 27 sept. 2026 à 14h30 », « Sep 27, 2026, 2:30 PM »).
 const french = language === "fr"
 
 const dateFormat = new Intl.DateTimeFormat(locale, {
@@ -28,7 +29,7 @@ const englishTimeFormat = new Intl.DateTimeFormat("en-US", {
   timeZone,
 })
 
-/** L'heure à l'heure de Paris : « 18h42 », « 09h05 » ; « 6:42 PM » en anglais. */
+/** L'heure à l'heure du fuseau : « 18h42 », « 09h05 » ; « 6:42 PM » en anglais. */
 function formatTime(value: Date): string {
   if (!french) return englishTimeFormat.format(value)
   const parts = timeFormat.formatToParts(value)
@@ -44,7 +45,7 @@ const dayFormat = new Intl.DateTimeFormat(locale, {
 })
 
 /**
- * Une date courte, à l'heure de Paris : l'heure seule le jour même (« 16h31 »), sinon le jour
+ * Une date courte, à l'heure du fuseau : l'heure seule le jour même (« 16h31 »), sinon le jour
  * (« 3 oct. »). `today` dit lequel.
  */
 export function formatShortDateTime(
@@ -52,19 +53,19 @@ export function formatShortDateTime(
   now: Date = new Date()
 ): { today: boolean; text: string } {
   const value = typeof date === "string" ? new Date(date) : date
-  const today = toParisParts(value).date === toParisParts(now).date
+  const today = toZoneParts(value).date === toZoneParts(now).date
   return {
     today,
     text: today ? formatTime(value) : dayFormat.format(value),
   }
 }
 
-/** Le jour seul, à l'heure de Paris : « 27 sept. 2026 », « Sep 27, 2026 » en anglais. */
+/** Le jour seul, à l'heure du fuseau : « 27 sept. 2026 », « Sep 27, 2026 » en anglais. */
 export function formatDate(date: Date | string): string {
   return dateFormat.format(typeof date === "string" ? new Date(date) : date)
 }
 
-/** « 27 sept. 2026 à 18h42 », « Sep 27, 2026, 6:42 PM » en anglais, à l'heure de Paris. */
+/** « 27 sept. 2026 à 18h42 », « Sep 27, 2026, 6:42 PM » en anglais, à l'heure du fuseau. */
 export function formatDateTime(date: Date | string): string {
   const value = typeof date === "string" ? new Date(date) : date
   if (!french) return `${dateFormat.format(value)}, ${formatTime(value)}`
@@ -152,27 +153,35 @@ export function formatTimeInput(time: string): string {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Heure de Paris ↔ instant (timestamptz), pour programmer une publication.
+// Heure du fuseau de l'admin ↔ instant (timestamptz), pour programmer une publication.
 // La base compare l'instant avec now() : seul l'instant compte, pas le fuseau de pg_cron.
 // ---------------------------------------------------------------------------------------------
 
-// Les chiffres de la date et de l'heure à Paris, sur 24 heures (jamais « 24:00 »).
-const partsFormat = new Intl.DateTimeFormat("en-GB", {
-  timeZone,
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-  hour: "2-digit",
-  minute: "2-digit",
-  hourCycle: "h23",
-})
+// Les chiffres de la date et de l'heure dans un fuseau, sur 24 heures (jamais « 24:00 »).
+const partsFormats = new Map<string, Intl.DateTimeFormat>()
+function partsFormat(zone: string): Intl.DateTimeFormat {
+  let format = partsFormats.get(zone)
+  if (!format) {
+    format = new Intl.DateTimeFormat("en-GB", {
+      timeZone: zone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    })
+    partsFormats.set(zone, format)
+  }
+  return format
+}
 
-/** Jour et heure à Paris : { date: "2026-10-25", time: "02:30" } (formats des champs HTML). */
-type ParisParts = { date: string; time: string }
+/** Jour et heure dans le fuseau : { date: "2026-10-25", time: "02:30" } (formats des champs HTML). */
+type ZoneParts = { date: string; time: string }
 
-export function toParisParts(instant: Date): ParisParts {
+export function toZoneParts(instant: Date, zone: string = timeZone): ZoneParts {
   const parts: Record<string, string> = {}
-  for (const part of partsFormat.formatToParts(instant)) {
+  for (const part of partsFormat(zone).formatToParts(instant)) {
     parts[part.type] = part.value
   }
   return {
@@ -181,7 +190,16 @@ export function toParisParts(instant: Date): ParisParts {
   }
 }
 
-type ParisInstant =
+// Le décalage du fuseau à un instant, en minutes (Paris : 120 en été, 60 en hiver).
+function offsetMinutes(instant: Date, zone: string): number {
+  const { date, time } = toZoneParts(instant, zone)
+  const [year, month, day] = date.split("-").map(Number)
+  const [hours, minutes] = time.split(":").map(Number)
+  const asUtc = Date.UTC(year, month - 1, day, hours, minutes)
+  return Math.round((asUtc - instant.getTime()) / 60_000)
+}
+
+type ZoneInstant =
   // ambiguous : l'heure existe deux fois (retour à l'heure d'hiver, fin octobre) ; c'est la
   // première, encore en heure d'été, qui est retenue.
   | { ok: true; instant: Date; ambiguous: boolean }
@@ -192,21 +210,24 @@ type ParisInstant =
 
 const DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/
 const TIME_PATTERN = /^(\d{2}):(\d{2})$/
-// Paris est à UTC+1 en hiver, UTC+2 en été.
-const PARIS_OFFSETS_MINUTES = [120, 60]
+const DAY_MS = 24 * 60 * 60_000
 
 /**
- * L'instant qui correspond à un jour et une heure de Paris (« 2026-10-03 », « 08:00 »). Aux
+ * L'instant qui correspond à un jour et une heure du fuseau (« 2026-10-03 », « 08:00 »). Aux
  * changements d'heure, une heure peut ne pas exister ou exister deux fois : on le dit.
  */
-export function parisToInstant(date: string, time: string): ParisInstant {
+export function zoneToInstant(
+  date: string,
+  time: string,
+  zone: string = timeZone
+): ZoneInstant {
   const day = DATE_PATTERN.exec(date)
   const clock = TIME_PATTERN.exec(time)
   if (!day || !clock) return { ok: false, reason: "invalid" }
   const [year, month, dayOfMonth] = day.slice(1).map(Number)
   const [hours, minutes] = clock.slice(1).map(Number)
   if (hours > 23 || minutes > 59) return { ok: false, reason: "invalid" }
-  // Le même jour et la même heure « comme si » Paris était à UTC.
+  // Le même jour et la même heure « comme si » le fuseau était à UTC.
   const naive = Date.UTC(year, month - 1, dayOfMonth, hours, minutes)
   const check = new Date(naive)
   if (
@@ -216,14 +237,22 @@ export function parisToInstant(date: string, time: string): ParisInstant {
   ) {
     return { ok: false, reason: "invalid" }
   }
-  // Les instants qui, lus à Paris, redonnent exactement ce jour et cette heure (le plus tôt
-  // d'abord : heure d'été avant heure d'hiver).
-  const matches = PARIS_OFFSETS_MINUTES.map(
-    (offset) => new Date(naive - offset * 60_000)
-  ).filter((instant) => {
-    const parts = toParisParts(instant)
-    return parts.date === date && parts.time === time
-  })
+  // Les décalages possibles : ceux du fuseau la veille et le lendemain (un changement d'heure,
+  // s'il y en a un, tombe entre les deux), le plus grand d'abord.
+  const offsets = [
+    ...new Set([
+      offsetMinutes(new Date(naive - DAY_MS), zone),
+      offsetMinutes(new Date(naive + DAY_MS), zone),
+    ]),
+  ].sort((a, b) => b - a)
+  // Les instants qui, lus dans le fuseau, redonnent exactement ce jour et cette heure (le plus
+  // tôt d'abord : heure d'été avant heure d'hiver).
+  const matches = offsets
+    .map((offset) => new Date(naive - offset * 60_000))
+    .filter((instant) => {
+      const parts = toZoneParts(instant, zone)
+      return parts.date === date && parts.time === time
+    })
   if (matches.length === 0) return { ok: false, reason: "nonexistent" }
   return { ok: true, instant: matches[0], ambiguous: matches.length > 1 }
 }

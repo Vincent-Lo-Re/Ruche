@@ -2151,10 +2151,11 @@ export const en = {
     },
     scheduleDialog: {
       title: "Schedule publishing",
-      description:
-        "Choose a date and time (Paris time). The latest saved draft will be published then.",
+      // Avec la ville du fuseau de l'admin (Paramètres › Avancé) : « Paris ».
+      description: (city: string) =>
+        `Choose a date and time (time zone: ${city}). The latest saved draft will be published then.`,
       date: "Date",
-      time: "Time (Paris)",
+      time: (city: string) => `Time (${city})`,
       summary: (date: string) => `Publishing on ${date}.`,
       ambiguous:
         "This time happens twice that night because clocks fall back. It'll publish at the first one, while daylight saving time is still in effect.",
@@ -2405,6 +2406,16 @@ export const en = {
         hint: "Members who chose their own language in My account keep it.",
         saved: "Admin language saved.",
         loadFailed: "The admin language couldn't be loaded.",
+      },
+      timeZone: {
+        title: "Time zone",
+        description:
+          "Dates across the admin are shown in this time zone, and scheduled publishing times use it. It applies to the whole team.",
+        label: "Admin time zone",
+        search: "Search for a city or region",
+        empty: "No time zone found.",
+        saved: "Time zone saved.",
+        loadFailed: "The admin time zone couldn't be loaded.",
       },
     },
     accessLevels: {

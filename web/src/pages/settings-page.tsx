@@ -11,6 +11,7 @@ import { PageHeader } from "@/components/page-header"
 import { AccessLevelsCard } from "@/components/settings/access-levels-card"
 import { AdminIdentityCard } from "@/components/settings/admin-identity-card"
 import { AdminLanguageCard } from "@/components/settings/admin-language-card"
+import { AdminTimeZoneCard } from "@/components/settings/admin-time-zone-card"
 import { BrandLogosCard } from "@/components/settings/brand-logos-card"
 import { LoginScreenCard } from "@/components/settings/login-screen-card"
 import { SettingsSection } from "@/components/settings/settings-section"
@@ -101,6 +102,12 @@ export function SettingsPage() {
                   description={labels.advanced.language.description}
                 >
                   <AdminLanguageCard />
+                </SettingsSection>
+                <SettingsSection
+                  title={labels.advanced.timeZone.title}
+                  description={labels.advanced.timeZone.description}
+                >
+                  <AdminTimeZoneCard />
                 </SettingsSection>
               </div>
             ) : (
