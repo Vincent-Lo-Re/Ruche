@@ -835,6 +835,13 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      content_title_taken: {
+        Args: { except_id?: string; kind: string; title: string }
+        Returns: {
+          taken_id: string
+          taken_title: string
+        }[]
+      }
       contents_reorder: {
         Args: { ids: string[]; kind: string }
         Returns: {
@@ -1131,6 +1138,7 @@ export type Database = {
         Args: { content_id: string }
         Returns: {
           restored: number
+          title: string
           warnings: string[]
         }[]
       }

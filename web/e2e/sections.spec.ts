@@ -69,7 +69,7 @@ async function saved(page: Page) {
 
 /** « Nouvel article » ou « Nouvel épisode », jusqu'à l'éditeur d'un contenu vide ([D42]). */
 async function createBlank(page: Page, kind: "article" | "episode") {
-  await createFromDialog(page, kind, `Essai ${kind}`)
+  await createFromDialog(page, kind, `Essai ${kind} ${uniqueId()}`)
 }
 
 /**
