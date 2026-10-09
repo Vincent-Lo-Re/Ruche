@@ -204,6 +204,13 @@
 
 /* Éditeur des contenus : une trame de points au fond de la colonne centrale, tous les 16 px ; la couleur
    du texte, presque transparente (pas de couleur nouvelle), en clair comme en sombre. */
+/* Le fond du panneau, opaque (le gris du panneau posé sur le fond de la page) : pour ce qui reste
+   collé en haut quand le panneau défile (les onglets de Paramètres) et doit cacher ce qui passe
+   dessous. */
+@utility bg-panel-solid {
+  background: linear-gradient(var(--panel), var(--panel)), var(--background);
+}
+
 @utility bg-dot-grid {
   background-image: radial-gradient(
     circle,

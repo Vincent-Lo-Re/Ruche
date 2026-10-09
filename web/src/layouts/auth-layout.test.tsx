@@ -52,21 +52,19 @@ describe("pages de connexion (modèle login-04)", () => {
     await waitFor(() =>
       expect(document.querySelector('img[alt=""]')).toHaveAttribute("src", url)
     )
-    // Par-dessus : le monogramme de Ruche (sans fichier ni nom de marque), en SVG animé.
-    await waitFor(() => expect(animatedMonogram()).not.toBeNull())
+    // Par-dessus : sans monogramme envoyé, le nom de la marque en texte (aucun logo de Ruche).
+    expect(animatedMonogram()).toBeNull()
   })
 
   it("sans image, met celle de Ruche, sous le voile et le monogramme", async () => {
     vi.mocked(identityApi.getAdminBrand).mockResolvedValue(brand(null))
     await renderApp("/sign-in", fakeAuth("signed-out"))
 
-    // Sans fichier ni nom de marque : le logotype de Ruche en haut, son monogramme à droite.
-    await waitFor(() => expect(animatedMonogram()).not.toBeNull())
-    // Ses contours se tracent, puis la lettre apparaît ; le segment miel a sa lueur.
-    expect(
-      animatedMonogram()?.querySelectorAll('[data-motion="trace"]').length
-    ).toBeGreaterThan(0)
-    expect(animatedMonogram()?.querySelector("[data-accent]")).not.toBeNull()
+    // Sans logo envoyé : le nom en texte, en haut comme sur l'image (aucun logo de Ruche).
+    await waitFor(() =>
+      expect(screen.getAllByText(texts.app.name).length).toBeGreaterThan(1)
+    )
+    expect(animatedMonogram()).toBeNull()
     expect(document.querySelector('img[alt=""]')).toHaveAttribute(
       "src",
       expect.stringContaining("connexion.webp")

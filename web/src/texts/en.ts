@@ -2318,7 +2318,7 @@ export const en = {
         // La section des logos : une carte, deux groupes de deux cases (fond clair, fond sombre).
         title: "Logos",
         description:
-          "Upload your logo for light and dark backgrounds (SVG, PNG, or WebP, up to 1 MB). Choose a file or drag it onto a slot. One version is enough: it's used on both backgrounds. With no logo, your brand name is shown instead, or the default logos if there's no name.",
+          "Upload your logo for light and dark backgrounds (SVG, PNG, or WebP, up to 1 MB). Choose a file or drag it onto a slot. One version is enough: it's used on both backgrounds. With no logo, your brand name is shown instead, as text.",
         logotype: {
           title: "Logo",
           use: "menu and sign-in",

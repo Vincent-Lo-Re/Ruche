@@ -5,12 +5,9 @@
 // admin_brand_variants). admin_brand() et admin_brand_variants() les donnent à tout le monde,
 // page de connexion comprise ; seul un admin les change.
 
-import rucheLogotype from "@/assets/brand/ruche-logotype.svg?raw"
-import rucheMonogram from "@/assets/brand/ruche-monogramme.svg?raw"
 import {
   analyzeSvgColors,
   recolorSvg,
-  svgDataUrl,
   type SvgColors,
 } from "@/lib/brand-colors"
 import type { Tables, TablesInsert } from "@/lib/database.types"
@@ -413,39 +410,9 @@ export function brandName(name: string | null | undefined): string {
 }
 
 /**
- * Les logos de Ruche, l'admin par défaut (src/assets/brand/) : déclinés comme un logo envoyé,
- * pour chaque palette et chaque fond, une fois, dans le navigateur (rien dans la base).
- */
-const rucheSources = { logotype: rucheLogotype, monogram: rucheMonogram }
-const rucheCache = new Map<string, string>()
-
-export function defaultBrandFile(
-  kind: BrandKind,
-  surface: BrandSurface,
-  preset: PresetId | null
-): string {
-  const palette = preset ?? ORIGIN
-  const key = variantKey(kind, palette, surface)
-  if (!rucheCache.has(key)) {
-    const markup = rucheSources[kind]
-    const colors = analyzeSvgColors(markup)!
-    for (const variant of brandVariants({ markup, colors })) {
-      for (const side of ["light", "dark"] as const) {
-        rucheCache.set(
-          variantKey(kind, variant.palette, side),
-          svgDataUrl(variant[side])
-        )
-      }
-    }
-  }
-  return rucheCache.get(key)!
-}
-
-/**
  * L'adresse d'un fichier pour un fond : la déclinaison de la palette de ce membre s'il y en a une
  * (Neutrine pour une association libre), sinon la version de ce fond, sinon l'autre. Sans aucun
- * fichier : les logos de Ruche si l'admin n'a pas non plus de nom de marque (c'est alors Ruche),
- * sinon null (le nom en texte, ou son initiale). Avec Neutrine, un fichier envoyé pour ce fond
+ * fichier : null, le nom en texte (ou son initiale) ; jamais de logo de Ruche par défaut. Avec Neutrine, un fichier envoyé pour ce fond
  * passe avant la déclinaison : ce sont les couleurs d'origine.
  */
 export function brandFileFor(
@@ -462,8 +429,7 @@ export function brandFileFor(
   if (variant) return variant
   const other = surface === "light" ? "dark" : "light"
   const file = sent ?? brand[`${kind}-${other}`]?.url ?? null
-  if (file) return file
-  return brand.name === null ? defaultBrandFile(kind, surface, preset) : null
+  return file
 }
 
 /** Le titre d'un onglet du navigateur (« Mon compte — Ruche »), sans le nom tant qu'il n'est pas lu. */
@@ -478,7 +444,7 @@ export function brandInitial(brand: string): string {
 
 /**
  * Le favicon d'une marque sans monogramme : son initiale, dans un carré arrondi (public/favicon.svg,
- * le monogramme de Ruche, sert pendant le chargement), en image data: (acceptée par la CSP, img-src).
+ * un carré vide sans logo, sert pendant le chargement), en image data: (acceptée par la CSP, img-src).
  */
 export function faviconHref(brand: string): string {
   const initial = brandInitial(brand)

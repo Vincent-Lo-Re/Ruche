@@ -222,10 +222,9 @@ describe("Paramètres : le nom de la marque", () => {
     const field = await screen.findByLabelText(identity.name)
     expect(field).toHaveValue("")
     expect(field).toHaveAttribute("placeholder", "Ruche")
-    // Ruche, sans logo ni nom de marque : son logotype, décliné pour la palette du membre.
-    const ruche = sidebar().querySelector("img")
-    expect(ruche).toHaveAttribute("alt", "Ruche")
-    expect(ruche?.getAttribute("src")).toMatch(/^data:image\/svg\+xml,/)
+    // Sans logo envoyé ni nom de marque : « Ruche » en texte, jamais un logo par défaut.
+    await waitFor(() => expect(sidebar()).toHaveTextContent("Ruche"))
+    expect(sidebar().querySelector("img")).toBeNull()
     expect(document.title).toBe(`${texts.sections.settings.title} — Ruche`)
 
     vi.mocked(identityApi.getAdminBrand).mockResolvedValue(brand("Essaim"))
@@ -243,7 +242,7 @@ describe("Paramètres : le nom de la marque", () => {
       })
     )
     expect(await screen.findByText(identity.saved)).toBeVisible()
-    // Une autre marque sans logo : son nom en texte, plus le logotype de Ruche.
+    // Une autre marque sans logo : son nom en texte.
     await waitFor(() => expect(sidebar()).toHaveTextContent("Essaim"))
     expect(sidebar().querySelector("img")).toBeNull()
     expect(document.title).toBe(`${texts.sections.settings.title} — Essaim`)

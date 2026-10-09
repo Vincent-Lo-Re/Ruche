@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest"
 import {
   BrandFileError,
   brandVariants,
-  defaultBrandFile,
   brandFileFor,
   brandInitial,
   brandName,
@@ -160,7 +159,7 @@ describe("le nom de la marque", () => {
     expect(blue.dark).toContain(presetLogoColors("zinc-blue").dark.accent)
   })
 
-  it("sans fichier ni nom de marque, les logos de Ruche, déclinés pour chaque palette", () => {
+  it("sans logo envoyé, aucun logo : le nom en texte, jamais celui de Ruche", () => {
     const empty: AdminBrand = {
       name: null,
       "logotype-light": null,
@@ -177,16 +176,8 @@ describe("le nom de la marque", () => {
       locale: null,
       variants: {},
     }
-    const origin = brandFileFor(empty, "monogram", "dark")!
-    const blue = brandFileFor(empty, "monogram", "dark", "zinc-blue")!
-    expect(decodeURIComponent(origin)).toContain("Symbole Ruche")
-    // Neutrine garde le miel de Ruche ; Zinbleu le remplace par son bleu.
-    expect(decodeURIComponent(origin).toLowerCase()).toContain("#f4cd48")
-    expect(decodeURIComponent(blue).toLowerCase()).not.toContain("#f4cd48")
-    expect(defaultBrandFile("logotype", "light", null)).toContain(
-      "data:image/svg+xml"
-    )
-    // Une autre marque sans logo : son nom en texte, pas le logo de Ruche.
+    expect(brandFileFor(empty, "monogram", "dark")).toBeNull()
+    expect(brandFileFor(empty, "logotype", "light", "zinc-blue")).toBeNull()
     expect(
       brandFileFor({ ...empty, name: "Essaim" }, "logotype", "light")
     ).toBeNull()
