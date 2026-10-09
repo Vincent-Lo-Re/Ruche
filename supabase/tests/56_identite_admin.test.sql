@@ -6,7 +6,7 @@
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(69);
+select plan(74);
 
 select pg_temp.create_people();
 
@@ -311,6 +311,27 @@ select is(
 );
 select pg_temp.as_anon();
 select is((select time_zone from public.admin_brand()), 'America/Montreal', 'anon : le fuseau horaire');
+select pg_temp.as_person('admin');
+
+-- Le format régional de toute l'admin : vide au départ (celui de la langue) ; un admin le change
+-- (« en-GB »), un éditeur non ; tout le monde le lit par admin_brand().
+select is((select locale from public.admin_brand()), null, 'pas de format régional au départ');
+select pg_temp.as_person('editor');
+select is(
+  pg_temp.affected($$update public.admin_identity set locale = 'en-GB'$$), 0,
+  'éditeur : ne change pas le format régional'
+);
+select pg_temp.as_person('admin');
+select throws_ok(
+  $$update public.admin_identity set locale = 'anglais'$$, '23514', null,
+  'un format mal écrit est refusé'
+);
+select is(
+  pg_temp.affected($$update public.admin_identity set locale = 'en-GB'$$), 1,
+  'admin : choisit le format du Royaume-Uni'
+);
+select pg_temp.as_anon();
+select is((select locale from public.admin_brand()), 'en-GB', 'anon : le format régional');
 select pg_temp.as_person('admin');
 
 -- Le site web du client : vide au départ (pas de lien « Site web ») ; un admin l'enregistre (une
