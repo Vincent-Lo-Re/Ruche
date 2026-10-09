@@ -1,6 +1,12 @@
 // Tous les textes de l'interface en anglais, la langue de référence : un texte s'écrit
 // d'abord ici, puis dans les autres langues (fr.ts). La forme des textes (`Texts`) en est tirée.
 
+import { englishSample, englishTerm } from "./grammar/en.ts"
+
+// Le nom des sections dans l'admin (Paramètres › Avancé, « Termes ») : « Blog » et « Podcasts » au départ.
+const blog = englishTerm("blog")
+const podcasts = englishTerm("podcasts")
+
 export const en = {
   app: {
     // Le nom par défaut de l'admin ; un admin le remplace par celui de la marque (Paramètres).
@@ -102,11 +108,11 @@ export const en = {
       description: "Welcome",
     },
     blog: {
-      title: "Blog",
+      title: blog.name,
       description: "Posts and categories.",
     },
     podcasts: {
-      title: "Podcasts",
+      title: podcasts.name,
       description: "Episodes and categories.",
     },
     pages: {
@@ -759,8 +765,8 @@ export const en = {
       all: "All",
       file: "Media library",
       page: "Pages",
-      article: "Blog",
-      episode: "Podcasts",
+      article: blog.name,
+      episode: podcasts.name,
       template: "Block templates",
     },
     itemTypes: {
@@ -1266,8 +1272,8 @@ export const en = {
     },
     // La section d'un point de départ ([D42]) : la sorte de contenu qu'il sert à créer.
     sections: {
-      article: "Blog posts",
-      episode: "Podcast episodes",
+      article: `${blog.name} (posts)`,
+      episode: `${podcasts.name} (episodes)`,
       page: "Pages",
     },
     list: {
@@ -1807,8 +1813,8 @@ export const en = {
       },
       feed: {
         title: {
-          article: "In the Blog list",
-          episode: "In the Podcasts list",
+          article: englishSample(blog),
+          episode: englishSample(podcasts),
         },
         choose: "Choose",
         chooseLabel: "Choose featured image",
@@ -2454,6 +2460,28 @@ export const en = {
         sameAsLanguage: "Based on each person's language",
         saved: "Regional format saved.",
       },
+      // Les termes de l'admin : les mots de l'équipe pour nommer les sections (ADMIN § 7 bis).
+      terms: {
+        title: "Terms",
+        description:
+          "Customize how sections are labeled in the admin, in English and French. These labels apply to the admin only: in the app, section names are translated with your content. Addresses like /blog don't change. Leave a field empty to use the default label.",
+        languages: "Admin languages",
+        sections: {
+          blog: "Section for posts",
+          podcasts: "Section for episodes",
+        },
+        name: "Name",
+        gender: "Gender",
+        genders: { masculine: "Masculine", feminine: "Feminine" },
+        number: "Number",
+        singular: "Singular",
+        plural: "Plural",
+        // L'article s'élide : « l'Agenda ».
+        elided: "Elision (l')",
+        preview: (sample: string) => `Preview: ${sample}`,
+        saved: "Terms saved.",
+        loadFailed: "The terms couldn't be loaded.",
+      },
       timeZone: {
         title: "Time zone",
         description:
@@ -2603,7 +2631,7 @@ export const en = {
     preview: {
       title: "Preview",
       description: "Your palette applies across the admin. Only you see it.",
-      nav: ["Dashboard", "Blog", "Podcasts", "Pages", "Media library"],
+      nav: ["Dashboard", blog.name, podcasts.name, "Pages", "Media library"],
       initial: "C",
       member: "Camille",
       heading: "Dashboard",
@@ -2618,17 +2646,17 @@ export const en = {
       rows: [
         {
           name: "Breathe before you reply",
-          meta: "Blog · by Léa, 2h ago",
+          meta: `${blog.name} · by Léa, 2h ago`,
           badge: "Published",
         },
         {
           name: "Morning calm",
-          meta: "Podcasts · by Hugo, yesterday",
+          meta: `${podcasts.name} · by Hugo, yesterday`,
           badge: "Scheduled",
         },
         {
           name: "Finding your rhythm",
-          meta: "Blog · by Camille, Monday",
+          meta: `${blog.name} · by Camille, Monday`,
           badge: "Draft",
         },
       ],

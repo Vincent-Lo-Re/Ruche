@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import * as levelsApi from "@/lib/access-levels"
 import * as languagesApi from "@/lib/app-languages"
 import * as identityApi from "@/lib/admin-identity"
+import * as termsApi from "@/lib/terms"
 import { fakeAuth, renderApp } from "@/test/render"
 import { texts } from "@/texts"
 
@@ -29,6 +30,14 @@ vi.mock("@/lib/app-languages", async (importOriginal) => ({
   setAppLanguageEnabled: vi.fn().mockResolvedValue(undefined),
   setDefaultAppLanguage: vi.fn().mockResolvedValue(undefined),
   removeAppLanguage: vi.fn().mockResolvedValue(undefined),
+}))
+
+vi.mock("@/lib/terms", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/terms")>()),
+  getTerms: vi.fn().mockResolvedValue([]),
+  saveTerms: vi.fn().mockResolvedValue(undefined),
+  // Les termes ne rechargent pas la page pendant les tests.
+  applyTerms: vi.fn(),
 }))
 
 vi.mock("@/lib/admin-identity", async (importOriginal) => {
@@ -244,6 +253,65 @@ describe("Paramètres : les langues de l'app", () => {
       expect(languagesApi.addAppLanguage).toHaveBeenCalledWith("de")
     )
     expect(await screen.findByText(words.added("Allemand"))).toBeVisible()
+  })
+})
+
+describe("Paramètres : les termes de l'admin (Avancé)", () => {
+  it("un onglet par langue de l'admin ; l'aperçu accorde, les termes d'une langue sont enregistrés", async () => {
+    await renderApp("/settings?tab=advanced")
+    const words = texts.settings.advanced.terms
+
+    const tabs = await screen.findByRole("tablist", { name: words.languages })
+    // La langue de l'admin d'abord (le français dans les tests).
+    expect(
+      within(tabs)
+        .getAllByRole("tab")
+        .map((tab) => tab.textContent)
+    ).toEqual([texts.languages.fr, texts.languages.en])
+
+    const blog = screen.getByRole("group", { name: words.sections.blog })
+    // Sans terme, les traits du mot par défaut : « Podcasts » est au pluriel.
+    expect(
+      within(
+        screen.getByRole("group", { name: words.sections.podcasts })
+      ).getByText(
+        words.preview(
+          "Les Podcasts · dans la liste des Podcasts · aux Podcasts"
+        )
+      )
+    ).toBeVisible()
+
+    fireEvent.change(within(blog).getByLabelText(words.name), {
+      target: { value: "Actualités" },
+    })
+    for (const [field, option] of [
+      [words.gender, words.genders.feminine],
+      [words.number, words.plural],
+    ]) {
+      fireEvent.click(within(blog).getByRole("combobox", { name: field }))
+      const choice = await screen.findByRole("option", { name: option })
+      fireEvent.pointerDown(choice, { pointerType: "mouse" })
+      fireEvent.click(choice)
+    }
+    expect(
+      within(blog).getByText(
+        words.preview(
+          "Les Actualités · dans la liste des Actualités · aux Actualités"
+        )
+      )
+    ).toBeVisible()
+
+    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
+    await waitFor(() =>
+      expect(termsApi.saveTerms).toHaveBeenCalledWith("fr", [
+        {
+          key: "blog",
+          name: "Actualités",
+          traits: { gender: "feminine", plural: true, elided: false },
+        },
+      ])
+    )
+    expect(await screen.findByText(words.saved)).toBeVisible()
   })
 })
 

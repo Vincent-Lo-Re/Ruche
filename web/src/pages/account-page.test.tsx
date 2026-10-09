@@ -188,7 +188,8 @@ describe("Mon compte", () => {
     expect(
       await screen.findByText(texts.account.profile.nameTooLong)
     ).toBeVisible()
-    expect(from).not.toHaveBeenCalled()
+    // Le profil n'est pas touché (la lecture des termes, au chargement, passe aussi par from).
+    expect(from).not.toHaveBeenCalledWith("profiles")
   })
 
   it("les couleurs : une palette d'une base et d'un accent, appliquée et gardée sur ce navigateur", async () => {
