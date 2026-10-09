@@ -196,13 +196,7 @@ export function writeTemplateTab(
 // --- Paramètres -----------------------------------------------------------------------------
 
 /** Les onglets de Paramètres, dans l'ordre (ADMIN § 7). */
-export const settingsTabs = [
-  "admin",
-  "app",
-  "plans",
-  "languages",
-  "advanced",
-] as const
+export const settingsTabs = ["admin", "app", "plans", "advanced"] as const
 export type SettingsTab = (typeof settingsTabs)[number]
 
 const settingsTabChoice: Choice<SettingsTab> = {
@@ -211,7 +205,6 @@ const settingsTabChoice: Choice<SettingsTab> = {
     admin: "admin",
     app: "app",
     plans: "plans",
-    languages: "languages",
     advanced: "advanced",
   },
   fallback: "admin",
