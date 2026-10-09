@@ -746,15 +746,21 @@ describe("Paramètres : le monogramme animé de l'écran de connexion", () => {
     ).toHaveLength(3)
   })
 
-  it("la dernière animation cochée ne se décoche pas", async () => {
+  it("la dernière animation cochée se décoche : aucune animation est permis", async () => {
     vi.mocked(identityApi.getAdminBrand).mockResolvedValue({
       ...brand(null),
+      monogramMotion: true,
       monogramMotions: ["sway"],
     })
     await renderApp("/settings")
     const group = await screen.findByRole("list", { name: motion.group })
-    expect(
-      within(group).getByRole("checkbox", { name: motion.motions.sway })
-    ).toHaveAttribute("aria-disabled", "true")
+    const sway = within(group).getByRole("checkbox", {
+      name: motion.motions.sway,
+    })
+    expect(sway).not.toHaveAttribute("aria-disabled", "true")
+    fireEvent.click(sway)
+    await waitFor(() =>
+      expect(identityApi.saveMonogramMotions).toHaveBeenCalledWith([])
+    )
   })
 })

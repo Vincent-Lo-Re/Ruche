@@ -100,7 +100,7 @@ export function LoginScreenCard() {
   // Pendant l'enregistrement, l'interrupteur et les cases montrent déjà le choix.
   const animated = motion.isPending
     ? motion.variables
-    : (brand?.monogramMotion ?? true)
+    : (brand?.monogramMotion ?? false)
   const motions = chosenMotions.isPending
     ? chosenMotions.variables
     : (brand?.monogramMotions ?? DEFAULT_MOTIONS)
@@ -228,12 +228,10 @@ export function LoginScreenCard() {
                       <Label className="font-normal">
                         <Checkbox
                           checked={checked}
-                          // Une au moins : la dernière cochée ne se décoche pas.
                           disabled={
                             !animated ||
                             blocked !== null ||
-                            chosenMotions.isPending ||
-                            (checked && motions.length === 1)
+                            chosenMotions.isPending
                           }
                           onCheckedChange={(next) => toggleMotion(one, next)}
                         />
