@@ -83,6 +83,7 @@ export type Database = {
           contact_email: string | null
           id: boolean
           language: string
+          locale: string | null
           login_image: string | null
           login_monogram_motion: boolean
           login_monogram_motions: string[]
@@ -91,6 +92,7 @@ export type Database = {
           monogram_dark: string | null
           monogram_light: string | null
           name: string | null
+          time_zone: string
           website_url: string | null
         }
         ComputedFields: never
@@ -98,6 +100,7 @@ export type Database = {
           contact_email?: string | null
           id?: boolean
           language?: string
+          locale?: string | null
           login_image?: string | null
           login_monogram_motion?: boolean
           login_monogram_motions?: string[]
@@ -106,12 +109,14 @@ export type Database = {
           monogram_dark?: string | null
           monogram_light?: string | null
           name?: string | null
+          time_zone?: string
           website_url?: string | null
         }
         Update: {
           contact_email?: string | null
           id?: boolean
           language?: string
+          locale?: string | null
           login_image?: string | null
           login_monogram_motion?: boolean
           login_monogram_motions?: string[]
@@ -120,6 +125,7 @@ export type Database = {
           monogram_dark?: string | null
           monogram_light?: string | null
           name?: string | null
+          time_zone?: string
           website_url?: string | null
         }
         Relationships: []
@@ -677,6 +683,7 @@ export type Database = {
         Returns: {
           contact_email: string
           language: string
+          locale: string
           login_image: string
           login_monogram_motion: boolean
           login_monogram_motions: string[]
@@ -685,6 +692,7 @@ export type Database = {
           monogram_dark: string
           monogram_light: string
           name: string
+          time_zone: string
           website_url: string
         }[]
       }
