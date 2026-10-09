@@ -236,10 +236,8 @@ export const en = {
   account: {
     profile: {
       title: "Profile",
-      description: [
+      description:
         "Your name is how your team knows you, in the team list and the version history.",
-        "Your sign-in codes are sent to your email address. A new address is confirmed with a code before it replaces the old one.",
-      ],
       name: "Name",
       namePlaceholder: "First and last name",
       nameTooLong: "The name can't be longer than 100 characters.",
@@ -248,6 +246,12 @@ export const en = {
       role: "Role",
       // Lu par les lecteurs d'écran devant le rôle.
       rolePrefix: "Role: ",
+    },
+    // L'adresse e-mail, où arrivent les codes de connexion.
+    signIn: {
+      title: "Sign-in",
+      description:
+        "Your sign-in codes are sent to your email address. A new address is confirmed with a code before it replaces the old one.",
     },
     emailChange: {
       // Bouton à côté de l'adresse grisée de la carte Profil.
