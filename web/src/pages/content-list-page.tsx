@@ -8,7 +8,7 @@ import {
   Search,
   Settings2,
   SquarePen,
-  Trash2,
+  Eraser,
   TriangleAlert,
 } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
@@ -409,7 +409,7 @@ export function ContentListPage({
                   disabled={categoryBulk.removeMany.isPending}
                   onClick={() => categoryBulk.setConfirming(true)}
                 >
-                  {categoryBulk.removeMany.isPending ? <Spinner /> : <Trash2 />}
+                  {categoryBulk.removeMany.isPending ? <Spinner /> : <Eraser />}
                   {texts.categories.removeMany(categoryBulk.selected.size)}
                 </Button>
               )}
@@ -852,7 +852,7 @@ function RowActions({
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onClick={onTrash}>
-          <Trash2 />
+          <Eraser />
           {labels.trash}
         </DropdownMenuItem>
       </DropdownMenuContent>

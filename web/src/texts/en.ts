@@ -2324,7 +2324,7 @@ export const en = {
         // La section des logos : une carte, deux groupes de deux cases (fond clair, fond sombre).
         title: "Logos",
         description: [
-          "Upload your logotype* and monogram** for light and dark backgrounds (SVG, PNG, or WebP).",
+          "Upload your logotype* and monogram** for light and dark backgrounds (SVG, PNG, or WebP, up to 1 MB each).",
           "* Without a logotype, your brand name is shown as text.",
           "** Without a monogram, your initials are shown.",
         ],
@@ -2361,8 +2361,6 @@ export const en = {
           done: "File saved and adapted to each palette.",
           // Sous le message : un fichier envoyé sans être décliné, ou retiré, emporte les déclinaisons.
           removed: "Its palette versions were removed.",
-          status: (count: number) =>
-            `Adapted for ${count} palette${count === 1 ? "" : "s"}`,
           // L'autre fond, vide : sa version tirée de ce fichier, proposée.
           other: {
             light: "Also create the version for light backgrounds",
@@ -2400,7 +2398,7 @@ export const en = {
           title: "Sign-in screen",
           description: [
             "Customize the first screen your team sees: its background image* and the monogram animation**.",
-            "* JPEG, PNG, or WebP, resized and compressed automatically, shown on large screens. Choose it, or drag it onto the preview.",
+            "* JPEG, PNG, or WebP, resized and compressed automatically, shown on large screens. Click the preview to choose it, or drag it there.",
             "** Until you upload a monogram, your initials animate instead.",
           ],
           preview: "Sign-in screen preview",
@@ -2409,7 +2407,6 @@ export const en = {
           title: "Background image",
           formats: "JPEG, PNG, or WebP",
           // Une photo plus lourde est réduite à l'envoi : elle tient toujours dans 1 Mo.
-          maxSize: "Resized and compressed automatically",
           choose: "Choose",
         },
         monogramMotion: {
@@ -2432,6 +2429,7 @@ export const en = {
           group: "Icon animations",
           // Une animation grisée : ce que le monogramme pour fond sombre ne permet pas.
           blocked: {
+            text: "“Trace”, “Cascade”, and “Glint” need an uploaded monogram: they don't work on your initials.",
             svg: "“Trace”, “Cascade”, and “Glint” only work with a simple SVG icon (up to four solid colors, no gradients or images).",
             accent:
               "“Glint” only works with an icon that has an accent color (a bright color, not just black, white, or gray).",

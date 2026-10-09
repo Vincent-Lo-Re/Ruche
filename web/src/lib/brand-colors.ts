@@ -14,6 +14,8 @@ const UNSUPPORTED = ["image", "linearGradient", "radialGradient", "pattern"]
 // Les formes qui se remplissent en noir quand rien ne dit leur couleur.
 const SHAPES = ["path", "rect", "circle", "ellipse", "polygon", "text"]
 const COLOR_PROPERTIES = ["fill", "stroke", "stop-color", "color"]
+// Ce qui ne se dessine pas lui-même : la forme d'une découpe, d'un masque, une définition.
+const UNDRAWN = "clipPath, mask, defs, symbol, marker"
 const NO_COLOR = new Set(["none", "transparent", "currentcolor", "inherit"])
 const NAMED: Record<string, string> = { black: "#000000", white: "#ffffff" }
 
@@ -127,6 +129,8 @@ function defaultBlackShapes(svg: SVGSVGElement): number {
   if (svg.querySelector("style")) return 0
   let count = 0
   for (const shape of svg.querySelectorAll(SHAPES.join(","))) {
+    // Une forme qui ne se dessine pas (découpe, masque, définition) n'a pas de couleur.
+    if (shape.closest(UNDRAWN)) continue
     let colored = false
     for (let node: Element | null = shape; node; node = node.parentElement) {
       const style = node.getAttribute("style") ?? ""

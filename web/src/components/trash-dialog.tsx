@@ -1,4 +1,4 @@
-import { Trash2 } from "lucide-react"
+import { Eraser } from "lucide-react"
 
 import {
   AlertDialog,
@@ -53,7 +53,7 @@ export function TrashDialog({
               disabled={pending}
               onClick={onConfirm}
             >
-              {pending ? <Spinner /> : <Trash2 />}
+              {pending ? <Spinner /> : <Eraser />}
               {confirmLabel}
             </Button>
           </AlertDialogFooter>

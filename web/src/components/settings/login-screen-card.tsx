@@ -1,10 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { cn } from "cn"
-import { Trash2, UploadCloud } from "lucide-react"
+import { Eraser, ImagePlus, UploadCloud } from "lucide-react"
 import { useId } from "react"
 import { toast } from "sonner"
 
-import defaultLoginImage from "@/assets/brand/connexion.webp"
 import { AnimatedMonogram } from "@/components/auth/animated-monogram"
 import { InfoTip } from "@/components/info-tip"
 import { Button } from "@/components/ui/button"
@@ -53,10 +52,13 @@ const motionLabels = files.monogramMotion
 
 /**
  * L'écran de connexion (Paramètres, section « Écran de connexion ») : une carte, l'aperçu tel que
- * sur la connexion (l'image choisie, sinon celle à défaut, sous le voile du fond du menu, et le
- * monogramme, animé ou immobile ; on peut y déposer une image) et, à côté (dessous sur une carte
- * étroite), deux réglages : l'image de fond (« Choisir », et la corbeille) et le monogramme animé
- * (son interrupteur, puis ses animations à cocher, une au moins). Les mêmes pour toute l'équipe.
+ * sur la connexion (l'image envoyée sous le voile du fond du menu, et le monogramme, animé ou
+ * immobile), qui marche comme une case des logos (FileSlot) : un clic choisit ou remplace
+ * l'image, on peut aussi l'y déposer, l'icône d'image prend son « + » au survol, et la gomme qui
+ * la retire apparaît dans le coin ; sans image, le fond sombre seul, sous le monogramme. À côté
+ * (dessous sur une carte étroite), l'image de fond (son titre et ses formats, sans bouton) et le
+ * monogramme animé (son interrupteur, puis ses animations à cocher). Les mêmes pour toute
+ * l'équipe.
  */
 export function LoginScreenCard() {
   const queryClient = useQueryClient()
@@ -113,36 +115,97 @@ export function LoginScreenCard() {
   return (
     <Card className="@container overflow-hidden py-0">
       <div className="flex flex-col @lg:flex-row">
-        {/* Sous la classe dark : le voile prend le fond du menu, comme sur l'écran de connexion. */}
+        {/* L'aperçu (un clic choisit l'image) et la gomme, à côté de lui : un bouton ne va ni
+            dans une étiquette de champ, ni dans une image (role="img"). */}
         <div
-          role="img"
-          aria-label={labels.preview}
-          className={cn(
-            "dark relative flex aspect-video items-center justify-center bg-card @lg:aspect-auto @lg:min-h-56 @lg:flex-1",
-            drop.dragging && "ring-2 ring-primary ring-inset"
-          )}
+          className="group/preview relative flex flex-col @lg:flex-1"
           {...drop.handlers}
         >
-          <img
-            src={image?.url ?? defaultLoginImage}
-            alt=""
-            className="absolute inset-0 size-full object-cover"
-          />
-          <div aria-hidden className="absolute inset-0 bg-card/70" />
-          <div className="relative text-foreground">
+          {/* Sous la classe dark : le voile prend le fond du menu, comme sur l'écran de connexion. */}
+          <label
+            htmlFor={inputId}
+            className={cn(
+              "dark relative flex aspect-video cursor-pointer items-center justify-center bg-card text-muted-foreground @lg:aspect-auto @lg:min-h-56 @lg:flex-1",
+              drop.dragging && "ring-2 ring-primary ring-inset"
+            )}
+          >
+            <span className="sr-only">
+              {image ? files.replace : files.loginImage.choose}
+            </span>
             {busy ? (
               <Spinner className="size-8" />
             ) : drop.dragging ? (
               <UploadCloud aria-hidden className="size-8" />
             ) : (
-              // Rallumé, ou ses animations changées, il repart du début.
-              <AnimatedMonogram
-                key={animated ? motions.join() : "still"}
-                motions={animated ? motions : []}
-                className="h-24 text-7xl"
-              />
+              <>
+                {/* Tel que sur la connexion : l'image envoyée sous le voile, sinon le fond seul ;
+                    le monogramme par-dessus. Au survol, il pâlit et le « + » apparaît. */}
+                <div
+                  role="img"
+                  aria-label={labels.preview}
+                  className="absolute inset-0 flex items-center justify-center transition-opacity group-hover/preview:opacity-30"
+                >
+                  {image && (
+                    <>
+                      <img
+                        src={image.url}
+                        alt=""
+                        className="absolute inset-0 size-full object-cover"
+                      />
+                      <div
+                        aria-hidden
+                        className="absolute inset-0 bg-card/70"
+                      />
+                    </>
+                  )}
+                  <div className="relative text-foreground">
+                    {/* Rallumé, ou ses animations changées, il repart du début. */}
+                    <AnimatedMonogram
+                      key={animated ? motions.join() : "still"}
+                      motions={animated ? motions : []}
+                      className="h-24 text-7xl"
+                    />
+                  </div>
+                </div>
+                <ImagePlus
+                  aria-hidden
+                  className="relative size-8 text-foreground opacity-0 transition-opacity group-hover/preview:opacity-100"
+                />
+              </>
             )}
-          </div>
+          </label>
+          <input
+            id={inputId}
+            type="file"
+            accept={loginImageAccept}
+            aria-label={labels.title}
+            className="sr-only"
+            disabled={busy}
+            onChange={(event) => {
+              const chosen = event.target.files?.[0]
+              event.target.value = ""
+              if (chosen) save.mutate(chosen)
+            }}
+          />
+          {image && !busy && (
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <Button
+                    variant="destructive"
+                    size="icon-sm"
+                    // Comme sur les logos : un fond plein sous le rouge pâle, visible sur toute image.
+                    className="absolute top-2 right-2 bg-background opacity-0 shadow-sm ring-1 ring-foreground/10 transition-opacity group-hover/preview:opacity-100 focus-visible:opacity-100"
+                    aria-label={files.remove}
+                    onClick={() => remove.mutate(image.path)}
+                  />
+                }
+              >
+                <Eraser />
+              </TooltipTrigger>
+              <TooltipContent>{files.remove}</TooltipContent>
+            </Tooltip>
+          )}
         </div>
         <ItemGroup className="justify-center gap-0 divide-y p-2 @lg:w-80">
           <Item size="sm">
@@ -150,50 +213,8 @@ export function LoginScreenCard() {
               <ItemTitle>{files.loginImage.title}</ItemTitle>
               <ItemDescription className="line-clamp-none">
                 {files.loginImage.formats}
-                <br />
-                {files.loginImage.maxSize}
               </ItemDescription>
             </ItemContent>
-            <ItemActions>
-              {image && !busy && (
-                <Tooltip>
-                  <TooltipTrigger
-                    render={
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        aria-label={files.remove}
-                        onClick={() => remove.mutate(image.path)}
-                      />
-                    }
-                  >
-                    <Trash2 />
-                  </TooltipTrigger>
-                  <TooltipContent>{files.remove}</TooltipContent>
-                </Tooltip>
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={busy}
-                render={<label htmlFor={inputId} />}
-              >
-                {image ? files.replace : files.loginImage.choose}
-              </Button>
-              <input
-                id={inputId}
-                type="file"
-                accept={loginImageAccept}
-                aria-label={labels.title}
-                className="sr-only"
-                disabled={busy}
-                onChange={(event) => {
-                  const chosen = event.target.files?.[0]
-                  event.target.value = ""
-                  if (chosen) save.mutate(chosen)
-                }}
-              />
-            </ItemActions>
           </Item>
           <Item size="sm">
             <ItemContent>
@@ -216,13 +237,16 @@ export function LoginScreenCard() {
                 className="grid grid-cols-2 gap-x-3 gap-y-2"
               >
                 {MOTIONS.map((one) => {
-                  const checked = motions.includes(one)
+                  // Sans monogramme, les initiales (du texte) : ni tracé, ni cascade, ni lueur.
                   // Tant que le fichier n'est pas lu, rien n'est grisé.
-                  const blocked = monogram.svg.isSuccess
-                    ? motionBlocker(one, monogram.svg.data)
-                    : monogram.url === null
-                      ? motionBlocker(one, null)
-                      : null
+                  const blocked =
+                    monogram.url === null
+                      ? motionBlocker(one, null) && "text"
+                      : monogram.svg.isSuccess
+                        ? motionBlocker(one, monogram.svg.data)
+                        : null
+                  // Une animation impossible n'est jamais montrée cochée (elle ne se joue pas).
+                  const checked = motions.includes(one) && blocked === null
                   return (
                     <li key={one} className="flex items-center gap-1">
                       <Label className="font-normal">

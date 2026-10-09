@@ -6,7 +6,7 @@ import {
   type UseQueryResult,
 } from "@tanstack/react-query"
 import { cn } from "cn"
-import { Ellipsis, Pencil, Plus, Trash2 } from "lucide-react"
+import { Ellipsis, Pencil, Plus, Eraser } from "lucide-react"
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -397,7 +397,7 @@ function SortableName<T extends Named>({
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem variant="destructive" onClick={onRemove}>
-                  <Trash2 />
+                  <Eraser />
                   {labels.remove}
                 </DropdownMenuItem>
               </DropdownMenuContent>

@@ -1,5 +1,5 @@
 import { cn } from "cn"
-import { ImageIcon, ImagePlus, Trash2, UploadCloud } from "lucide-react"
+import { ImageIcon, ImagePlus, Eraser, UploadCloud } from "lucide-react"
 import { useId } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -18,7 +18,8 @@ const labels = texts.settings.adminIdentity.files
 /**
  * Une case de fichier (Paramètres, section « Logos ») : l'aperçu sur son fond (un clic choisit
  * ou remplace le fichier, l'image prend son « + » au survol ; on peut aussi y déposer un fichier),
- * l'icône qui le retire dans son coin, et sa légende en bas du cadre (« Fond clair »).
+ * la gomme qui le retire dans son coin, au survol de la case (ou au clavier), et sa légende en
+ * bas du cadre (« Fond clair »).
  */
 export function FileSlot({
   label,
@@ -30,6 +31,7 @@ export function FileSlot({
   onRemove,
   frameClassName,
   zoneClassName,
+  dark,
 }: {
   /** Le nom du champ, pour les lecteurs d'écran (« Logotype · fond clair »). */
   label: string
@@ -43,6 +45,8 @@ export function FileSlot({
   frameClassName: string
   /** La couleur des icônes sur ce fond. */
   zoneClassName: string
+  /** Un fond sombre : la gomme y prend une ombre, qui ne se voit pas proprement sur du blanc. */
+  dark: boolean
 }) {
   const inputId = useId()
   const drop = useFileDrop(onChoose, busy)
@@ -52,7 +56,7 @@ export function FileSlot({
       <Item
         variant="outline"
         className={cn(
-          "relative aspect-3/2 overflow-hidden p-0 transition-shadow",
+          "group/slot relative aspect-3/2 overflow-hidden p-0 transition-shadow",
           drop.dragging && "ring-2 ring-primary",
           frameClassName
         )}
@@ -110,13 +114,16 @@ export function FileSlot({
                   variant="destructive"
                   size="icon-sm"
                   // Un fond plein sous le rouge pâle : l'icône se voit sur n'importe quelle image.
-                  className="absolute top-2 right-2 bg-background shadow-sm ring-1 ring-foreground/10"
+                  className={cn(
+                    "absolute top-2 right-2 bg-background opacity-0 transition-opacity group-hover/slot:opacity-100 focus-visible:opacity-100",
+                    dark && "shadow-sm ring-1 ring-foreground/10"
+                  )}
                   aria-label={labels.remove}
                   onClick={onRemove}
                 />
               }
             >
-              <Trash2 />
+              <Eraser />
             </TooltipTrigger>
             <TooltipContent>{labels.remove}</TooltipContent>
           </Tooltip>

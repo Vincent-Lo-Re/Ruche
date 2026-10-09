@@ -6,7 +6,7 @@ import {
   Copy,
   ImageIcon,
   SquarePen,
-  Trash2,
+  Eraser,
   Unlink,
 } from "lucide-react"
 import type { ReactNode } from "react"
@@ -355,7 +355,7 @@ function ActionBar({
         destructive
         onClick={() => onRemove(block.id)}
       >
-        <Trash2 />
+        <Eraser />
       </IconAction>
     </div>
   )

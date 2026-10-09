@@ -11,7 +11,7 @@ import {
   GripVertical,
   ListChecks,
   ListTree,
-  Trash2,
+  Eraser,
   TriangleAlert,
   X,
 } from "lucide-react"
@@ -676,7 +676,7 @@ function RowActions({
           aria-describedby={removeBlocked ? reasonId : undefined}
           onClick={onRemove}
         >
-          <Trash2 />
+          <Eraser />
           {labels.remove}
         </DropdownMenuItem>
         {/* Grisé : pourquoi, juste dessous (un bloc partagé utilisé garde son bloc). */}

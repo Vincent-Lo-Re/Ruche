@@ -5,7 +5,7 @@ import {
   Search,
   SquarePen,
   Tags,
-  Trash2,
+  Eraser,
 } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
@@ -474,7 +474,7 @@ function CategoryTable({
                         variant="destructive"
                         onClick={() => onRemove(category)}
                       >
-                        <Trash2 />
+                        <Eraser />
                         {labels.remove}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
