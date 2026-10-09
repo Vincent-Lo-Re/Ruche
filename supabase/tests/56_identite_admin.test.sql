@@ -6,7 +6,7 @@
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(74);
+select plan(79);
 
 select pg_temp.create_people();
 
@@ -367,6 +367,29 @@ select throws_ok(
 select throws_ok(
   'delete from public.admin_identity', '42501', null, 'admin : pas de suppression'
 );
+
+-- Les initiales (1 à 3 caractères, sans espace autour) : un admin les change, tout le monde
+-- les lit par admin_brand() ; un éditeur non.
+select pg_temp.as_person('admin');
+select is(
+  pg_temp.affected($$update public.admin_identity set initials = 'ES'$$), 1,
+  'admin : change les initiales'
+);
+select throws_ok(
+  $$update public.admin_identity set initials = 'ABCD'$$, '23514', null,
+  'plus de 3 caractères : refusé'
+);
+select throws_ok(
+  $$update public.admin_identity set initials = ' E'$$, '23514', null,
+  'des espaces autour : refusé'
+);
+select pg_temp.as_person('editor');
+select is(
+  pg_temp.affected($$update public.admin_identity set initials = 'XX'$$), 0,
+  'éditeur : ne change pas les initiales'
+);
+select pg_temp.as_anon();
+select is((select initials from public.admin_brand()), 'ES', 'anon : les initiales');
 
 select * from finish();
 rollback;
