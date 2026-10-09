@@ -47,9 +47,6 @@ function effectiveLanguage(): Language {
 
 export const language: Language = effectiveLanguage()
 
-/** Pour Intl : les dates et les nombres de la langue (« 1 000 », « 1,000 »). */
-export const locale = language === "fr" ? "fr-FR" : "en-US"
-
 /** La langue choisie par le membre dans Mon compte, rangée sur son compte ; null s'il suit l'admin. */
 export function memberLanguage(
   metadata: Record<string, unknown> | undefined

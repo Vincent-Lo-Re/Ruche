@@ -17,6 +17,7 @@ import { useAuth } from "@/auth/auth-context"
 import { ListCard } from "@/components/list-card"
 import { LoadState } from "@/components/load-state"
 import { PageHeader } from "@/components/page-header"
+import { RoleBadge } from "@/components/role-badge"
 import { InviteDialog } from "@/components/team/invite-dialog"
 import { useAccessCheck } from "@/components/team/use-access-check"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -180,7 +181,9 @@ export function TeamPage() {
                           {member.email}
                         </div>
                       </TableCell>
-                      <TableCell>{texts.roles[member.role]}</TableCell>
+                      <TableCell>
+                        <RoleBadge role={member.role} />
+                      </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap items-center gap-2">
                           <Badge

@@ -13,8 +13,8 @@ type CodeInputProps = {
   onBlur?: () => void
   invalid?: boolean
   disabled?: boolean
-  /** Les 6 chiffres saisis : la connexion part sans attendre le clic. */
-  onComplete?: () => void
+  /** Les 6 chiffres saisis (le code complet) : la connexion part sans attendre le clic. */
+  onComplete?: (value: string) => void
 }
 
 /**

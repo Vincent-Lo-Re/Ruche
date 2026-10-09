@@ -23,6 +23,8 @@ const brand = (websiteUrl: string | null): identityApi.AdminBrand => ({
   contactEmail: null,
   websiteUrl,
   language: "fr",
+  timeZone: "Europe/Paris",
+  locale: null,
   variants: {},
 })
 
@@ -141,5 +143,29 @@ describe("header (ADMIN § 7, « Un header sur toute la largeur »)", () => {
       target: { value: "zzzz aucun mot" },
     })
     expect(await within(dialog).findByText(texts.help.empty)).toBeVisible()
+  })
+
+  it("les palettes : l'icône en dernier ouvre une glissière, et le choix est gardé comme dans Mon compte", async () => {
+    await renderApp("/", fakeAuth({ role: "editor" }))
+    // Le header de la page : celui qui porte le menu du haut.
+    const header = screen
+      .getByRole("navigation", { name: texts.header.label })
+      .closest("header")!
+    const buttons = within(header).getAllByRole("button")
+    const open = within(header).getByRole("button", {
+      name: texts.theme.openPalettes,
+    })
+    expect(buttons.at(-1)).toBe(open)
+
+    fireEvent.click(open)
+    const sheet = await screen.findByRole("dialog", { name: texts.theme.title })
+    expect(within(sheet).getByText(texts.theme.description)).toBeVisible()
+    const presets = within(sheet).getByRole("group", {
+      name: texts.colors.presets.title,
+    })
+    fireEvent.click(within(presets).getAllByRole("button")[1])
+    expect(localStorage.getItem("ruche-couleurs")).not.toBeNull()
+    localStorage.clear()
+    document.getElementById("ruche-couleurs")?.remove()
   })
 })

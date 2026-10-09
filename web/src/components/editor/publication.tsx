@@ -73,11 +73,12 @@ import {
   formatDateTime,
   formatDayInput,
   formatTimeInput,
-  parisToInstant,
+  zoneToInstant,
   parseDayInput,
   parseTimeInput,
-  toParisParts,
+  toZoneParts,
 } from "@/lib/dates"
+import { timeZone, timeZoneCity } from "@/lib/time-zone"
 import { texts } from "@/texts"
 
 const labels = texts.publication
@@ -767,7 +768,7 @@ function PublishDialog({ pub }: { pub: PublicationControls }) {
   )
 }
 
-// Jour et heure à Paris, tels qu'ils sont saisis (« 25/10/2099 », « 08h00 »).
+// Jour et heure dans le fuseau de l'admin, tels qu'ils sont saisis (« 25/10/2099 », « 08h00 »).
 const scheduleSchema = z.object({
   date: z.string(),
   time: z.string(),
@@ -778,7 +779,7 @@ function toInstant(date: string, time: string) {
   const day = parseDayInput(date)
   const clock = parseTimeInput(time)
   return day && clock
-    ? parisToInstant(day, clock)
+    ? zoneToInstant(day, clock)
     : ({ ok: false, reason: "invalid" } as const)
 }
 
@@ -792,12 +793,12 @@ function ScheduleDialog({ pub }: { pub: PublicationControls }) {
   const chosen = pub.bridge.settings.accessChosen
   const [pick, setPick] = useState<LevelPick>(undefined)
   const current = pub.publication?.scheduled_at
-  // Par défaut : l'heure déjà programmée, sinon demain à 8 h (heure de Paris).
+  // Par défaut : l'heure déjà programmée, sinon demain à 8 h (heure du fuseau de l'admin).
   const [defaults] = useState(() => {
     const parts = current
-      ? toParisParts(new Date(current))
+      ? toZoneParts(new Date(current))
       : {
-          date: toParisParts(new Date(pub.now + 24 * 3600 * 1000)).date,
+          date: toZoneParts(new Date(pub.now + 24 * 3600 * 1000)).date,
           time: "08:00",
         }
     return {
@@ -844,7 +845,7 @@ function ScheduleDialog({ pub }: { pub: PublicationControls }) {
         <DialogHeader>
           <DialogTitle>{labels.scheduleDialog.title}</DialogTitle>
           <DialogDescription>
-            {labels.scheduleDialog.description}
+            {labels.scheduleDialog.description(timeZoneCity(timeZone))}
           </DialogDescription>
         </DialogHeader>
         <FieldGroup className="grid grid-cols-2 gap-3">
@@ -874,7 +875,7 @@ function ScheduleDialog({ pub }: { pub: PublicationControls }) {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="programmer-heure">
-                  {labels.scheduleDialog.time}
+                  {labels.scheduleDialog.time(timeZoneCity(timeZone))}
                 </FieldLabel>
                 <TimeField
                   {...field}

@@ -236,7 +236,10 @@ export const en = {
   account: {
     profile: {
       title: "Profile",
-      description: "Your name is shown to your team.",
+      description: [
+        "Your name is how your team knows you, in the team list and the version history.",
+        "Your sign-in codes are sent to your email address. A new address is confirmed with a code before it replaces the old one.",
+      ],
       name: "Name",
       namePlaceholder: "First and last name",
       nameTooLong: "The name can't be longer than 100 characters.",
@@ -246,6 +249,26 @@ export const en = {
       // Lu par les lecteurs d'écran devant le rôle.
       rolePrefix: "Role: ",
     },
+    emailChange: {
+      // Bouton à côté de l'adresse grisée de la carte Profil.
+      open: "Change",
+      title: "Change your email address",
+      description:
+        "We'll send a code to the new address to confirm it. Your current address gets an email too, so you'll know if anyone else tries.",
+      newEmail: "New email address",
+      sameEmail: "This is already your email address.",
+      taken: "This address is already used by another account.",
+      send: "Send the code",
+      codeTitle: "Enter the code",
+      codeSent: (email: string) =>
+        `We sent a 6-digit code to ${email}. It's valid for 10 minutes.`,
+      code: "Code from your email",
+      confirm: "Confirm",
+      resend: "Send a new code",
+      resent: "A new code is on its way.",
+      otherEmail: "Use a different address",
+      done: "Email address changed.",
+    },
     language: {
       title: "Language",
       description:
@@ -254,6 +277,14 @@ export const en = {
       // Le membre suit la langue de toute l'admin (Paramètres › Avancé), entre parenthèses.
       sameAsAdmin: (language: string) => `Same as the admin (${language})`,
       failed: "Your language couldn't be saved. Try again.",
+    },
+    format: {
+      title: "Regional format",
+      description: "How dates, times, and numbers are written, for you only.",
+      label: "Regional format",
+      // Le membre suit le format de toute l'admin (Paramètres › Avancé), entre parenthèses.
+      sameAsAdmin: (format: string) => `Same as the admin (${format})`,
+      failed: "Your regional format couldn't be saved. Try again.",
     },
     mfa: {
       title: "Two-step verification",
@@ -2128,10 +2159,11 @@ export const en = {
     },
     scheduleDialog: {
       title: "Schedule publishing",
-      description:
-        "Choose a date and time (Paris time). The latest saved draft will be published then.",
+      // Avec la ville du fuseau de l'admin (Paramètres › Avancé) : « Paris ».
+      description: (city: string) =>
+        `Choose a date and time (time zone: ${city}). The latest saved draft will be published then.`,
       date: "Date",
-      time: "Time (Paris)",
+      time: (city: string) => `Time (${city})`,
       summary: (date: string) => `Publishing on ${date}.`,
       ambiguous:
         "This time happens twice that night because clocks fall back. It'll publish at the first one, while daylight saving time is still in effect.",
@@ -2383,6 +2415,25 @@ export const en = {
         saved: "Admin language saved.",
         loadFailed: "The admin language couldn't be loaded.",
       },
+      format: {
+        title: "Regional format",
+        description:
+          "How dates, times, and numbers are written across the admin, for the whole team. Each member can choose their own in My account.",
+        label: "Admin regional format",
+        // Pas de format choisi : chacun a celui de sa langue.
+        sameAsLanguage: "Based on each person's language",
+        saved: "Regional format saved.",
+      },
+      timeZone: {
+        title: "Time zone",
+        description:
+          "Dates across the admin are shown in this time zone, and scheduled publishing times use it. It applies to the whole team.",
+        label: "Admin time zone",
+        search: "Search for a city or region",
+        empty: "No time zone found.",
+        saved: "Time zone saved.",
+        loadFailed: "The admin time zone couldn't be loaded.",
+      },
     },
     accessLevels: {
       title: "Subscription plans",
@@ -2564,6 +2615,8 @@ export const en = {
     // Le bouton du header : le thème choisi, et celui qui vient au clic.
     switch: (current: string, next: string) =>
       `Theme: ${current}. Switch to ${next.toLowerCase()} theme`,
+    // Le bouton du header qui ouvre la glissière des palettes.
+    openPalettes: "Change colors",
   },
 
   smallScreen: {
@@ -2586,13 +2639,11 @@ export const en = {
   },
 
   dates: {
-    // Entre la date et l'heure : « 27 sept. 2026 à 18h42 »
-    at: "at",
-    // Entre les heures et les minutes : « 18h42 »
-    hour: ":",
-    // Champs « Jour » et « Heure » (fenêtre « Programmer »).
-    dayPlaceholder: "mm/dd/yyyy",
-    timePlaceholder: "8:00 AM",
+    // Ce qu'on tape dans « Jour » (fenêtre « Programmer »), dans l'ordre du format régional :
+    // « dd/mm/yyyy », « mm/dd/yyyy ».
+    fields: { day: "dd", month: "mm", year: "yyyy" },
+    // Sous la liste d'un format régional : « Example: Sep 27, 2026, 2:30 PM · 1,234.5 ».
+    sample: (sample: string) => `Example: ${sample}`,
     pickDay: "Pick a date from the calendar",
   },
 } as const

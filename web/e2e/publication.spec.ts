@@ -200,7 +200,7 @@ async function scheduleInTwoDays(page: Page) {
     .getByLabel(labels.scheduleDialog.date, { exact: true })
     .fill(frenchDay(when.date))
   await dialog
-    .getByLabel(labels.scheduleDialog.time, { exact: true })
+    .getByLabel(labels.scheduleDialog.time("Paris"), { exact: true })
     .fill(frenchTime(when.time))
   await dialog
     .getByRole("button", { name: labels.scheduleDialog.confirm })

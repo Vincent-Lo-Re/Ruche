@@ -14,13 +14,17 @@ afterAll(() => {
   vi.resetModules()
 })
 
+// Les navigateurs récents mettent une espace fine insécable avant « AM » et « PM ».
+const plain = (text: string) => text.replace(/\u202f/g, " ")
+
 describe("dates en anglais", () => {
   it("s'écrivent à l'américaine, à l'heure de Paris", () => {
-    expect(dates.formatDateTime("2026-09-27T12:30:00Z")).toBe(
+    expect(plain(dates.formatDateTime("2026-09-27T12:30:00Z"))).toBe(
       "Sep 27, 2026, 2:30 PM"
     )
     const now = new Date("2026-10-03T10:00:00Z")
-    expect(dates.formatShortDateTime("2026-10-03T07:05:00Z", now)).toEqual({
+    const today = dates.formatShortDateTime("2026-10-03T07:05:00Z", now)
+    expect({ ...today, text: plain(today.text) }).toEqual({
       today: true,
       text: "9:05 AM",
     })

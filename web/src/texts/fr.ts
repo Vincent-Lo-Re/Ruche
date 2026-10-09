@@ -240,7 +240,10 @@ export const fr: Texts = {
   account: {
     profile: {
       title: "Profil",
-      description: "Ton nom apparaît auprès de l'équipe.",
+      description: [
+        "Ton nom permet à l'équipe de te reconnaître, dans la liste de l'équipe et dans l'historique.",
+        "Tes codes de connexion arrivent sur ton adresse e-mail. Une nouvelle adresse se confirme par un code avant de remplacer l'ancienne.",
+      ],
       name: "Nom",
       namePlaceholder: "Prénom Nom",
       nameTooLong: "Le nom ne doit pas dépasser 100 caractères.",
@@ -250,6 +253,26 @@ export const fr: Texts = {
       // Lu par les lecteurs d'écran devant le rôle.
       rolePrefix: "Rôle : ",
     },
+    emailChange: {
+      // Bouton à côté de l'adresse grisée de la carte Profil.
+      open: "Modifier",
+      title: "Changer d'adresse e-mail",
+      description:
+        "On envoie un code à la nouvelle adresse pour la confirmer. Ton adresse actuelle reçoit aussi un e-mail : tu sauras si quelqu'un d'autre essaie.",
+      newEmail: "Nouvelle adresse e-mail",
+      sameEmail: "C'est déjà ton adresse e-mail.",
+      taken: "Cette adresse est déjà celle d'un autre compte.",
+      send: "Envoyer le code",
+      codeTitle: "Saisis le code",
+      codeSent: (email: string) =>
+        `On a envoyé un code à 6 chiffres à ${email}. Il est valable 10 minutes.`,
+      code: "Code reçu par e-mail",
+      confirm: "Confirmer",
+      resend: "Recevoir un nouveau code",
+      resent: "Un nouveau code est en route.",
+      otherEmail: "Choisir une autre adresse",
+      done: "Adresse e-mail changée.",
+    },
     language: {
       title: "Langue",
       description:
@@ -258,6 +281,15 @@ export const fr: Texts = {
       // Le membre suit la langue de toute l'admin (Paramètres › Avancé), entre parenthèses.
       sameAsAdmin: (language: string) => `Comme l'admin (${language})`,
       failed: "Ta langue n'a pas pu être enregistrée. Réessaie.",
+    },
+    format: {
+      title: "Format régional",
+      description:
+        "L'écriture des dates, des heures et des nombres, pour toi seulement.",
+      label: "Format régional",
+      // Le membre suit le format de toute l'admin (Paramètres › Avancé), entre parenthèses.
+      sameAsAdmin: (format: string) => `Comme l'admin (${format})`,
+      failed: "Ton format régional n'a pas pu être enregistré. Réessaie.",
     },
     mfa: {
       title: "Double vérification",
@@ -2175,10 +2207,11 @@ export const fr: Texts = {
     },
     scheduleDialog: {
       title: "Programmer la publication",
-      description:
-        "Choisis le jour et l'heure, à l'heure de Paris. À ce moment-là, le dernier brouillon enregistré partira dans l'app.",
+      // Avec la ville du fuseau de l'admin (Paramètres › Avancé) : « Paris ».
+      description: (city: string) =>
+        `Choisis le jour et l'heure (fuseau : ${city}). À ce moment-là, le dernier brouillon enregistré partira dans l'app.`,
       date: "Jour",
-      time: "Heure (Paris)",
+      time: (city: string) => `Heure (${city})`,
       summary: (date: string) => `Publication le ${date}.`,
       ambiguous:
         "Cette heure existe deux fois cette nuit-là (retour à l'heure d'hiver) : la publication partira à la première, encore en heure d'été.",
@@ -2427,6 +2460,25 @@ export const fr: Texts = {
         saved: "Langue de l'admin enregistrée.",
         loadFailed: "La langue de l'admin n'a pas pu être chargée.",
       },
+      format: {
+        title: "Format régional",
+        description:
+          "L'écriture des dates, des heures et des nombres dans l'admin, pour toute l'équipe. Chaque membre peut choisir le sien dans Mon compte.",
+        label: "Format régional de l'admin",
+        // Pas de format choisi : chacun a celui de sa langue.
+        sameAsLanguage: "Selon la langue de chacun",
+        saved: "Format régional enregistré.",
+      },
+      timeZone: {
+        title: "Fuseau horaire",
+        description:
+          "Les dates de l'admin s'affichent dans ce fuseau, et l'heure d'une publication programmée s'y comprend. Il vaut pour toute l'équipe.",
+        label: "Fuseau horaire de l'admin",
+        search: "Chercher une ville ou une région",
+        empty: "Aucun fuseau trouvé.",
+        saved: "Fuseau horaire enregistré.",
+        loadFailed: "Le fuseau horaire de l'admin n'a pas pu être chargé.",
+      },
     },
     // Un onglet pas encore rempli.
     empty: {
@@ -2616,6 +2668,8 @@ export const fr: Texts = {
     // Le bouton du header : le thème choisi, et celui qui vient au clic.
     switch: (current: string, next: string) =>
       `Thème : ${current}. Passer en ${next.toLowerCase()}`,
+    // Le bouton du header qui ouvre la glissière des palettes.
+    openPalettes: "Changer les couleurs",
   },
 
   smallScreen: {
@@ -2638,13 +2692,11 @@ export const fr: Texts = {
   },
 
   dates: {
-    // Entre la date et l'heure : « 27 sept. 2026 à 18h42 »
-    at: "à",
-    // Entre les heures et les minutes : « 18h42 »
-    hour: "h",
-    // Champs « Jour » et « Heure » (fenêtre « Programmer »).
-    dayPlaceholder: "jj/mm/aaaa",
-    timePlaceholder: "08h00",
+    // Ce qu'on tape dans « Jour » (fenêtre « Programmer »), dans l'ordre du format régional :
+    // « jj/mm/aaaa », « mm/jj/aaaa ».
+    fields: { day: "jj", month: "mm", year: "aaaa" },
+    // Sous la liste d'un format régional : « Exemple : 27 sept. 2026 à 14:30 · 1 234,5 ».
+    sample: (sample: string) => `Exemple : ${sample}`,
     pickDay: "Choisir le jour dans le calendrier",
   },
 }

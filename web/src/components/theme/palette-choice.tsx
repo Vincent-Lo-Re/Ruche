@@ -32,7 +32,9 @@ export function PaletteChoice() {
     palette.base === DEFAULT_PALETTE.base &&
     palette.accent === DEFAULT_PALETTE.accent
   return (
-    <Field>
+    // Un conteneur : deux colonnes de palettes dès que la place le permet (carte de Mon compte,
+    // glissière du header), une sur un écran étroit.
+    <Field className="@container">
       {/* Les couleurs des pastilles de chaque carte, tirées des palettes (lib/palettes.ts). */}
       <style>{swatchCss()}</style>
       <div className="flex min-h-6 items-center justify-between gap-2">
@@ -51,7 +53,7 @@ export function PaletteChoice() {
       <div
         role="group"
         aria-labelledby={titleId}
-        className="grid gap-3 sm:grid-cols-2"
+        className="grid gap-3 @sm:grid-cols-2"
       >
         {palettePresets.map(({ id, base, accent }) => {
           const chosen = palette.base === base && palette.accent === accent

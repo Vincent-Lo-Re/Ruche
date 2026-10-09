@@ -2,7 +2,9 @@ import { Outlet, useLocation, useMatches } from "react-router"
 
 import { NavigationBar } from "@/components/navigation-bar"
 import { SmallScreenNotice } from "@/components/small-screen-notice"
+import { useAdminFormat } from "@/hooks/use-admin-format"
 import { useAdminLanguage } from "@/hooks/use-admin-language"
+import { useAdminTimeZone } from "@/hooks/use-admin-time-zone"
 import { useBrandFavicon } from "@/hooks/use-brand-favicon"
 import { useShownPages } from "@/hooks/use-preparation"
 import { useScrollMemory } from "@/hooks/use-scroll-memory"
@@ -14,11 +16,14 @@ import { menuRouteId } from "@/navigation"
  * prépare, une fine barre court en haut (NavigationBar). Une nouvelle page apparaît en fondu
  * (data-page-fade, index.css) : toute la page d'un éditeur à une liste, d'un éditeur à l'autre ou
  * vers la connexion ; entre deux pages avec le menu, leur contenu seulement (AppLayout). Le
- * favicon suit le nom de la marque (useBrandFavicon), la langue celle de l'admin (useAdminLanguage).
+ * favicon suit le nom de la marque (useBrandFavicon), la langue celle de l'admin (useAdminLanguage),
+ * le format régional et le fuseau horaire aussi (useAdminFormat, useAdminTimeZone).
  */
 export function RootLayout() {
   useBrandFavicon()
   useAdminLanguage()
+  useAdminFormat()
+  useAdminTimeZone()
   useScrollMemory()
   useShownPages()
   const { pathname } = useLocation()
