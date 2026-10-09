@@ -62,7 +62,7 @@ function AuthAside() {
       <div className="relative">
         <AnimatedMonogram
           motions={brand.monogramMotion ? brand.monogramMotions : []}
-          className="h-32"
+          className="h-32 text-8xl"
         />
       </div>
     </div>

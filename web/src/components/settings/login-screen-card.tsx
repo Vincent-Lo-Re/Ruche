@@ -139,7 +139,7 @@ export function LoginScreenCard() {
               <AnimatedMonogram
                 key={animated ? motions.join() : "still"}
                 motions={animated ? motions : []}
-                className="h-24"
+                className="h-24 text-7xl"
               />
             )}
           </div>
