@@ -2419,6 +2419,23 @@ export const fr: Texts = {
             dark: "Créer aussi la version pour fond sombre",
             hint: "Tirée de ce fichier, aux mêmes couleurs.",
           },
+          // Un fichier qui semble fait pour l'autre fond (un logo clair sur fond clair…).
+          surface: {
+            title: {
+              dark: "Ce fichier semble fait pour un fond sombre",
+              light: "Ce fichier semble fait pour un fond clair",
+            },
+            description: {
+              dark: "Il est clair : il risque de mal se voir sur fond clair. Le mettre plutôt dans la case du fond sombre ?",
+              light:
+                "Il est sombre : il risque de mal se voir sur fond sombre. Le mettre plutôt dans la case du fond clair ?",
+            },
+            move: {
+              dark: "Le mettre sur fond sombre",
+              light: "Le mettre sur fond clair",
+            },
+            keep: "Le garder ici",
+          },
         },
         errors: {
           type: "Choisis un SVG, un PNG ou un WebP.",

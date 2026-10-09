@@ -26,6 +26,8 @@ vi.mock("@/lib/admin-identity", async (importOriginal) => {
     saveBrandDetails: vi.fn(),
     saveBrandFile: vi.fn(),
     saveBrandVariants: vi.fn(),
+    // jsdom ne dessine pas : la clarté d'un fichier ne se mesure pas ici.
+    brandFileSurface: vi.fn(async () => null),
     removeBrandFile: vi.fn(),
     prepareLoginImage: vi.fn(),
     saveLoginImage: vi.fn(),

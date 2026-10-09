@@ -7,6 +7,9 @@
 
 import {
   analyzeSvgColors,
+  luminance,
+  surfaceFor,
+  svgLightness,
   recolorSvg,
   type SvgColors,
 } from "@/lib/brand-colors"
@@ -236,6 +239,55 @@ export async function prepareBrandFile(file: File): Promise<PreparedBrandFile> {
   if (body.size > MAX_BYTES) throw new BrandFileError(words.tooBig)
   const colors = analyzeSvgColors(markup)
   return { body, mime, svg: colors ? { markup, colors } : null }
+}
+
+/**
+ * Le fond pour lequel un fichier de la marque semble fait (null : les deux, ou on ne sait pas).
+ * Un SVG aux couleurs modifiables : sa couleur principale ; une image ou un autre SVG : la clarté
+ * moyenne de ses pixels visibles, dessinés en petit (pour prévenir d'un logo clair mis sur fond
+ * clair, ou l'inverse).
+ */
+export async function brandFileSurface(
+  prepared: PreparedBrandFile
+): Promise<BrandSurface | null> {
+  if (prepared.svg) return surfaceFor(svgLightness(prepared.svg.colors))
+  return surfaceFor(await imageLightness(prepared.body))
+}
+
+async function imageLightness(body: Blob): Promise<number | null> {
+  const size = 48
+  const canvas = document.createElement("canvas")
+  canvas.width = size
+  canvas.height = size
+  const context = canvas.getContext("2d")
+  if (!context) return null
+  const url = URL.createObjectURL(body)
+  try {
+    const image = new Image()
+    image.src = url
+    // Une image qui ne se décode pas (ou trop lentement) : on ne sait pas, on ne prévient pas.
+    const decoded = await Promise.race([
+      image.decode().then(() => true),
+      new Promise<false>((resolve) => setTimeout(() => resolve(false), 2000)),
+    ])
+    if (!decoded) return null
+    context.drawImage(image, 0, 0, size, size)
+    const { data } = context.getImageData(0, 0, size, size)
+    let weight = 0
+    let total = 0
+    for (let index = 0; index < data.length; index += 4) {
+      const alpha = data[index + 3] / 255
+      if (alpha < 0.1) continue
+      weight += alpha
+      total += alpha * luminance(data[index], data[index + 1], data[index + 2])
+    }
+    return weight > 0 ? total / weight : null
+  } catch {
+    // Pas de dessin possible (navigateur, fichier) : on ne sait pas, on ne prévient pas.
+    return null
+  } finally {
+    URL.revokeObjectURL(url)
+  }
 }
 
 async function upload(path: string, body: Blob, mime: BrandMime) {

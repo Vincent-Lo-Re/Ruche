@@ -4,6 +4,8 @@ import {
   analyzeSvgColors,
   normalizeColor,
   recolorSvg,
+  surfaceFor,
+  svgLightness,
 } from "@/lib/brand-colors"
 
 const svg = (body: string, attributes = "") =>
@@ -84,5 +86,20 @@ describe("les couleurs d'un logo SVG", () => {
       accent: "oklch(0.5 0.1 240)",
     })
     expect(recolored).toMatch(/<svg[^>]*fill="oklch\(0\.985 0 0\)"/)
+  })
+})
+
+describe("le fond pour lequel un logo semble fait", () => {
+  it("un logo clair va sur fond sombre, un sombre sur fond clair, entre les deux sur les deux", () => {
+    expect(surfaceFor(svgLightness({ main: "#fafafa", accent: null }))).toBe(
+      "dark"
+    )
+    expect(
+      surfaceFor(svgLightness({ main: "#111111", accent: "#f59e0b" }))
+    ).toBe("light")
+    expect(
+      surfaceFor(svgLightness({ main: null, accent: "#f59e0b" }))
+    ).toBeNull()
+    expect(surfaceFor(null)).toBeNull()
   })
 })

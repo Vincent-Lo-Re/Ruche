@@ -2369,6 +2369,23 @@ export const en = {
             dark: "Also create the version for dark backgrounds",
             hint: "Made from this file, in the same colors.",
           },
+          // Un fichier qui semble fait pour l'autre fond (un logo clair sur fond clair…).
+          surface: {
+            title: {
+              dark: "This file looks made for a dark background",
+              light: "This file looks made for a light background",
+            },
+            description: {
+              dark: "It's light, so it may be hard to see on a light background. Put it in the dark-background slot instead?",
+              light:
+                "It's dark, so it may be hard to see on a dark background. Put it in the light-background slot instead?",
+            },
+            move: {
+              dark: "Put it on dark background",
+              light: "Put it on light background",
+            },
+            keep: "Keep it here",
+          },
         },
         errors: {
           type: "Choose an SVG, PNG, or WebP file.",
