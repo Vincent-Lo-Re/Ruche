@@ -17,7 +17,7 @@ export const fiche: HelpFiche = {
     "accès",
   ],
   steps: [
-    "Ouvre « Équipe » (réservée aux admins) et clique sur « Inviter un membre ».",
+    "Ouvre « La team » dans le header (réservée aux admins) et clique sur « Inviter un membre ».",
     "Saisis son adresse e-mail et, si tu veux, son nom.",
     "Choisis son rôle : « Admin » ou « Éditeur ».",
     "Clique sur « Envoyer l'invitation ».",

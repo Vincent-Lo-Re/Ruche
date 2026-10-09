@@ -130,8 +130,8 @@ export const fr: Texts = {
         "Ce qui a été mis à la corbeille, restaurable pendant 30 jours.",
     },
     team: {
-      title: "Équipe",
-      description: "Les membres de l'équipe et leurs rôles.",
+      title: "La team",
+      description: "Les membres de la team et leurs rôles.",
     },
     settings: {
       title: "Paramètres",

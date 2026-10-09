@@ -31,6 +31,7 @@ describe("paletteCss", () => {
     expect(css).toContain("--muted: oklch(0.967 0.001 286.375);")
     expect(css).toContain(".dark {")
     expect(css).not.toContain("--sidebar-active")
+    expect(css).not.toContain("--nav-active")
   })
 
   it("un accent pose ses jetons, comme shadcn : principale, secondaire, graphiques", () => {
@@ -46,6 +47,8 @@ describe("paletteCss", () => {
     expect(css).toContain(
       '.dark[data-slot="sidebar-inner"] {\n  --sidebar-active: var(--page-primary);'
     )
+    // Le lien choisi du header aussi.
+    expect(root).toContain("--nav-active: var(--page-primary);")
     // Neutre est la base de départ : ses gris ne sont pas repris.
     expect(css).not.toContain("--background")
   })

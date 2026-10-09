@@ -44,7 +44,7 @@ const headerNav = () =>
   screen.getByRole("navigation", { name: texts.header.label })
 
 describe("header (ADMIN § 7, « Un header sur toute la largeur »)", () => {
-  it("à gauche : « Site web » (le site réglé dans Paramètres) dans un nouvel onglet, puis Mon compte, Équipe et Paramètres", async () => {
+  it("à gauche : « Site web » (le site réglé dans Paramètres) dans un nouvel onglet, puis Mon compte, La team et Paramètres", async () => {
     await renderApp("/account", fakeAuth({ role: "admin" }))
 
     const site = await within(headerNav()).findByRole("link", {

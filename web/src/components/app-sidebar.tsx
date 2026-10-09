@@ -1,7 +1,6 @@
 import { NavLink, useLocation } from "react-router"
 
 import { AccountMenu } from "@/components/account-menu"
-import { BrandLogo } from "@/components/brand-logo"
 import {
   Sidebar,
   SidebarContent,
@@ -9,7 +8,6 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -21,14 +19,8 @@ import { texts } from "@/texts"
 export function AppSidebar() {
   return (
     <Sidebar>
-      <SidebarHeader>
-        <div className="flex h-8 items-center px-2 text-sm font-medium">
-          {/* Le menu est une carte sombre : la version pour fond sombre. */}
-          <BrandLogo kind="logotype" surface="dark" className="h-6" />
-        </div>
-      </SidebarHeader>
-
-      <SidebarContent>
+      {/* Sans en-tête (la marque est dans le header) : de l'air au-dessus du premier lien. */}
+      <SidebarContent className="pt-2">
         <nav aria-label={texts.nav.label}>
           <SidebarGroup>
             <SidebarGroupContent>

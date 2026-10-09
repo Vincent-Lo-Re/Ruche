@@ -44,7 +44,7 @@ describe("menu", () => {
       within(header)
         .getAllByRole("link")
         .map((link) => link.textContent)
-    ).toEqual(["Mon compte", "Équipe", "Paramètres"])
+    ).toEqual(["Mon compte", "La team", "Paramètres"])
   })
 
   it("mène aux adresses en français", async () => {
@@ -134,7 +134,7 @@ describe("déconnexion", () => {
 })
 
 describe("rôles", () => {
-  it("cache Équipe et Paramètres dans le menu d'un éditeur", async () => {
+  it("cache La team et Paramètres dans le menu d'un éditeur", async () => {
     await renderApp("/", fakeAuth({ role: "editor" }))
 
     // Le header garde Mon compte.
@@ -144,7 +144,7 @@ describe("rôles", () => {
         .getAllByRole("link")
         .map((link) => link.textContent)
     ).toEqual(["Mon compte"])
-    expect(screen.queryByRole("link", { name: "Équipe" })).toBeNull()
+    expect(screen.queryByRole("link", { name: "La team" })).toBeNull()
   })
 
   it.each(["/team", "/settings"])(

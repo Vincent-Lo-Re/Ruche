@@ -217,17 +217,18 @@ describe("Paramètres : les onglets", () => {
 
 describe("Paramètres : le nom de la marque", () => {
   const identity = texts.settings.adminIdentity
-  const sidebar = () =>
-    document.querySelector('[data-slot="sidebar-header"]') as HTMLElement
+  // La marque, à gauche du header : le lien vers le Tableau de bord.
+  const brandLink = () =>
+    document.querySelector("header a[href='/']") as HTMLElement
 
-  it("par défaut « Ruche » ; un admin le change, et le menu comme l'onglet le prennent", async () => {
+  it("par défaut « Ruche » ; un admin le change, et le header comme l'onglet le prennent", async () => {
     await renderApp("/settings")
     const field = await screen.findByLabelText(identity.name)
     expect(field).toHaveValue("")
     expect(field).toHaveAttribute("placeholder", "Ruche")
     // Sans logo envoyé ni nom de marque : « Ruche » en texte, jamais un logo par défaut.
-    await waitFor(() => expect(sidebar()).toHaveTextContent("Ruche"))
-    expect(sidebar().querySelector("img")).toBeNull()
+    await waitFor(() => expect(brandLink()).toHaveTextContent("Ruche"))
+    expect(brandLink().querySelector("img")).toBeNull()
     expect(document.title).toBe(`${texts.sections.settings.title} — Ruche`)
 
     vi.mocked(identityApi.getAdminBrand).mockResolvedValue(brand("Essaim"))
@@ -247,8 +248,8 @@ describe("Paramètres : le nom de la marque", () => {
     )
     expect(await screen.findByText(identity.saved)).toBeVisible()
     // Une autre marque sans logo : son nom en texte.
-    await waitFor(() => expect(sidebar()).toHaveTextContent("Essaim"))
-    expect(sidebar().querySelector("img")).toBeNull()
+    await waitFor(() => expect(brandLink()).toHaveTextContent("Essaim"))
+    expect(brandLink().querySelector("img")).toBeNull()
     expect(document.title).toBe(`${texts.sections.settings.title} — Essaim`)
   })
 
@@ -363,7 +364,7 @@ describe("Paramètres : le logotype et le monogramme", () => {
     url: "https://cdn.test/logo.svg",
   }
 
-  it("une case par fichier ; le logotype remplace le nom en haut du menu", async () => {
+  it("une case par fichier ; le logotype remplace le nom à gauche du header", async () => {
     vi.mocked(identityApi.getAdminBrand).mockResolvedValue({
       ...brand("Essaim"),
       "logotype-dark": logo,
@@ -383,10 +384,11 @@ describe("Paramètres : le logotype et le monogramme", () => {
     expect(within(cardOf(light)).queryByRole("img")).toBeNull()
     expect(within(cardOf(light)).getByText(files.choose)).toBeVisible()
 
-    // Le menu est sombre : son logotype, avec le nom de la marque pour les lecteurs d'écran.
-    const header = document.querySelector('[data-slot="sidebar-header"]')
-    expect(header?.querySelector("img")).toHaveAttribute("src", logo.url)
-    expect(header?.querySelector("img")).toHaveAttribute("alt", "Essaim")
+    // Dans le header (le thème : sombre ici, seul fichier envoyé), avec le nom de la marque pour
+    // les lecteurs d'écran ; il mène au Tableau de bord.
+    const home = screen.getByRole("link", { name: /Essaim/ })
+    expect(home).toHaveAttribute("href", "/")
+    expect(home.querySelector("img")).toHaveAttribute("src", logo.url)
 
     // Envoyer pour le fond clair ; retirer celui du fond sombre.
     const chosen = new File(["<svg/>"], "logo.svg", { type: "image/svg+xml" })

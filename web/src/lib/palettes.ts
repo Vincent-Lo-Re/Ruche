@@ -1122,6 +1122,9 @@ export function paletteCss(palette: Palette): string {
   if (palette.accent !== "none") {
     menu["sidebar-active"] = "var(--page-primary)"
     menu["sidebar-active-foreground"] = "var(--page-primary-foreground)"
+    // Le lien choisi du header suit l'élément choisi du menu (index.css).
+    light["nav-active"] = "var(--page-primary)"
+    light["nav-active-foreground"] = "var(--page-primary-foreground)"
   }
   return [
     block(":root", light),
