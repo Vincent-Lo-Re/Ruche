@@ -1,11 +1,13 @@
-// Fonction serveur « equipe » : gestion de l'équipe, réservée aux admins.
+// Fonction serveur « equipe » : la liste de l'équipe, lisible par toute l'équipe (admins et
+// éditeurs, 09/10/2026) ; inviter, changer un rôle, retirer un membre ou réinitialiser sa double
+// vérification, réservés aux admins.
 //
 // Appel : POST avec un JSON { action, ... } (voir validation.ts) et la session de l'admin dans
 // l'en-tête Authorization (supabase.functions.invoke l'ajoute tout seul).
 // Réponse : 200 avec les données, ou { error: { code, message } } avec un statut 4xx/5xx.
 //
-// Sécurité : c'est la base qui décide si l'appelant est admin (public.is_admin(), qui exige aussi
-// la double vérification). Les opérations se font ensuite avec la clé secrète, fournie par la
+// Sécurité : c'est la base qui décide si l'appelant est de l'équipe et s'il est admin
+// (public.is_staff() et public.is_admin(), qui exigent aussi la double vérification). Les opérations se font ensuite avec la clé secrète, fournie par la
 // plateforme ; aucune clé n'est écrite ici.
 
 import { createClient, isAuthApiError, type User } from "@supabase/supabase-js"
@@ -48,6 +50,7 @@ class HttpError extends Error {
 
 const messages = {
   notSignedIn: "Connecte-toi pour continuer.",
+  staffOnly: "Réservé à l'équipe, après la double vérification.",
   adminsOnly: "Réservé aux admins, après la double vérification.",
   lastAdmin: "L'équipe doit garder au moins un admin qui a configuré la double vérification.",
   notFound: "Ce membre n'existe pas.",
@@ -87,7 +90,8 @@ function json(status: number, body: unknown, headers: Record<string, string>): R
 }
 
 // Vérifie la session de l'appelant et son rôle d'admin (en aal2). Renvoie son compte.
-async function authenticateAdmin(request: Request): Promise<User> {
+/** L'appelant, de l'équipe (sinon refusé), et s'il est admin. */
+async function authenticate(request: Request): Promise<{ user: User; isAdmin: boolean }> {
   const match = request.headers.get("Authorization")?.match(/^Bearer\s+(\S+)$/i)
   if (!match) throw new HttpError(401, "non_connecte", messages.notSignedIn)
   const token = match[1]
@@ -100,11 +104,13 @@ async function authenticateAdmin(request: Request): Promise<User> {
     ...clientOptions,
     global: { headers: { Authorization: `Bearer ${token}` } },
   })
+  const { data: isStaff, error: staffError } = await asCaller.rpc("is_staff")
+  if (staffError) throw new Error(`is_staff : ${staffError.message}`)
+  if (isStaff !== true) throw new HttpError(403, "reserve_a_l_equipe", messages.staffOnly)
   const { data: isAdmin, error } = await asCaller.rpc("is_admin")
   if (error) throw new Error(`is_admin : ${error.message}`)
-  if (isAdmin !== true) throw new HttpError(403, "reserve_aux_admins", messages.adminsOnly)
 
-  return userData.user
+  return { user: userData.user, isAdmin: isAdmin === true }
 }
 
 function toMember({ email_confirmed_at, ...row }: TeamMemberRow): Member {
@@ -297,12 +303,16 @@ Deno.serve(async (request) => {
     if (request.method !== "POST") {
       throw new HttpError(405, "methode_refusee", messages.methodNotAllowed)
     }
-    const caller = await authenticateAdmin(request)
+    const { user: caller, isAdmin } = await authenticate(request)
 
     const body = await request.json().catch(() => undefined)
     const parsed = parseRequest(body)
     if (!parsed.ok) {
       throw new HttpError(400, "demande_invalide", parsed.message)
+    }
+    // Un éditeur lit la liste, sans rien y changer.
+    if (parsed.request.action !== "list" && !isAdmin) {
+      throw new HttpError(403, "reserve_aux_admins", messages.adminsOnly)
     }
 
     return json(200, await run(parsed.request, caller), headers)

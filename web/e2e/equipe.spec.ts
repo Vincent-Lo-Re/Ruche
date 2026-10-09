@@ -90,19 +90,22 @@ test("un admin invite un éditeur, qui rejoint l'équipe sans voir Équipe", asy
     editorPage.getByRole("heading", { name: texts.adminOnly.title })
   ).toBeVisible()
 
-  // La fonction « equipe » refuse elle-même un éditeur, même après la double vérification.
+  // La fonction « equipe » laisse un éditeur lire la liste, et refuse elle-même qu'il y change
+  // quoi que ce soit, même après la double vérification.
   const editorProfile = await readProfile(editor.email)
   expect(editorProfile?.role).toBe("editor")
   const editorToken = await accessToken(editorPage)
-  for (const body of [
-    { action: "set_role", user_id: editorProfile!.id, role: "admin" },
-    { action: "list" },
-  ]) {
-    expect(await callTeamFunction(editorToken, body)).toEqual({
-      status: 403,
-      code: "reserve_aux_admins",
+  expect(await callTeamFunction(editorToken, { action: "list" })).toEqual({
+    status: 200,
+    code: undefined,
+  })
+  expect(
+    await callTeamFunction(editorToken, {
+      action: "set_role",
+      user_id: editorProfile!.id,
+      role: "admin",
     })
-  }
+  ).toEqual({ status: 403, code: "reserve_aux_admins" })
   expect((await readProfile(editor.email))?.role).toBe("editor")
 
   // Côté admin : l'invitation est acceptée et la double vérification configurée.
@@ -197,7 +200,7 @@ test("la fonction « equipe » refuse un admin avant la double vérification, et
     code: "non_connecte",
   })
 
-  // Admin qui n'a saisi que le code reçu par e-mail (session aal1) : 403.
+  // Admin qui n'a saisi que le code reçu par e-mail (session aal1) : 403, pas encore de l'équipe.
   await page.goto("/sign-in")
   await signInWithEmailCode(page, admin)
   const me = await readProfile(admin.email)
@@ -208,7 +211,7 @@ test("la fonction « equipe » refuse un admin avant la double vérification, et
   ]) {
     expect(await callTeamFunction(token, body)).toEqual({
       status: 403,
-      code: "reserve_aux_admins",
+      code: "reserve_a_l_equipe",
     })
   }
   expect((await readProfile(admin.email))?.role).toBe("admin")
