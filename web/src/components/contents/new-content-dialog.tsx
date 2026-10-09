@@ -27,6 +27,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
 import { useDebouncedValue } from "@/hooks/use-debounced-value"
+import { useTitleCheck } from "@/hooks/use-title-check"
 import {
   contentKeys,
   findPageBySlug,
@@ -89,6 +90,11 @@ export function NewContentDialog({
   const [settings, setSettings] = useState(emptyChoices)
   const [titleError, setTitleError] = useState<string | null>(null)
 
+  // Deux contenus d'une section ne portent pas le même titre : un titre pris bloque la création.
+  const titleCheck = useTitleCheck(kind, title, null, open)
+  const titleMessage =
+    titleError ?? (titleCheck.takenBy ? kindLabels.titleTaken : null)
+
   // Une page : son adresse vient du titre, et une adresse déjà prise bloque la création.
   const isPage = kind === "page"
   const wantedSlug = isPage ? slugFromTitle(title) : ""
@@ -104,9 +110,10 @@ export function NewContentDialog({
     wantedSlug !== "" &&
     (wantedSlug !== checkedSlug || slugCheck.isPending)
   const takenBy = isPage && !slugPending ? (slugCheck.data ?? null) : null
+  // Un titre pris : seul son message compte (l'adresse qui en vient serait prise aussi).
   const addressMessage = !isPage
     ? null
-    : title.trim() === ""
+    : title.trim() === "" || titleCheck.takenBy
       ? null
       : wantedSlug === ""
         ? { error: true, text: labels.newContent.addressEmpty }
@@ -146,6 +153,8 @@ export function NewContentDialog({
       setTitleError(texts.publication.settings.titleRequired)
       return
     }
+    // Un titre pas encore vérifié part quand même : la base refuse s'il est pris.
+    if (titleCheck.takenBy) return
     if (isPage && (wantedSlug === "" || slugPending || takenBy)) return
     onSubmit({
       title: trimmed,
@@ -179,7 +188,7 @@ export function NewContentDialog({
                 setTitle(value)
                 setTitleError(null)
               }}
-              titleError={titleError}
+              titleError={titleMessage}
               creating
               slugField={false}
               settings={settings}
@@ -247,7 +256,10 @@ export function NewContentDialog({
             <Button
               type="submit"
               disabled={
-                pending || Boolean(addressMessage?.error) || slugPending
+                pending ||
+                Boolean(addressMessage?.error) ||
+                slugPending ||
+                titleCheck.takenBy !== null
               }
             >
               {pending && <Spinner />}

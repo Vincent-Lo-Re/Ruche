@@ -84,7 +84,12 @@ import { buttonVariants } from "@/components/ui/button"
 import { useCategories } from "@/hooks/use-categories"
 import { useLockDialog } from "@/hooks/use-lock-dialog"
 import { categoryNames } from "@/lib/categories"
-import { contentKeys, type Content, type ContentKind } from "@/lib/contents/api"
+import {
+  contentKeys,
+  hasUniqueTitle,
+  type Content,
+  type ContentKind,
+} from "@/lib/contents/api"
 import { publishChecks, readyItems } from "@/lib/contents/requirements"
 import {
   isTemplateFor,
@@ -95,7 +100,11 @@ import { previewLocked, type PreviewSettings } from "@/lib/editor/preview"
 import { focusOnceShown } from "@/lib/editor/block-focus"
 import { contentProfile, isListedKind } from "@/lib/editor/profile"
 import { lockSituation } from "@/lib/editor/lock-view"
-import { CONTENT_TITLE_ID, showReadySetting } from "@/lib/editor/ready-targets"
+import {
+  CONTENT_TITLE_ID,
+  showReadySetting,
+  TITLE_TAKEN_ID,
+} from "@/lib/editor/ready-targets"
 import { focusSoon, highlightSoon } from "@/lib/focus"
 import { mediaKeys } from "@/lib/media/api"
 import { formatDuration } from "@/lib/media/format"
@@ -247,6 +256,7 @@ function ContentEditor({
     setSettings,
     refusedSlug,
     setRefusedSlug,
+    titleTaken,
     loadedRev,
     viewKey,
     autosave,
@@ -263,6 +273,7 @@ function ContentEditor({
     dismissStash,
   } = useDraftSync({
     initial,
+    kind,
     writing: !reading,
     afterSave: () => {
       // « Utilisé dans » de la médiathèque et liste des pages.
@@ -411,8 +422,10 @@ function ContentEditor({
   // Ce qui manque pour publier ([D45], audio) et le conseil [D46] : expliqués avant l'envoi.
   const checks = useMemo(
     () =>
-      profile.titleRequired ? publishChecks(kind, draft, mediaFor) : undefined,
-    [profile, kind, draft, mediaFor]
+      profile.titleRequired
+        ? publishChecks(kind, draft, mediaFor, titleTaken)
+        : undefined,
+    [profile, kind, draft, mediaFor, titleTaken]
   )
 
   const pub = usePublication({
@@ -501,12 +514,23 @@ function ContentEditor({
             ? texts.templates.editor.nameLabel
             : texts.editor.title.label
         }
+        aria-invalid={titleTaken || undefined}
+        aria-describedby={titleTaken ? TITLE_TAKEN_ID : undefined}
         onChange={onTitle}
         onFocus={profile.cover !== null ? () => setSelectedId(null) : undefined}
         onKeyDown={(event) => {
           if (event.key === "Enter") event.preventDefault()
         }}
       />
+      {titleTaken && hasUniqueTitle(kind) && (
+        <p
+          id={TITLE_TAKEN_ID}
+          role="alert"
+          className="blocks-title-error text-sm text-destructive"
+        >
+          {texts.contentList.kinds[kind].titleTaken}
+        </p>
+      )}
       {profile.audio && (
         <AudioPreview
           media={mediaFor(draft.audio?.mediaId ?? null)}

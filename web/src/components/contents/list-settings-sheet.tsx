@@ -10,10 +10,12 @@ import {
 import { useAccessCheck } from "@/components/team/use-access-check"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
+import { useTitleCheck } from "@/hooks/use-title-check"
 import type { AccessLevel } from "@/lib/access-levels"
 import {
   ContentError,
   contentKeys,
+  hasUniqueTitle,
   lockStatus,
   type ContentKind,
   type ContentListItem,
@@ -62,6 +64,9 @@ export function ListSettingsSheet({
     categoryIds: item.category_ids,
   })
   const [refusedSlug, setRefusedSlug] = useState<RefusedSlug | null>(null)
+  // Un titre que la base a refusé (un autre contenu de la section l'a pris entre-temps).
+  const [refusedTitle, setRefusedTitle] = useState<string | null>(null)
+  const titleCheck = useTitleCheck(kind, title, item.id)
   const [held, setHeld] = useState<string | null>(null)
 
   // Qui écrit ce contenu en ce moment : lu à l'ouverture (session neuve, qui ne tient rien).
@@ -102,6 +107,8 @@ export function ListSettingsSheet({
       checkAccess(error)
       if (error instanceof ContentError && error.code === "verrou_tenu") {
         setHeld(error.detail ?? error.message)
+      } else if (error instanceof ContentError && error.code === "titre_pris") {
+        setRefusedTitle(title)
       } else if (
         error instanceof ContentError &&
         error.code !== null &&
@@ -115,6 +122,9 @@ export function ListSettingsSheet({
   })
 
   const titleMissing = title.trim() === ""
+  const titleTaken =
+    hasUniqueTitle(kind) &&
+    (titleCheck.takenBy !== null || refusedTitle === title)
   const editable = !lock.isPending && heldMessage === null && !save.isPending
 
   return (
@@ -128,7 +138,11 @@ export function ListSettingsSheet({
       title={title}
       onTitleChange={setTitle}
       titleError={
-        titleMissing ? texts.publication.settings.titleRequired : null
+        titleMissing
+          ? texts.publication.settings.titleRequired
+          : titleTaken && hasUniqueTitle(kind)
+            ? texts.contentList.kinds[kind].titleTaken
+            : null
       }
       settings={settings}
       editable={editable}
@@ -148,7 +162,7 @@ export function ListSettingsSheet({
             {texts.common.cancel}
           </Button>
           <Button
-            disabled={!editable || titleMissing}
+            disabled={!editable || titleMissing || titleTaken}
             onClick={() => save.mutate()}
           >
             {save.isPending && <Spinner />}

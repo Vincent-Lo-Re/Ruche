@@ -6,6 +6,7 @@ import { draftToPlainText } from "@/blocks/draft"
 import type { Draft } from "@/blocks/types"
 import type { RefusedSlug } from "@/lib/contents/slug"
 import { useAccessCheck } from "@/components/team/use-access-check"
+import { useTitleCheck } from "@/hooks/use-title-check"
 import {
   saveCheckedDraft,
   useAutosave,
@@ -16,10 +17,12 @@ import { categoryKeys } from "@/lib/categories"
 import {
   contentKeys,
   getContent,
+  hasUniqueTitle,
   sameCategories,
   settingsDiff,
   settingsOf,
   type Content,
+  type ContentKind,
   type ContentSettings,
   type SettingsPayload,
 } from "@/lib/contents/api"
@@ -60,12 +63,14 @@ type DraftLock = {
  */
 export function useDraftSaving({
   initial,
+  kind,
   session,
   lock,
   resumeSignal,
   afterSave,
 }: {
   initial: Content
+  kind: ContentKind
   session: string
   lock: DraftLock
   resumeSignal: number
@@ -84,6 +89,16 @@ export function useDraftSaving({
   // Les réglages du dernier envoi (pour reconnaître le refus d'un réglage).
   const sentSettings = useRef<SettingsPayload | null>(null)
   const [refusedSlug, setRefusedSlug] = useState<RefusedSlug | null>(null)
+  // Le titre tel qu'il est dans la base, et le dernier envoyé (celui du brouillon, ou l'ancien
+  // si le titre à l'écran est pris).
+  const savedTitle = useRef(initial.draft.title)
+  const sentTitle = useRef(initial.draft.title)
+  // Le titre à l'écran envoyé avec le dernier enregistrement (pour reconnaître son refus).
+  const sentScreenTitle = useRef(initial.draft.title)
+  // Un titre que la base a refusé (titre_pris) : il reste à l'écran, avec la raison.
+  const [refusedTitle, setRefusedTitle] = useState<string | null>(null)
+  // Le titre pris à l'écran (vérifié en tapant, ou refusé) : il part sous l'ancien.
+  const takenTitle = useRef<string | null>(null)
   // Révision du brouillon affiché (celle de la base au dernier chargement ou enregistrement).
   const [loadedRev, setLoadedRev] = useState(initial.draft_rev)
   // Change à chaque rechargement depuis la base : les blocs repartent du nouveau brouillon.
@@ -105,13 +120,14 @@ export function useDraftSaving({
       onSaved: (result, saved) => {
         setLoadedRev(result.rev)
         savedSettings.current = saved.settings
+        savedTitle.current = sentTitle.current
         queryClient.setQueryData<Content | null>(
           contentKeys.detail(contentId),
           (old) =>
             old && {
               ...old,
-              draft: saved.draft,
-              title: saved.draft.title,
+              draft: { ...saved.draft, title: sentTitle.current },
+              title: sentTitle.current,
               draft_rev: result.rev,
               draft_saved_at: result.savedAt,
               access_chosen: saved.settings.accessChosen,
@@ -136,14 +152,33 @@ export function useDraftSaving({
     },
     // Les réglages envoyés sont ceux qui diffèrent de la base au moment de l'envoi : une
     // valeur rejouée après une réponse perdue repart avec les mêmes.
+    // Un titre pris part sous l'ancien : le reste du brouillon s'enregistre quand même.
     (value, baseRev) => {
       const payload = settingsDiff(savedSettings.current, value.settings)
       sentSettings.current = payload
-      return saveCheckedDraft(contentId, session, value.draft, baseRev, payload)
+      const taken = takenTitle.current
+      const draft =
+        taken !== null && value.draft.title === taken
+          ? { ...value.draft, title: savedTitle.current }
+          : value.draft
+      sentScreenTitle.current = value.draft.title
+      sentTitle.current = draft.title
+      return saveCheckedDraft(contentId, session, draft, baseRev, payload)
     }
   )
   const saving = autosave.controller
   const { phase, serverRev, notifyLost } = lock
+
+  // Deux contenus d'une section ne portent pas le même titre : vérifié pendant qu'on tape, et
+  // refusé par la base (titre_pris). Le titre pris reste à l'écran ; l'enregistrement garde
+  // l'ancien (takenTitle) jusqu'à ce qu'il change.
+  const titleCheck = useTitleCheck(kind, draft.title, contentId)
+  const titleTaken =
+    hasUniqueTitle(kind) &&
+    (titleCheck.takenBy !== null || refusedTitle === draft.title)
+  useEffect(() => {
+    takenTitle.current = titleTaken ? draft.title : null
+  }, [titleTaken, draft.title])
 
   // serverRev ne suit que les autres (edit-lock.ts) : nos propres enregistrements, vus par
   // Realtime avant leur réponse, ne rendent pas l'aperçu non modifiable.
@@ -168,6 +203,13 @@ export function useDraftSaving({
   useEffect(() => {
     const sent = sentSettings.current
     const code = failedError?.code
+    // Un titre pris : il reste à l'écran, et le brouillon repart sous l'ancien.
+    if (code === "titre_pris") {
+      takenTitle.current = sentScreenTitle.current
+      setRefusedTitle(sentScreenTitle.current)
+      saving.change(synced.current)
+      return
+    }
     if (!failedError || !sent || !code) return
     const saved = savedSettings.current
     const latest = synced.current.settings
@@ -245,6 +287,9 @@ export function useDraftSaving({
       if (pending) setStash(pending.draft)
       const freshSettings = settingsOf(fresh)
       savedSettings.current = freshSettings
+      savedTitle.current = fresh.draft.title
+      sentTitle.current = fresh.draft.title
+      setRefusedTitle(null)
       synced.current = { draft: fresh.draft, settings: freshSettings }
       saving.reset(fresh.draft_rev, fresh.draft_saved_at)
       setDraft(fresh.draft)
@@ -393,6 +438,7 @@ export function useDraftSaving({
     setSettings,
     refusedSlug,
     setRefusedSlug,
+    titleTaken,
     loadedRev,
     viewKey,
     autosave: autosave.state,

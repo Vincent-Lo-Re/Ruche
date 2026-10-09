@@ -177,6 +177,32 @@ export async function findPageBySlug(
   return found ? { id: found.id, title: found.title ?? "" } : null
 }
 
+/** Les sortes dont deux contenus ne portent pas le même titre (la base : titre_pris). */
+export function hasUniqueTitle(
+  kind: ContentKind
+): kind is "article" | "episode" | "page" {
+  return kind === "article" || kind === "episode" || kind === "page"
+}
+
+/**
+ * Le contenu de la section (hors corbeille) qui porte déjà ce titre, sauf exceptId : la base
+ * compare sans les majuscules ni les espaces en trop (content_title_taken, comme titre_pris).
+ */
+export async function findContentByTitle(
+  kind: ContentKind,
+  title: string,
+  exceptId: string | null = null
+): Promise<{ id: string; title: string } | null> {
+  const { data, error, status } = await supabase.rpc("content_title_taken", {
+    kind,
+    title,
+    ...(exceptId ? { except_id: exceptId } : {}),
+  })
+  if (error) throw toContentError(error, status)
+  const found = data[0]
+  return found ? { id: found.taken_id, title: found.taken_title } : null
+}
+
 /** Les sortes rangées à la main, dans l'ordre de leur liste ([D47]). */
 export function isOrderedKind(
   kind: ContentKind

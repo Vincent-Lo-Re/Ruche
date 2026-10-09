@@ -210,10 +210,12 @@ export function ContentListPage({
   const undo = async (item: ContentListItem) => {
     const name = displayTitle(item.title)
     try {
-      const { addressRemoved } = await restoreContent(item.id)
+      const { addressRemoved, renamedTo } = await restoreContent(item.id)
+      if (renamedTo !== null)
+        toast.warning(texts.trash.restoredRenamed(name, renamedTo))
       if (addressRemoved)
         toast.warning(texts.trash.restoredWithoutAddress(name))
-      else toast.success(kindLabels.restored(name))
+      else if (renamedTo === null) toast.success(kindLabels.restored(name))
     } catch (error) {
       toast.error(errorMessage(error))
     } finally {

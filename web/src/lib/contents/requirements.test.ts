@@ -57,6 +57,25 @@ describe("ce qui manque pour publier", () => {
     ).toEqual([])
   })
 
+  it("un titre déjà porté par un autre contenu de la section n'est pas prêt", () => {
+    expect(
+      publishChecks("page", { title: "À propos" }, mediaFor({}), true).missing
+    ).toEqual([{ key: "title", state: "taken" }])
+    // Un titre vide est d'abord à écrire.
+    expect(
+      publishChecks("page", { title: " " }, mediaFor({}), true).missing
+    ).toEqual([{ key: "title", state: "missing" }])
+    const checks = publishChecks(
+      "page",
+      { title: "À propos" },
+      mediaFor({}),
+      true
+    )
+    expect(
+      readyItems("page", checks, { accessChosen: true, slug: "a-propos" })[0]
+    ).toEqual({ key: "title", done: false })
+  })
+
   it("un article sans image de présentation", () => {
     expect(
       publishChecks("article", { title: "Titre", cover: null }, mediaFor({}))

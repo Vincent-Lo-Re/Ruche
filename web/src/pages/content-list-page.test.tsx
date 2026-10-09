@@ -19,6 +19,7 @@ vi.mock("@/lib/contents/api", async (importOriginal) => {
   return {
     ...actual,
     findPageBySlug: vi.fn(async () => null),
+    findContentByTitle: vi.fn(async () => null),
     listContents: vi.fn(),
     getMediaByIds: vi.fn(async () => []),
     createContent: vi.fn(),
@@ -578,6 +579,51 @@ describe("Blog", () => {
     )
   })
 
+  it("« Nouvel article » : un titre déjà porté par un autre article bloque la création", async () => {
+    vi.mocked(api.listContents).mockResolvedValue([])
+    vi.mocked(api.findContentByTitle).mockImplementation(
+      async (_kind, title) =>
+        title.toLowerCase() === "mon article"
+          ? { id: ARTICLE, title: "Mon article" }
+          : null
+    )
+    await renderApp("/blog")
+    fireEvent.click(
+      await screen.findByRole("button", { name: labels.kinds.article.create })
+    )
+    const dialog = await screen.findByRole("dialog", {
+      name: labels.kinds.article.create,
+    })
+    const field = within(dialog).getByLabelText(
+      texts.publication.settings.titleLabel
+    )
+    const submit = within(dialog).getByRole("button", {
+      name: labels.kinds.article.submit,
+    })
+
+    fireEvent.change(field, { target: { value: "MON ARTICLE" } })
+    expect(
+      await within(dialog).findByText(labels.kinds.article.titleTaken)
+    ).toBeVisible()
+    expect(field).toHaveAttribute("aria-invalid", "true")
+    expect(submit).toBeDisabled()
+    expect(api.findContentByTitle).toHaveBeenLastCalledWith(
+      "article",
+      "MON ARTICLE",
+      null
+    )
+
+    // Un autre titre : la création repart.
+    fireEvent.change(field, { target: { value: "Mon autre article" } })
+    await waitFor(() =>
+      expect(
+        within(dialog).queryByText(labels.kinds.article.titleTaken)
+      ).toBeNull()
+    )
+    expect(submit).toBeEnabled()
+    expect(api.createContent).not.toHaveBeenCalled()
+  })
+
   it("« Nouvel article » : une catégorie se crée dans la fenêtre, et elle est cochée", async () => {
     vi.mocked(api.listContents).mockResolvedValue([])
     const created = {
@@ -725,6 +771,7 @@ describe("Blog", () => {
     vi.mocked(publicationApi.restoreContent).mockResolvedValue({
       restored: 1,
       addressRemoved: false,
+      renamedTo: null,
     })
     await renderApp("/blog")
     fireEvent.click(
@@ -765,6 +812,7 @@ describe("Blog", () => {
     vi.mocked(publicationApi.restoreContent).mockResolvedValue({
       restored: 1,
       addressRemoved: false,
+      renamedTo: null,
     })
     await renderApp("/blog")
 

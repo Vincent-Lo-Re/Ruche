@@ -157,6 +157,37 @@ async function uploadInImagePicker(page: Page, name: string) {
   await expect(picker).toHaveCount(0, { timeout: 60_000 })
 }
 
+test("Un titre par section : un second article du même titre est refusé, un épisode l'accepte", async ({
+  page,
+  team,
+}) => {
+  const id = uniqueId()
+  const admin = await team.createAdmin("Tina Titre")
+  const title = `Mon article ${id}`
+  const words = list.kinds.article
+
+  await open(page, "/blog", admin)
+  await createFromDialog(page, "article", title)
+  await page.goto("/blog")
+
+  // Majuscules et espaces ne comptent pas : la fenêtre le dit et bloque la création.
+  await page.getByRole("button", { name: words.create }).click()
+  const dialog = page.getByRole("dialog", { name: words.create })
+  await dialog
+    .getByLabel(texts.publication.settings.titleLabel)
+    .fill(`  ${title.toUpperCase()} `)
+  await expect(dialog.getByText(words.titleTaken)).toBeVisible()
+  await expect(
+    dialog.getByRole("button", { name: words.submit })
+  ).toBeDisabled()
+  await page.keyboard.press("Escape")
+
+  // Un épisode peut porter le titre d'un article.
+  await page.goto("/podcasts")
+  await createFromDialog(page, "episode", title)
+  await expect(page).toHaveURL(/\/podcasts\/[0-9a-f-]{36}$/)
+})
+
 test("Le Fil : un article neuf arrive en tête ; rangé au clavier, l'ordre tient ; la recherche gardée au retour", async ({
   page,
   team,

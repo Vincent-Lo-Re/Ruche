@@ -59,6 +59,15 @@
   opacity: 1;
 }
 
+/* Un titre déjà porté par un autre contenu de la section : la raison juste dessous (admin). */
+.blocks-title[aria-invalid="true"] {
+  margin-bottom: --spacing(1);
+}
+
+.blocks-title-error {
+  margin-bottom: var(--blocks-space-block-gap);
+}
+
 /* Le titre n'a pas de cadre : un contour montre où est le focus (comme la sélection des
    blocs). */
 .blocks-title:focus-visible {

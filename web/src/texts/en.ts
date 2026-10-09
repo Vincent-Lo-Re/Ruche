@@ -798,6 +798,9 @@ export const en = {
     // Seules les pages ont une adresse.
     restoredWithoutAddress: (name: string) =>
       `“${name}” was restored without its URL because another page now uses it. Choose a new URL before you publish it.`,
+    // Un autre contenu de la section a pris son titre : il revient numéroté.
+    restoredRenamed: (name: string, title: string) =>
+      `“${name}” was restored as “${title}” because another item in its section now has its title.`,
     restoredDraft: "Restored as a draft. Nothing is put back in the app.",
     open: "Open",
     columns: {
@@ -857,6 +860,8 @@ export const en = {
         create: "New page",
         tab: "Pages",
         createFailed: "Couldn't create the page.",
+        titleTaken:
+          "Another page already has this title. Choose a different one.",
         // « Nouvelle page » quand des points de départ existent pour les Pages ([D42]).
         blank: "Blank page",
         confirmTrashTitle: "Move this page to Trash?",
@@ -894,6 +899,8 @@ export const en = {
         // L'onglet de la liste, à côté de « Categories ».
         tab: "Posts",
         createFailed: "Couldn't create the post.",
+        titleTaken:
+          "Another post already has this title. Choose a different one.",
         blank: "Blank post",
         confirmTrashTitle: "Move this post to Trash?",
         confirmTrash: (title: string) =>
@@ -930,6 +937,8 @@ export const en = {
         // L'onglet de la liste, à côté de « Categories ».
         tab: "Episodes",
         createFailed: "Couldn't create the episode.",
+        titleTaken:
+          "Another episode already has this title. Choose a different one.",
         blank: "Blank episode",
         confirmTrashTitle: "Move this episode to Trash?",
         confirmTrash: (title: string) =>
@@ -2005,6 +2014,7 @@ export const en = {
       adresse_invalide:
         "The page URL can only contain lowercase letters (no accents), numbers, and hyphens.",
       adresse_prise: "Another page already uses this URL.",
+      titre_pris: "Another item in this section already has this title.",
       categorie_invalide:
         "One of the categories no longer exists. Reload the page.",
       brouillon_trop_lourd:
@@ -2136,6 +2146,8 @@ export const en = {
       scheduleTitle: "Before you can schedule, add:",
       title: "A title.",
       writeTitle: "Add a title",
+      titleTaken: "A title that no other item in this section has.",
+      changeTitle: "Change the title",
       cover: "A featured image (the thumbnail in the app's lists).",
       coverUnavailable:
         "An available featured image (the current one is in the Trash or isn't ready yet).",
@@ -2231,6 +2243,8 @@ export const en = {
           "A synced block's template no longer exists, so the block is now a regular copy.",
         adresse_prise:
           "Another page now uses this URL, so the draft keeps its current one.",
+        titre_renomme:
+          "Another item now has this version's title, so the draft gets a numbered one, like “Title (2)”.",
         formule_supprimee:
           "This version's plan has been deleted since. Choose the access again before publishing.",
       },
