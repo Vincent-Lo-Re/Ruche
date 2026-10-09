@@ -1,11 +1,16 @@
 import type { HelpFiche } from "@/help/types"
+import { sectionNamesFor } from "@/lib/section-names"
+
+// Les noms du Blog et des Podcasts, ceux de l'admin s'il les a changés.
+const names = sectionNamesFor("fr")
+const capitalize = (text: string) =>
+  text.charAt(0).toUpperCase() + text.slice(1)
 
 export const fiche: HelpFiche = {
   slug: "gerer-les-categories",
   theme: "contenus",
   title: "Gérer les catégories",
-  summary:
-    "Le Blog et les Podcasts ont chacun leurs catégories, que l'app utilise pour filtrer les contenus.",
+  summary: `${capitalize(names.blog.le)} et ${names.podcasts.le} ont chacun leurs catégories, que l'app utilise pour filtrer les contenus.`,
   keywords: [
     "catégorie",
     "filtre",
@@ -16,7 +21,7 @@ export const fiche: HelpFiche = {
     "étiquette",
   ],
   steps: [
-    "Ouvre « Blog » ou « Podcasts », puis clique sur « Catégories ».",
+    `Ouvre « ${names.blog.name} » ou « ${names.podcasts.name} », puis clique sur « Catégories ».`,
     "Pour en ajouter une, clique sur « Nouvelle catégorie » en haut de la page, écris son nom, puis clique sur « Enregistrer ».",
     "Range-les avec la poignée, à la souris ou au clavier : l'app les montre dans cet ordre.",
     "Pour renommer ou supprimer une catégorie, ouvre le menu « … » de sa ligne et choisis « Modifier » ou « Supprimer définitivement ». Pour en supprimer plusieurs, coche-les, puis clique sur « Supprimer définitivement (n) ».",

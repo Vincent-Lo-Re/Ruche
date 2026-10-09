@@ -134,3 +134,34 @@ export const templateSchema = z
   })
 
 export type TemplateValues = z.infer<typeof templateSchema>
+
+// Les noms du Blog et des Podcasts (Paramètres › Avancé). Même règle que la base
+// (domaine section_form, 40 caractères au plus) : les trois formes françaises toutes, ou aucune.
+const sectionNames = texts.settings.advanced.sectionNames
+const sectionForm = z.string().trim().max(40, sectionNames.tooLong)
+const sectionFields = z
+  .object({
+    name: sectionForm,
+    le: sectionForm,
+    du: sectionForm,
+    en: sectionForm,
+  })
+  .superRefine((value, context) => {
+    const french = [value.name, value.le, value.du]
+    const filled = french.filter((form) => form !== "").length
+    if (filled === 0 || filled === 3) return
+    for (const key of ["name", "le", "du"] as const) {
+      if (value[key] === "") {
+        context.addIssue({
+          code: "custom",
+          path: [key],
+          message: sectionNames.incomplete,
+        })
+      }
+    }
+  })
+
+export const sectionNamesSchema = z.object({
+  blog: sectionFields,
+  podcasts: sectionFields,
+})

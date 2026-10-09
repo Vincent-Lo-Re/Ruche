@@ -19,6 +19,11 @@ import { cleanSvg } from "@/lib/media/svg"
 import { isLanguage, type Language } from "@/lib/language"
 import { DEFAULT_MOTIONS, isMotion, type Motion } from "@/lib/monogram-motion"
 import { palettePresets, presetLogoColors, type PresetId } from "@/lib/palettes"
+import type {
+  CustomSectionNames,
+  NamedSection,
+  SectionForms,
+} from "@/lib/section-names"
 import { supabase } from "@/lib/supabase"
 import {
   isRegionalFormat,
@@ -83,6 +88,8 @@ export type AdminBrand = { name: string | null } & Record<
     locale: RegionalFormat | null
     /** Les initiales, à la place d'un monogramme pas envoyé ; null : la première lettre du nom. */
     initials: string | null
+    /** Les noms du Blog et des Podcasts écrits par un admin (Paramètres › Avancé). */
+    sectionNames: CustomSectionNames
   }
 
 type BrandRow = Pick<
@@ -98,7 +105,21 @@ type BrandRow = Pick<
   | "time_zone"
   | "locale"
   | "initials"
+  | SectionNameColumn
 >
+
+// Les colonnes des noms du Blog et des Podcasts.
+type SectionNameColumn =
+  `${NamedSection}_${"name" | "le" | "du"}_fr` | `${NamedSection}_name_en`
+
+/** Les trois formes françaises d'une section, toutes données, ou aucune. */
+function frenchForms(
+  name: string | null,
+  le: string | null,
+  du: string | null
+): SectionForms | null {
+  return name && le && du ? { name, le, du } : null
+}
 
 const variantKey = (kind: BrandKind, palette: string, surface: BrandSurface) =>
   `${kind}:${palette}:${surface}`
@@ -153,6 +174,20 @@ export async function getAdminBrand(): Promise<AdminBrand> {
     timeZone: isTimeZone(row.time_zone) ? row.time_zone : DEFAULT_TIME_ZONE,
     locale: isRegionalFormat(row.locale) ? row.locale : null,
     initials: row.initials ?? null,
+    sectionNames: {
+      fr: {
+        blog: frenchForms(row.blog_name_fr, row.blog_le_fr, row.blog_du_fr),
+        podcasts: frenchForms(
+          row.podcasts_name_fr,
+          row.podcasts_le_fr,
+          row.podcasts_du_fr
+        ),
+      },
+      en: {
+        blog: row.blog_name_en ?? null,
+        podcasts: row.podcasts_name_en ?? null,
+      },
+    },
     variants: Object.fromEntries(
       variants.data.map((variant) => [
         variantKey(
@@ -189,6 +224,21 @@ export function saveBrandDetails(details: {
     initials: details.initials,
     contact_email: details.contactEmail,
     website_url: details.websiteUrl,
+  })
+}
+
+/** Change les noms du Blog et des Podcasts (admins) ; null : le nom d'origine. */
+export function saveSectionNames(names: CustomSectionNames): Promise<void> {
+  const { fr, en } = names
+  return updateIdentity({
+    blog_name_fr: fr.blog?.name ?? null,
+    blog_le_fr: fr.blog?.le ?? null,
+    blog_du_fr: fr.blog?.du ?? null,
+    podcasts_name_fr: fr.podcasts?.name ?? null,
+    podcasts_le_fr: fr.podcasts?.le ?? null,
+    podcasts_du_fr: fr.podcasts?.du ?? null,
+    blog_name_en: en.blog,
+    podcasts_name_en: en.podcasts,
   })
 }
 

@@ -16,6 +16,7 @@ import {
 } from "@/lib/admin-identity"
 import { presetLogoColors } from "@/lib/palettes"
 import { texts } from "@/texts"
+import { NO_CUSTOM_NAMES } from "@/lib/section-names"
 
 describe("le nom de la marque", () => {
   it("affiche la marque, sinon « Ruche »", () => {
@@ -60,6 +61,7 @@ describe("le nom de la marque", () => {
       timeZone: "Europe/Paris",
       locale: null,
       initials: null,
+      sectionNames: NO_CUSTOM_NAMES,
       variants: {
         "logotype:zinc-blue:dark": "bleu",
         "logotype:neutral-none:dark": "origine-sombre",
@@ -186,6 +188,7 @@ describe("le nom de la marque", () => {
       timeZone: "Europe/Paris",
       locale: null,
       initials: null,
+      sectionNames: NO_CUSTOM_NAMES,
       variants: {},
     }
     expect(brandFileFor(empty, "monogram", "dark")).toBeNull()
