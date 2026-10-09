@@ -58,7 +58,7 @@ export function SettingsPage() {
       <Tabs value={tab} onValueChange={(value: SettingsTab) => setTab(value)}>
         {/* Les onglets restent en haut quand la page défile, sur le fond du panneau (qui couvre sa
             marge de chaque côté). */}
-        <div className="sticky top-0 z-10 -mx-8 self-stretch bg-panel-solid px-8 py-3">
+        <div className="sticky top-0 z-10 -mx-8 -my-3 self-stretch bg-panel-solid px-8 py-3">
           <TabsList aria-label={labels.tabs.label}>
             {settingsTabs.map((value) => {
               const Icon = tabIcons[value]
