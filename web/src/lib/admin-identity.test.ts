@@ -3,11 +3,12 @@ import { describe, expect, it } from "vitest"
 import {
   BrandFileError,
   brandVariants,
-  defaultBrandFile,
   brandFileFor,
   brandInitial,
+  brandMark,
   brandName,
   faviconHref,
+  otherSurfaceVersion,
   prepareBrandFile,
   prepareLoginImage,
   tabTitle,
@@ -33,9 +34,13 @@ describe("le nom de la marque", () => {
     expect(brandInitial("essaim")).toBe("E")
     expect(brandInitial("  Ruche")).toBe("R")
     expect(brandInitial("")).toBe("")
-    expect(decodeURIComponent(faviconHref("Essaim"))).toContain(">E</text>")
+    expect(
+      decodeURIComponent(faviconHref(brandMark(null, "Essaim")))
+    ).toContain(">E</text>")
     // Un caractère spécial ne casse pas l'image.
-    expect(decodeURIComponent(faviconHref("<b>"))).toContain(">&lt;</text>")
+    expect(decodeURIComponent(faviconHref(brandMark(null, "<b>")))).toContain(
+      ">&lt;</text>"
+    )
   })
 
   it("prend la version du fond, sinon l'autre, sinon rien", () => {
@@ -54,6 +59,7 @@ describe("le nom de la marque", () => {
       language: "en",
       timeZone: "Europe/Paris",
       locale: null,
+      initials: null,
       variants: {
         "logotype:zinc-blue:dark": "bleu",
         "logotype:neutral-none:dark": "origine-sombre",
@@ -126,6 +132,10 @@ describe("le nom de la marque", () => {
     const variants = brandVariants(prepared.svg!)
     // Les onze palettes, Neutrine comprise, chacune pour fond clair et pour fond sombre.
     expect(variants).toHaveLength(11)
+    // La version pour l'autre fond, proposée après l'envoi : celle de Neutrine.
+    expect(otherSurfaceVersion(prepared.svg!, "dark")).toBe(
+      variants.find((variant) => variant.palette === "neutral-none")!.dark
+    )
     // Neutrine garde l'accent du logo ; sur fond sombre, sa couleur principale passe en clair.
     const origin = variants.find(
       (variant) => variant.palette === "neutral-none"
@@ -160,7 +170,7 @@ describe("le nom de la marque", () => {
     expect(blue.dark).toContain(presetLogoColors("zinc-blue").dark.accent)
   })
 
-  it("sans fichier ni nom de marque, les logos de Ruche, déclinés pour chaque palette", () => {
+  it("sans logo envoyé, aucun logo : le nom en texte, jamais celui de Ruche", () => {
     const empty: AdminBrand = {
       name: null,
       "logotype-light": null,
@@ -175,18 +185,11 @@ describe("le nom de la marque", () => {
       language: "en",
       timeZone: "Europe/Paris",
       locale: null,
+      initials: null,
       variants: {},
     }
-    const origin = brandFileFor(empty, "monogram", "dark")!
-    const blue = brandFileFor(empty, "monogram", "dark", "zinc-blue")!
-    expect(decodeURIComponent(origin)).toContain("Symbole Ruche")
-    // Neutrine garde le miel de Ruche ; Zinbleu le remplace par son bleu.
-    expect(decodeURIComponent(origin).toLowerCase()).toContain("#f4cd48")
-    expect(decodeURIComponent(blue).toLowerCase()).not.toContain("#f4cd48")
-    expect(defaultBrandFile("logotype", "light", null)).toContain(
-      "data:image/svg+xml"
-    )
-    // Une autre marque sans logo : son nom en texte, pas le logo de Ruche.
+    expect(brandFileFor(empty, "monogram", "dark")).toBeNull()
+    expect(brandFileFor(empty, "logotype", "light", "zinc-blue")).toBeNull()
     expect(
       brandFileFor({ ...empty, name: "Essaim" }, "logotype", "light")
     ).toBeNull()

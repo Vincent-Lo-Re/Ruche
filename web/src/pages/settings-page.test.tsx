@@ -26,6 +26,8 @@ vi.mock("@/lib/admin-identity", async (importOriginal) => {
     saveBrandDetails: vi.fn(),
     saveBrandFile: vi.fn(),
     saveBrandVariants: vi.fn(),
+    // jsdom ne dessine pas : la clarté d'un fichier ne se mesure pas ici.
+    brandFileSurface: vi.fn(async () => null),
     removeBrandFile: vi.fn(),
     prepareLoginImage: vi.fn(),
     saveLoginImage: vi.fn(),
@@ -73,6 +75,7 @@ const brand = (name: string | null): identityApi.AdminBrand => ({
   language: "en",
   timeZone: "Europe/Paris",
   locale: null,
+  initials: null,
   variants: {},
 })
 
@@ -222,10 +225,9 @@ describe("Paramètres : le nom de la marque", () => {
     const field = await screen.findByLabelText(identity.name)
     expect(field).toHaveValue("")
     expect(field).toHaveAttribute("placeholder", "Ruche")
-    // Ruche, sans logo ni nom de marque : son logotype, décliné pour la palette du membre.
-    const ruche = sidebar().querySelector("img")
-    expect(ruche).toHaveAttribute("alt", "Ruche")
-    expect(ruche?.getAttribute("src")).toMatch(/^data:image\/svg\+xml,/)
+    // Sans logo envoyé ni nom de marque : « Ruche » en texte, jamais un logo par défaut.
+    await waitFor(() => expect(sidebar()).toHaveTextContent("Ruche"))
+    expect(sidebar().querySelector("img")).toBeNull()
     expect(document.title).toBe(`${texts.sections.settings.title} — Ruche`)
 
     vi.mocked(identityApi.getAdminBrand).mockResolvedValue(brand("Essaim"))
@@ -238,12 +240,13 @@ describe("Paramètres : le nom de la marque", () => {
     await waitFor(() =>
       expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
         name: "Essaim",
+        initials: null,
         contactEmail: null,
         websiteUrl: null,
       })
     )
     expect(await screen.findByText(identity.saved)).toBeVisible()
-    // Une autre marque sans logo : son nom en texte, plus le logotype de Ruche.
+    // Une autre marque sans logo : son nom en texte.
     await waitFor(() => expect(sidebar()).toHaveTextContent("Essaim"))
     expect(sidebar().querySelector("img")).toBeNull()
     expect(document.title).toBe(`${texts.sections.settings.title} — Essaim`)
@@ -269,6 +272,7 @@ describe("Paramètres : le nom de la marque", () => {
     await waitFor(() =>
       expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
         name: null,
+        initials: null,
         contactEmail: null,
         websiteUrl: null,
       })
@@ -296,6 +300,7 @@ describe("Paramètres : l'adresse de contact de la marque", () => {
     await waitFor(() =>
       expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
         name: null,
+        initials: null,
         contactEmail: "aide@exemple.fr",
         websiteUrl: null,
       })
@@ -319,8 +324,33 @@ describe("Paramètres : le site web du client", () => {
     await waitFor(() =>
       expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
         name: null,
+        initials: null,
         contactEmail: null,
         websiteUrl: "https://example.com/fr",
+      })
+    )
+  })
+})
+
+describe("Paramètres : les initiales de la marque", () => {
+  const identity = texts.settings.adminIdentity
+
+  it("vides, la première lettre du nom en exemple ; choisies, elles partent avec le reste", async () => {
+    await renderApp("/settings")
+    const field = await screen.findByLabelText(identity.initials)
+    expect(field).toHaveAttribute("placeholder", "R")
+    fireEvent.change(screen.getByLabelText(identity.name), {
+      target: { value: "Essaim" },
+    })
+    expect(field).toHaveAttribute("placeholder", "E")
+    fireEvent.change(field, { target: { value: " ES " } })
+    fireEvent.click(screen.getByRole("button", { name: identity.save }))
+    await waitFor(() =>
+      expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
+        name: "Essaim",
+        initials: "ES",
+        contactEmail: null,
+        websiteUrl: null,
       })
     )
   })
@@ -716,15 +746,21 @@ describe("Paramètres : le monogramme animé de l'écran de connexion", () => {
     ).toHaveLength(3)
   })
 
-  it("la dernière animation cochée ne se décoche pas", async () => {
+  it("la dernière animation cochée se décoche : aucune animation est permis", async () => {
     vi.mocked(identityApi.getAdminBrand).mockResolvedValue({
       ...brand(null),
+      monogramMotion: true,
       monogramMotions: ["sway"],
     })
     await renderApp("/settings")
     const group = await screen.findByRole("list", { name: motion.group })
-    expect(
-      within(group).getByRole("checkbox", { name: motion.motions.sway })
-    ).toHaveAttribute("aria-disabled", "true")
+    const sway = within(group).getByRole("checkbox", {
+      name: motion.motions.sway,
+    })
+    expect(sway).not.toHaveAttribute("aria-disabled", "true")
+    fireEvent.click(sway)
+    await waitFor(() =>
+      expect(identityApi.saveMonogramMotions).toHaveBeenCalledWith([])
+    )
   })
 })

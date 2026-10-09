@@ -17,7 +17,7 @@ import {
  * index.css). Un SVG compatible est montré en ligne pour animer ses formes ; un autre fichier, ou
  * le nom sans logo, ne joue que les animations de tout le monogramme. Le reflet passe sur une
  * copie blanche posée par-dessus. Immobile si l'ordinateur demande moins d'animations (index.css).
- * `className` : sa hauteur.
+ * `className` : sa hauteur, et la taille des initiales quand aucun monogramme n'a été envoyé.
  */
 export function AnimatedMonogram({
   motions,
@@ -66,7 +66,11 @@ export function AnimatedMonogram({
     <div
       data-monogram
       data-motion-phase={phase}
-      className={cn("relative", className)}
+      // Les initiales (sans monogramme envoyé) : grandes, en gras, au centre.
+      className={cn(
+        "relative flex items-center justify-center leading-none font-semibold",
+        className
+      )}
     >
       {mark}
       {phase === "shine" && (

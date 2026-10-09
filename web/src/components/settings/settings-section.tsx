@@ -5,15 +5,17 @@ import type { ReactNode } from "react"
  * gauche son titre et sa phrase, à droite sa carte ; dans un cadre étroit (tablette, téléphone),
  * le titre passe au-dessus. Le cadre est un conteneur (@container) : la mise en page suit sa
  * largeur, pas celle de la fenêtre. Une phrase en plusieurs parties (un tableau) s'écrit en
- * paragraphes séparés.
+ * paragraphes séparés ; extra s'ajoute dessous (un conseil avec son titre).
  */
 export function SettingsSection({
   title,
   description,
+  extra,
   children,
 }: {
   title: string
   description: string | readonly string[]
+  extra?: ReactNode
   children: ReactNode
 }) {
   return (
@@ -28,6 +30,7 @@ export function SettingsSection({
               </p>
             )
           )}
+          {extra}
         </div>
       </div>
       {children}

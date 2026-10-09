@@ -240,10 +240,8 @@ export const fr: Texts = {
   account: {
     profile: {
       title: "Profil",
-      description: [
+      description:
         "Ton nom permet à l'équipe de te reconnaître, dans la liste de l'équipe et dans l'historique.",
-        "Tes codes de connexion arrivent sur ton adresse e-mail. Une nouvelle adresse se confirme par un code avant de remplacer l'ancienne.",
-      ],
       name: "Nom",
       namePlaceholder: "Prénom Nom",
       nameTooLong: "Le nom ne doit pas dépasser 100 caractères.",
@@ -252,6 +250,12 @@ export const fr: Texts = {
       role: "Rôle",
       // Lu par les lecteurs d'écran devant le rôle.
       rolePrefix: "Rôle : ",
+    },
+    // L'adresse e-mail, où arrivent les codes de connexion.
+    signIn: {
+      title: "Connexion",
+      description:
+        "Tes codes de connexion arrivent sur ton adresse e-mail. Une nouvelle adresse se confirme par un code avant de remplacer l'ancienne.",
     },
     emailChange: {
       // Bouton à côté de l'adresse grisée de la carte Profil.
@@ -2343,11 +2347,17 @@ export const fr: Texts = {
     adminIdentity: {
       // La carte de la marque : son nom, son adresse de contact et son site web.
       title: "Marque",
-      description:
-        "Le nom que ton équipe voit dans le menu, l'onglet du navigateur et l'écran de connexion. L'adresse e-mail de contact s'affiche sur l'écran de connexion, pour que qui a perdu son téléphone ou son invitation puisse te joindre. Le site web est accessible en haut de chaque page ; laisse-le vide pour masquer le lien.",
+      description: [
+        "Renseigne les informations de ta marque : son nom, ses initiales*, une adresse de contact** et ton site web.",
+        "* Remplacent le monogramme tant qu'il n'est pas envoyé.",
+        "** Affichée sur l'écran de connexion, pour qui a besoin d'aide.",
+      ],
       name: "Le nom de ta marque",
       save: "Enregistrer",
       nameTooLong: "Le nom ne doit pas dépasser 40 caractères.",
+      // Les initiales, à la place d'un monogramme pas encore envoyé (onglet, connexion).
+      initials: "Initiale(s)",
+      initialsTooLong: "Les initiales font 1 à 3 caractères.",
       // L'adresse de contact, montrée sur l'écran de connexion à qui a besoin d'aide.
       email: "Adresse e-mail de contact",
       emailPlaceholder: "contact@exemple.fr",
@@ -2363,8 +2373,11 @@ export const fr: Texts = {
       files: {
         // La section des logos : une carte, deux groupes de deux cases (fond clair, fond sombre).
         title: "Logos",
-        description:
-          "Envoie ton logo pour les fonds clairs et sombres (SVG, PNG ou WebP, 1 Mo au plus). Choisis un fichier ou glisse-le dans une case. Une seule version suffit : elle sert sur les deux fonds. Sans logo, le nom de ta marque s'affiche à la place, ou les logos à défaut s'il n'y a pas de nom.",
+        description: [
+          "Envoie ton logotype* et ton monogramme** pour les fonds clairs et sombres (SVG, PNG ou WebP).",
+          "* Sans logotype, le nom de ta marque s'affiche en texte.",
+          "** Sans monogramme, ce sont tes initiales.",
+        ],
         logotype: {
           title: "Logotype",
           use: "menu et connexion",
@@ -2400,6 +2413,29 @@ export const fr: Texts = {
           removed: "Ses déclinaisons par palette ont été retirées.",
           status: (count: number) =>
             `Décliné pour ${count} palette${count > 1 ? "s" : ""}`,
+          // L'autre fond, vide : sa version tirée de ce fichier, proposée.
+          other: {
+            light: "Créer aussi la version pour fond clair",
+            dark: "Créer aussi la version pour fond sombre",
+            hint: "Tirée de ce fichier, aux mêmes couleurs.",
+          },
+          // Un fichier qui semble fait pour l'autre fond (un logo clair sur fond clair…).
+          surface: {
+            title: {
+              dark: "Ce fichier semble fait pour un fond sombre",
+              light: "Ce fichier semble fait pour un fond clair",
+            },
+            description: {
+              dark: "Il est clair : il risque de mal se voir sur fond clair. Le mettre plutôt dans la case du fond sombre ?",
+              light:
+                "Il est sombre : il risque de mal se voir sur fond sombre. Le mettre plutôt dans la case du fond clair ?",
+            },
+            move: {
+              dark: "Le mettre sur fond sombre",
+              light: "Le mettre sur fond clair",
+            },
+            keep: "Le garder ici",
+          },
         },
         errors: {
           type: "Choisis un SVG, un PNG ou un WebP.",
@@ -2412,8 +2448,11 @@ export const fr: Texts = {
         // à côté, l'image et le monogramme animé.
         loginScreen: {
           title: "Écran de connexion",
-          description:
-            "Le premier écran que voit ton équipe en se connectant. Choisis une image de fond, montrée sur les grands écrans (JPEG, PNG ou WebP, réduite et allégée automatiquement), ou glisse-la sur l'aperçu, puis choisis comment le monogramme s'anime.",
+          description: [
+            "Personnalise le premier écran que voit ton équipe : son image de fond* et l'animation du monogramme**.",
+            "* JPEG, PNG ou WebP, réduite et allégée automatiquement, montrée sur les grands écrans. Choisis-la, ou glisse-la sur l'aperçu.",
+            "** Tant qu'aucun monogramme n'est envoyé, ce sont tes initiales qui s'animent.",
+          ],
           preview: "Aperçu de l'écran de connexion",
         },
         loginImage: {

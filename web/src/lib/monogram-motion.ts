@@ -27,8 +27,8 @@ export type Motion = (typeof MOTIONS)[number]
 /** Celles qui animent les formes une à une : il leur faut un SVG compatible. */
 const SVG_MOTIONS: readonly Motion[] = ["trace", "cascade", "glint"]
 
-/** Le départ, et le repli quand aucune animation cochée ne convient au fichier. */
-export const DEFAULT_MOTIONS: Motion[] = ["trace", "glint", "breathe"]
+/** Le départ : aucune animation cochée (c'est un admin qui les choisit, décidé le 09/10/2026). */
+export const DEFAULT_MOTIONS: Motion[] = []
 
 export const isMotion = (value: string): value is Motion =>
   (MOTIONS as readonly string[]).includes(value)

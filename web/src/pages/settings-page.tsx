@@ -56,17 +56,21 @@ export function SettingsPage() {
         description={description}
       />
       <Tabs value={tab} onValueChange={(value: SettingsTab) => setTab(value)}>
-        <TabsList aria-label={labels.tabs.label}>
-          {settingsTabs.map((value) => {
-            const Icon = tabIcons[value]
-            return (
-              <TabsTrigger key={value} value={value}>
-                <Icon />
-                {labels.tabs[value]}
-              </TabsTrigger>
-            )
-          })}
-        </TabsList>
+        {/* Les onglets restent en haut quand la page défile, sur le fond du panneau (qui couvre sa
+            marge de chaque côté). */}
+        <div className="sticky top-0 z-10 -mx-8 -my-3 self-stretch bg-panel-solid px-8 py-3">
+          <TabsList aria-label={labels.tabs.label}>
+            {settingsTabs.map((value) => {
+              const Icon = tabIcons[value]
+              return (
+                <TabsTrigger key={value} value={value}>
+                  <Icon />
+                  {labels.tabs[value]}
+                </TabsTrigger>
+              )
+            })}
+          </TabsList>
+        </div>
         {settingsTabs.map((value) => (
           <TabsContent key={value} value={value} data-settings-tab={value}>
             {value === "admin" ? (

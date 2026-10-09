@@ -2,7 +2,7 @@ import { cn } from "cn"
 
 import { usePalette } from "@/components/theme/palette-context"
 import { useBrand, useBrandName } from "@/hooks/use-brand-name"
-import { brandFileFor } from "@/lib/admin-identity"
+import { brandFileFor, brandMark } from "@/lib/admin-identity"
 import { presetOf } from "@/lib/palettes"
 
 /**
@@ -27,7 +27,10 @@ export function BrandLogo({
   const preset = presetOf(usePalette().palette)
   const light = brandFileFor(brand, kind, "light", preset)
   const dark = brandFileFor(brand, kind, "dark", preset)
-  if (!light) return <>{name}</>
+  // Sans fichier : le nom en texte ; à la place d'un monogramme, les initiales (sinon l'initiale du nom).
+  if (!light) {
+    return <>{kind === "monogram" ? brandMark(brand?.initials, name) : name}</>
+  }
   const image = (src: string, extra?: string) => (
     <img
       src={src}

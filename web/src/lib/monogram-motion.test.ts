@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest"
 
 import {
-  DEFAULT_MOTIONS,
   type Motion,
   MOTIONS,
   motionBlocker,
@@ -42,7 +41,11 @@ describe("le monogramme animé de la connexion", () => {
   })
 
   it("enchaîne le tracé, la lueur et la respiration, avec 4 secondes de pause", () => {
-    const loop = motionLoop(prepareAnimatedSvg(mark), DEFAULT_MOTIONS)
+    const loop = motionLoop(prepareAnimatedSvg(mark), [
+      "trace",
+      "glint",
+      "breathe",
+    ])
     expect(loop.map((step) => step.phase)).toEqual([
       "trace",
       "rest",

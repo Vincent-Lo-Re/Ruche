@@ -5,12 +5,12 @@
 // admin_brand_variants). admin_brand() et admin_brand_variants() les donnent à tout le monde,
 // page de connexion comprise ; seul un admin les change.
 
-import rucheLogotype from "@/assets/brand/ruche-logotype.svg?raw"
-import rucheMonogram from "@/assets/brand/ruche-monogramme.svg?raw"
 import {
   analyzeSvgColors,
+  luminance,
+  surfaceFor,
+  svgLightness,
   recolorSvg,
-  svgDataUrl,
   type SvgColors,
 } from "@/lib/brand-colors"
 import type { Tables, TablesInsert } from "@/lib/database.types"
@@ -81,6 +81,8 @@ export type AdminBrand = { name: string | null } & Record<
     timeZone: string
     /** Le format régional de toute l'admin (Paramètres › Avancé) ; null : celui de la langue. */
     locale: RegionalFormat | null
+    /** Les initiales, à la place d'un monogramme pas envoyé ; null : la première lettre du nom. */
+    initials: string | null
   }
 
 type BrandRow = Pick<
@@ -95,6 +97,7 @@ type BrandRow = Pick<
   | "language"
   | "time_zone"
   | "locale"
+  | "initials"
 >
 
 const variantKey = (kind: BrandKind, palette: string, surface: BrandSurface) =>
@@ -149,6 +152,7 @@ export async function getAdminBrand(): Promise<AdminBrand> {
     language: isLanguage(row.language) ? row.language : "en",
     timeZone: isTimeZone(row.time_zone) ? row.time_zone : DEFAULT_TIME_ZONE,
     locale: isRegionalFormat(row.locale) ? row.locale : null,
+    initials: row.initials ?? null,
     variants: Object.fromEntries(
       variants.data.map((variant) => [
         variantKey(
@@ -178,9 +182,11 @@ export function saveBrandDetails(details: {
   name: string | null
   contactEmail: string | null
   websiteUrl: string | null
+  initials: string | null
 }): Promise<void> {
   return updateIdentity({
     name: details.name,
+    initials: details.initials,
     contact_email: details.contactEmail,
     website_url: details.websiteUrl,
   })
@@ -233,6 +239,55 @@ export async function prepareBrandFile(file: File): Promise<PreparedBrandFile> {
   if (body.size > MAX_BYTES) throw new BrandFileError(words.tooBig)
   const colors = analyzeSvgColors(markup)
   return { body, mime, svg: colors ? { markup, colors } : null }
+}
+
+/**
+ * Le fond pour lequel un fichier de la marque semble fait (null : les deux, ou on ne sait pas).
+ * Un SVG aux couleurs modifiables : sa couleur principale ; une image ou un autre SVG : la clarté
+ * moyenne de ses pixels visibles, dessinés en petit (pour prévenir d'un logo clair mis sur fond
+ * clair, ou l'inverse).
+ */
+export async function brandFileSurface(
+  prepared: PreparedBrandFile
+): Promise<BrandSurface | null> {
+  if (prepared.svg) return surfaceFor(svgLightness(prepared.svg.colors))
+  return surfaceFor(await imageLightness(prepared.body))
+}
+
+async function imageLightness(body: Blob): Promise<number | null> {
+  const size = 48
+  const canvas = document.createElement("canvas")
+  canvas.width = size
+  canvas.height = size
+  const context = canvas.getContext("2d")
+  if (!context) return null
+  const url = URL.createObjectURL(body)
+  try {
+    const image = new Image()
+    image.src = url
+    // Une image qui ne se décode pas (ou trop lentement) : on ne sait pas, on ne prévient pas.
+    const decoded = await Promise.race([
+      image.decode().then(() => true),
+      new Promise<false>((resolve) => setTimeout(() => resolve(false), 2000)),
+    ])
+    if (!decoded) return null
+    context.drawImage(image, 0, 0, size, size)
+    const { data } = context.getImageData(0, 0, size, size)
+    let weight = 0
+    let total = 0
+    for (let index = 0; index < data.length; index += 4) {
+      const alpha = data[index + 3] / 255
+      if (alpha < 0.1) continue
+      weight += alpha
+      total += alpha * luminance(data[index], data[index + 1], data[index + 2])
+    }
+    return weight > 0 ? total / weight : null
+  } catch {
+    // Pas de dessin possible (navigateur, fichier) : on ne sait pas, on ne prévient pas.
+    return null
+  } finally {
+    URL.revokeObjectURL(url)
+  }
 }
 
 async function upload(path: string, body: Blob, mime: BrandMime) {
@@ -382,13 +437,33 @@ export async function saveBrandVariants(
   }
   const { error } = await supabase.from("admin_brand_variants").insert(rows)
   if (error) throw error
-  if (!fill) return
-  const origin = variants.find((variant) => variant.palette === ORIGIN)!
+  if (fill) await saveOtherSurface(svg, fill)
+}
+
+/** La version d'un SVG pour l'autre fond (aux couleurs du fichier), tirée de lui. */
+export function otherSurfaceVersion(
+  svg: BrandSvg,
+  surface: BrandSurface
+): string {
+  const origin = brandVariants(svg).find(
+    (variant) => variant.palette === ORIGIN
+  )!
+  return origin[surface]
+}
+
+/**
+ * Enregistre dans une case vide la version de ce SVG pour son fond (« Créer aussi la version pour
+ * fond clair »), aux couleurs du fichier.
+ */
+export async function saveOtherSurface(
+  svg: BrandSvg,
+  fill: BrandSlot
+): Promise<void> {
   const surface: BrandSurface = fill.endsWith("dark") ? "dark" : "light"
   const path = `${brandSlots[fill].folder}/${crypto.randomUUID()}.svg`
   await upload(
     path,
-    new Blob([origin[surface]], { type: "image/svg+xml" }),
+    new Blob([otherSurfaceVersion(svg, surface)], { type: "image/svg+xml" }),
     "image/svg+xml"
   )
   await updateIdentity({ [brandSlots[fill].column]: path })
@@ -413,39 +488,9 @@ export function brandName(name: string | null | undefined): string {
 }
 
 /**
- * Les logos de Ruche, l'admin par défaut (src/assets/brand/) : déclinés comme un logo envoyé,
- * pour chaque palette et chaque fond, une fois, dans le navigateur (rien dans la base).
- */
-const rucheSources = { logotype: rucheLogotype, monogram: rucheMonogram }
-const rucheCache = new Map<string, string>()
-
-export function defaultBrandFile(
-  kind: BrandKind,
-  surface: BrandSurface,
-  preset: PresetId | null
-): string {
-  const palette = preset ?? ORIGIN
-  const key = variantKey(kind, palette, surface)
-  if (!rucheCache.has(key)) {
-    const markup = rucheSources[kind]
-    const colors = analyzeSvgColors(markup)!
-    for (const variant of brandVariants({ markup, colors })) {
-      for (const side of ["light", "dark"] as const) {
-        rucheCache.set(
-          variantKey(kind, variant.palette, side),
-          svgDataUrl(variant[side])
-        )
-      }
-    }
-  }
-  return rucheCache.get(key)!
-}
-
-/**
  * L'adresse d'un fichier pour un fond : la déclinaison de la palette de ce membre s'il y en a une
  * (Neutrine pour une association libre), sinon la version de ce fond, sinon l'autre. Sans aucun
- * fichier : les logos de Ruche si l'admin n'a pas non plus de nom de marque (c'est alors Ruche),
- * sinon null (le nom en texte, ou son initiale). Avec Neutrine, un fichier envoyé pour ce fond
+ * fichier : null, le nom en texte (ou son initiale) ; jamais de logo de Ruche par défaut. Avec Neutrine, un fichier envoyé pour ce fond
  * passe avant la déclinaison : ce sont les couleurs d'origine.
  */
 export function brandFileFor(
@@ -462,8 +507,7 @@ export function brandFileFor(
   if (variant) return variant
   const other = surface === "light" ? "dark" : "light"
   const file = sent ?? brand[`${kind}-${other}`]?.url ?? null
-  if (file) return file
-  return brand.name === null ? defaultBrandFile(kind, surface, preset) : null
+  return file
 }
 
 /** Le titre d'un onglet du navigateur (« Mon compte — Ruche »), sans le nom tant qu'il n'est pas lu. */
@@ -477,13 +521,24 @@ export function brandInitial(brand: string): string {
 }
 
 /**
- * Le favicon d'une marque sans monogramme : son initiale, dans un carré arrondi (public/favicon.svg,
- * le monogramme de Ruche, sert pendant le chargement), en image data: (acceptée par la CSP, img-src).
+ * Ce qui tient lieu de monogramme quand aucun n'a été envoyé : les initiales choisies, sinon
+ * l'initiale du nom.
  */
-export function faviconHref(brand: string): string {
-  const initial = brandInitial(brand)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><style>rect{fill:#171717}text{fill:#fafafa}@media (prefers-color-scheme:dark){rect{fill:#fafafa}text{fill:#171717}}</style><rect width="32" height="32" rx="7"/><text x="16" y="22.5" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="600">${initial}</text></svg>`
+export function brandMark(
+  initials: string | null | undefined,
+  name: string
+): string {
+  return initials?.trim() || brandInitial(name)
+}
+
+/**
+ * Le favicon d'une marque sans monogramme : ses initiales (1 à 3 caractères, plus petites quand
+ * elles sont plusieurs), dans un carré arrondi (public/favicon.svg, un carré vide sans logo, sert
+ * pendant le chargement), en image data: (acceptée par la CSP, img-src).
+ */
+export function faviconHref(mark: string): string {
+  const text = mark.replace(/&/g, "&amp;").replace(/</g, "&lt;")
+  const size = [18, 18, 14, 11][Array.from(mark).length] ?? 11
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><style>rect{fill:#171717}text{fill:#fafafa}@media (prefers-color-scheme:dark){rect{fill:#fafafa}text{fill:#171717}}</style><rect width="32" height="32" rx="7"/><text x="16" y="${16 + size * 0.36}" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="${size}" font-weight="600">${text}</text></svg>`
   return `data:image/svg+xml,${encodeURIComponent(svg)}`
 }

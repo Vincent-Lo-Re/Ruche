@@ -138,19 +138,31 @@ function Section({
 
 /**
  * La double vérification : la date dans une ligne grise avec le bouclier (Item, comme « Se
- * déconnecter ») ; ce qu'il faut faire si le téléphone est perdu, en petit texte (seul un admin la
- * réinitialise).
+ * déconnecter ») ; ce qu'il faut faire si le téléphone est perdu, sous l'explication (seul un
+ * admin la réinitialise).
  */
 function MfaCard({ factor }: { factor: Factor | null }) {
   const labels = texts.account.mfa
   return (
-    <SettingsSection title={labels.title} description={labels.description}>
+    <SettingsSection
+      title={labels.title}
+      description={labels.description}
+      extra={
+        <p className="text-sm text-muted-foreground">
+          <span className="block font-medium text-foreground">
+            {labels.lostPhone.title}
+          </span>
+          {labels.lostPhone.text}
+        </p>
+      }
+    >
+      {/* La ligne grise remplit la carte, de la hauteur de l'explication à gauche. */}
       <Card>
-        <CardContent className="space-y-3">
+        <CardContent className="flex flex-1 flex-col">
           {factor && (
-            <Item variant="muted" className="py-4">
-              <ItemMedia variant="icon">
-                <ShieldCheck className="text-status-live" />
+            <Item variant="muted" className="flex-1 items-center py-4">
+              <ItemMedia variant="icon" className="self-center!">
+                <ShieldCheck className="size-8! text-status-live" />
               </ItemMedia>
               <ItemContent>
                 <ItemTitle className="text-status-live">
@@ -162,12 +174,6 @@ function MfaCard({ factor }: { factor: Factor | null }) {
               </ItemContent>
             </Item>
           )}
-          <p className="text-sm text-muted-foreground">
-            <span className="block font-medium text-foreground">
-              {labels.lostPhone.title}
-            </span>
-            {labels.lostPhone.text}
-          </p>
         </CardContent>
       </Card>
     </SettingsSection>
@@ -176,8 +182,8 @@ function MfaCard({ factor }: { factor: Factor | null }) {
 
 /**
  * Le profil, sur le modèle de la carte « Account Access » de shadcn : le nom, avec « Enregistrer »
- * collé au champ ; l'adresse e-mail grisée, avec « Modifier » collé au champ, qui ouvre le
- * changement d'adresse (EmailChangeDialog).
+ * collé au champ ; puis la connexion : l'adresse e-mail grisée, avec « Modifier » collé au champ,
+ * qui ouvre le changement d'adresse (EmailChangeDialog).
  */
 function ProfileCard({ profile }: { profile: Profile }) {
   const labels = texts.account.profile
@@ -204,70 +210,82 @@ function ProfileCard({ profile }: { profile: Profile }) {
   const onSubmit = form.handleSubmit(({ full_name }) => save.mutate(full_name))
 
   return (
-    <SettingsSection title={labels.title} description={labels.description}>
-      <form onSubmit={onSubmit} noValidate>
+    <>
+      <SettingsSection title={labels.title} description={labels.description}>
+        <form onSubmit={onSubmit} noValidate>
+          <Card>
+            <CardContent>
+              <FieldGroup>
+                <Controller
+                  name="full_name"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="account-name">
+                        {labels.name}
+                      </FieldLabel>
+                      <ButtonGroup className="w-full">
+                        <Input
+                          {...field}
+                          id="account-name"
+                          autoComplete="name"
+                          placeholder={labels.namePlaceholder}
+                          aria-invalid={fieldState.invalid}
+                        />
+                        <Button
+                          type="submit"
+                          variant="outline"
+                          disabled={save.isPending || !form.formState.isDirty}
+                        >
+                          {save.isPending && <Spinner />}
+                          {texts.common.save}
+                        </Button>
+                      </ButtonGroup>
+                      <FieldError errors={[fieldState.error]} />
+                    </Field>
+                  )}
+                />
+              </FieldGroup>
+            </CardContent>
+          </Card>
+        </form>
+      </SettingsSection>
+      {/* L'adresse e-mail, où arrivent les codes de connexion. */}
+      <SettingsSection
+        title={texts.account.signIn.title}
+        description={texts.account.signIn.description}
+      >
         <Card>
           <CardContent>
-            <FieldGroup>
-              <Controller
-                name="full_name"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="account-name">
-                      {labels.name}
-                    </FieldLabel>
-                    <ButtonGroup className="w-full">
-                      <Input
-                        {...field}
-                        id="account-name"
-                        autoComplete="name"
-                        placeholder={labels.namePlaceholder}
-                        aria-invalid={fieldState.invalid}
-                      />
-                      <Button
-                        type="submit"
-                        variant="outline"
-                        disabled={save.isPending || !form.formState.isDirty}
-                      >
-                        {save.isPending && <Spinner />}
-                        {texts.common.save}
-                      </Button>
-                    </ButtonGroup>
-                    <FieldError errors={[fieldState.error]} />
-                  </Field>
-                )}
-              />
-              <Field>
-                <FieldLabel htmlFor="account-email">{labels.email}</FieldLabel>
-                <ButtonGroup className="w-full">
-                  <Input
-                    id="account-email"
-                    type="email"
-                    value={profile.email}
-                    disabled
-                    readOnly
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setChangingEmail(true)}
-                  >
-                    {texts.account.emailChange.open}
-                  </Button>
-                </ButtonGroup>
-              </Field>
-            </FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="account-email">{labels.email}</FieldLabel>
+              <ButtonGroup className="w-full">
+                <Input
+                  id="account-email"
+                  type="email"
+                  value={profile.email}
+                  disabled
+                  readOnly
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setChangingEmail(true)}
+                >
+                  {texts.account.emailChange.open}
+                </Button>
+              </ButtonGroup>
+            </Field>
           </CardContent>
         </Card>
-      </form>
-      <EmailChangeDialog
-        open={changingEmail}
-        onOpenChange={setChangingEmail}
-        userId={profile.id}
-        currentEmail={session?.user.email ?? profile.email}
-      />
-    </SettingsSection>
+        <EmailChangeDialog
+          open={changingEmail}
+          onOpenChange={setChangingEmail}
+          userId={profile.id}
+          currentEmail={session?.user.email ?? profile.email}
+        />
+      </SettingsSection>
+    </>
   )
 }
 

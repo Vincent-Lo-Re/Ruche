@@ -56,6 +56,11 @@ export const adminNameSchema = z.object({
     .string()
     .trim()
     .max(ADMIN_NAME_MAX, texts.settings.adminIdentity.nameTooLong),
+  // Vides : la première lettre du nom. Même règle que la base (admin_identity.initials).
+  initials: z
+    .string()
+    .trim()
+    .max(3, texts.settings.adminIdentity.initialsTooLong),
   // Vide : pas d'adresse de contact.
   contactEmail: z.union([
     z.literal(""),

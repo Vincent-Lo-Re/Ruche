@@ -220,3 +220,37 @@ export function recolorSvg(
 export function svgDataUrl(markup: string): string {
   return `data:image/svg+xml,${encodeURIComponent(markup)}`
 }
+
+/** La luminance relative d'une couleur sRGB (0 : noir, 1 : blanc), canaux de 0 à 255. */
+export function luminance(red: number, green: number, blue: number): number {
+  const linear = (value: number) => {
+    const channel = value / 255
+    return channel <= 0.04045
+      ? channel / 12.92
+      : ((channel + 0.055) / 1.055) ** 2.4
+  }
+  return 0.2126 * linear(red) + 0.7152 * linear(green) + 0.0722 * linear(blue)
+}
+
+// Au-delà, un logo est clair (fait pour un fond sombre) ; en deçà, sombre (pour un fond clair).
+const LIGHT_LOGO = 0.6
+const DARK_LOGO = 0.1
+
+/**
+ * Le fond pour lequel un logo semble fait, d'après sa clarté (0 à 1) : un logo clair va sur fond
+ * sombre, un logo sombre sur fond clair ; entre les deux, il va sur les deux (null).
+ */
+export function surfaceFor(lightness: number | null): "light" | "dark" | null {
+  if (lightness === null) return null
+  if (lightness >= LIGHT_LOGO) return "dark"
+  if (lightness <= DARK_LOGO) return "light"
+  return null
+}
+
+/** La clarté d'un SVG aux couleurs modifiables : celle de sa couleur principale (sinon l'accent). */
+export function svgLightness(colors: SvgColors): number | null {
+  const color = colors.main ?? colors.accent
+  if (!color) return null
+  const value = Number.parseInt(color.slice(1), 16)
+  return luminance((value >> 16) & 255, (value >> 8) & 255, value & 255)
+}
