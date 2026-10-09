@@ -69,6 +69,7 @@ export function AccountPage() {
         icon={sections.account.icon}
         title={title}
         description={description}
+        actions={profile && <RoleBadge role={profile.role} />}
       />
       <div className="@container space-y-8 pt-4">
         {profile && <ProfileCard profile={profile} />}
@@ -164,7 +165,7 @@ function MfaCard({ factor }: { factor: Factor | null }) {
 /**
  * Le profil, sur le modèle de la carte « Account Access » de shadcn : le nom, avec « Enregistrer »
  * collé au champ ; l'adresse e-mail grisée, avec « Modifier » collé au champ, qui ouvre le
- * changement d'adresse (EmailChangeDialog). Le rôle est une pastille à droite de l'intitulé « Nom ».
+ * changement d'adresse (EmailChangeDialog).
  */
 function ProfileCard({ profile }: { profile: Profile }) {
   const labels = texts.account.profile
@@ -201,12 +202,9 @@ function ProfileCard({ profile }: { profile: Profile }) {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <div className="flex items-center justify-between gap-2">
-                      <FieldLabel htmlFor="account-name">
-                        {labels.name}
-                      </FieldLabel>
-                      <RoleBadge role={profile.role} />
-                    </div>
+                    <FieldLabel htmlFor="account-name">
+                      {labels.name}
+                    </FieldLabel>
                     <ButtonGroup className="w-full">
                       <Input
                         {...field}
