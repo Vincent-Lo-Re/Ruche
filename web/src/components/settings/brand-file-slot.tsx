@@ -13,6 +13,7 @@ import {
   removeBrandFile,
   saveBrandFile,
   saveBrandVariants,
+  saveOtherSurface,
   type PreparedBrandFile,
 } from "@/lib/admin-identity"
 import { adminBrandRead } from "@/lib/reads"
@@ -22,8 +23,8 @@ const labels = texts.settings.adminIdentity.files
 
 /**
  * Un fichier de la marque (FileSlot, « Logotype · fond clair »), montré sur ce fond. Un SVG
- * aux couleurs modifiables demande s'il faut le décliner aux couleurs des palettes
- * (BrandVariantsDialog).
+ * aux couleurs modifiables demande s'il faut le décliner aux couleurs des palettes, et propose sa
+ * version pour l'autre fond si celui-ci est vide (BrandVariantsDialog).
  */
 export function BrandFileSlot({
   kind,
@@ -41,6 +42,8 @@ export function BrandFileSlot({
   const label = labels.label(labels[kind].title, labels[surface])
   // Un SVG aux couleurs modifiables, en attente de la réponse : le décliner ou non.
   const [asking, setAsking] = useState<PreparedBrandFile | null>(null)
+  // L'autre fond vide : y mettre la version tirée de ce fichier (proposé, coché au départ).
+  const [alsoOther, setAlsoOther] = useState(true)
 
   // Les déclinaisons existantes partent avec un fichier envoyé sans être décliné, ou retiré : on
   // le dit sous le message (un SVG aux couleurs modifiables repose la question avant).
@@ -64,9 +67,12 @@ export function BrandFileSlot({
       decline: boolean
     }) => {
       await saveBrandFile(slot, prepared, file?.path ?? null)
-      // La carte de l'autre fond, vide, reçoit sa version (créée avec les déclinaisons).
+      // La carte de l'autre fond, vide, reçoit sa version si elle est demandée.
+      const fill = !other && alsoOther ? otherSlot : null
       if (decline && prepared.svg) {
-        await saveBrandVariants(kind, prepared.svg, other ? null : otherSlot)
+        await saveBrandVariants(kind, prepared.svg, fill)
+      } else if (fill && prepared.svg) {
+        await saveOtherSurface(prepared.svg, fill)
       }
     },
     onSuccess: (_, { decline }) =>
@@ -88,8 +94,10 @@ export function BrandFileSlot({
   const choose = async (chosen: File) => {
     try {
       const prepared = await prepareBrandFile(chosen)
-      if (prepared.svg) setAsking(prepared)
-      else save.mutate({ prepared, decline: false })
+      if (prepared.svg) {
+        setAlsoOther(true)
+        setAsking(prepared)
+      } else save.mutate({ prepared, decline: false })
     } catch (error) {
       onError(error as Error)
     }
@@ -118,6 +126,15 @@ export function BrandFileSlot({
       <BrandVariantsDialog
         file={asking}
         pending={save.isPending}
+        other={
+          other
+            ? null
+            : {
+                surface: surface === "light" ? "dark" : "light",
+                checked: alsoOther,
+              }
+        }
+        onOtherChange={setAlsoOther}
         onKeep={() =>
           asking && save.mutate({ prepared: asking, decline: false })
         }

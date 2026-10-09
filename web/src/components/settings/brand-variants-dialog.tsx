@@ -1,6 +1,7 @@
 import { cn } from "cn"
 
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
   DialogContent,
@@ -12,6 +13,7 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import {
   brandVariants,
+  otherSurfaceVersion,
   variantPresets,
   type PreparedBrandFile,
 } from "@/lib/admin-identity"
@@ -30,16 +32,23 @@ function swatch(color: string) {
 /**
  * La question posée après l'envoi d'un SVG aux couleurs modifiables (ADMIN § 7) : les couleurs
  * détectées, puis le logo décliné pour chaque palette, sur fond clair et sur fond sombre ;
- * « Décliner » les enregistre toutes, « Garder tel quel » enregistre le fichier seul.
+ * « Décliner » les enregistre toutes, « Garder tel quel » enregistre le fichier seul. Si la case de
+ * l'autre fond est vide, une case à cocher (cochée au départ) propose d'y mettre sa version, tirée
+ * de ce fichier, dans les deux cas.
  */
 export function BrandVariantsDialog({
   file,
   pending,
+  other,
+  onOtherChange,
   onKeep,
   onConfirm,
 }: {
   file: PreparedBrandFile | null
   pending: boolean
+  // L'autre fond, vide (null : il a déjà son fichier), et si sa version est demandée.
+  other: { surface: "light" | "dark"; checked: boolean } | null
+  onOtherChange: (checked: boolean) => void
   onKeep: () => void
   onConfirm: () => void
 }) {
@@ -117,6 +126,37 @@ export function BrandVariantsDialog({
                 </li>
               ))}
             </ul>
+            {other && (
+              <label className="flex items-center gap-3 rounded-lg p-2 ring-1 ring-foreground/10">
+                <Checkbox
+                  checked={other.checked}
+                  disabled={pending}
+                  onCheckedChange={(checked) => onOtherChange(checked === true)}
+                />
+                <span className="grid flex-1 gap-0.5 text-sm">
+                  <span className="font-medium">
+                    {labels.other[other.surface]}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {labels.other.hint}
+                  </span>
+                </span>
+                <span
+                  className={cn(
+                    "flex h-14 w-28 items-center justify-center rounded-md p-2",
+                    other.surface === "light"
+                      ? "bg-brand-light"
+                      : "bg-brand-dark"
+                  )}
+                >
+                  <img
+                    src={svgDataUrl(otherSurfaceVersion(svg, other.surface))}
+                    alt=""
+                    className="max-h-full max-w-full object-contain"
+                  />
+                </span>
+              </label>
+            )}
           </>
         )}
         <DialogFooter>

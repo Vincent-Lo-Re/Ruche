@@ -8,6 +8,7 @@ import {
   brandMark,
   brandName,
   faviconHref,
+  otherSurfaceVersion,
   prepareBrandFile,
   prepareLoginImage,
   tabTitle,
@@ -131,6 +132,10 @@ describe("le nom de la marque", () => {
     const variants = brandVariants(prepared.svg!)
     // Les onze palettes, Neutrine comprise, chacune pour fond clair et pour fond sombre.
     expect(variants).toHaveLength(11)
+    // La version pour l'autre fond, proposée après l'envoi : celle de Neutrine.
+    expect(otherSurfaceVersion(prepared.svg!, "dark")).toBe(
+      variants.find((variant) => variant.palette === "neutral-none")!.dark
+    )
     // Neutrine garde l'accent du logo ; sur fond sombre, sa couleur principale passe en clair.
     const origin = variants.find(
       (variant) => variant.palette === "neutral-none"

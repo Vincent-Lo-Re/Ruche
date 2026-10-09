@@ -385,13 +385,33 @@ export async function saveBrandVariants(
   }
   const { error } = await supabase.from("admin_brand_variants").insert(rows)
   if (error) throw error
-  if (!fill) return
-  const origin = variants.find((variant) => variant.palette === ORIGIN)!
+  if (fill) await saveOtherSurface(svg, fill)
+}
+
+/** La version d'un SVG pour l'autre fond (aux couleurs du fichier), tirée de lui. */
+export function otherSurfaceVersion(
+  svg: BrandSvg,
+  surface: BrandSurface
+): string {
+  const origin = brandVariants(svg).find(
+    (variant) => variant.palette === ORIGIN
+  )!
+  return origin[surface]
+}
+
+/**
+ * Enregistre dans une case vide la version de ce SVG pour son fond (« Créer aussi la version pour
+ * fond clair »), aux couleurs du fichier.
+ */
+export async function saveOtherSurface(
+  svg: BrandSvg,
+  fill: BrandSlot
+): Promise<void> {
   const surface: BrandSurface = fill.endsWith("dark") ? "dark" : "light"
   const path = `${brandSlots[fill].folder}/${crypto.randomUUID()}.svg`
   await upload(
     path,
-    new Blob([origin[surface]], { type: "image/svg+xml" }),
+    new Blob([otherSurfaceVersion(svg, surface)], { type: "image/svg+xml" }),
     "image/svg+xml"
   )
   await updateIdentity({ [brandSlots[fill].column]: path })

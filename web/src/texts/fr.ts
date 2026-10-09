@@ -2413,6 +2413,12 @@ export const fr: Texts = {
           removed: "Ses déclinaisons par palette ont été retirées.",
           status: (count: number) =>
             `Décliné pour ${count} palette${count > 1 ? "s" : ""}`,
+          // L'autre fond, vide : sa version tirée de ce fichier, proposée.
+          other: {
+            light: "Créer aussi la version pour fond clair",
+            dark: "Créer aussi la version pour fond sombre",
+            hint: "Tirée de ce fichier, aux mêmes couleurs.",
+          },
         },
         errors: {
           type: "Choisis un SVG, un PNG ou un WebP.",

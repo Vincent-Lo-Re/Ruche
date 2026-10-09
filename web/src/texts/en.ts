@@ -2363,6 +2363,12 @@ export const en = {
           removed: "Its palette versions were removed.",
           status: (count: number) =>
             `Adapted for ${count} palette${count === 1 ? "" : "s"}`,
+          // L'autre fond, vide : sa version tirée de ce fichier, proposée.
+          other: {
+            light: "Also create the version for light backgrounds",
+            dark: "Also create the version for dark backgrounds",
+            hint: "Made from this file, in the same colors.",
+          },
         },
         errors: {
           type: "Choose an SVG, PNG, or WebP file.",
