@@ -69,7 +69,7 @@ export function AccountPage() {
         icon={sections.account.icon}
         title={title}
         description={description}
-        actions={profile && <RoleBadge role={profile.role} />}
+        actions={profile && <RoleBadge role={profile.role} large />}
       />
       <div className="@container space-y-8 pt-4">
         {profile && <ProfileCard profile={profile} />}
