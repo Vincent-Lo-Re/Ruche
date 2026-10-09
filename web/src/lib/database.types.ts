@@ -572,6 +572,7 @@ export type Database = {
       versions: {
         Row: {
           access_level_id: string | null
+          access_level_name: string | null
           block_types: string[]
           body: NonNullable<Json>
           category_ids: string[]
@@ -592,6 +593,7 @@ export type Database = {
         ComputedFields: never
         Insert: {
           access_level_id?: string | null
+          access_level_name?: string | null
           block_types?: string[]
           body: NonNullable<Json>
           category_ids?: string[]
@@ -611,6 +613,7 @@ export type Database = {
         }
         Update: {
           access_level_id?: string | null
+          access_level_name?: string | null
           block_types?: string[]
           body?: NonNullable<Json>
           category_ids?: string[]
