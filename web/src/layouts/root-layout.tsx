@@ -4,6 +4,7 @@ import { NavigationBar } from "@/components/navigation-bar"
 import { SmallScreenNotice } from "@/components/small-screen-notice"
 import { useAdminFormat } from "@/hooks/use-admin-format"
 import { useAdminLanguage } from "@/hooks/use-admin-language"
+import { useAdminSectionNames } from "@/hooks/use-admin-section-names"
 import { useAdminTimeZone } from "@/hooks/use-admin-time-zone"
 import { useBrandFavicon } from "@/hooks/use-brand-favicon"
 import { useShownPages } from "@/hooks/use-preparation"
@@ -17,13 +18,15 @@ import { menuRouteId } from "@/navigation"
  * (data-page-fade, index.css) : toute la page d'un éditeur à une liste, d'un éditeur à l'autre ou
  * vers la connexion ; entre deux pages avec le menu, leur contenu seulement (AppLayout). Le
  * favicon suit le nom de la marque (useBrandFavicon), la langue celle de l'admin (useAdminLanguage),
- * le format régional et le fuseau horaire aussi (useAdminFormat, useAdminTimeZone).
+ * le format régional et le fuseau horaire aussi (useAdminFormat, useAdminTimeZone), comme les noms
+ * du Blog et des Podcasts (useAdminSectionNames).
  */
 export function RootLayout() {
   useBrandFavicon()
   useAdminLanguage()
   useAdminFormat()
   useAdminTimeZone()
+  useAdminSectionNames()
   useScrollMemory()
   useShownPages()
   const { pathname } = useLocation()

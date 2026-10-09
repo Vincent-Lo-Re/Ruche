@@ -1,4 +1,8 @@
 import type { HelpFiche } from "@/help/types"
+import { sectionNamesFor } from "@/lib/section-names"
+
+// Les noms du Blog et des Podcasts, ceux de l'admin s'il les a changés.
+const names = sectionNamesFor("fr")
 
 export const fiche: HelpFiche = {
   slug: "programmer-une-publication",
@@ -24,7 +28,7 @@ export const fiche: HelpFiche = {
   notes: [
     "C'est le dernier brouillon enregistré à cette heure-là qui part dans l'app : tu peux continuer à écrire d'ici là.",
     "Si quelqu'un a modifié le brouillon depuis la programmation et a encore l'éditeur ouvert à l'heure prévue, la publication attend qu'il le quitte, une heure au plus. Ensuite, elle échoue.",
-    "Dans les listes (Blog, Podcasts, Pages), une pastille sur la ligne montre une publication programmée, en attente ou échouée.",
+    `Dans les listes (${names.blog.name}, ${names.podcasts.name}, Pages), une pastille sur la ligne montre une publication programmée, en attente ou échouée.`,
     "Il faut les mêmes réglages que pour publier : titre, image de présentation, audio d'un épisode, adresse d'une page.",
   ],
 }

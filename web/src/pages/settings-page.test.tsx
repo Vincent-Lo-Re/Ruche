@@ -5,6 +5,7 @@ import * as levelsApi from "@/lib/access-levels"
 import * as identityApi from "@/lib/admin-identity"
 import { fakeAuth, renderApp } from "@/test/render"
 import { texts } from "@/texts"
+import { NO_CUSTOM_NAMES } from "@/lib/section-names"
 
 vi.mock("@/lib/access-levels", async (importOriginal) => {
   const actual = await importOriginal<typeof levelsApi>()
@@ -35,6 +36,7 @@ vi.mock("@/lib/admin-identity", async (importOriginal) => {
     saveMonogramMotion: vi.fn(),
     saveMonogramMotions: vi.fn(),
     saveAdminLanguage: vi.fn(),
+    saveSectionNames: vi.fn(),
     saveAdminTimeZone: vi.fn(),
     saveAdminFormat: vi.fn(),
   }
@@ -76,6 +78,7 @@ const brand = (name: string | null): identityApi.AdminBrand => ({
   timeZone: "Europe/Paris",
   locale: null,
   initials: null,
+  sectionNames: NO_CUSTOM_NAMES,
   variants: {},
 })
 
@@ -212,6 +215,39 @@ describe("Paramètres : les onglets", () => {
     )
     expect(await screen.findByText(labels.title)).toBeVisible()
     await waitFor(() => expect(router.state.location.search).toBe("?tab=plans"))
+  })
+})
+
+describe("Paramètres : les noms du Blog et des Podcasts", () => {
+  const words = texts.settings.advanced.sectionNames
+
+  it("les trois formes françaises vont ensemble ; enregistre les noms écrits", async () => {
+    vi.mocked(identityApi.saveSectionNames).mockResolvedValue()
+    await renderApp("/settings?tab=advanced")
+    const blog = await screen.findByRole("group", { name: words.sections.blog })
+    const [name, le, du, en] = within(blog).getAllByRole("textbox")
+
+    // Le nom seul, sans « le » ni « du » : refusé, les deux autres champs le disent.
+    fireEvent.change(name, { target: { value: "Le Fil" } })
+    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
+    expect(await within(blog).findAllByText(words.incomplete)).toHaveLength(2)
+    expect(identityApi.saveSectionNames).not.toHaveBeenCalled()
+
+    fireEvent.change(le, { target: { value: "le Fil" } })
+    fireEvent.change(du, { target: { value: "du Fil" } })
+    fireEvent.change(en, { target: { value: "The Feed" } })
+    // L'exemple suit la forme « du ».
+    expect(within(blog).getByText(words.exampleFr("du Fil"))).toBeVisible()
+    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
+    await waitFor(() =>
+      expect(identityApi.saveSectionNames).toHaveBeenCalledWith({
+        fr: {
+          blog: { name: "Le Fil", le: "le Fil", du: "du Fil" },
+          podcasts: null,
+        },
+        en: { blog: "The Feed", podcasts: null },
+      })
+    )
   })
 })
 

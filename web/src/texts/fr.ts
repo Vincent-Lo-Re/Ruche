@@ -1,6 +1,10 @@
 // Tous les textes de l'interface en français, tirés de l'anglais (en.ts), au même endroit.
 
 import type { Texts } from "./en.ts"
+import { sectionNamesFor } from "../lib/section-names.ts"
+
+// Les noms du Blog et des Podcasts : ceux de l'admin s'il les a changés (Paramètres › Avancé).
+const names = sectionNamesFor("fr")
 
 export const fr: Texts = {
   app: {
@@ -103,11 +107,11 @@ export const fr: Texts = {
       description: "Bienvenue",
     },
     blog: {
-      title: "Blog",
+      title: names.blog.name,
       description: "Les articles et leurs catégories.",
     },
     podcasts: {
-      title: "Podcasts",
+      title: names.podcasts.name,
       description: "Les épisodes et leurs catégories.",
     },
     pages: {
@@ -782,8 +786,8 @@ export const fr: Texts = {
       all: "Tout",
       file: "Médiathèque",
       page: "Pages",
-      article: "Blog",
-      episode: "Podcasts",
+      article: names.blog.name,
+      episode: names.podcasts.name,
       template: "Modèles de bloc",
     },
     itemTypes: {
@@ -1304,8 +1308,8 @@ export const fr: Texts = {
     },
     // La section d'un point de départ ([D42]) : la sorte de contenu qu'il sert à créer.
     sections: {
-      article: "Blog (article)",
-      episode: "Podcasts (épisode)",
+      article: `${names.blog.name} (article)`,
+      episode: `${names.podcasts.name} (épisode)`,
       page: "Pages",
     },
     list: {
@@ -1847,8 +1851,8 @@ export const fr: Texts = {
       },
       feed: {
         title: {
-          article: "Dans la liste du Blog",
-          episode: "Dans la liste des Podcasts",
+          article: `Dans la liste ${names.blog.du}`,
+          episode: `Dans la liste ${names.podcasts.du}`,
         },
         choose: "Choisir",
         chooseLabel: "Choisir l'image de présentation",
@@ -2519,6 +2523,24 @@ export const fr: Texts = {
         saved: "Fuseau horaire enregistré.",
         loadFailed: "Le fuseau horaire de l'admin n'a pas pu être chargé.",
       },
+      sectionNames: {
+        title: "Noms des sections",
+        description: [
+          "Renomme le Blog et les Podcasts dans chaque langue de l'admin, pour toute l'équipe*. La page se recharge après l'enregistrement.",
+          "* En français, écris trois formes à la main : le nom seul (menu, titres des pages), avec « le » et avec « du », pour que chaque phrase reste juste. Vides : le nom d'origine.",
+        ],
+        sections: { blog: "Blog", podcasts: "Podcasts" },
+        french: "Français",
+        english: "Anglais",
+        name: "Nom",
+        le: "Avec « le »",
+        du: "Avec « du »",
+        exampleFr: (du: string) => `Exemple : « Dans la liste ${du} »`,
+        exampleEn: (name: string) => `Exemple : « In the ${name} list »`,
+        incomplete: "Remplis les trois formes françaises, ou aucune.",
+        tooLong: "40 caractères au plus.",
+        saved: "Noms des sections enregistrés.",
+      },
     },
     // Un onglet pas encore rempli.
     empty: {
@@ -2666,7 +2688,13 @@ export const fr: Texts = {
       title: "Aperçu",
       description:
         "La palette choisie s'applique à toute l'admin, pour toi seulement.",
-      nav: ["Tableau de bord", "Blog", "Podcasts", "Pages", "Médiathèque"],
+      nav: [
+        "Tableau de bord",
+        names.blog.name,
+        names.podcasts.name,
+        "Pages",
+        "Médiathèque",
+      ],
       initial: "C",
       member: "Camille",
       heading: "Tableau de bord",
@@ -2681,17 +2709,17 @@ export const fr: Texts = {
       rows: [
         {
           name: "Respirer avant de répondre",
-          meta: "Blog · par Léa, il y a 2 h",
+          meta: `${names.blog.name} · par Léa, il y a 2 h`,
           badge: "En ligne",
         },
         {
           name: "Le calme du matin",
-          meta: "Podcasts · par Hugo, hier",
+          meta: `${names.podcasts.name} · par Hugo, hier`,
           badge: "Programmé",
         },
         {
           name: "Trouver son rythme",
-          meta: "Blog · par Camille, lundi",
+          meta: `${names.blog.name} · par Camille, lundi`,
           badge: "Brouillon",
         },
       ],

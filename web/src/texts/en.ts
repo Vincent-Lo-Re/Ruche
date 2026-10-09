@@ -1,6 +1,11 @@
 // Tous les textes de l'interface en anglais, la langue de référence : un texte s'écrit
 // d'abord ici, puis dans les autres langues (fr.ts). La forme des textes (`Texts`) en est tirée.
 
+import { sectionNamesFor } from "../lib/section-names.ts"
+
+// Les noms du Blog et des Podcasts : ceux de l'admin s'il les a changés (Paramètres › Avancé).
+const names = sectionNamesFor("en")
+
 export const en = {
   app: {
     // Le nom par défaut de l'admin ; un admin le remplace par celui de la marque (Paramètres).
@@ -102,11 +107,11 @@ export const en = {
       description: "Welcome",
     },
     blog: {
-      title: "Blog",
+      title: names.blog.name,
       description: "Posts and categories.",
     },
     podcasts: {
-      title: "Podcasts",
+      title: names.podcasts.name,
       description: "Episodes and categories.",
     },
     pages: {
@@ -764,8 +769,8 @@ export const en = {
       all: "All",
       file: "Media library",
       page: "Pages",
-      article: "Blog",
-      episode: "Podcasts",
+      article: names.blog.name,
+      episode: names.podcasts.name,
       template: "Block templates",
     },
     itemTypes: {
@@ -1271,8 +1276,8 @@ export const en = {
     },
     // La section d'un point de départ ([D42]) : la sorte de contenu qu'il sert à créer.
     sections: {
-      article: "Blog posts",
-      episode: "Podcast episodes",
+      article: `${names.blog.name} (posts)`,
+      episode: `${names.podcasts.name} (episodes)`,
       page: "Pages",
     },
     list: {
@@ -1812,8 +1817,8 @@ export const en = {
       },
       feed: {
         title: {
-          article: "In the Blog list",
-          episode: "In the Podcasts list",
+          article: `In the ${names.blog.name} list`,
+          episode: `In the ${names.podcasts.name} list`,
         },
         choose: "Choose",
         chooseLabel: "Choose featured image",
@@ -2474,6 +2479,26 @@ export const en = {
         saved: "Time zone saved.",
         loadFailed: "The admin time zone couldn't be loaded.",
       },
+      sectionNames: {
+        title: "Section names",
+        description: [
+          "Rename the Blog and Podcasts in each admin language, for the whole team*. The page reloads after saving.",
+          "* In French, write three forms by hand: the name alone (menu, page titles), with “le”, and with “du”, so every sentence reads right. Leave them empty to keep the original name.",
+        ],
+        // Les noms d'origine, en tête de chaque bloc.
+        sections: { blog: "Blog", podcasts: "Podcasts" },
+        french: "French",
+        english: "English",
+        name: "Name",
+        le: "With “le”",
+        du: "With “du”",
+        // Un exemple, dans la langue du nom (pas dans celle de l'admin).
+        exampleFr: (du: string) => `Example: “Dans la liste ${du}”`,
+        exampleEn: (name: string) => `Example: “In the ${name} list”`,
+        incomplete: "Fill in all three French forms, or none.",
+        tooLong: "40 characters at most.",
+        saved: "Section names saved.",
+      },
     },
     accessLevels: {
       title: "Subscription plans",
@@ -2613,7 +2638,13 @@ export const en = {
     preview: {
       title: "Preview",
       description: "Your palette applies across the admin. Only you see it.",
-      nav: ["Dashboard", "Blog", "Podcasts", "Pages", "Media library"],
+      nav: [
+        "Dashboard",
+        names.blog.name,
+        names.podcasts.name,
+        "Pages",
+        "Media library",
+      ],
       initial: "C",
       member: "Camille",
       heading: "Dashboard",
@@ -2628,17 +2659,17 @@ export const en = {
       rows: [
         {
           name: "Breathe before you reply",
-          meta: "Blog · by Léa, 2h ago",
+          meta: `${names.blog.name} · by Léa, 2h ago`,
           badge: "Published",
         },
         {
           name: "Morning calm",
-          meta: "Podcasts · by Hugo, yesterday",
+          meta: `${names.podcasts.name} · by Hugo, yesterday`,
           badge: "Scheduled",
         },
         {
           name: "Finding your rhythm",
-          meta: "Blog · by Camille, Monday",
+          meta: `${names.blog.name} · by Camille, Monday`,
           badge: "Draft",
         },
       ],

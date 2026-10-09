@@ -5,6 +5,7 @@ import { helpFiches } from "@/help/fiches"
 import * as identityApi from "@/lib/admin-identity"
 import { fakeAuth, renderApp } from "@/test/render"
 import { texts } from "@/texts"
+import { NO_CUSTOM_NAMES } from "@/lib/section-names"
 
 vi.mock("@/lib/admin-identity", async (importOriginal) => ({
   ...(await importOriginal<typeof identityApi>()),
@@ -26,6 +27,7 @@ const brand = (websiteUrl: string | null): identityApi.AdminBrand => ({
   timeZone: "Europe/Paris",
   locale: null,
   initials: null,
+  sectionNames: NO_CUSTOM_NAMES,
   variants: {},
 })
 

@@ -15,6 +15,7 @@ import { AdminLanguageCard } from "@/components/settings/admin-language-card"
 import { AdminTimeZoneCard } from "@/components/settings/admin-time-zone-card"
 import { BrandLogosCard } from "@/components/settings/brand-logos-card"
 import { LoginScreenCard } from "@/components/settings/login-screen-card"
+import { SectionNamesCard } from "@/components/settings/section-names-card"
 import { SettingsSection } from "@/components/settings/settings-section"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAddressState } from "@/hooks/use-address-state"
@@ -119,6 +120,12 @@ export function SettingsPage() {
                   description={labels.advanced.timeZone.description}
                 >
                   <AdminTimeZoneCard />
+                </SettingsSection>
+                <SettingsSection
+                  title={labels.advanced.sectionNames.title}
+                  description={labels.advanced.sectionNames.description}
+                >
+                  <SectionNamesCard />
                 </SettingsSection>
               </div>
             ) : (
