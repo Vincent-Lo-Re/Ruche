@@ -34,34 +34,56 @@ beforeEach(() => {
 afterEach(() => vi.clearAllMocks())
 
 describe("App : les onglets", () => {
-  it("quatre onglets ; la charte graphique s'ouvre au départ ; les autres arrivent avec l'app", async () => {
+  it("quatre onglets à gauche, la charte et ses familles ; les autres arrivent avec l'app", async () => {
     const { router } = await renderApp("/app")
-    const tabs = await screen.findByRole("tablist", {
+    const nav = await screen.findByRole("navigation", {
       name: texts.appPage.tabs.label,
     })
     expect(
-      within(tabs)
-        .getAllByRole("tab")
-        .map((tab) => tab.textContent)
+      within(nav)
+        .getAllByRole("button")
+        .map((button) => button.textContent)
     ).toEqual([
       texts.appPage.tabs.identity,
       texts.appPage.tabs.style,
+      labels.sections.groups.colors,
+      labels.sections.groups.elements,
+      labels.sections.groups.text,
+      labels.sections.groups.shapes,
       texts.appPage.tabs.navigation,
       texts.appPage.tabs.layouts,
     ])
+    // La charte s'ouvre au départ, sur les couleurs.
     expect(
-      within(tabs).getByRole("tab", { name: texts.appPage.tabs.style })
-    ).toHaveAttribute("aria-selected", "true")
+      within(nav).getByRole("button", { name: labels.sections.groups.colors })
+    ).toHaveAttribute("aria-current", "true")
     expect(
       await screen.findByRole("heading", { name: labels.colors.title })
     ).toBeVisible()
+    expect(
+      screen.queryByRole("heading", { name: labels.fonts.title })
+    ).toBeNull()
+
+    // Une famille ouvre ses réglages seulement, et s'écrit dans l'adresse.
+    fireEvent.click(
+      within(nav).getByRole("button", { name: labels.sections.groups.text })
+    )
+    expect(
+      screen.getByRole("heading", { name: labels.fonts.title })
+    ).toBeVisible()
+    expect(
+      screen.queryByRole("heading", { name: labels.colors.title })
+    ).toBeNull()
+    await waitFor(() =>
+      expect(router.state.location.search).toBe("?group=text")
+    )
 
     fireEvent.click(
-      within(tabs).getByRole("tab", { name: texts.appPage.tabs.navigation })
+      within(nav).getByRole("button", { name: texts.appPage.tabs.navigation })
     )
     expect(await screen.findByText(texts.appPage.soon.title)).toBeVisible()
     await waitFor(() =>
-      expect(router.state.location.search).toBe("?tab=navigation")
+      expect(router.state.location.search).toBe("?group=text&tab=navigation")
     )
   })
 
@@ -117,5 +139,43 @@ describe("App : la charte graphique", () => {
     expect(field).toHaveValue(labels.neutral.colors.lightGray)
     await new Promise((resolve) => setTimeout(resolve, 900))
     expect(styleApi.saveStyle).not.toHaveBeenCalled()
+  })
+
+  it("un élément du téléphone ouvre sa famille et mène à son réglage", async () => {
+    await renderApp("/app")
+    await screen.findByRole("heading", { name: labels.colors.title })
+    // L'encadré : la famille « Éléments », réglage des teintes.
+    fireEvent.click(document.querySelector('[data-style-section="tints"]')!)
+    expect(document.getElementById("style-tints")).toHaveFocus()
+    expect(
+      screen.getByRole("button", { name: labels.sections.groups.elements })
+    ).toHaveAttribute("aria-current", "true")
+  })
+
+  it("un bouton se replie : un seul est ouvert à la fois", async () => {
+    await renderApp("/app?group=elements")
+    const primary = await screen.findByRole("button", {
+      name: labels.buttons.details(labels.neutral.buttons.primary),
+    })
+    expect(primary).toHaveAttribute("aria-expanded", "false")
+    expect(
+      screen.queryByRole("group", { name: labels.buttons.kind })
+    ).toBeNull()
+
+    fireEvent.click(primary)
+    expect(primary).toHaveAttribute("aria-expanded", "true")
+    expect(
+      screen.getByRole("group", { name: labels.buttons.kind })
+    ).toBeVisible()
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: labels.buttons.details(labels.neutral.buttons.secondary),
+      })
+    )
+    expect(primary).toHaveAttribute("aria-expanded", "false")
+    expect(
+      screen.getAllByRole("group", { name: labels.buttons.kind })
+    ).toHaveLength(1)
   })
 })

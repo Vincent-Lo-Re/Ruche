@@ -259,7 +259,8 @@ export function NameInput({
     setTyped(null)
   }
   return (
-    <div className="min-w-0 flex-1">
+    // Dans une colonne étroite, le nom prend sa ligne, les couleurs passent dessous.
+    <div className="min-w-0 flex-1 basis-full @md:basis-0">
       <Input
         value={typed ?? value}
         aria-label={label}

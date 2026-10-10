@@ -27,6 +27,11 @@ test("Charte de l'app : une police libre, publiée et copiée dans le stockage",
     .click()
   await expect(page.getByText(labels.status.never)).toBeVisible()
 
+  // La famille « Texte », dans la colonne de gauche.
+  await page
+    .getByRole("button", { name: labels.sections.groups.text, exact: true })
+    .click()
+
   // La police « Titres » (grasse) passe à Inter.
   await page
     .getByRole("combobox", { name: labels.fonts.family })

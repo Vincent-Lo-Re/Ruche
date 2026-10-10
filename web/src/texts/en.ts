@@ -2616,7 +2616,7 @@ export const en = {
     },
     publish: "Publish",
     published: "Style published. The app uses it from now on.",
-    discard: "Revert to published",
+    discard: "Revert",
     discardTitle: "Revert to the published style?",
     discardDescription:
       "The draft goes back to the published style, or to the neutral style if nothing has been published yet.",
@@ -2624,6 +2624,18 @@ export const en = {
     discarded: "Draft reverted to the published style.",
     // Les vérifications qui empêchent d'enregistrer le brouillon (même règle que la base).
     blocked: "Fix the highlighted names to save the draft.",
+    // Les familles de réglages de l'onglet, sous « Charte graphique » dans la colonne de gauche.
+    sections: {
+      label: "Style sections",
+      groups: {
+        colors: "Colors",
+        elements: "Elements",
+        text: "Text",
+        shapes: "Shapes and file",
+      },
+      hardToRead: "Some text is hard to read here",
+      hint: "Click an element in the phone to go to its setting.",
+    },
     darkMode: {
       title: "Dark mode",
       description:
@@ -2754,6 +2766,7 @@ export const en = {
         border: "Border",
         label: "Text",
       },
+      details: (name: string) => `Settings for “${name}”`,
       minOne: "You need at least one button.",
     },
     fields: {
@@ -2872,12 +2885,6 @@ export const en = {
     // L'aperçu : un téléphone avec un article imaginaire, aux couleurs du brouillon.
     preview: {
       label: "App preview",
-      mode: "Preview mode",
-      light: "Light",
-      dark: "Dark",
-      text: "Text size",
-      normalText: "Normal text",
-      largeText: "Large text",
       title: "Post title",
       meta: "Oct 12 · 6 min read",
       category: "Category",

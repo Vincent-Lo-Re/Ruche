@@ -2661,7 +2661,7 @@ export const fr: Texts = {
     },
     publish: "Publier",
     published: "Charte publiée. L'app s'en sert dès maintenant.",
-    discard: "Revenir à la version publiée",
+    discard: "Revenir",
     discardTitle: "Revenir à la version publiée ?",
     discardDescription:
       "Le brouillon revient à la charte publiée, ou à la charte neutre si rien n'a encore été publié.",
@@ -2669,6 +2669,18 @@ export const fr: Texts = {
     discarded: "Le brouillon est revenu à la version publiée.",
     // Les vérifications qui empêchent d'enregistrer le brouillon (même règle que la base).
     blocked: "Corrige les noms signalés pour enregistrer le brouillon.",
+    // Les familles de réglages de l'onglet, sous « Charte graphique » dans la colonne de gauche.
+    sections: {
+      label: "Sections de la charte",
+      groups: {
+        colors: "Couleurs",
+        elements: "Éléments",
+        text: "Texte",
+        shapes: "Formes et fichier",
+      },
+      hardToRead: "Un texte se lit mal ici",
+      hint: "Clique sur un élément du téléphone pour aller à son réglage.",
+    },
     darkMode: {
       title: "Mode sombre",
       description:
@@ -2797,6 +2809,7 @@ export const fr: Texts = {
         border: "Bordure",
         label: "Texte",
       },
+      details: (name: string) => `Réglages de « ${name} »`,
       minOne: "Il faut au moins un bouton.",
     },
     fields: {
@@ -2916,12 +2929,6 @@ export const fr: Texts = {
     // L'aperçu : un téléphone avec un article imaginaire, aux couleurs du brouillon.
     preview: {
       label: "Aperçu de l'app",
-      mode: "Mode de l'aperçu",
-      light: "Clair",
-      dark: "Sombre",
-      text: "Taille du texte",
-      normalText: "Texte normal",
-      largeText: "Grand texte",
       title: "Titre de l'article",
       meta: "12 oct. · 6 min de lecture",
       category: "Catégorie",

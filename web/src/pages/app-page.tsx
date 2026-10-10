@@ -1,78 +1,77 @@
-import {
-  Compass,
-  Fingerprint,
-  LayoutTemplate,
-  Palette,
-  type LucideIcon,
-} from "lucide-react"
+import type { ReactNode } from "react"
 
-import { StyleTab } from "@/components/app-style/style-tab"
+import { AppNav } from "@/components/app-nav"
+import { appTabIcons } from "@/components/app-tab-icons"
+import { StyleTab, type StyleFlags } from "@/components/app-style/style-tab"
 import { ListEmpty } from "@/components/list-card"
 import { PageHeader } from "@/components/page-header"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAddressState } from "@/hooks/use-address-state"
 import {
   appTabFromAddress,
-  appTabs,
+  styleGroupFromAddress,
   writeAppTab,
-  type AppTab,
+  writeStyleGroup,
 } from "@/lib/address"
+import type { StyleSectionGroup } from "@/lib/app-style/sections"
 import { sections } from "@/navigation"
 import { texts } from "@/texts"
 
 const labels = texts.appPage
 
-const tabIcons: Record<AppTab, LucideIcon> = {
-  identity: Fingerprint,
-  style: Palette,
-  navigation: Compass,
-  layouts: LayoutTemplate,
-}
-
 /**
  * La section « App » (admins seulement, ADMIN § 1) : tout ce que voient les lecteurs de l'app, en
- * quatre onglets. Seule la charte graphique est construite ; l'identité, la navigation et les
- * mises en page arrivent avec l'app mobile. L'onglet ouvert est dans l'adresse (« ?tab=style »).
+ * trois colonnes de même largeur qui tiennent dans le panneau. À gauche, le titre et les quatre
+ * onglets (sous la charte graphique, ses familles de réglages) ; au centre, le téléphone ; à
+ * droite, les réglages. Seule la charte graphique est construite ; l'identité, la navigation et
+ * les mises en page arrivent avec l'app mobile. L'onglet et la famille ouverts sont dans
+ * l'adresse (« ?group=text »).
  */
 export function AppPage() {
   const { title, description } = texts.sections.app
   const [tab, setTab] = useAddressState(appTabFromAddress, writeAppTab)
-  return (
-    <>
+  const [group, setGroup] = useAddressState(
+    styleGroupFromAddress,
+    writeStyleGroup
+  )
+  const openGroup = (next: StyleSectionGroup) => {
+    setTab("style")
+    setGroup(next)
+  }
+  const aside = (flags?: StyleFlags, extra?: ReactNode) => (
+    <div className="flex min-h-0 flex-col gap-6 lg:overflow-y-auto">
       <PageHeader
         icon={sections.app.icon}
         title={title}
         description={description}
       />
-      <Tabs value={tab} onValueChange={(value: AppTab) => setTab(value)}>
-        {/* Les onglets restent en haut quand la page défile, sur le fond du panneau. */}
-        <div className="sticky top-0 z-10 -mx-8 -my-3 self-stretch bg-panel-solid px-8 py-3">
-          <TabsList aria-label={labels.tabs.label}>
-            {appTabs.map((value) => {
-              const Icon = tabIcons[value]
-              return (
-                <TabsTrigger key={value} value={value}>
-                  <Icon />
-                  {labels.tabs[value]}
-                </TabsTrigger>
-              )
-            })}
-          </TabsList>
-        </div>
-        {appTabs.map((value) => (
-          <TabsContent key={value} value={value} data-app-tab={value}>
-            {value === "style" ? (
-              <StyleTab />
-            ) : (
-              <ListEmpty
-                icon={tabIcons[value]}
-                title={labels.soon.title}
-                description={labels.soon.description}
-              />
-            )}
-          </TabsContent>
-        ))}
-      </Tabs>
-    </>
+      <AppNav
+        tab={tab}
+        group={group}
+        onTab={setTab}
+        onGroup={openGroup}
+        flagged={flags}
+      />
+      {extra}
+    </div>
+  )
+  return (
+    // Sur un écran large, la page tient dans le panneau (posée sur lui, avec ses marges) : seules
+    // les colonnes défilent. Plus étroit, les colonnes s'empilent et la page défile.
+    <div className="grid gap-6 lg:absolute lg:inset-0 lg:grid-cols-3 lg:grid-rows-1 lg:p-8 lg:pb-page">
+      {tab === "style" ? (
+        <StyleTab group={group} onGroup={openGroup} aside={aside} />
+      ) : (
+        <>
+          {aside()}
+          <div className="lg:col-span-2">
+            <ListEmpty
+              icon={appTabIcons[tab]}
+              title={labels.soon.title}
+              description={labels.soon.description}
+            />
+          </div>
+        </>
+      )}
+    </div>
   )
 }

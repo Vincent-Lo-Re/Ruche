@@ -1,51 +1,48 @@
 import {
-  ALargeSmall,
   Bookmark,
   ChevronLeft,
   Eye,
   Focus,
   Lock,
-  Moon,
   Pencil,
   Share,
-  Sun,
   UserCheck,
   UserX,
-  type LucideIcon,
 } from "lucide-react"
 import {
   useEffect,
   useRef,
   useState,
-  type ComponentType,
   type CSSProperties,
   type ReactNode,
-  type SVGProps,
 } from "react"
 
 import type { BlockMedia } from "@/blocks/components/context"
 import { StaticBlock } from "@/blocks/components/static-block"
-import { AndroidLogo, AppleLogo } from "@/components/brand-icons"
+import {
+  DeviceTool,
+  LargeTextTool,
+  PreviewToolbar,
+  ThemeTool,
+  ToolGroup,
+  type ToolChoices,
+} from "@/components/editor/preview-tools"
 import { PhoneDevice } from "@/components/phone-device"
 import type { Block, Draft } from "@/blocks/types"
 import { AudioPreview, CoverPreview } from "@/components/editor/presentation"
 import { Kbd } from "@/components/ui/kbd"
 import { Separator } from "@/components/ui/separator"
 import { Toggle } from "@/components/ui/toggle"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import {
-  chosenValue,
-  devices,
   deviceHeightOf,
   phoneScale,
   previewModes,
   previewReaders,
-  previewThemes,
   type PreviewSettings,
 } from "@/lib/editor/preview"
 import type { LockableKind } from "@/lib/editor/profile"
@@ -154,23 +151,11 @@ export function FeedPreview({
   )
 }
 
-// Une icône Lucide, ou l'un des deux logos de marque (iPhone, Android).
-type Icon = LucideIcon | ComponentType<SVGProps<SVGSVGElement>>
-type Choice<T extends string> = Record<T, { label: string; icon: Icon }>
-
-const deviceChoices: Choice<(typeof devices)[number]> = {
-  ios: { label: labels.device.ios, icon: AppleLogo },
-  android: { label: labels.device.android, icon: AndroidLogo },
-}
-const modeChoices: Choice<(typeof previewModes)[number]> = {
+const modeChoices: ToolChoices<(typeof previewModes)[number]> = {
   edit: { label: labels.mode.edit, icon: Pencil },
   read: { label: labels.mode.read, icon: Eye },
 }
-const themeChoices: Choice<(typeof previewThemes)[number]> = {
-  light: { label: labels.theme.light, icon: Sun },
-  dark: { label: labels.theme.dark, icon: Moon },
-}
-const readerChoices: Choice<(typeof previewReaders)[number]> = {
+const readerChoices: ToolChoices<(typeof previewReaders)[number]> = {
   subscriber: { label: labels.reader.subscriber, icon: UserCheck },
   visitor: { label: labels.reader.visitor, icon: UserX },
 }
@@ -198,16 +183,8 @@ function PreviewTools({
   themeLocked: boolean
 }) {
   return (
-    <div
-      role="toolbar"
-      aria-label={labels.tools}
-      aria-orientation="vertical"
-      className="flex shrink-0 flex-col items-center gap-1 self-start rounded-lg border bg-background p-1 shadow-xs"
-    >
-      <ToolGroup
-        label={labels.device.label}
-        values={devices}
-        choices={deviceChoices}
+    <PreviewToolbar>
+      <DeviceTool
         value={preview.device}
         onChange={(device) => onChange({ ...preview, device })}
       />
@@ -240,33 +217,17 @@ function PreviewTools({
       {!themeLocked && (
         <>
           <Separator className="my-1 w-5" />
-          <ToolGroup
-            label={labels.theme.label}
-            values={previewThemes}
-            choices={themeChoices}
+          <ThemeTool
             value={preview.theme}
             onChange={(theme) => onChange({ ...preview, theme })}
           />
         </>
       )}
       <Separator className="my-1 w-5" />
-      <Tooltip>
-        <TooltipTrigger
-          render={
-            <Toggle
-              size="icon"
-              aria-label={labels.largeText}
-              pressed={preview.largeText}
-              onPressedChange={(largeText) =>
-                onChange({ ...preview, largeText })
-              }
-            />
-          }
-        >
-          <ALargeSmall />
-        </TooltipTrigger>
-        <TooltipContent side="left">{labels.largeText}</TooltipContent>
-      </Tooltip>
+      <LargeTextTool
+        pressed={preview.largeText}
+        onChange={(largeText) => onChange({ ...preview, largeText })}
+      />
       {preview.mode === "read" && (
         <>
           {readers && (
@@ -283,54 +244,7 @@ function PreviewTools({
           )}
         </>
       )}
-    </div>
-  )
-}
-
-function ToolGroup<T extends string>({
-  label,
-  values,
-  choices,
-  value,
-  onChange,
-}: {
-  label: string
-  values: readonly T[]
-  choices: Choice<T>
-  value: T
-  onChange: (value: T) => void
-}) {
-  return (
-    <ToggleGroup
-      aria-label={label}
-      orientation="vertical"
-      className="flex-col"
-      value={[value]}
-      onValueChange={(next: string[]) => {
-        const chosen = chosenValue(values, next)
-        if (chosen) onChange(chosen)
-      }}
-    >
-      {values.map((candidate) => {
-        const { label: itemLabel, icon: Icon } = choices[candidate]
-        return (
-          <Tooltip key={candidate}>
-            <TooltipTrigger
-              render={
-                <ToggleGroupItem
-                  value={candidate}
-                  size="icon"
-                  aria-label={itemLabel}
-                />
-              }
-            >
-              <Icon />
-            </TooltipTrigger>
-            <TooltipContent side="left">{itemLabel}</TooltipContent>
-          </Tooltip>
-        )
-      })}
-    </ToggleGroup>
+    </PreviewToolbar>
   )
 }
 
