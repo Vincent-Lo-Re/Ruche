@@ -16,6 +16,35 @@ Les sections 1 à 9 sont **décidées**. On coche chaque ligne quand elle est en
 - [x] **Accueil** (« Tableau de bord ») : on y arrive après la connexion. Depuis le 06/10/2026, il n'a plus que son titre, avec son icône, et « Bienvenue » dessous (avant : tes brouillons récents, les publications programmées et les programmations échouées).
 - [x] **Blog** : les articles et leurs catégories.
 - [x] **Podcasts** : les épisodes (le son fait partie de l'épisode) et leurs catégories.
+- [ ] **App : l'allure de l'app mobile** (décidé le 10/10/2026, **à construire avec l'app mobile, sauf la charte graphique, construite tout de suite**). Tout ce que voit le lecteur se règle dans **une seule section « App »** du menu, pas dans Paramètres (qui règle l'admin et le fonctionnement) : l'aperçu du téléphone y montre ensemble le logo, la charte et les mises en page. Le header, la barre de navigation et les mises en page ne sont pas des modèles de bloc : un modèle s'insère dans un contenu, autant de fois qu'on veut, alors que ces éléments sont uniques et valent pour toute l'app. Ce ne sont pas non plus des pages de blocs libres : quelques choix guidés, dessinés par l'app elle-même (cohérente, lisible en grand texte, rapide). Quatre onglets, chacun avec son aperçu en direct dans le téléphone de l'admin :
+  - **Identité** :
+    - **Marque** : les mêmes champs que l'identité de l'admin (nom, adresse de contact, site web).
+    - **Écran de chargement** : celui qui suit le démarrage de l'app, animé comme le monogramme de la connexion de l'admin.
+    - **Logos** : ceux que montre l'app.
+  - **Charte graphique** (validée le 10/10/2026 sur la maquette `docs/maquettes/charte-app.html` ; **construite tout de suite**, car le téléphone de l'éditeur et les encadrés s'en servent déjà). La charte de Ruche part **neutre et vierge** (noir, blanc, gris, la police du téléphone) : chaque client compose la sienne, sans rien d'un client dans Ruche.
+    - **Mode sombre** : suit le téléphone, toujours clair ou toujours sombre.
+    - **Couleurs** : une palette libre, nommée par le client, chaque couleur avec sa valeur en clair et en sombre (saisies, pas calculées) ; une couleur utilisée ne se supprime pas.
+    - **Où va chaque couleur** : les usages dont l'app a besoin, rangés en groupes (Écran : fond, cartes et champs, bordures ; Texte : texte, texte secondaire, liens, couleur principale ; Barres : fond et texte de la barre du haut, fond de la barre de navigation, onglet choisi, onglets non choisis ; Champs : bordure d'un champ actif ; États : réussite, avertissement, erreur), chacun pris dans la palette.
+    - **Teintes des encadrés**, **pastilles** (la première sert aux catégories) et **boutons** (aplat, dégradé, bordure ou texte seul ; arrondi de la charte, pilule ou carré ; le premier sert aux boutons de l'app) : autant que le client veut, nommés par lui, rangés par glisser-déposer. Le bloc Encadré reçoit une teinte (on ajoute au schéma ; les encadrés existants prennent la première) ; le bloc Bouton est un chantier à part. Appuyé ou désactivé, un bouton change de lui-même ; le voile derrière une fenêtre, le fond d'une image qui charge et le surlignage du texte sont tirés de la charte, sans réglage.
+    - **Champs** : avec bordure, fond plein ou souligné.
+    - **Polices** : trois au moins, nommées par le client, chacune avec son épaisseur, puis **où va chaque police** (nom de la marque, titre d'un contenu, intertitres, texte courant, citations, petits textes, titres des encadrés, boutons et pastilles, onglets). Une liste choisie de polices libres de Google Fonts, **copiées dans le stockage de l'installation** quand on les choisit : ni l'admin ni l'app n'appellent Google (QCM du 10/10/2026).
+    - **Tailles du texte** : taille en points et interligne (titre, intertitres, texte courant, citations, petits textes), pour un texte de taille normale ; le « grand texte » du téléphone les agrandit.
+    - **Formes et effets** : arrondi des cartes, arrondi des images, ombres (aucune, légère, marquée, forte), liens soulignés ou non.
+    - **Lisibilité** : l'admin vérifie les contrastes (WCAG : 4,5:1 pour un texte, 3:1 pour une bordure de champ actif), dans les modes gardés, et le signale à côté du réglage et sous l'aperçu.
+    - **Fichier** : la charte s'exporte et s'importe.
+    - **Brouillon, puis « Publier »** (QCM du 10/10/2026) : on essaie librement, l'aperçu montre le brouillon ; les lecteurs ne voient la charte qu'une fois publiée.
+    - **Choisir une couleur** : une fenêtre aux couleurs de l'admin (nuancier `react-colorful` dans un `Popover`, et le code « #RRGGBB » à taper ou coller), pas celle du navigateur (QCM du 10/10/2026).
+    - **Implantation** : page `/app` (admins seulement), l'onglet dans l'adresse ; l'onglet vide « Identité de l'app » de Paramètres disparaît. Une charte est un seul document, dont la forme est décrite une fois et vérifiée par la base, l'admin et l'app ; enregistré par une fonction de la base avec révision, lu par l'app par une lecture `app_*`. La logique (charte neutre, contrastes, import et export, utilisations) est dans `lib/`, sans React. L'aperçu est le téléphone de l'éditeur, qui prend aussi la charte (couleurs, polices, tailles ; `blocks.tokens.json` garde les espacements). Composants shadcn (`Select` avec la pastille de couleur, `ToggleGroup`, `Slider`, `Badge`, `Tooltip`), la gomme pour supprimer, le glisser-déposer pour ranger. La base avant l'admin, en demandes de fusion séparées.
+  - **Navigation** :
+    - **Barre du haut** : le logo ou le nom de la marque, les boutons montrés (recherche, favoris, partage).
+    - **Barre de navigation** : les onglets (Accueil, Blog, Podcasts, une page…), leur ordre, leur icône et leur nom ; 5 au plus, comme le veulent iOS et Android.
+  - **Mises en page** :
+    - **Listes du Blog et des Podcasts** : une présentation choisie parmi quelques-unes (grande image, vignette à gauche, grille), et ce qui s'affiche (catégorie, temps de lecture ou durée).
+    - **Mise en page d'un contenu** : l'en-tête d'un article, d'un épisode ou d'une page, choisi parmi quelques mises en page toutes faites (3 ou 4 ; pas de dessin libre) : l'image en fond avec le titre par-dessus, l'image puis le titre, le titre puis l'image ; la date de parution et les catégories dans l'image, sous le titre ou masquées. **Une mise en page par section** (Blog, Podcasts, Pages), la même pour tous ses contenus : **pas d'exception pour un seul contenu** (QCM du 10/10/2026). Sans image mise en avant (une page « Mentions légales »), le titre seul. Le téléphone de l'éditeur montre l'en-tête dans la mise en page de sa section.
+
+  **Ce qui est figé dans l'app** : l'icône, le nom sous l'icône et le tout premier écran de démarrage sont posés quand l'app est publiée sur l'App Store et Google Play ; les changer demande une nouvelle version de l'app, validée par Apple et Google. L'onglet Identité le dit à côté de ces réglages. Tout le reste est lu par l'app à chaque ouverture et s'applique aussitôt.
+
+  Construite avant l'app, elle proposerait des réglages que l'app ne saurait pas suivre : on la fait au début de l'app mobile, avec ses écrans.
 - [ ] **Méthodes, refaites en écrans** (décidé le 06/10/2026, sur QCM et sur la maquette `docs/maquettes/methode-ecrans.html`). Les essais précédents (une méthode faite de chapitres et de leçons à blocs, puis les exercices, puis une seule page qui déroule tout) sont **retirés** : on repart au propre, en retirant tout l'ancien système de l'admin puis de la base, avant de construire le nouveau. Aucune méthode n'existait en ligne.
   - **La structure** : une méthode a une **Entrée** (facultative), un ou plusieurs **chapitres**, et une **Sortie** (facultative), qu'on ajoute au besoin (« Ajouter une Entrée », « Ajouter une Sortie »). Un chapitre contient des **leçons** ; une leçon contient des **exercices**.
   - **Simple ou à écrans** : l'Entrée, la Sortie et chaque chapitre, leçon ou exercice ont une sorte, choisie à la création et **qui ne change plus** :
@@ -262,6 +291,8 @@ Le 09/10/2026, après avoir construit les langues de l'app (#16, #17), les terme
 - **Renommer les niveaux d'une méthode** (04/10/2026) : « Chapitre », « Leçon » et « Exercice » pourront être changés à la main. D'ici là, ces mots restent dans `texts.ts`.
 - **Blocs à répondre dans un exercice** (questions à choix, réponses à écrire, minuteur…).
 - **Méthodes en écrans** (06/10/2026) : ce que le lecteur voit de sa place dans la méthode (titre, position), avec la charte graphique de l'app ; un menu de navigation dans l'app ; la vidéo ; les points de départ d'une Entrée et d'une Sortie.
+
+- **Section « App »** (10/10/2026) : voir § 1, « App : l'allure de l'app mobile » ; à construire au début de l'app mobile.
 
 ## 11. Ordre de construction proposé
 
