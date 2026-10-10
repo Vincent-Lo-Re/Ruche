@@ -1,6 +1,6 @@
 # Lexique de l'admin
 
-> **Brouillon du 07/10/2026**, rédigé par l'agent rédacteur à partir de tous les textes de l'admin (`web/src/texts.ts`, les fiches de l'aide, les e-mails). Les lignes marquées attendent une décision par QCM.
+> **Brouillon du 07/10/2026**, rédigé par l'agent rédacteur à partir de tous les textes de l'admin (alors `web/src/texts.ts`, les fiches de l'aide, les e-mails). Les textes sont depuis le 08/10/2026 dans `web/src/texts/en.ts`, la référence, écrite d'abord, et `web/src/texts/fr.ts`, tiré de l'anglais. Les lignes marquées attendent une décision par QCM.
 >
 > Il fait foi pour tous les textes, en anglais comme en français : la même chose porte le même nom partout. Un mot nouveau s'y ajoute avant d'apparaître dans l'interface. Les agents `.claude/agents/redacteur-fr.md`, `redacteur-en.md` et `relecteur-en.md` le lisent avant chaque travail. Décision : [ADMINISTRATION.md](ADMINISTRATION.md), § 7, « En anglais et en français ».
 
@@ -30,13 +30,21 @@
 | Corbeille | Trash | Ce qu'on supprime y reste 30 jours avant l'effacement. | Poubelle / Bin, Recycle bin |
 | La team | Team | Les membres et leurs rôles (un éditeur la lit, seul un admin la gère). Le nom de la section depuis le 09/10/2026 (avant, « Équipe ») ; « l'équipe » reste dans les phrases. | Utilisateurs / Users |
 | Paramètres | Settings | Les réglages de toute l'admin (admins seulement). | Configuration / Preferences |
-| Mon compte | My account | Profil, double vérification et thème de chaque membre. | Profil (seul) / Profile (seul) |
+| Mon compte | My account | Le profil de chaque membre (nom, adresse e-mail), sa langue, son format régional, son thème et sa double vérification. « Profil » / « Profile » nomme seulement sa carte du nom et de l'adresse e-mail (10/10/2026). | Profil (seul, pour toute la page) / Profile (alone, for the whole page) |
 | Contenus (groupe du menu) | Content | Blog, Podcasts, Pages. | — / Contents |
 | Outils (groupe du menu) | Tools | Modèles de bloc, Médiathèque, Corbeille. | — |
+| App mobile (groupe du menu) | Mobile app | Les cinq pages qui régleront l'allure de l'app (admins seulement) : Identité, Charte graphique, Formes et fichier, Navigation, Mises en page. | — |
+| Identité (page de l'App mobile) | App identity | Le nom, l'icône et l'écran de chargement de l'app. | — |
+| Charte graphique (page de l'App mobile) | Style | Les couleurs, les polices et les éléments de l'app. | — |
+| Formes et fichier (page de l'App mobile) | Shapes and file | Les formes de l'app, et sa charte dans un fichier. | — |
+| Navigation (page de l'App mobile) | Navigation | Les onglets et les menus de l'app. | — |
+| Mises en page (page de l'App mobile) | Layouts | La mise en page des contenus de chaque section de l'app. | — |
+| Bientôt | Coming soon | Une page pas encore construite (les pages de l'App mobile). | — |
 | Aide | Help | La recherche des fiches d'aide (⌘ K). | Documentation, FAQ / Docs |
 | fiche d'aide | help article | Une réponse courte de l'aide. | article (réservé au Blog) / doc, page |
-| Site web | Website | Lien vers le site public. | — / Site |
-| Avancé | Advanced | Onglet des Paramètres pour les réglages rares (langue de l'admin…). | — |
+| Site web | Website | Lien du header vers le site du client, et le champ de la carte « Marque » où l'on donne son adresse (sans adresse, pas de lien). | — / Site |
+| Avancé | Advanced | Onglet des Paramètres pour les réglages rares : langue, format régional et fuseau horaire de l'admin, noms des sections. | — |
+| Noms des sections | Section names | Section d'Avancé où un admin renomme le Blog et les Podcasts pour toute l'équipe. | — |
 
 ## Équipe, accès et connexion
 
@@ -44,8 +52,8 @@
 |---|---|---|---|
 | membre | member | Une personne de l'équipe qui a accès à l'admin. | utilisateur, collaborateur / user |
 | rôle | role | Ce qu'un membre peut faire : Admin ou Éditeur. | droits, profil / permissions |
-| Admin (rôle) | Admin | Peut tout faire, La team et Paramètres compris. | administrateur / Administrator, Owner |
-| Éditeur (rôle) | Editor | Écrit, publie et range, sans La team ni Paramètres. | rédacteur, auteur / Author, Contributor |
+| Admin (rôle) | Admin | Peut tout faire : gérer La team et les Paramètres compris. | administrateur / Administrator, Owner |
+| Éditeur (rôle) | Editor | Écrit, publie et range ; lit La team sans la gérer, sans les Paramètres. | rédacteur, auteur / Author, Contributor |
 | inviter, invitation | invite, invitation | Un admin ajoute une personne par un e-mail avec un lien valable 10 minutes. | inscription / sign up |
 | renvoyer l'invitation | resend invitation | Envoyer un nouveau lien. | relancer / reinvite |
 | retirer de l'équipe | remove from team | Supprimer l'accès et le compte d'un membre. | supprimer le membre / delete user |
@@ -68,7 +76,8 @@
 | page | page | Contenu simple de l'app, ouvert par son adresse. | — |
 | titre | title | Le nom d'un contenu, exigé pour publier. | — / headline |
 | catégorie | category | Propre au Blog ou aux Podcasts ; filtre dans l'app. | thème, étiquette / tag |
-| image mise en avant | featured image | Image en tête du contenu et vignette des listes de l'app : exigée pour publier un article ou un épisode, facultative pour une page (10/10/2026). | image de présentation (jusqu'au 10/10/2026), vignette, couverture / cover, thumbnail |
+| image mise en avant | featured image | Image en tête du contenu et vignette des listes de l'app : exigée pour publier un article ou un épisode, facultative pour une page (10/10/2026). | image de présentation (jusqu'au 10/10/2026), vignette (pour nommer l'image elle-même), couverture / cover, thumbnail (for the image itself) |
+| vignette | thumbnail | La petite image d'une liste : celle d'un fichier dans la Médiathèque, ou ce que devient l'image mise en avant dans les listes de l'app (10/10/2026). | miniature / — |
 | audio (d'un épisode) | audio | Le fichier MP3 ou M4A d'un épisode, exigé pour publier. | son, piste / sound, track |
 | adresse de la page | page URL | Ce que l'app demande pour ouvrir une page (`mentions-legales`). | slug, permalien / slug, permalink |
 | niveau d'accès | access (« Access » comme titre de champ, comme le « Post access » de Ghost ; « who can read it » dans une phrase) | Qui peut lire : Gratuit ou une formule. | visibilité, droits / visibility, permission |
@@ -96,7 +105,7 @@
 | réglages du bloc | block settings | Glissière à droite, pour le bloc choisi. | inspecteur / inspector |
 | barre de mise en forme | formatting toolbar | Gras, italique, lien, listes. | mise en forme (seul) / format bar |
 | modèle | template | Bloc ou structure réutilisable, de trois types. | gabarit / pattern |
-| mise en forme (type de modèle) | preset | Copie déjà mise en forme, à compléter, qui ne suit plus son modèle. | style / style, snippet |
+| mise en forme (type de modèle) | preset | Copie déjà mise en forme, à compléter, qui ne suit plus son modèle. | style / style, snippet (pour ce type de modèle ; « Style » reste le nom anglais de la page Charte graphique, 10/10/2026) |
 | bloc partagé | synced block | Un seul bloc, identique partout, corrigé une fois dans son modèle. | bloc lié / linked block, reusable block, global block |
 | détacher | detach | Faire d'un bloc partagé une copie ordinaire. | délier / unlink |
 | point de départ | starter | Modèle qui ouvre un nouveau contenu avec une structure en place. | gabarit / blueprint |
@@ -162,7 +171,7 @@
 | supprimer définitivement | delete permanently | Sans retour possible (Corbeille, catégorie, formule). | effacer définitivement / erase, purge |
 | vider la corbeille | Empty Trash | Tout supprimer définitivement. | — |
 | élément (de la Corbeille) | item | Fichier ou contenu dans la Corbeille. | objet / object |
-| lot | batch | Ce qui est parti ensemble dans la Corbeille et en revient ensemble. | groupe / group |
+| lot (retiré le 08/10/2026) | batch | Ce qui partait ensemble dans la Corbeille et en revenait ensemble ; depuis, chaque élément part et revient seul. | groupe / group |
 | effacement automatique | auto-delete | La date où la Corbeille efface un élément. | — / purge |
 | supprimer | delete | Sans passer par la Corbeille (un bloc d'un brouillon). | — / remove |
 | retirer | remove | Enlever sans détruire (image d'un contenu, logo, lien). | supprimer / delete |
@@ -179,12 +188,13 @@
 
 | Français | English | Définition | À éviter (FR / EN) |
 |---|---|---|---|
-| Identité de l'admin / de l'app | Admin branding / App branding | Onglets des Paramètres. | — / Admin identity |
+| Identité de l'admin | Admin branding | Onglet des Paramètres : marque, écran de connexion, logos. (« Identité de l'app » / « App branding », onglet prévu, n'existe pas : l'app se règle dans le groupe App mobile.) | — / Admin identity |
 | marque, nom de la marque | brand, brand name | Le nom affiché partout ; « Ruche » à défaut. Les e-mails, qui ne lisent pas la base, disent « ton administration » / « your admin ». | un nom de client (dans les e-mails) |
 | Ruche | Ruche | Nom à défaut. Ne se traduit pas, n'apparaît jamais dans les textes. | — / Hive |
 | à défaut | default | Ce qui s'affiche quand rien n'est choisi. | — |
-| logotype | logo | Le logo complet, dans le menu et à la connexion. | logo (seul) / wordmark |
-| monogramme | icon | Le petit signe de la marque : onglet du navigateur, connexion. | favicon, icône / favicon, logomark |
+| Initiale(s) | Initials | Une à trois lettres qui remplacent le monogramme tant qu'il n'est pas envoyé ; vide : la première lettre du nom. | — |
+| logotype | logo | Le logo complet, à gauche du header et à la connexion. En anglais « logo », dans les titres comme dans les phrases (10/10/2026). | logo (seul) / wordmark, logotype |
+| monogramme | icon | Le petit signe de la marque : onglet du navigateur, connexion. En anglais « icon », dans les titres comme dans les phrases (10/10/2026). | favicon, icône / favicon, logomark, monogram |
 | monogramme animé | animated icon | Le monogramme de l'écran de connexion, animé. | — |
 | écran de connexion | sign-in screen | La page de connexion. | page de login / login page |
 | image de fond | background image | La photo à droite de l'écran de connexion. | — / cover |
@@ -193,5 +203,7 @@
 | Automatique | System | Suit le thème de l'ordinateur. | Système / Auto |
 | palette | palette | Une base et un accent, propres à chaque membre. Les noms des palettes (Neutrine, Pierrange…) ne se traduisent pas, comme Ruche. | couleurs / color scheme |
 | décliner (un logo) | adapt | Faire un logo aux couleurs de chaque palette. | — / generate variants |
-| langue | language | La langue de l'admin. | — / locale |
+| langue | language | La langue de l'admin, ou celle d'un membre (Mon compte). | — / locale |
+| format régional | regional format | L'écriture des dates, des heures et des nombres, et l'ordre du jour et du mois à la saisie : pour toute l'admin (Avancé) ou pour soi (Mon compte). | — |
+| fuseau horaire | time zone | L'heure de toute l'admin (Avancé), Paris au départ ; le même pour toute l'équipe. | — |
 | adresse (d'un lien) | URL | Ce vers quoi mène un lien du texte. | — / address |
