@@ -144,7 +144,7 @@ export function useBlockEditing({
   }, [])
   const undoToast = (message: string, undo: () => void) => {
     const id = toast(message, {
-      action: { label: texts.editor.settings.undo, onClick: undo },
+      action: { label: texts.common.undo, onClick: undo },
       onDismiss: () => undoToasts.current.delete(id),
       onAutoClose: () => undoToasts.current.delete(id),
     })

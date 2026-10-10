@@ -29,7 +29,6 @@ type Row = { id: string; title: string }
 type Words = {
   trashedMany: (count: number) => string
   restoredMany: (count: number) => string
-  undo: string
 }
 
 /**
@@ -142,7 +141,7 @@ function useBulkTrash<T extends Row>({
       if (result.trashed.length > 0) {
         toast.success(words.trashedMany(result.trashed.length), {
           action: {
-            label: words.undo,
+            label: texts.common.undo,
             onClick: () => void undo(result.trashed),
           },
         })

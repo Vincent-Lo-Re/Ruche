@@ -23,7 +23,7 @@ describe("menu", () => {
     await renderApp("/account", fakeAuth({ role: "admin" }))
 
     const copyright = await screen.findByText(
-      texts.nav.copyright(new Date().getFullYear(), texts.app.name)
+      texts.common.copyright(new Date().getFullYear(), texts.app.name)
     )
     const footer = copyright.closest<HTMLElement>('[data-sidebar="footer"]')
     expect(footer).not.toBeNull()

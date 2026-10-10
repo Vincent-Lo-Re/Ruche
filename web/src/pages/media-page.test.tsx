@@ -851,7 +851,7 @@ describe("Sélection en masse", () => {
       .getByText(selection.trashed(2))
       .closest<HTMLElement>("[data-sonner-toast]")
     fireEvent.click(
-      within(toastItem!).getByRole("button", { name: texts.media.detail.undo })
+      within(toastItem!).getByRole("button", { name: texts.common.undo })
     )
     expect(await screen.findByText(selection.restored(2))).toBeVisible()
     expect(vi.mocked(api.restoreMedia).mock.calls.map(([id]) => id)).toEqual([

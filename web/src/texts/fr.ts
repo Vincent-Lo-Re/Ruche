@@ -20,6 +20,10 @@ export const fr: Texts = {
 
   // Les mots de l'interface qui ne dépendent pas de la page : une seule fois ici.
   common: {
+    // En bas du menu et sous la carte des pages de connexion, au nom de la marque (« Ruche »
+    // sans nom enregistré).
+    copyright: (year: number, brand: string) =>
+      `© ${year} ${brand}. Tous droits réservés.`,
     // Ce que les lecteurs d'écran annoncent d'un carrousel (components/ui/carousel.tsx).
     carousel: "carrousel",
     slide: "diapositive",
@@ -36,6 +40,9 @@ export const fr: Texts = {
     cancel: "Annuler",
     retry: "Réessayer",
     save: "Enregistrer",
+    undo: "Annuler",
+    open: "Ouvrir",
+    deletePermanently: "Supprimer définitivement",
     untitled: "Sans titre",
     actions: "Actions",
     clearSearch: "Effacer la recherche",
@@ -111,9 +118,6 @@ export const fr: Texts = {
     },
     // La barre du haut, pendant que la page suivante se prépare.
     pageLoading: "Chargement de la page",
-    // En bas du menu : le copyright au nom de la marque (« Ruche » sans nom enregistré).
-    copyright: (year: number, brand: string) =>
-      `© ${year} ${brand}. Tous droits réservés.`,
   },
 
   // Titre et présentation de chaque section, dans le menu et en tête de page.
@@ -185,9 +189,6 @@ export const fr: Texts = {
   },
 
   // Connexion : e-mail, puis code reçu par e-mail, puis double vérification.
-  // Sous la carte des pages de connexion : « © 2026 Ruche · Tous droits réservés ».
-  copyright: (year: number, brand: string) =>
-    `© ${year} ${brand} · Tous droits réservés`,
   signIn: {
     title: "Connexion",
     // En bas de l'étape de l'adresse (AuthNote).
@@ -288,7 +289,6 @@ export const fr: Texts = {
         `Le nom ne doit pas dépasser ${max} caractères.`,
       saved: "Nom enregistré.",
       email: "Adresse e-mail",
-      role: "Rôle",
       // Lu par les lecteurs d'écran devant le rôle.
       rolePrefix: "Rôle : ",
     },
@@ -789,7 +789,6 @@ export const fr: Texts = {
       },
       trash: "Mettre à la corbeille",
       trashed: "Fichier mis à la corbeille.",
-      undo: "Annuler",
       restored: "Fichier restauré.",
       used: "Ce fichier est encore utilisé : retire-le d'abord des contenus. Les contenus de la Corbeille comptent encore, tant qu'ils ne sont pas supprimés définitivement.",
     },
@@ -858,7 +857,6 @@ export const fr: Texts = {
         count === 1
           ? "L'élément sélectionné sera supprimé définitivement. Tu ne pourras pas revenir en arrière."
           : `Les ${count} éléments sélectionnés seront supprimés définitivement. Tu ne pourras pas revenir en arrière.`,
-      confirm: "Supprimer définitivement",
     },
     // Son titre a été repris entre-temps (un contenu de sa section, un modèle) : il revient numéroté.
     restoredRenamed: (name: string, title: string) =>
@@ -867,7 +865,6 @@ export const fr: Texts = {
     restoredWithoutAddress: (name: string) =>
       `La page « ${name} » est restaurée, mais sans adresse : une autre page a pris la sienne entre-temps. Choisis-en une autre avant de la publier.`,
     restoredDraft: "Retour en brouillon : rien n'est republié dans l'app.",
-    open: "Ouvrir",
     columns: {
       name: "Nom",
       type: "Type",
@@ -883,7 +880,6 @@ export const fr: Texts = {
     // Sans accord : l'élément peut être un fichier, une page, un article…
     restored: (name: string) => `« ${name} » est de retour.`,
     eraseItem: (name: string) => `Supprimer définitivement ${name}`,
-    erase: "Supprimer définitivement",
     empty: "Vider la corbeille",
     emptied: (count: number) =>
       count === 0
@@ -901,7 +897,6 @@ export const fr: Texts = {
       title: "Supprimer définitivement ?",
       description: (name: string) =>
         `Suppression définitive de « ${name} » : tu ne pourras pas revenir en arrière.`,
-      confirm: "Supprimer définitivement",
     },
     emptyState: {
       title: "La Corbeille est vide",
@@ -1071,13 +1066,11 @@ export const fr: Texts = {
         : `${shown} sur ${total}`,
     noCategory: "Aucune",
     actions: (title: string) => `Actions pour ${title}`,
-    open: "Ouvrir",
     trash: "Mettre à la corbeille",
     confirmTrash: {
       confirm: "Mettre à la corbeille",
     },
     trashed: (title: string) => `« ${title} » est dans la Corbeille.`,
-    undo: "Annuler",
     // Fenêtre « Nouvel article » (…) : le titre, un point de départ, les réglages ([D42]).
     newContent: {
       description:
@@ -1125,7 +1118,6 @@ export const fr: Texts = {
     // « Réglages » dans le menu d'une ligne : les mêmes réglages que dans l'éditeur.
     settings: {
       action: "Réglages",
-      save: "Enregistrer",
       saved: (title: string) => `Réglages de « ${title} » enregistrés.`,
       unchanged: "Rien n'a changé.",
       checking: "On vérifie que personne n'écrit ce contenu…",
@@ -1245,11 +1237,9 @@ export const fr: Texts = {
       editTitle: "Modifier la catégorie",
       description:
         "Une nouvelle catégorie arrive en bas de la liste. Range-la ensuite à sa place.",
-      save: "Enregistrer",
     },
     name: "Nom",
     // Le champ pour en créer une au passage (fenêtre d'un nouveau contenu, réglages).
-    add: "Ajouter",
     namePlaceholder: "Par exemple : Sommeil",
     nameRequired: "Donne un nom à la catégorie.",
     nameTooLong: (max: string) =>
@@ -1420,7 +1410,6 @@ export const fr: Texts = {
       emptySort: "Aucun modèle de ce type pour l'instant",
       usesLoading: "Recherche des brouillons…",
       actions: (name: string) => `Actions pour ${name}`,
-      open: "Ouvrir",
       trash: "Mettre à la corbeille",
       loadFailed: "La liste des modèles n'a pas pu être chargée.",
       refreshFailed:
@@ -1433,7 +1422,6 @@ export const fr: Texts = {
         confirm: "Mettre à la corbeille",
       },
       trashed: (name: string) => `« ${name} » est dans la Corbeille.`,
-      undo: "Annuler",
       restored: (name: string) => `« ${name} » est restauré.`,
       // Sélection en masse.
       confirmTrashManyTitle: (count: number) =>
@@ -1577,7 +1565,6 @@ export const fr: Texts = {
         "Le bloc suit maintenant le modèle : le corriger dans le modèle le corrigera ici aussi.",
       submit: "Enregistrer le modèle",
       saved: (name: string) => `Modèle « ${name} » enregistré.`,
-      open: "Ouvrir",
     },
   },
 
@@ -1679,7 +1666,6 @@ export const fr: Texts = {
       bold: "Gras",
       italic: "Italique",
       link: "Lien",
-      undo: "Annuler",
       redo: "Rétablir",
     },
     link: {
@@ -1921,10 +1907,6 @@ export const fr: Texts = {
           page: "Facultative : elle s'affiche en tête de la page.",
         },
       },
-      categories: {
-        add: "Ajouter",
-        addLabel: "Ajouter une catégorie",
-      },
       stats: {
         words: (count: string) =>
           count === "0" || count === "1" ? `${count} mot` : `${count} mots`,
@@ -1975,7 +1957,6 @@ export const fr: Texts = {
       moveDownOut: "Descendre hors de l'encadré",
       remove: "Supprimer le bloc",
       removed: (label: string) => `Bloc supprimé : ${label}.`,
-      undo: "Annuler",
       // Annoncé après « Monter » ou « Descendre ».
       moved: (position: number, count: number, container: string) =>
         `Bloc n° ${position} sur ${count}, dans ${container}.`,
@@ -2154,7 +2135,6 @@ export const fr: Texts = {
   // Publication (étape 5) : barre de publication, programmation, historique, réglages.
   publication: {
     status: {
-      label: "État de la publication",
       draft: "Brouillon",
       withdrawn: "Retiré de l'app",
       live: "En ligne",
@@ -2420,7 +2400,6 @@ export const fr: Texts = {
         "** Affichée sur l'écran de connexion, pour qui a besoin d'aide.",
       ],
       name: "Le nom de ta marque",
-      save: "Enregistrer",
       nameTooLong: (max: string) =>
         `Le nom ne doit pas dépasser ${max} caractères.`,
       // Les initiales, à la place d'un monogramme pas encore envoyé (onglet, connexion).

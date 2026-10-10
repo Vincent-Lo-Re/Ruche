@@ -347,7 +347,7 @@ describe("liste des pages : publication et corbeille", () => {
     )
     fireEvent.click(
       within(toast.closest("li")!).getByRole("button", {
-        name: texts.contentList.undo,
+        name: texts.common.undo,
       })
     )
     await waitFor(() =>

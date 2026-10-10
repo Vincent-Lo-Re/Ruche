@@ -105,7 +105,7 @@ export function TrashPage() {
           ? contentEditorPath(item.kind, item.id)
           : null
       const action = path
-        ? { label: texts.trash.open, onClick: () => void navigate(path) }
+        ? { label: texts.common.open, onClick: () => void navigate(path) }
         : undefined
       if (renamedTo !== null) {
         toast.warning(texts.trash.restoredRenamed(name, renamedTo), { action })
@@ -330,14 +330,14 @@ function confirmationWords(confirmation: Confirmation | null) {
     return {
       title: words.title(confirmation.items.length),
       description: words.description(confirmation.items.length),
-      confirmLabel: words.confirm,
+      confirmLabel: texts.common.deletePermanently,
     }
   }
   const words = texts.trash.confirmErase
   return {
     title: words.title,
     description: words.description(displayTitle(confirmation.item.title)),
-    confirmLabel: words.confirm,
+    confirmLabel: texts.common.deletePermanently,
   }
 }
 
@@ -433,7 +433,7 @@ function TrashRow({
             >
               <Eraser />
             </TooltipTrigger>
-            <TooltipContent>{texts.trash.erase}</TooltipContent>
+            <TooltipContent>{texts.common.deletePermanently}</TooltipContent>
           </Tooltip>
         </div>
       </TableCell>

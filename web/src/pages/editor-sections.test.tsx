@@ -380,7 +380,7 @@ describe("éditeur d'un article (Blog)", () => {
     const toast = await screen.findByText(words.cover.removed)
     fireEvent.click(
       within(toast.closest("li")!).getByRole("button", {
-        name: texts.editor.settings.undo,
+        name: texts.common.undo,
       })
     )
     expect(
@@ -1881,7 +1881,7 @@ describe("éditeur d'un épisode (Podcasts, dans l'éditeur des contenus)", () =
     const toast = await screen.findByText(words.audio.removed)
     fireEvent.click(
       within(toast.closest("li")!).getByRole("button", {
-        name: texts.editor.settings.undo,
+        name: texts.common.undo,
       })
     )
     expect(await within(audioCard()).findByText("entretien.mp3")).toBeVisible()

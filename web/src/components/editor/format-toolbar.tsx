@@ -180,7 +180,7 @@ export function FormatToolbar({
             <Button
               variant="ghost"
               size="icon"
-              aria-label={labels.undo}
+              aria-label={texts.common.undo}
               disabled={!usable || !formats.canUndo}
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => chain().undo().run()}
@@ -189,7 +189,7 @@ export function FormatToolbar({
         >
           <Undo2 />
         </TooltipTrigger>
-        <TooltipContent side={side}>{labels.undo}</TooltipContent>
+        <TooltipContent side={side}>{texts.common.undo}</TooltipContent>
       </Tooltip>
       <Tooltip>
         <TooltipTrigger

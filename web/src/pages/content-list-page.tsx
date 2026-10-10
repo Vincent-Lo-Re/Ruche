@@ -206,7 +206,7 @@ export function ContentListPage({
   // et listé.
   const bulk = useContentsSelection({
     shown: paged.items,
-    words: { ...kindLabels, undo: labels.undo },
+    words: kindLabels,
     nameOf: (item) => displayTitle(item.title),
   })
   const { selection } = bulk
@@ -240,7 +240,7 @@ export function ContentListPage({
       setToTrash(null)
       bulk.toggle(item, false)
       toast.success(labels.trashed(displayTitle(item.title)), {
-        action: { label: labels.undo, onClick: () => void undo(item) },
+        action: { label: texts.common.undo, onClick: () => void undo(item) },
       })
       // Ses fichiers redeviennent peut-être protégés : tout de suite.
       if (result.needsFileSync) void kickFiles()
@@ -883,7 +883,7 @@ function RowActions({
       <DropdownMenuContent align="end" className="w-44">
         <DropdownMenuItem onClick={() => void navigate(editPath)}>
           <SquarePen />
-          {labels.open}
+          {texts.common.open}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={onSettings}>
           <Settings2 />

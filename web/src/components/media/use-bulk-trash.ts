@@ -45,7 +45,7 @@ export function useBulkTrash(onDone: (result: BulkTrashResult<Media>) => void) {
         const ids = result.trashed.map((media) => media.id)
         toast.success(texts.media.selection.trashed(ids.length), {
           action: {
-            label: texts.media.detail.undo,
+            label: texts.common.undo,
             onClick: () => void undo(ids),
           },
         })

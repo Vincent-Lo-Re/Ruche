@@ -171,7 +171,7 @@ function BrandDetailsForm({
             disabled={save.isPending || !form.formState.isDirty}
           >
             {save.isPending ? <Spinner /> : <Save aria-hidden />}
-            {labels.save}
+            {texts.common.save}
           </Button>
         </CardFooter>
       </Card>

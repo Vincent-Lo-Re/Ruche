@@ -504,7 +504,9 @@ describe("« Enregistrer comme modèle »", () => {
     )
     const toast = await screen.findByText(saveAs.saved("Deux textes"))
     fireEvent.click(
-      within(toast.closest("li")!).getByRole("button", { name: saveAs.open })
+      within(toast.closest("li")!).getByRole("button", {
+        name: texts.common.open,
+      })
     )
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(`/templates/${STYLE_ID}`)

@@ -113,7 +113,7 @@ describe("Blog : l'onglet Catégories", () => {
     })
     // Un nom vide est refusé sans rien envoyer.
     fireEvent.click(
-      within(dialog).getByRole("button", { name: labels.dialog.save })
+      within(dialog).getByRole("button", { name: texts.common.save })
     )
     expect(await within(dialog).findByText(labels.nameRequired)).toBeVisible()
     expect(categoriesApi.createCategory).not.toHaveBeenCalled()
@@ -126,14 +126,14 @@ describe("Blog : l'onglet Catégories", () => {
       await within(dialog).findByText(labels.errors.nom_en_double)
     ).toBeVisible()
     expect(
-      within(dialog).getByRole("button", { name: labels.dialog.save })
+      within(dialog).getByRole("button", { name: texts.common.save })
     ).toBeDisabled()
 
     fireEvent.change(within(dialog).getByLabelText(labels.name), {
       target: { value: "Respiration" },
     })
     fireEvent.click(
-      within(dialog).getByRole("button", { name: labels.dialog.save })
+      within(dialog).getByRole("button", { name: texts.common.save })
     )
 
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
@@ -157,7 +157,7 @@ describe("Blog : l'onglet Catégories", () => {
       name: labels.dialog.editTitle,
     })
     const save = within(dialog).getByRole("button", {
-      name: labels.dialog.save,
+      name: texts.common.save,
     })
     expect(save).toBeEnabled()
     fireEvent.change(within(dialog).getByLabelText(labels.name), {
@@ -184,7 +184,7 @@ describe("Blog : l'onglet Catégories", () => {
     expect(name).toHaveValue("Sommeil")
     fireEvent.change(name, { target: { value: "Bien dormir" } })
     fireEvent.click(
-      within(dialog).getByRole("button", { name: labels.dialog.save })
+      within(dialog).getByRole("button", { name: texts.common.save })
     )
 
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())

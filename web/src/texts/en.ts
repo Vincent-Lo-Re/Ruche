@@ -20,6 +20,10 @@ export const en = {
 
   // Les mots de l'interface qui ne dépendent pas de la page : une seule fois ici.
   common: {
+    // En bas du menu et sous la carte des pages de connexion, au nom de la marque (« Ruche »
+    // sans nom enregistré).
+    copyright: (year: number, brand: string) =>
+      `© ${year} ${brand}. All rights reserved.`,
     // Ce que les lecteurs d'écran annoncent d'un carrousel (components/ui/carousel.tsx).
     carousel: "carousel",
     slide: "slide",
@@ -36,6 +40,9 @@ export const en = {
     cancel: "Cancel",
     retry: "Try again",
     save: "Save",
+    undo: "Undo",
+    open: "Open",
+    deletePermanently: "Delete permanently",
     untitled: "Untitled",
     actions: "Actions",
     clearSearch: "Clear search",
@@ -111,9 +118,6 @@ export const en = {
     },
     // La barre du haut, pendant que la page suivante se prépare.
     pageLoading: "Loading page",
-    // En bas du menu : le copyright au nom de la marque (« Ruche » sans nom enregistré).
-    copyright: (year: number, brand: string) =>
-      `© ${year} ${brand}. All rights reserved.`,
   },
 
   // Titre et présentation de chaque section, dans le menu et en tête de page.
@@ -183,9 +187,6 @@ export const en = {
   },
 
   // Connexion : e-mail, puis code reçu par e-mail, puis double vérification.
-  // Sous la carte des pages de connexion : « © 2026 Ruche · Tous droits réservés ».
-  copyright: (year: number, brand: string) =>
-    `© ${year} ${brand} · All rights reserved`,
   signIn: {
     title: "Sign in",
     // En bas de l'étape de l'adresse (AuthNote).
@@ -285,7 +286,6 @@ export const en = {
         `The name can't be longer than ${max} characters.`,
       saved: "Name saved.",
       email: "Email address",
-      role: "Role",
       // Lu par les lecteurs d'écran devant le rôle.
       rolePrefix: "Role: ",
     },
@@ -773,7 +773,6 @@ export const en = {
       },
       trash: "Move to Trash",
       trashed: "File moved to the Trash.",
-      undo: "Undo",
       restored: "File restored.",
       used: "This file is still in use. Remove it from your content first. Content in the Trash still counts until it's permanently deleted.",
     },
@@ -841,7 +840,6 @@ export const en = {
         count === 1
           ? "The selected item will be permanently deleted. This can't be undone."
           : `The ${count} selected items will be permanently deleted. This can't be undone.`,
-      confirm: "Delete permanently",
     },
     // Seules les pages ont une adresse.
     restoredWithoutAddress: (name: string) =>
@@ -850,7 +848,6 @@ export const en = {
     restoredRenamed: (name: string, title: string) =>
       `“${name}” was restored as “${title}” because its title was taken in the meantime.`,
     restoredDraft: "Restored as a draft. Nothing is put back in the app.",
-    open: "Open",
     columns: {
       name: "Name",
       type: "Type",
@@ -866,7 +863,6 @@ export const en = {
     // Sans accord : l'élément peut être un fichier, une page, un article…
     restored: (name: string) => `“${name}” restored.`,
     eraseItem: (name: string) => `Delete ${name} permanently`,
-    erase: "Delete permanently",
     empty: "Empty Trash",
     emptied: (count: number) =>
       count === 0
@@ -884,7 +880,6 @@ export const en = {
       title: "Delete permanently?",
       description: (name: string) =>
         `“${name}” will be permanently deleted. This can't be undone.`,
-      confirm: "Delete permanently",
     },
     emptyState: {
       title: "The Trash is empty",
@@ -1052,13 +1047,11 @@ export const en = {
         : `${shown} of ${total}`,
     noCategory: "Uncategorized",
     actions: (title: string) => `Actions for ${title}`,
-    open: "Open",
     trash: "Move to Trash",
     confirmTrash: {
       confirm: "Move to Trash",
     },
     trashed: (title: string) => `“${title}” moved to the Trash.`,
-    undo: "Undo",
     // Fenêtre « Nouvel article » (…) : le titre, un point de départ, les réglages ([D42]).
     newContent: {
       description:
@@ -1104,7 +1097,6 @@ export const en = {
     // « Réglages » dans le menu d'une ligne : les mêmes réglages que dans l'éditeur.
     settings: {
       action: "Settings",
-      save: "Save",
       saved: (title: string) => `Settings saved for “${title}”.`,
       unchanged: "No changes to save.",
       checking: "Checking if someone is editing…",
@@ -1222,11 +1214,9 @@ export const en = {
       editTitle: "Edit category",
       description:
         "New categories are added at the bottom of the list. Drag them into place.",
-      save: "Save",
     },
     name: "Name",
     // Le champ pour en créer une au passage (fenêtre d'un nouveau contenu, réglages).
-    add: "Add",
     namePlaceholder: "e.g. Sleep",
     nameRequired: "Give the category a name.",
     nameTooLong: (max: string) =>
@@ -1389,7 +1379,6 @@ export const en = {
       emptySort: "No templates of this type yet",
       usesLoading: "Checking which drafts use it…",
       actions: (name: string) => `Actions for ${name}`,
-      open: "Open",
       trash: "Move to Trash",
       loadFailed: "Couldn't load the templates.",
       refreshFailed:
@@ -1402,7 +1391,6 @@ export const en = {
         confirm: "Move to Trash",
       },
       trashed: (name: string) => `“${name}” moved to the Trash.`,
-      undo: "Undo",
       restored: (name: string) => `“${name}” restored.`,
       // Sélection en masse.
       confirmTrashManyTitle: (count: number) =>
@@ -1546,7 +1534,6 @@ export const en = {
         "This block is now synced with the template: edits there will show up here too.",
       submit: "Save template",
       saved: (name: string) => `Template “${name}” saved.`,
-      open: "Open",
     },
   },
 
@@ -1648,7 +1635,6 @@ export const en = {
       bold: "Bold",
       italic: "Italic",
       link: "Link",
-      undo: "Undo",
       redo: "Redo",
     },
     link: {
@@ -1889,10 +1875,6 @@ export const en = {
           page: "Optional. It appears at the top of the page.",
         },
       },
-      categories: {
-        add: "Add",
-        addLabel: "Add a category",
-      },
       stats: {
         words: (count: string) =>
           count === "1" ? `${count} word` : `${count} words`,
@@ -1942,7 +1924,6 @@ export const en = {
       moveDownOut: "Move down out of the box",
       remove: "Delete block",
       removed: (label: string) => `Block deleted: ${label}.`,
-      undo: "Undo",
       // Annoncé après « Monter » ou « Descendre ».
       moved: (position: number, count: number, container: string) =>
         `Block ${position} of ${count}, in ${container}.`,
@@ -2115,7 +2096,6 @@ export const en = {
   // Publication (étape 5) : barre de publication, programmation, historique, réglages.
   publication: {
     status: {
-      label: "Publishing status",
       draft: "Draft",
       withdrawn: "Unpublished",
       live: "Published",
@@ -2373,7 +2353,6 @@ export const en = {
         "** Shown on the sign-in screen for anyone who needs help.",
       ],
       name: "Brand name",
-      save: "Save",
       nameTooLong: (max: string) =>
         `The name can't be longer than ${max} characters.`,
       // Les initiales, à la place d'un monogramme pas encore envoyé (onglet, connexion).

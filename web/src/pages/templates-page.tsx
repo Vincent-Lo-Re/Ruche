@@ -437,7 +437,7 @@ function RowActions({
           onClick={() => void navigate(editorPath("templates", item.id))}
         >
           <SquarePen />
-          {labels.open}
+          {texts.common.open}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onClick={onTrash}>
@@ -514,7 +514,7 @@ function TrashTemplateDialog({
     onSuccess: (result) => {
       onClose()
       toast.success(labels.trashed(name), {
-        action: { label: labels.undo, onClick: () => void undo() },
+        action: { label: texts.common.undo, onClick: () => void undo() },
       })
       if (result.needsFileSync) void kickFiles()
     },

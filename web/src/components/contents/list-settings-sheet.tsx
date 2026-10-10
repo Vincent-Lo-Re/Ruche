@@ -161,7 +161,7 @@ export function ListSettingsSheet({
             onClick={() => save.mutate()}
           >
             {save.isPending && <Spinner />}
-            {labels.save}
+            {texts.common.save}
           </Button>
         </>
       }
