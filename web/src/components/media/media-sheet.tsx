@@ -40,7 +40,6 @@ import {
 } from "@/components/uses-dialog"
 import { ReplaceFile } from "@/components/media/replace-file"
 import { PanelCard } from "@/components/panel-card"
-import { useAccessCheck } from "@/components/team/use-access-check"
 import { FormField } from "@/components/form-field"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
@@ -283,7 +282,6 @@ function PreviewCard({ children }: { children: ReactNode }) {
 
 function MediaDetailsForm({ media }: { media: Media }) {
   const queryClient = useQueryClient()
-  const checkAccess = useAccessCheck()
   const hasAlt = media.kind === "image" || media.kind === "svg"
   const hasTranscript = media.kind === "audio"
   const defaults = {
@@ -315,7 +313,6 @@ function MediaDetailsForm({ media }: { media: Media }) {
     },
     onError: (error) => {
       form.setError("root", { message: error.message })
-      checkAccess(error)
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: mediaKeys.all }),
   })
@@ -543,7 +540,6 @@ function UseList({
 /** Contenus en ligne qui montrent encore un ancien texte de ce fichier, et leur mise à jour. */
 function OutdatedTexts({ media }: { media: Media }) {
   const queryClient = useQueryClient()
-  const checkAccess = useAccessCheck()
   const labels = texts.media.detail.outdated
   const outdated = useQuery({
     queryKey: mediaKeys.outdated(media.id),
@@ -557,7 +553,6 @@ function OutdatedTexts({ media }: { media: Media }) {
     },
     onError: (error) => {
       toast.error(error.message)
-      checkAccess(error)
     },
     onSettled: () =>
       Promise.all([
@@ -635,7 +630,6 @@ function TrashBar({
   onTrashed: () => void
 }) {
   const queryClient = useQueryClient()
-  const checkAccess = useAccessCheck()
   const [refusal, setRefusal] = useState<string | null>(null)
 
   const refresh = () =>
@@ -673,7 +667,6 @@ function TrashBar({
         setRefusal(error.detail ?? error.message)
       } else {
         toast.error(error.message)
-        checkAccess(error)
       }
     },
     onSettled: refresh,

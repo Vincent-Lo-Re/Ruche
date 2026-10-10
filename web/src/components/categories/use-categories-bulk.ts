@@ -46,7 +46,6 @@ export function useCategoriesBulk() {
     },
     onError: (error) => {
       toast.error(error.message)
-      checkAccess(error)
     },
     onSettled: async () => {
       setConfirming(false)

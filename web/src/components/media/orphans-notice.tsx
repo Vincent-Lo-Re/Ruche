@@ -3,7 +3,6 @@ import { Eraser, FileWarning } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { useAccessCheck } from "@/components/team/use-access-check"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
@@ -22,7 +21,6 @@ const shownPaths = 10
  */
 export function OrphansNotice() {
   const queryClient = useQueryClient()
-  const checkAccess = useAccessCheck()
   const [expanded, setExpanded] = useState(false)
   const audit = useQuery(auditRead())
 
@@ -32,7 +30,6 @@ export function OrphansNotice() {
       toast.success(texts.media.orphans.cleaned(summary.removed)),
     onError: (error) => {
       toast.error(error.message)
-      checkAccess(error)
     },
     onSettled: () =>
       Promise.all([

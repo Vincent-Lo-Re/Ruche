@@ -7,7 +7,6 @@ import {
   ContentSettingsSheet,
   type SectionCategories,
 } from "@/components/editor/content-settings-sheet"
-import { useAccessCheck } from "@/components/team/use-access-check"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { useTitleCheck } from "@/hooks/use-title-check"
@@ -55,7 +54,6 @@ export function ListSettingsSheet({
   onClose: () => void
 }) {
   const queryClient = useQueryClient()
-  const checkAccess = useAccessCheck()
   const myId = useAuth().session?.user.id ?? ""
   const [title, setTitle] = useState(item.title)
   const [settings, setSettings] = useState<ContentSettings>({
@@ -99,7 +97,6 @@ export function ListSettingsSheet({
       onClose()
     },
     onError: (error) => {
-      checkAccess(error)
       if (error instanceof ContentError && error.code === "verrou_tenu") {
         setHeld(error.detail ?? error.message)
       } else if (error instanceof ContentError && error.code === "titre_pris") {

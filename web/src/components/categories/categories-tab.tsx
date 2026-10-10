@@ -21,7 +21,6 @@ import { ListPagination } from "@/components/list-pagination"
 import { SortableList } from "@/components/list-sorting"
 import { LoadState } from "@/components/load-state"
 import { SearchInput } from "@/components/search-input"
-import { useAccessCheck } from "@/components/team/use-access-check"
 import { TrashDialog } from "@/components/confirm-dialog"
 import { RowActionsMenu } from "@/components/row-actions-menu"
 import { Button } from "@/components/ui/button"
@@ -87,16 +86,12 @@ export function CategoriesTab({
   bulk: CategoriesBulk
 }) {
   const queryClient = useQueryClient()
-  const checkAccess = useAccessCheck()
   const key = categoryKeys.list(section)
   // Relue à chaque ouverture : le nombre de brouillons de chaque catégorie change dans l'éditeur.
   const categories = useQuery({
     ...categoriesRead(section),
     staleTime: REREAD_MS,
   })
-  useEffect(() => {
-    if (categories.error) checkAccess(categories.error)
-  }, [categories.error, checkAccess])
 
   const [search, setSearch] = useState("")
   const [usage, setUsage] = useState<UsageFilter>("all")
@@ -138,7 +133,6 @@ export function CategoriesTab({
     ])
   const onError = (error: Error) => {
     toast.error(error.message)
-    checkAccess(error)
   }
 
   // Créer ou modifier : la fenêtre se ferme, la catégorie arrive dans la liste.
@@ -157,7 +151,6 @@ export function CategoriesTab({
       toast.success(editing ? labels.renamed : labels.added(category.name))
       closeDialog()
     },
-    onError: (error) => checkAccess(error),
     onSettled: refresh,
   })
 

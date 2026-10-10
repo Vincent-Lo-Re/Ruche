@@ -70,7 +70,6 @@ import {
 import { SaveStatus } from "@/components/editor/save-status"
 import { usePublication } from "@/components/editor/use-publication"
 import { useRevert } from "@/components/editor/use-revert"
-import { useAccessCheck } from "@/components/team/use-access-check"
 import {
   TemplateSortBadge,
   TemplateSortCard,
@@ -147,7 +146,6 @@ function EditorLoader({
   section: SectionKey
   kind: ContentKind
 }) {
-  const checkAccess = useAccessCheck()
   const queryClient = useQueryClient()
   // Un contenu changé ailleurs sans que son brouillon change (« Restaurer » de la Corbeille) : sa
   // lecture en mémoire est marquée périmée. L'éditeur ne lit son état de départ qu'une fois, à
@@ -161,9 +159,6 @@ function EditorLoader({
     ...contentRead(contentId),
     refetchOnWindowFocus: false,
   })
-  useEffect(() => {
-    if (content.error) checkAccess(content.error)
-  }, [content.error, checkAccess])
 
   const waitingFresh =
     mustWaitFresh && !content.isFetchedAfterMount && !content.isError

@@ -11,7 +11,7 @@ import {
   ArrowDownToLine,
   ArrowUpToLine,
 } from "lucide-react"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { Link, useNavigate } from "react-router"
 
 import { toast } from "sonner"
@@ -42,7 +42,6 @@ import { SortableList } from "@/components/list-sorting"
 import { LoadState, RefreshFailed } from "@/components/load-state"
 import { PageHeader } from "@/components/page-header"
 import { SearchInput } from "@/components/search-input"
-import { useAccessCheck } from "@/components/team/use-access-check"
 import { TrashDialog } from "@/components/confirm-dialog"
 import { RowActionsMenu } from "@/components/row-actions-menu"
 import { Badge } from "@/components/ui/badge"
@@ -137,7 +136,6 @@ export function ContentListPage({
   const categorySection = contentProfile(kind).categories
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const checkAccess = useAccessCheck()
 
   const list = useQuery({
     ...contentListRead(kind),
@@ -248,14 +246,9 @@ export function ContentListPage({
             ? (error.detail ?? undefined)
             : undefined,
       })
-      checkAccess(error)
     },
     onSettled: refresh,
   })
-
-  useEffect(() => {
-    if (list.error) checkAccess(list.error)
-  }, [list.error, checkAccess])
 
   // Les points de départ de cette sorte ([D42]) : « Nouvel article » propose « Article vide »
   // ou l'un d'eux. Sans point de départ (ou si la liste ne se lit pas), un contenu vide.
@@ -277,7 +270,6 @@ export function ContentListPage({
       }
       void navigate(editorPath(section, content.id))
     },
-    onError: (error) => checkAccess(error),
   })
   // Blog, Podcasts : ranger par glisser-déposer ([D47]). La liste change
   // tout de suite ; si l'enregistrement échoue, elle reprend son ordre.
@@ -306,7 +298,6 @@ export function ContentListPage({
     onError: (error, _ids, context) => {
       queryClient.setQueryData(contentKeys.list(kind), context?.previous)
       toast.error(labels.order.failed, { description: errorMessage(error) })
-      checkAccess(error)
     },
     onSettled: () =>
       queryClient.invalidateQueries({ queryKey: contentKeys.list(kind) }),

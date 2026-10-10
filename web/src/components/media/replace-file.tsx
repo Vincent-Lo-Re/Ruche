@@ -9,7 +9,6 @@ import {
   useUploadVerdicts,
 } from "@/components/media/use-upload-queue"
 import { PanelCard } from "@/components/panel-card"
-import { useAccessCheck } from "@/components/team/use-access-check"
 import { HiddenFileInput } from "@/components/file-input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -45,7 +44,6 @@ export function ReplaceFile({
   onReplaced: (newId: string) => void
 }) {
   const queryClient = useQueryClient()
-  const checkAccess = useAccessCheck()
   const input = useRef<HTMLInputElement>(null)
   const { queue, items } = useUploadQueue()
   const [uploadId, setUploadId] = useState<string | null>(null)
@@ -91,7 +89,6 @@ export function ReplaceFile({
       toast.success(labels.replaced(replaced))
     },
     onError: (error) => {
-      checkAccess(error)
       toast.error(errorMessage(error))
     },
     onSettled: refresh,
@@ -105,7 +102,6 @@ export function ReplaceFile({
       void kickFiles()
     },
     onError: (error) => {
-      checkAccess(error)
       toast.error(errorMessage(error))
     },
     onSettled: refresh,

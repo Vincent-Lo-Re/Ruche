@@ -2,7 +2,6 @@ import { FunctionsHttpError } from "@supabase/supabase-js"
 import { act, fireEvent, screen, waitFor, within } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
-import { profileQueryKey } from "@/auth/auth-context"
 import { teamQueryKey, type Member } from "@/lib/team"
 import { supabase } from "@/lib/supabase"
 import { fakeAuth, renderApp, testProfile } from "@/test/render"
@@ -175,9 +174,8 @@ describe("La team", () => {
     expect(
       await screen.findByText(texts.team.errors.reserve_aux_admins)
     ).toBeVisible()
-    expect(invalidate).toHaveBeenCalledWith({
-      queryKey: profileQueryKey(me.id),
-    })
+    // La fiche du membre (et toute autre en mémoire) : lib/query-client.ts.
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ["profile"] })
   })
 
   it("vérifie l'adresse de la personne invitée", async () => {
