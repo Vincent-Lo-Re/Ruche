@@ -488,13 +488,17 @@ test("Blog : catégories rangées, article refusé sans image mise en avant, pub
     const articleId = contentIdFromUrl(page.url())
     const title = `Bien dormir ${id}`
     await page.getByLabel(editor.title.label).fill(title)
-    // Éditeur du Fil : les catégories sont dans l'onglet « Article ».
-    const pill = articleTab(page).getByRole("button", {
-      name: sommeil,
-      exact: true,
-    })
-    await pill.click()
-    await expect(pill).toHaveAttribute("aria-pressed", "true")
+    // Éditeur du Fil : les catégories sont dans l'onglet « Article », trouvées en tapant.
+    const categoryInput = articleTab(page).getByPlaceholder(
+      categories.picker.placeholder
+    )
+    await categoryInput.fill(sommeil)
+    await page.getByRole("option", { name: sommeil, exact: true }).click()
+    await expect(
+      articleTab(page).getByRole("button", {
+        name: categories.picker.remove(sommeil),
+      })
+    ).toBeVisible()
     await saved(page)
 
     // « Publier » sans image mise en avant : refusé, avec l'explication ([D45]).

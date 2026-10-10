@@ -1072,6 +1072,14 @@ export const en = {
 
   // Catégories du Blog et des Podcasts (étape 7) : ADMIN § 3, [D28], [D44].
   categories: {
+    // Le choix des catégories d'un contenu (éditeur, fenêtre de création, Réglages) : les choisies
+    // en pastilles, les autres trouvées en tapant.
+    picker: {
+      placeholder: "Add a category…",
+      empty: "No matching category.",
+      create: (name: string) => `Create “${name}”`,
+      remove: (name: string) => `Remove “${name}”`,
+    },
     // Sous les onglets, dans l'onglet Categories du Blog et des Podcasts.
     description: {
       // Renommer ou ranger une catégorie change l'app tout de suite, sans « Publier ».
@@ -1167,7 +1175,6 @@ export const en = {
     },
     name: "Name",
     // Le champ pour en créer une au passage (fenêtre d'un nouveau contenu, réglages).
-    newName: "New category name",
     add: "Add",
     namePlaceholder: "e.g. Sleep",
     nameRequired: "Give the category a name.",
@@ -1725,9 +1732,6 @@ export const en = {
         dark: "Dark",
       },
       largeText: "Large text",
-      // Le téléphone réduit pour tenir dans la fenêtre.
-      scale: (percent: number) => `${percent}%`,
-      scaleLabel: (percent: number) => `Phone shown at ${percent}%`,
       reader: {
         label: "Reader",
         subscriber: "View as a subscriber with access",

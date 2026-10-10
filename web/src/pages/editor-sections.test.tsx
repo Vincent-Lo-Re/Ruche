@@ -9,6 +9,11 @@ import * as publicationApi from "@/lib/contents/publication"
 import * as templatesApi from "@/lib/contents/templates"
 import * as mediaApi from "@/lib/media/api"
 import type { Media } from "@/lib/media/constants"
+import {
+  categoryInput,
+  chooseCategory,
+  chosenCategory,
+} from "@/test/categories"
 import { renderApp, testProfile } from "@/test/render"
 import { texts } from "@/texts"
 
@@ -1004,6 +1009,24 @@ describe("éditeur d'un article (Blog)", () => {
     expect(left).not.toHaveClass("hidden")
   })
 
+  it("la barre de mise en forme ne disparaît jamais : en Lecture, elle reste là, inactive", async () => {
+    vi.mocked(api.getContent).mockResolvedValue(contentOf(ARTICLE, "article"))
+    await renderApp(`/blog/${ARTICLE}`)
+    await editable()
+    const tools = screen.getByRole("toolbar", { name: preview.tools })
+    fireEvent.click(
+      within(tools).getByRole("button", { name: preview.mode.read })
+    )
+    const toolbar = screen.getByRole("toolbar", {
+      name: texts.editor.toolbar.label,
+    })
+    expect(toolbar).toBeVisible()
+    expect(toolbar.parentElement).not.toHaveClass("invisible")
+    for (const button of within(toolbar).getAllByRole("button")) {
+      expect(button).toBeDisabled()
+    }
+  })
+
   it("le téléphone est toujours en entier, réduit d'après la hauteur disponible, en Édition comme en Lecture", async () => {
     // jsdom n'a pas ResizeObserver : la hauteur mesurée est 0, le téléphone descend à 40 %.
     vi.stubGlobal(
@@ -1023,15 +1046,20 @@ describe("éditeur d'un article (Blog)", () => {
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
     const tools = screen.getByRole("toolbar", { name: preview.tools })
-    // « 40 % » à l'écran, la phrase entière pour les lecteurs d'écran, dès l'Édition.
-    expect(within(tools).getByText(preview.scale(40))).toBeVisible()
-    expect(within(tools).getByText(preview.scaleLabel(40))).toBeInTheDocument()
+    const layout = document.querySelector<HTMLElement>("[data-device]")!
+    // Réduit dès l'Édition, sans pourcentage affiché (il soulèverait plus de questions).
+    expect(layout.style.getPropertyValue("--blocks-device-scale")).toBe("0.4")
+    expect(within(tools).queryByText(/%/)).toBeNull()
+    // La barre du haut de l'app, en Édition aussi.
+    expect(document.querySelector(".blocks-appbar")).toHaveTextContent(
+      texts.sections.blog.title
+    )
 
     // En Lecture aussi, sans choix de taille.
     fireEvent.click(
       within(tools).getByRole("button", { name: preview.mode.read })
     )
-    expect(within(tools).getByText(preview.scale(40))).toBeVisible()
+    expect(layout.style.getPropertyValue("--blocks-device-scale")).toBe("0.4")
     vi.unstubAllGlobals()
   })
 
@@ -1125,7 +1153,7 @@ describe("éditeur d'un article (Blog)", () => {
     ).toBeNull()
   }, 10_000)
 
-  it("niveau d'accès et catégories en pastilles : ils partent avec le brouillon ([D41], [D44])", async () => {
+  it("niveau d'accès et catégories (pastilles des choisies) : ils partent avec le brouillon ([D41], [D44])", async () => {
     vi.mocked(api.getContent).mockResolvedValue(
       contentOf(
         ARTICLE,
@@ -1144,22 +1172,26 @@ describe("éditeur d'un article (Blog)", () => {
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
     const tab = articleTab()
-    expect(
-      await within(tab).findByRole("button", { name: "Stress" })
-    ).toHaveAttribute("aria-pressed", "true")
-    expect(
-      within(tab).getByRole("button", { name: "Sommeil" })
-    ).toHaveAttribute("aria-pressed", "false")
+    // Seule la catégorie choisie est en pastille ; les autres se trouvent en tapant.
+    await waitFor(() =>
+      expect(chosenCategory(tab, "Stress")).toBeInTheDocument()
+    )
+    expect(chosenCategory(tab, "Sommeil")).toBeNull()
+    // Le niveau d'accès : la liste à côté du champ des catégories.
+    const accessList = () =>
+      within(tab)
+        .getAllByRole("combobox")
+        .find((element) => element !== categoryInput(tab))!
     // Pas encore choisi : la liste le dit elle-même, sans phrase orange dessous.
-    expect(within(tab).getByRole("combobox")).toHaveTextContent(
+    expect(accessList()).toHaveTextContent(
       texts.publication.settings.access.notChosenShort
     )
     expect(
       within(tab).queryByText(texts.publication.settings.access.notChosen)
     ).toBeNull()
 
-    await pick(within(tab).getByRole("combobox"), "Essentiel")
-    fireEvent.click(within(tab).getByRole("button", { name: "Sommeil" }))
+    await pick(accessList(), "Essentiel")
+    await chooseCategory(tab, "Sommeil")
     await waitFor(() => expect(api.saveDraft).toHaveBeenCalled(), {
       timeout: 4000,
     })
@@ -1181,8 +1213,12 @@ describe("éditeur d'un article (Blog)", () => {
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
     const tab = articleTab()
-    fireEvent.click(await within(tab).findByRole("button", { name: "Sommeil" }))
-    fireEvent.click(within(tab).getByRole("button", { name: "Stress" }))
+    // Le × de chaque pastille la retire.
+    await waitFor(() =>
+      expect(chosenCategory(tab, "Sommeil")).toBeInTheDocument()
+    )
+    fireEvent.click(chosenCategory(tab, "Sommeil")!)
+    fireEvent.click(chosenCategory(tab, "Stress")!)
     await waitFor(() => expect(api.saveDraft).toHaveBeenCalled(), {
       timeout: 4000,
     })

@@ -201,6 +201,9 @@ export function CategoriesTab({
       open={dialogOpen}
       onOpenChange={(open) => !open && closeDialog()}
       name={editing?.name ?? null}
+      others={(all ?? [])
+        .filter((category) => category.id !== editing?.id)
+        .map((category) => category.name)}
       pending={save.isPending}
       error={save.error ? errorMessage(save.error) : null}
       onSubmit={(name) => save.mutate(name)}

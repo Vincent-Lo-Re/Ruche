@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect } from "react"
-import { Controller, useForm } from "react-hook-form"
+import { Controller, useForm, useWatch } from "react-hook-form"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -15,6 +15,7 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { categoryNameSchema } from "@/lib/schemas"
+import { sameNameKey } from "@/lib/titles"
 import { texts } from "@/texts"
 
 const labels = texts.categories
@@ -27,6 +28,7 @@ export function CategoryDialog({
   open,
   onOpenChange,
   name,
+  others,
   pending,
   error,
   onSubmit,
@@ -35,6 +37,8 @@ export function CategoryDialog({
   onOpenChange: (open: boolean) => void
   // Le nom de la catégorie modifiée ; null pour une nouvelle catégorie.
   name: string | null
+  // Les noms des autres catégories de la section : un nom déjà porté est refusé en tapant.
+  others: string[]
   pending: boolean
   error: string | null
   onSubmit: (name: string) => void
@@ -49,7 +53,14 @@ export function CategoryDialog({
     if (open) form.reset({ name: name ?? "" })
   }, [open, name, form])
 
-  const submit = form.handleSubmit((values) => onSubmit(values.name))
+  // Deux catégories d'une section ne portent pas le même nom (majuscules et espaces ignorés).
+  const typed = useWatch({ control: form.control, name: "name" })
+  const taken =
+    typed.trim() !== "" &&
+    others.some((other) => sameNameKey(other) === sameNameKey(typed))
+  const submit = form.handleSubmit((values) => {
+    if (!taken) onSubmit(values.name)
+  })
 
   return (
     <Dialog open={open} onOpenChange={(next) => !pending && onOpenChange(next)}>
@@ -69,26 +80,32 @@ export function CategoryDialog({
             name="name"
             control={form.control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid || error !== null}>
+              <Field
+                data-invalid={fieldState.invalid || taken || error !== null}
+              >
                 <FieldLabel htmlFor="categorie-nom">{labels.name}</FieldLabel>
                 <Input
                   {...field}
                   id="categorie-nom"
                   autoComplete="off"
                   placeholder={labels.namePlaceholder}
-                  aria-invalid={fieldState.invalid || error !== null}
+                  aria-invalid={fieldState.invalid || taken || error !== null}
                 />
                 <FieldError
                   errors={[
                     fieldState.error ??
-                      (error ? { message: error } : undefined),
+                      (taken
+                        ? { message: labels.errors.nom_en_double }
+                        : error
+                          ? { message: error }
+                          : undefined),
                   ]}
                 />
               </Field>
             )}
           />
           <DialogFooter>
-            <Button type="submit" disabled={pending}>
+            <Button type="submit" disabled={pending || taken}>
               {pending && <Spinner />}
               {labels.dialog.save}
             </Button>
