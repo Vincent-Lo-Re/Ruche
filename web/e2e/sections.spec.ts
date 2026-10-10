@@ -92,7 +92,7 @@ function audioCard(page: Page) {
   })
 }
 
-/** Éditeur du Fil : niveau d'accès « Gratuit », dans la colonne de droite. */
+/** Éditeur du Blog : niveau d'accès « Gratuit », dans la colonne de droite. */
 async function articleFree(
   page: Page,
   kind: "article" | "episode" | "page" = "article"
@@ -289,7 +289,7 @@ test("Blog : un article neuf arrive en tête ; rangé au clavier, l'ordre tient 
   ).toHaveAttribute("data-returned", "")
 })
 
-test("Éditeur du Fil : « Ajouter un bloc » ouvre les Blocs, bloc glissé, plan (intertitre, Dupliquer), Concentration", async ({
+test("Éditeur du Blog : « Ajouter un bloc » ouvre les Blocs, bloc glissé, plan (intertitre, Dupliquer), Concentration", async ({
   page,
   team,
 }) => {
@@ -404,7 +404,7 @@ test("Éditeur du Fil : « Ajouter un bloc » ouvre les Blocs, bloc glissé, pla
   await expect(rows).toHaveCount(3)
 })
 
-test("Éditeur du Fil : main prise dans un autre onglet, la fenêtre, le cadenas, la reprise", async ({
+test("Éditeur du Blog : main prise dans un autre onglet, la fenêtre, le cadenas, la reprise", async ({
   page,
   team,
 }) => {
@@ -520,7 +520,7 @@ test("Blog : catégories rangées, article refusé sans image mise en avant, pub
     const articleId = contentIdFromUrl(page.url())
     const title = `Bien dormir ${id}`
     await page.getByLabel(editor.title.label).fill(title)
-    // Éditeur du Fil : les catégories sont dans l'onglet « Article », trouvées en tapant.
+    // Éditeur du Blog : les catégories sont dans l'onglet « Article », trouvées en tapant.
     const categoryInput = articleTab(page).getByPlaceholder(
       categories.picker.placeholder
     )
