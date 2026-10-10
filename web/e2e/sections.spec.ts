@@ -5,12 +5,12 @@
 //    n'a pas d'image mise en avant ([D45]) ; l'image et une catégorie, puis
 //    publier ; l'app le liste avec sa vignette (publique, question 1) ; filtres par catégorie
 //    (admin et app) ; la catégorie supprimée, l'app l'ignore ([D28]).
-// 1 bis. L'éditeur du Fil : « Ajouter un bloc » ouvre les Blocs, un Texte glissé depuis les Blocs, un
+// 1 bis. L'éditeur des contenus : « Ajouter un bloc » ouvre les Blocs, un Texte glissé depuis les Blocs, un
 //    intertitre qui nomme sa ligne du plan, « … » › Dupliquer, le plan rangé au clavier, la Concentration,
 //    puis recharger.
-// 1 ter. L'éditeur du Fil en lecture seule : un second onglet prend la main, la fenêtre s'ouvre
+// 1 ter. L'éditeur des contenus en lecture seule : un second onglet prend la main, la fenêtre s'ouvre
 //    dans le premier, Échap y laisse le cadenas, qui la rouvre pour reprendre la main.
-// 2. Podcasts, dans l'éditeur du Fil : un épisode que « Publier » refuse sans audio ; l'audio
+// 2. Podcasts, dans l'éditeur des contenus : un épisode que « Publier » refuse sans audio ; l'audio
 //    choisi dans la médiathèque, son lecteur dans le téléphone, sa durée dans la carte Audio et
 //    en bas de la colonne, la transcription conseillée ([D46]) ; publier ; l'app le liste avec sa
 //    durée ; la transcription ajoutée depuis sa fiche fait taire l'avertissement.
@@ -75,7 +75,7 @@ async function createBlank(page: Page, kind: "article" | "episode") {
 }
 
 /**
- * L'Article (l'Épisode, la Page), dans la colonne de droite de l'éditeur du Fil : image, audio,
+ * L'Article (l'Épisode, la Page), dans la colonne de droite de l'éditeur des contenus : image, audio,
  * adresse, niveau d'accès, catégories.
  */
 function articleTab(
@@ -92,7 +92,7 @@ function audioCard(page: Page) {
   })
 }
 
-/** Éditeur du Fil : niveau d'accès « Gratuit », dans la colonne de droite. */
+/** Éditeur du Blog : niveau d'accès « Gratuit », dans la colonne de droite. */
 async function articleFree(
   page: Page,
   kind: "article" | "episode" | "page" = "article"
@@ -138,7 +138,7 @@ async function publishFree(page: Page) {
   await expect(page.getByText(publication.published(1))).toBeVisible()
 }
 
-/** Une page, dans l'éditeur du Fil : son adresse (dans sa carte), puis « Gratuit ». */
+/** Une page, dans l'éditeur des contenus : son adresse (dans sa carte), puis « Gratuit ». */
 async function pageFree(page: Page, slug: string) {
   const address = articleTab(page, "page")
     .getByRole("region", { name: publication.settings.slug.label })
@@ -221,7 +221,7 @@ test("Un titre par section : un second article du même titre est refusé, un é
   await expect(page).toHaveURL(/\/podcasts\/[0-9a-f-]{36}$/)
 })
 
-test("Le Fil : un article neuf arrive en tête ; rangé au clavier, l'ordre tient ; la recherche gardée au retour", async ({
+test("Blog : un article neuf arrive en tête ; rangé au clavier, l'ordre tient ; la recherche gardée au retour", async ({
   page,
   team,
 }) => {
@@ -289,7 +289,7 @@ test("Le Fil : un article neuf arrive en tête ; rangé au clavier, l'ordre tien
   ).toHaveAttribute("data-returned", "")
 })
 
-test("Éditeur du Fil : « Ajouter un bloc » ouvre les Blocs, bloc glissé, plan (intertitre, Dupliquer), Concentration", async ({
+test("Éditeur du Blog : « Ajouter un bloc » ouvre les Blocs, bloc glissé, plan (intertitre, Dupliquer), Concentration", async ({
   page,
   team,
 }) => {
@@ -387,7 +387,7 @@ test("Éditeur du Fil : « Ajouter un bloc » ouvre les Blocs, bloc glissé, pla
   await page.keyboard.press("Space")
   await expect(rows).toHaveText([emptyBox, "Les bons réflexes", emptyBox])
 
-  // Le plan range les blocs : l'aperçu du Fil n'a pas de poignée.
+  // Le plan range les blocs : le téléphone n'a pas de poignée.
   await expect(phone.getByRole("button", { name: /^Déplacer : / })).toHaveCount(
     0
   )
@@ -404,7 +404,7 @@ test("Éditeur du Fil : « Ajouter un bloc » ouvre les Blocs, bloc glissé, pla
   await expect(rows).toHaveCount(3)
 })
 
-test("Éditeur du Fil : main prise dans un autre onglet, la fenêtre, le cadenas, la reprise", async ({
+test("Éditeur du Blog : main prise dans un autre onglet, la fenêtre, le cadenas, la reprise", async ({
   page,
   team,
 }) => {
@@ -520,7 +520,7 @@ test("Blog : catégories rangées, article refusé sans image mise en avant, pub
     const articleId = contentIdFromUrl(page.url())
     const title = `Bien dormir ${id}`
     await page.getByLabel(editor.title.label).fill(title)
-    // Éditeur du Fil : les catégories sont dans l'onglet « Article », trouvées en tapant.
+    // Éditeur du Blog : les catégories sont dans l'onglet « Article », trouvées en tapant.
     const categoryInput = articleTab(page).getByPlaceholder(
       categories.picker.placeholder
     )

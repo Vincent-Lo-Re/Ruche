@@ -84,6 +84,8 @@ async function sendStandard(request: TransferRequest): Promise<void> {
     request
   if (signal.aborted) throw abortError()
   const token = await request.getAccessToken()
+  // Annulé pendant l'attente du jeton : l'écouteur posé ensuite ne se déclencherait jamais.
+  if (signal.aborted) throw abortError()
 
   await new Promise<void>((resolve, reject) => {
     const xhr = new XMLHttpRequest()
@@ -188,10 +190,14 @@ async function sendResumable(request: TransferRequest): Promise<void> {
     void upload
       .findPreviousUploads()
       .then((previous) => {
+        // Annulé pendant la recherche d'un envoi précédent : rien ne part.
+        if (signal.aborted) return
         if (previous.length > 0) upload.resumeFromPreviousUpload(previous[0])
         upload.start()
       })
-      .catch(() => upload.start())
+      .catch(() => {
+        if (!signal.aborted) upload.start()
+      })
   })
 }
 

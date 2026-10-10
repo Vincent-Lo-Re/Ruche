@@ -117,12 +117,12 @@ export async function verifySecondFactor(page: Page, account: Account) {
   await typeCode(page, texts.mfa.code, await totpCode(account.totpSecret))
 }
 
-/** Le menu du header (Site web, Mon compte, et Équipe et Paramètres pour les admins). */
+/** Le menu du header (Site web, Mon compte, La team, et Paramètres pour les admins). */
 export function headerMenu(page: Page) {
   return page.getByRole("navigation", { name: texts.header.label })
 }
 
-/** L'avatar en bas du menu de gauche, qui ouvre le menu du compte (nom, e-mail, déconnexion). */
+/** L'avatar tout à droite du header, qui ouvre le menu du compte (nom, e-mail, rôle, déconnexion). */
 export function accountMenuButton(page: Page) {
   return page.getByRole("button", { name: texts.accountMenu.open })
 }

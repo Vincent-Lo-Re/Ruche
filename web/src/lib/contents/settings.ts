@@ -15,6 +15,7 @@ import {
   type Content,
   type ContentKind,
   type ContentSettings,
+  type LockRow,
 } from "@/lib/contents/api"
 import {
   getPublication,
@@ -33,6 +34,21 @@ export type HeldWords = {
 }
 
 /**
+ * Qui écrit ce contenu en ce moment, dit à la personne : soi-même dans un autre onglet, ou le nom
+ * de l'autre membre ; null si personne.
+ */
+export function heldMessage(
+  state: Pick<LockRow, "is_active" | "holder_id" | "holder_name">,
+  myId: string,
+  words: Pick<HeldWords, "heldBy" | "heldSelf">
+): string | null {
+  if (!state.is_active || state.holder_id === null) return null
+  return state.holder_id === myId
+    ? words.heldSelf
+    : words.heldBy(state.holder_name ?? texts.editor.lock.someone)
+}
+
+/**
  * Prend le verrou d'un contenu le temps de run, puis le rend. Refusé (verrou_tenu, avec le nom)
  * si quelqu'un l'écrit en ce moment, y compris soi-même dans un autre onglet : on ne lui retire
  * pas la main en silence. run reçoit le contenu relu sous le verrou.
@@ -45,14 +61,14 @@ async function withBorrowedLock<T>(
 ): Promise<T> {
   const session = crypto.randomUUID()
   const state = await lockStatus(contentId, session)
-  if (state.is_active && state.holder_id !== null) {
-    const self = state.holder_id === myId
-    const name = self
-      ? words.yourselfElsewhere
-      : (state.holder_name ?? texts.editor.lock.someone)
+  const held = heldMessage(state, myId, words)
+  if (held !== null) {
     throw new ContentError("verrou_tenu", {
-      hint: name,
-      detail: self ? words.heldSelf : words.heldBy(name),
+      hint:
+        state.holder_id === myId
+          ? words.yourselfElsewhere
+          : (state.holder_name ?? texts.editor.lock.someone),
+      detail: held,
     })
   }
   const taken = await lockTake(contentId, false, session)

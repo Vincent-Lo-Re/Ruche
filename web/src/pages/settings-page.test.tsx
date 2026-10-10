@@ -227,23 +227,25 @@ describe("Paramètres : les noms du Blog et des Podcasts", () => {
     const [name, le, du, en] = within(blog).getAllByRole("textbox")
 
     // Le nom seul, sans « le » ni « du » : refusé, les deux autres champs le disent.
-    fireEvent.change(name, { target: { value: "Le Fil" } })
+    fireEvent.change(name, { target: { value: "Le Journal" } })
     fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
     expect(await within(blog).findAllByText(words.incomplete)).toHaveLength(2)
     expect(identityApi.saveSectionNames).not.toHaveBeenCalled()
 
-    fireEvent.change(le, { target: { value: "le Fil" } })
-    fireEvent.change(du, { target: { value: "du Fil" } })
+    fireEvent.change(le, { target: { value: "le Journal" } })
+    fireEvent.change(du, { target: { value: "du Journal" } })
     fireEvent.change(en, { target: { value: "The Feed" } })
     // Sous chaque champ, l'exemple suit ce qui est écrit.
-    expect(within(blog).getByText(words.exampleName("Le Fil"))).toBeVisible()
-    expect(within(blog).getByText(words.exampleLe("le Fil"))).toBeVisible()
-    expect(within(blog).getByText(words.exampleDu("du Fil"))).toBeVisible()
+    expect(
+      within(blog).getByText(words.exampleName("Le Journal"))
+    ).toBeVisible()
+    expect(within(blog).getByText(words.exampleLe("le Journal"))).toBeVisible()
+    expect(within(blog).getByText(words.exampleDu("du Journal"))).toBeVisible()
     fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
     await waitFor(() =>
       expect(identityApi.saveSectionNames).toHaveBeenCalledWith({
         fr: {
-          blog: { name: "Le Fil", le: "le Fil", du: "du Fil" },
+          blog: { name: "Le Journal", le: "le Journal", du: "du Journal" },
           podcasts: null,
         },
         en: { blog: "The Feed", podcasts: null },
@@ -270,9 +272,7 @@ describe("Paramètres : le nom de la marque", () => {
 
     vi.mocked(identityApi.getAdminBrand).mockResolvedValue(brand("Essaim"))
     fireEvent.change(field, { target: { value: "  Essaim " } })
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.settings.adminIdentity.save })
-    )
+    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
 
     // Sans les espaces autour ; puis relu pour toute l'admin.
     await waitFor(() =>
@@ -297,16 +297,12 @@ describe("Paramètres : le nom de la marque", () => {
     expect(field).toHaveValue("Essaim")
 
     fireEvent.change(field, { target: { value: "a".repeat(41) } })
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.settings.adminIdentity.save })
-    )
-    expect(await screen.findByText(identity.nameTooLong)).toBeVisible()
+    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
+    expect(await screen.findByText(identity.nameTooLong("40"))).toBeVisible()
     expect(identityApi.saveBrandDetails).not.toHaveBeenCalled()
 
     fireEvent.change(field, { target: { value: "   " } })
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.settings.adminIdentity.save })
-    )
+    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
     await waitFor(() =>
       expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
         name: null,
@@ -325,16 +321,12 @@ describe("Paramètres : l'adresse de contact de la marque", () => {
     await renderApp("/settings")
     const field = await screen.findByLabelText(identity.email)
     fireEvent.change(field, { target: { value: "pas-une-adresse" } })
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.settings.adminIdentity.save })
-    )
+    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
     expect(await screen.findByText(identity.invalidEmail)).toBeVisible()
     expect(identityApi.saveBrandDetails).not.toHaveBeenCalled()
 
     fireEvent.change(field, { target: { value: "aide@exemple.fr" } })
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.settings.adminIdentity.save })
-    )
+    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
     await waitFor(() =>
       expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
         name: null,
@@ -353,12 +345,12 @@ describe("Paramètres : le site web du client", () => {
     await renderApp("/settings")
     const field = await screen.findByLabelText(identity.website)
     fireEvent.change(field, { target: { value: "http://example.com" } })
-    fireEvent.click(screen.getByRole("button", { name: identity.save }))
+    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
     expect(await screen.findByText(identity.invalidWebsite)).toBeVisible()
     expect(identityApi.saveBrandDetails).not.toHaveBeenCalled()
 
     fireEvent.change(field, { target: { value: " https://example.com/fr " } })
-    fireEvent.click(screen.getByRole("button", { name: identity.save }))
+    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
     await waitFor(() =>
       expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
         name: null,
@@ -382,7 +374,7 @@ describe("Paramètres : les initiales de la marque", () => {
     })
     expect(field).toHaveAttribute("placeholder", "E")
     fireEvent.change(field, { target: { value: " ES " } })
-    fireEvent.click(screen.getByRole("button", { name: identity.save }))
+    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
     await waitFor(() =>
       expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
         name: "Essaim",

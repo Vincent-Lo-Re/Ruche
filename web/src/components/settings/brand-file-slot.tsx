@@ -1,10 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import { toast } from "sonner"
 
 import { BrandSurfaceDialog } from "@/components/settings/brand-surface-dialog"
 import { BrandVariantsDialog } from "@/components/settings/brand-variants-dialog"
 import { FileSlot } from "@/components/settings/file-slot"
+import { useBrand } from "@/hooks/use-brand-name"
 import {
   adminBrandKey,
   BrandFileError,
@@ -18,7 +19,6 @@ import {
   saveOtherSurface,
   type PreparedBrandFile,
 } from "@/lib/admin-identity"
-import { adminBrandRead } from "@/lib/reads"
 import { texts } from "@/texts"
 
 const labels = texts.settings.adminIdentity.files
@@ -40,7 +40,7 @@ export function BrandFileSlot({
 }) {
   const slot = `${kind}-${surface}` as const
   const queryClient = useQueryClient()
-  const brand = useQuery(adminBrandRead()).data
+  const brand = useBrand()
   const file = brand?.[slot] ?? null
   const label = labels.label(labels[kind].title, labels[surface])
   // Où va le fichier choisi : ce fond, ou l'autre si l'admin l'y envoie (BrandSurfaceDialog).

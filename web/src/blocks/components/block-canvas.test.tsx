@@ -66,7 +66,7 @@ describe("le téléphone en Édition", () => {
     ).toHaveAttribute("data-selected")
   })
 
-  it("une section vide le dit ; « Ajouter dans la section » ouvre les Blocs pour elle", () => {
+  it("un encadré vide le dit ; « Ajouter dans l'encadré » ouvre les Blocs pour lui", () => {
     const onAddInBox = vi.fn()
     renderCanvas({ onAddInBox })
     expect(screen.getByText(texts.editor.emptyBox)).toBeVisible()

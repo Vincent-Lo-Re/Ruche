@@ -192,7 +192,7 @@ test("un membre envoie une photo et un SVG piégé, décrit la photo, la met à 
     .filter({ hasText: texts.media.detail.trashed })
   await expect(trashed).toBeVisible()
   await expect(card(page, photoName)).toHaveCount(0)
-  await trashed.getByRole("button", { name: texts.media.detail.undo }).click()
+  await trashed.getByRole("button", { name: texts.common.undo }).click()
   await expect(page.getByText(texts.media.detail.restored)).toBeVisible()
   await expect(
     tile(page, photoName).getByRole("img", { name: texts.media.status.ready })
@@ -206,7 +206,9 @@ test("un membre envoie une photo et un SVG piégé, décrit la photo, la met à 
   // Restauration depuis la page Corbeille : le fichier revient, prêt, avec son texte.
   await page.goto("/trash")
   const row = page.getByRole("row").filter({ hasText: photoName })
-  await expect(row).toContainText("Fichier · Image")
+  await expect(row).toContainText(
+    texts.trash.fileOfKind(texts.media.kinds.image)
+  )
   await expect(row).toContainText(admin.fullName)
   await row
     .getByRole("button", { name: texts.trash.restoreItem(photoName) })
@@ -446,7 +448,7 @@ test("un membre envoie les autres formats, filtre, cherche, en met deux à la co
     texts.trash.confirmErase.description(names.pdf)
   )
   await confirmation
-    .getByRole("button", { name: texts.trash.confirmErase.confirm })
+    .getByRole("button", { name: texts.common.deletePermanently })
     .click()
   await expect(
     page.getByRole("row").filter({ hasText: names.pdf })

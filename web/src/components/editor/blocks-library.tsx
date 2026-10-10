@@ -60,6 +60,7 @@ import {
   type TemplateItem,
 } from "@/lib/contents/templates"
 import type { Media } from "@/lib/media/constants"
+import { LIBRARY_FIRST_ID } from "@/lib/editor/library-target"
 import { sections } from "@/navigation"
 import { texts } from "@/texts"
 
@@ -102,13 +103,10 @@ function startDrag(event: DragEvent, drag: LibraryDrag) {
   event.dataTransfer.effectAllowed = "copy"
 }
 
-// Le premier bloc des Blocs : il reçoit le curseur quand un « Ajouter » les ouvre.
-export const LIBRARY_FIRST_ID = "blocs-premier"
-
 /**
  * Les Blocs de l'éditeur des contenus (ADMIN § 4), en glissière par-dessus le Plan : Texte, Image et
- * Section, puis « Mes blocs » (mises en forme et blocs partagés), qui glisse à son tour
- * par-dessus. Un clic ajoute le bloc sous le bloc choisi (ou à la fin de la section visée), ou à
+ * Encadré, puis « Mes blocs » (mises en forme et blocs partagés), qui glisse à son tour
+ * par-dessus. Un clic ajoute le bloc sous le bloc choisi (ou à la fin de la encadré visé), ou à
  * la fin.
  */
 export function BlocksLibrary({
@@ -124,7 +122,7 @@ export function BlocksLibrary({
   editable: boolean
   // Faux : on ne peut plus rien ajouter au premier niveau.
   canAdd: boolean
-  // Après « Ajouter dans la section » : un bandeau le dit, et seuls Texte et Image y vont.
+  // Après « Ajouter dans l'encadré » : un bandeau le dit, et seuls Texte et Image y vont.
   inBox: boolean
   onCancelTarget: () => void
   onAdd: (type: InsertableType) => void
@@ -176,7 +174,7 @@ export function BlocksLibrary({
             </AlertAction>
           </Alert>
         )}
-        {/* Dans une section, le bandeau dit déjà où va le bloc (et il ne se glisse pas). */}
+        {/* Dans un encadré, le bandeau dit déjà où va le bloc (et il ne se glisse pas). */}
         {!inBox && (
           <p className="text-sm text-muted-foreground">{labels.hint}</p>
         )}
@@ -218,7 +216,7 @@ export function BlocksLibrary({
                 type="button"
                 aria-expanded={open}
                 aria-controls="mes-blocs"
-                // Dans une section, pas de bloc enregistré.
+                // Dans un encadré, pas de bloc enregistré.
                 disabled={inBox}
                 onClick={() => onOpenChange(true)}
               />
@@ -452,7 +450,7 @@ function SavedBlock({
 
 /**
  * Un bloc dans l'aperçu réduit : le texte tel qu'il est (sans éditeur), une image comme dans
- * l'aperçu (son icône tant qu'elle n'est pas lue), une section avec ses blocs.
+ * l'aperçu (son icône tant qu'elle n'est pas lue), un encadré avec ses blocs.
  */
 function MiniBlock({ block, imageFor }: { block: Block; imageFor: ImageFor }) {
   switch (block.type) {

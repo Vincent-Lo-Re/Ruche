@@ -28,7 +28,7 @@
 | Modèles de bloc | Block templates | Section des modèles réutilisables. | Modèles de blocs, Modèles (seul, dans un titre), gabarits / Patterns, Templates (seul) |
 | Médiathèque | Media library | Section de tous les fichiers envoyés. | Médias, bibliothèque / Media (seul), Assets, Files |
 | Corbeille | Trash | Ce qu'on supprime y reste 30 jours avant l'effacement. | Poubelle / Bin, Recycle bin |
-| La team | Team | Les membres et leurs rôles (admins seulement). Le nom de la section depuis le 09/10/2026 (avant, « Équipe ») ; « l'équipe » reste dans les phrases. | Utilisateurs / Users |
+| La team | Team | Les membres et leurs rôles (un éditeur la lit, seul un admin la gère). Le nom de la section depuis le 09/10/2026 (avant, « Équipe ») ; « l'équipe » reste dans les phrases. | Utilisateurs / Users |
 | Paramètres | Settings | Les réglages de toute l'admin (admins seulement). | Configuration / Preferences |
 | Mon compte | My account | Profil, double vérification et thème de chaque membre. | Profil (seul) / Profile (seul) |
 | Contenus (groupe du menu) | Content | Blog, Podcasts, Pages. | — / Contents |
@@ -125,7 +125,7 @@
 | version | version | Copie publiée et numérotée, qui ne change plus. | révision / revision |
 | historique | version history | La liste des versions publiées. | — / changelog |
 | revenir à cette version | restore this version | Recopier une version dans le brouillon. | restaurer (réservé à la Corbeille) / revert, roll back |
-| programmer | schedule | Publier seul au jour et à l'heure choisis, heure de Paris. | planifier / plan |
+| programmer | schedule | Publier seul au jour et à l'heure choisis, dans le fuseau de l'admin. | planifier / plan |
 | annuler la programmation | unschedule | Retirer une publication programmée. | déprogrammer |
 | retirer de l'app | unpublish | Ne plus montrer le contenu, en gardant brouillon et historique. | dépublier / hide, take down |
 | mettre à jour dans l'app | update in app | Republier seulement un fichier ou un bloc partagé changé. | pousser / push, sync |

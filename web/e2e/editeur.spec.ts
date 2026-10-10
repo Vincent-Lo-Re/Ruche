@@ -1,5 +1,5 @@
 // Parcours de l'éditeur de blocs (étape 4), contre le Supabase local (base, Realtime), avec une
-// page dans l'éditeur du Fil (ADMIN § 4, « Le builder du Fil partout »).
+// page dans l'éditeur des contenus (ADMIN § 4, « Le builder des contenus partout »).
 //
 // 1. Écrire une page, ranger un bloc dans le plan au clavier, recharger et retrouver son texte.
 // 2. Deux navigateurs : le second voit le brouillon en lecture seule (le cadenas) et le voit
@@ -96,7 +96,7 @@ test("écrire une page, ranger un bloc dans le plan au clavier, recharger et ret
   await expect(
     page.getByRole("link", { name: labels.back(texts.sections.pages.title) })
   ).toBeVisible()
-  // Éditeur du Fil : le plan est ouvert d'office.
+  // Éditeur des contenus : le plan est ouvert d'office.
   const outline = page.getByRole("navigation", { name: labels.outline.title })
   await expect(outline).toBeVisible()
 
@@ -373,7 +373,7 @@ test("une image insérée apparaît dans « Utilisé dans » et ne peut plus all
   // Pas de légende : elle est retirée de l'admin (02/10/2026).
   await expect(image.getByRole("textbox")).toHaveCount(0)
 
-  // Une section, avec la même image dedans (« Ajouter dans la section » ouvre les Blocs).
+  // Un encadré, avec la même image dedans (« Ajouter dans l'encadré » ouvre les Blocs).
   await addBlock(page, "box")
   const box = page.locator('[data-block-type="box"]')
   await box.getByRole("button", { name: labels.add.inBox }).click()

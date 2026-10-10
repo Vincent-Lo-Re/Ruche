@@ -34,6 +34,9 @@ import { DEFAULT_TIME_ZONE, isTimeZone } from "@/lib/time-zone"
 import { texts } from "@/texts"
 
 export const adminBrandKey = ["admin-brand"] as const
+// Le monogramme prêt à animer, lu à son adresse (hooks/use-monogram-svg.ts).
+export const monogramSvgKey = (url: string | null) =>
+  ["admin-brand", "monogram-svg", url] as const
 
 const BUCKET = "marque"
 const MAX_BYTES = 1024 * 1024

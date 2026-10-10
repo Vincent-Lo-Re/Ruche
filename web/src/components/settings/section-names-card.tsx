@@ -1,14 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Save } from "lucide-react"
+import { useQuery } from "@tanstack/react-query"
 import { Fragment } from "react"
 import { Controller, useForm, useWatch, type Control } from "react-hook-form"
-import { toast } from "sonner"
 import type { z } from "zod"
 
 import { LoadState } from "@/components/load-state"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { SaveFooter } from "@/components/settings/save-footer"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Field,
   FieldDescription,
@@ -17,8 +15,8 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { Spinner } from "@/components/ui/spinner"
-import { adminBrandKey, saveSectionNames } from "@/lib/admin-identity"
+import { useBrandMutation } from "@/hooks/use-brand-name"
+import { saveSectionNames } from "@/lib/admin-identity"
 import { adminBrandRead } from "@/lib/reads"
 import { sectionNamesSchema } from "@/lib/schemas"
 import {
@@ -63,7 +61,7 @@ function fromValues(values: Values): CustomSectionNames {
  * Les noms du Blog et des Podcasts (Paramètres › Avancé, admins) : pour chaque section, en
  * français trois formes écrites à la main (le nom, avec « le », avec « du »), et en anglais le nom,
  * chacune avec un exemple sous son champ, qui suit ce qui est écrit ; vides, le nom d'origine (en gris). « Enregistrer » dans le pied
- * gris ; la page se recharge ensuite pour que tous les textes les prennent (useAdminSectionNames).
+ * gris ; la page se recharge ensuite pour que tous les textes les prennent (useAdminSettings).
  */
 export function SectionNamesCard() {
   const brand = useQuery(adminBrandRead())
@@ -79,21 +77,16 @@ export function SectionNamesCard() {
 }
 
 function SectionNamesForm({ names }: { names: CustomSectionNames }) {
-  const queryClient = useQueryClient()
   const form = useForm({
     resolver: zodResolver(sectionNamesSchema),
     defaultValues: toValues(names),
   })
 
-  const save = useMutation({
+  const save = useBrandMutation({
     mutationFn: (values: Values) => saveSectionNames(fromValues(values)),
-    onSuccess: async (_, values) => {
-      form.reset(values)
-      toast.success(labels.saved)
-      // Les noms relus, la page se recharge (useAdminSectionNames).
-      await queryClient.invalidateQueries({ queryKey: adminBrandKey })
-    },
-    onError: () => toast.error(texts.common.unexpected),
+    saved: labels.saved,
+    // Les noms relus, la page se recharge (useAdminSettings).
+    onSaved: (values) => form.reset(values),
   })
 
   return (
@@ -110,16 +103,7 @@ function SectionNamesForm({ names }: { names: CustomSectionNames }) {
             </Fragment>
           ))}
         </CardContent>
-        <CardFooter>
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={save.isPending || !form.formState.isDirty}
-          >
-            {save.isPending ? <Spinner /> : <Save aria-hidden />}
-            {texts.common.save}
-          </Button>
-        </CardFooter>
+        <SaveFooter pending={save.isPending} dirty={form.formState.isDirty} />
       </Card>
     </form>
   )

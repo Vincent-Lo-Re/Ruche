@@ -22,13 +22,13 @@ import { texts } from "@/texts"
 
 export type SectionKey = keyof typeof texts.sections
 
-// Adresse (en français) et icône de chaque section.
 /**
  * La route des pages avec le menu (AppLayout) : d'une de ces pages à l'autre, seul leur contenu
  * passe en fondu, le menu ne bouge pas (ADMIN § 7, « Une navigation sans à-coups »).
  */
 export const menuRouteId = "menu"
 
+// Adresse (en anglais) et icône de chaque section.
 export const sections = {
   home: { path: "/", icon: LayoutDashboard },
   blog: { path: "/blog", icon: Rss },
@@ -93,7 +93,7 @@ export const menu = {
 }
 
 // Le menu du header, à gauche, après « Site web » (ADMIN § 7, « Un header sur toute la
-// largeur ») ; Équipe et Paramètres pour les admins seulement.
+// largeur ») ; La team (en lecture seule pour un éditeur), et Paramètres pour les admins.
 export const header: SectionKey[] = ["account", "team", "settings"]
 
 /** Adresse de l'éditeur d'un contenu : « /pages/<id> ». */

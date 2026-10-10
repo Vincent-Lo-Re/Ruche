@@ -31,6 +31,6 @@ export const fiche: HelpFiche = {
   notes: [
     "Les catégories sont facultatives : un contenu peut en avoir une, plusieurs ou aucune.",
     "Les catégories d'un contenu ne changent dans l'app qu'à sa prochaine publication.",
-    "Supprimer une catégorie est définitif : elle ne passe pas par la corbeille, et elle disparaît tout de suite des filtres de l'app.",
+    "Supprimer une catégorie est définitif : elle ne passe pas par la Corbeille, et elle disparaît tout de suite des filtres de l'app.",
   ],
 }

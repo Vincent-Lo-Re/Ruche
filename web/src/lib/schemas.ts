@@ -2,19 +2,29 @@ import { z } from "zod"
 
 import { ALT_MAX, TITLE_MAX } from "@/blocks/draft"
 import { templateSections, templateSorts } from "@/lib/contents/templates"
+import { formatCount } from "@/lib/media/format"
 import { texts } from "@/texts"
 
 // Formulaires de l'admin : ce qui est saisi, et les messages en cas d'erreur.
 
+// Les longueurs maximales : la même règle que la base, écrite une fois ici.
 export const MAX_NAME_LENGTH = 100
+const MEDIA_NAME_MAX = 255
+const TRANSCRIPT_MAX = 200_000
+const INITIALS_MAX = 3
+const SECTION_NAME_MAX = 40
+
+/** Le message d'un texte trop long, avec la limite écrite dans le format de l'admin. */
+const tooLong = (message: (max: string) => string, max: number) =>
+  message(formatCount(max))
 
 const email = (message: string) =>
   z.string().trim().toLowerCase().pipe(z.email(message))
 
 const sixDigits = (message: string) => z.string().regex(/^\d{6}$/, message)
 
-const fullName = (message: string) =>
-  z.string().trim().max(MAX_NAME_LENGTH, message)
+const fullName = (message: (max: string) => string) =>
+  z.string().trim().max(MAX_NAME_LENGTH, tooLong(message, MAX_NAME_LENGTH))
 
 export const signInEmailSchema = z.object({
   email: email(texts.signIn.invalidEmail),
@@ -55,12 +65,18 @@ export const adminNameSchema = z.object({
   name: z
     .string()
     .trim()
-    .max(ADMIN_NAME_MAX, texts.settings.adminIdentity.nameTooLong),
+    .max(
+      ADMIN_NAME_MAX,
+      tooLong(texts.settings.adminIdentity.nameTooLong, ADMIN_NAME_MAX)
+    ),
   // Vides : la première lettre du nom. Même règle que la base (admin_identity.initials).
   initials: z
     .string()
     .trim()
-    .max(3, texts.settings.adminIdentity.initialsTooLong),
+    .max(
+      INITIALS_MAX,
+      tooLong(texts.settings.adminIdentity.initialsTooLong, INITIALS_MAX)
+    ),
   // Vide : pas d'adresse de contact.
   contactEmail: z.union([
     z.literal(""),
@@ -89,12 +105,21 @@ export const mediaDetailsSchema = z.object({
     .string()
     .trim()
     .min(1, texts.media.detail.nameRequired)
-    .max(255, texts.media.detail.nameTooLong),
-  alt: z.string().trim().max(ALT_MAX, texts.media.detail.altTooLong),
+    .max(
+      MEDIA_NAME_MAX,
+      tooLong(texts.media.detail.nameTooLong, MEDIA_NAME_MAX)
+    ),
+  alt: z
+    .string()
+    .trim()
+    .max(ALT_MAX, tooLong(texts.media.detail.altTooLong, ALT_MAX)),
   transcript: z
     .string()
     .trim()
-    .max(200_000, texts.media.detail.transcriptTooLong),
+    .max(
+      TRANSCRIPT_MAX,
+      tooLong(texts.media.detail.transcriptTooLong, TRANSCRIPT_MAX)
+    ),
 })
 
 // Formule d'abonnement : mêmes limites que la base (table access_levels).
@@ -103,7 +128,10 @@ export const accessLevelNameSchema = z.object({
     .string()
     .trim()
     .min(1, texts.settings.accessLevels.nameRequired)
-    .max(MAX_NAME_LENGTH, texts.settings.accessLevels.nameTooLong),
+    .max(
+      MAX_NAME_LENGTH,
+      tooLong(texts.settings.accessLevels.nameTooLong, MAX_NAME_LENGTH)
+    ),
 })
 
 // Catégorie du Blog ou des Podcasts : mêmes limites que la base (table categories).
@@ -112,7 +140,10 @@ export const categoryNameSchema = z.object({
     .string()
     .trim()
     .min(1, texts.categories.nameRequired)
-    .max(MAX_NAME_LENGTH, texts.categories.nameTooLong),
+    .max(
+      MAX_NAME_LENGTH,
+      tooLong(texts.categories.nameTooLong, MAX_NAME_LENGTH)
+    ),
 })
 
 // Nouveau modèle (section Modèles, ou « Enregistrer comme modèle ») : mêmes règles que la base
@@ -124,7 +155,7 @@ export const templateSchema = z
       .string()
       .trim()
       .min(1, texts.templates.create.nameRequired)
-      .max(TITLE_MAX, texts.templates.create.nameTooLong),
+      .max(TITLE_MAX, tooLong(texts.templates.create.nameTooLong, TITLE_MAX)),
     sort: z.enum(templateSorts),
     templateFor: z.enum(templateSections).nullable(),
   })
@@ -138,7 +169,10 @@ export type TemplateValues = z.infer<typeof templateSchema>
 // Les noms du Blog et des Podcasts (Paramètres › Avancé). Même règle que la base
 // (domaine section_form, 40 caractères au plus) : les trois formes françaises toutes, ou aucune.
 const sectionNames = texts.settings.advanced.sectionNames
-const sectionForm = z.string().trim().max(40, sectionNames.tooLong)
+const sectionForm = z
+  .string()
+  .trim()
+  .max(SECTION_NAME_MAX, tooLong(sectionNames.tooLong, SECTION_NAME_MAX))
 const sectionFields = z
   .object({
     name: sectionForm,

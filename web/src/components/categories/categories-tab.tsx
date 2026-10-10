@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
-  Ellipsis,
   FilterX,
   Search,
   SquarePen,
@@ -23,15 +22,13 @@ import { SortableList } from "@/components/list-sorting"
 import { LoadState } from "@/components/load-state"
 import { SearchInput } from "@/components/search-input"
 import { useAccessCheck } from "@/components/team/use-access-check"
-import { TrashDialog } from "@/components/trash-dialog"
+import { TrashDialog } from "@/components/confirm-dialog"
+import { RowActionsMenu } from "@/components/row-actions-menu"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
   Select,
@@ -48,6 +45,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { selectionOf, toggleAll, toggleSelected } from "@/lib/bulk-trash"
 import {
   categoryKeys,
   createCategory,
@@ -130,7 +128,7 @@ export function CategoriesTab({
     if ([...selected].some((id) => !visible.has(id)))
       setSelected(new Set([...selected].filter((id) => visible.has(id))))
   }, [pageItems, selected, setSelected])
-  const checked = pageItems.filter((category) => selected.has(category.id))
+  const checked = selectionOf(selected, pageItems).items
 
   // Les listes du Blog ou des Podcasts montrent les noms : relues aussi.
   const refresh = () =>
@@ -167,7 +165,7 @@ export function CategoriesTab({
     mutationFn: (category: Category) => deleteCategory(category.id),
     onSuccess: (_, category) => {
       toast.success(labels.removed(category.name))
-      setSelected((previous) => without(previous, [category.id]))
+      setSelected((previous) => toggleSelected(previous, category.id, false))
     },
     onError,
     onSettled: async () => {
@@ -202,11 +200,7 @@ export function CategoriesTab({
   const busy =
     remove.isPending || bulk.removeMany.isPending || reorder.isPending
   const toggle = (category: Category, on: boolean) =>
-    setSelected((previous) =>
-      on
-        ? new Set([...previous, category.id])
-        : without(previous, [category.id])
-    )
+    setSelected((previous) => toggleSelected(previous, category.id, on))
 
   const dialog = (
     <CategoryDialog
@@ -314,14 +308,7 @@ export function CategoriesTab({
                 reorderDisabled={filtering || busy}
                 onToggle={toggle}
                 onToggleAll={(on) =>
-                  setSelected(
-                    on
-                      ? new Set(pageItems.map((category) => category.id))
-                      : without(
-                          selected,
-                          pageItems.map((category) => category.id)
-                        )
-                  )
+                  setSelected(toggleAll(selected, pageItems, on))
                 }
                 // Rangée dans la page : toute la liste suit (sans recherche, shown est la
                 // liste entière, dans son ordre).
@@ -395,12 +382,6 @@ const usageItems = usageFilters.map((value) => ({
 }))
 function isUsageFilter(value: unknown): value is UsageFilter {
   return usageFilters.includes(value as UsageFilter)
-}
-
-function without(set: ReadonlySet<string>, ids: string[]): Set<string> {
-  const next = new Set(set)
-  for (const id of ids) next.delete(id)
-  return next
 }
 
 function CategoryTable({
@@ -494,46 +475,42 @@ function CategoryTable({
                   {formatDateTime(category.created_at)}
                 </TableCell>
                 <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      disabled={disabled}
-                      aria-label={labels.actions(category.name)}
-                      render={<Button variant="ghost" size="icon-sm" />}
+                  {" "}
+                  <RowActionsMenu
+                    label={labels.actions(category.name)}
+                    disabled={disabled}
+                    width="w-52"
+                  >
+                    <DropdownMenuItem onClick={() => onEdit(category)}>
+                      <SquarePen />
+                      {labels.edit}
+                    </DropdownMenuItem>
+                    {!reorderDisabled && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => onMove(category, "top")}
+                        >
+                          <ArrowUpToLine />
+                          {texts.contentList.order.moveTop}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => onMove(category, "bottom")}
+                        >
+                          <ArrowDownToLine />
+                          {texts.contentList.order.moveBottom}
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onClick={() => onRemove(category)}
                     >
-                      <Ellipsis />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-52">
-                      <DropdownMenuItem onClick={() => onEdit(category)}>
-                        <SquarePen />
-                        {labels.edit}
-                      </DropdownMenuItem>
-                      {!reorderDisabled && (
-                        <>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={() => onMove(category, "top")}
-                          >
-                            <ArrowUpToLine />
-                            {texts.contentList.order.moveTop}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => onMove(category, "bottom")}
-                          >
-                            <ArrowDownToLine />
-                            {texts.contentList.order.moveBottom}
-                          </DropdownMenuItem>
-                        </>
-                      )}
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        variant="destructive"
-                        onClick={() => onRemove(category)}
-                      >
-                        <Eraser />
-                        {labels.remove}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                      <Eraser />
+                      {labels.remove}
+                    </DropdownMenuItem>
+                  </RowActionsMenu>
                 </TableCell>
               </SortableRow>
             ))}

@@ -9,16 +9,8 @@ import { PanelCard } from "@/components/panel-card"
 import { useAccessCheck } from "@/components/team/use-access-check"
 import { templateSortIcons } from "@/components/templates/sort-icons"
 import { useTemplateUses } from "@/components/templates/use-template-uses"
+import { ConfirmDialog } from "@/components/confirm-dialog"
 import { Alert, AlertTitle } from "@/components/ui/alert"
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -209,54 +201,40 @@ export function TemplateUsesCard({ templateId }: { templateId: string }) {
         </Button>
       )}
 
-      <AlertDialog
+      <ConfirmDialog
         open={confirming}
-        onOpenChange={(open) => {
-          if (!push.isPending) setConfirming(open)
-        }}
+        title={labels.outdated.title(stale.length)}
+        description={labels.outdated.description(stale.length)}
+        confirmLabel={labels.outdated.confirm}
+        pending={push.isPending}
+        onCancel={() => setConfirming(false)}
+        onConfirm={() => push.mutate()}
+        icon={<RefreshCw />}
+        destructive={false}
       >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {labels.outdated.title(stale.length)}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {labels.outdated.description(stale.length)}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <ItemGroup className="max-h-48 overflow-y-auto">
-            {stale.map((item) => (
-              <Item
-                key={item.content_id}
-                role="listitem"
-                size="xs"
-                data-outdated-content={item.content_id}
-              >
-                <ItemContent className="min-w-0">
-                  <ItemTitle className="block w-full truncate font-normal">
-                    {displayTitle(item.title)}
-                  </ItemTitle>
-                  <ItemDescription>
-                    {labels.outdated.version(
-                      item.version_number,
-                      formatDateTime(item.published_at)
-                    )}
-                  </ItemDescription>
-                </ItemContent>
-              </Item>
-            ))}
-          </ItemGroup>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={push.isPending}>
-              {texts.common.cancel}
-            </AlertDialogCancel>
-            <Button disabled={push.isPending} onClick={() => push.mutate()}>
-              {push.isPending ? <Spinner /> : <RefreshCw />}
-              {labels.outdated.confirm}
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        <ItemGroup className="max-h-48 overflow-y-auto">
+          {stale.map((item) => (
+            <Item
+              key={item.content_id}
+              role="listitem"
+              size="xs"
+              data-outdated-content={item.content_id}
+            >
+              <ItemContent className="min-w-0">
+                <ItemTitle className="block w-full truncate font-normal">
+                  {displayTitle(item.title)}
+                </ItemTitle>
+                <ItemDescription>
+                  {labels.outdated.version(
+                    item.version_number,
+                    formatDateTime(item.published_at)
+                  )}
+                </ItemDescription>
+              </ItemContent>
+            </Item>
+          ))}
+        </ItemGroup>
+      </ConfirmDialog>
     </PanelCard>
   )
 }

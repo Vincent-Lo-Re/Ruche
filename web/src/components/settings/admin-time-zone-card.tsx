@@ -1,7 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import { ChevronsUpDown } from "lucide-react"
 import { useMemo, useState } from "react"
-import { toast } from "sonner"
 
 import { LoadState } from "@/components/load-state"
 import { Button } from "@/components/ui/button"
@@ -19,7 +18,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { adminBrandKey, saveAdminTimeZone } from "@/lib/admin-identity"
+import { useBrandMutation } from "@/hooks/use-brand-name"
+import { saveAdminTimeZone } from "@/lib/admin-identity"
 import { adminBrandRead } from "@/lib/reads"
 import { timeZoneCity, timeZoneNames, timeZoneOffset } from "@/lib/time-zone"
 import { texts } from "@/texts"
@@ -35,19 +35,14 @@ function zoneLabel(zone: string): string {
  * Le fuseau horaire de toute l'admin (onglet « Avancé » des Paramètres, admins) : les dates s'y
  * affichent et l'heure d'une publication programmée s'y comprend. Une liste où l'on cherche une
  * ville ou une région (Command dans un Popover, le « combobox » de shadcn). L'identité de l'admin
- * relue, useAdminTimeZone recharge la page si le fuseau change.
+ * relue, useAdminSettings recharge la page si le fuseau change.
  */
 export function AdminTimeZoneCard() {
-  const queryClient = useQueryClient()
   const brand = useQuery(adminBrandRead())
   const [open, setOpen] = useState(false)
-  const save = useMutation({
+  const save = useBrandMutation({
     mutationFn: (zone: string) => saveAdminTimeZone(zone),
-    onSuccess: async () => {
-      toast.success(labels.saved)
-      await queryClient.invalidateQueries({ queryKey: adminBrandKey })
-    },
-    onError: () => toast.error(texts.common.unexpected),
+    saved: labels.saved,
   })
   const current = save.isPending ? save.variables : brand.data?.timeZone
   const zones = useMemo(

@@ -325,4 +325,38 @@ describe("enregistrement automatique", () => {
       unsaved: false,
     })
   })
+
+  it("reset pendant un envoi : la réponse de cet envoi ne touche plus à rien", async () => {
+    const { save, calls } = fakeSave()
+    const autosave = new AutosaveController({
+      save,
+      rev: 1,
+      savedAt: null,
+      retryDelaysMs: [2000],
+    })
+    autosave.change("ancien")
+    await vi.advanceTimersByTimeAsync(1500)
+    autosave.reset(7, "2026-09-27T12:00:00Z")
+    calls[0].reject(new TypeError("Failed to fetch"))
+    await vi.advanceTimersByTimeAsync(10_000)
+    expect(save).toHaveBeenCalledTimes(1)
+    expect(autosave.state).toMatchObject({
+      status: "saved",
+      rev: 7,
+      unsaved: false,
+    })
+  })
+
+  it("arrêté pendant un envoi : il reste arrêté, quelle que soit la réponse", async () => {
+    const { save, calls } = fakeSave()
+    const autosave = new AutosaveController({ save, rev: 1, savedAt: null })
+    autosave.change("a")
+    await vi.advanceTimersByTimeAsync(1500)
+    autosave.change("ab")
+    autosave.stop()
+    calls[0].resolve()
+    await vi.advanceTimersByTimeAsync(10_000)
+    expect(save).toHaveBeenCalledTimes(1)
+    expect(autosave.state).toMatchObject({ status: "stopped", rev: 2 })
+  })
 })

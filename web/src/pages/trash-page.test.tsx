@@ -177,7 +177,7 @@ describe("Corbeille", () => {
     const dialog = await screen.findByRole("alertdialog")
     fireEvent.click(
       within(dialog).getByRole("button", {
-        name: texts.trash.confirmErase.confirm,
+        name: texts.common.deletePermanently,
       })
     )
 
@@ -253,7 +253,7 @@ describe("Corbeille : contenus", () => {
     expect(
       await screen.findByText(texts.trash.restored(article.title!))
     ).toBeVisible()
-    fireEvent.click(screen.getByRole("button", { name: texts.trash.open }))
+    fireEvent.click(screen.getByRole("button", { name: texts.common.open }))
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(`/blog/${article.id}`)
     )
@@ -320,7 +320,7 @@ describe("Corbeille : contenus", () => {
     )
     fireEvent.click(
       within(dialog).getByRole("button", {
-        name: texts.trash.confirmSelection.confirm,
+        name: texts.common.deletePermanently,
       })
     )
     await waitFor(() =>

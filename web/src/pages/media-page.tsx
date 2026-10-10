@@ -4,18 +4,11 @@ import {
   LayoutGrid,
   List,
   Search,
-  TriangleAlert,
   Unlink,
   Upload,
   UploadCloud,
 } from "lucide-react"
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type ChangeEvent,
-} from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useSearchParams } from "react-router"
 import { toast } from "sonner"
 
@@ -26,7 +19,7 @@ import {
   type SelectAll,
 } from "@/components/bulk-selection"
 import { ListCard, ListEmpty } from "@/components/list-card"
-import { LoadState } from "@/components/load-state"
+import { LoadState, RefreshFailed } from "@/components/load-state"
 import { acceptedFiles, kindIcons } from "@/components/media/media-kinds"
 import { ListPagination } from "@/components/list-pagination"
 import { MediaGrid, MediaTable } from "@/components/media/media-collection"
@@ -39,7 +32,7 @@ import { usePreviewUrls } from "@/components/media/use-preview-urls"
 import { PageHeader } from "@/components/page-header"
 import { SearchInput } from "@/components/search-input"
 import { useAccessCheck } from "@/components/team/use-access-check"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { HiddenFileInput } from "@/components/file-input"
 import { Button } from "@/components/ui/button"
 import {
   Empty,
@@ -57,7 +50,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useAddressState } from "@/hooks/use-address-state"
-import { useDebouncedValue } from "@/hooks/use-debounced-value"
+import { SEARCH_DELAY_MS, useDebouncedValue } from "@/hooks/use-debounced-value"
 import {
   askedFileFromAddress,
   FILE_PARAM,
@@ -81,6 +74,7 @@ import { getUploadQueue } from "@/lib/media/upload-queue"
 import { mediaListRead, mediaRead } from "@/lib/reads"
 import { sections } from "@/navigation"
 import { texts } from "@/texts"
+import { readStored, writeStored } from "@/lib/stored-choice"
 
 type View = "grid" | "list"
 
@@ -92,19 +86,11 @@ const viewChoices: { value: View; Icon: typeof LayoutGrid }[] = [
 ]
 
 function readView(): View {
-  try {
-    return localStorage.getItem(viewStorageKey) === "list" ? "list" : "grid"
-  } catch {
-    return "grid"
-  }
+  return readStored(viewStorageKey) === "list" ? "list" : "grid"
 }
 
 function saveView(view: View) {
-  try {
-    localStorage.setItem(viewStorageKey, view)
-  } catch {
-    // Préférence non gardée : sans conséquence.
-  }
+  writeStored(viewStorageKey, view)
 }
 
 /**
@@ -138,7 +124,7 @@ export function MediaPage() {
     setAddress({ ...address, kind: next })
   const setUnused = (next: boolean) => setAddress({ ...address, unused: next })
   const setSearch = (next: string) => setAddress({ ...address, search: next })
-  const debouncedSearch = useDebouncedValue(search, 250)
+  const debouncedSearch = useDebouncedValue(search, SEARCH_DELAY_MS)
   const [view, setView] = useState<View>(readView)
   // Fiche ouverte : relue dans la liste à chaque mise à jour, gardée si elle en sort.
   const [opened, setOpened] = useState<Media | null>(null)
@@ -252,12 +238,6 @@ export function MediaPage() {
     }
   }, [addFiles])
 
-  const onInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    addFiles(event.target.files)
-    // Le même fichier pourra être choisi de nouveau.
-    event.target.value = ""
-  }
-
   const filtering = debouncedSearch.trim() !== "" || kind !== "all" || unused
   // « Non utilisés » seul et rien à montrer : tout sert, ce n'est pas une recherche ratée.
   const emptyText = !filtering
@@ -337,15 +317,13 @@ export function MediaPage() {
         description={description}
         actions={
           <>
-            <input
+            <HiddenFileInput
               ref={fileInput}
-              type="file"
               multiple
               accept={acceptedFiles}
-              className="sr-only"
               tabIndex={-1}
               aria-label={texts.media.uploadInput}
-              onChange={onInputChange}
+              onFiles={addFiles}
             />
             <BulkTrashButton
               count={selection.items.length}
@@ -485,21 +463,7 @@ export function MediaPage() {
         </ListCard>
       ) : (
         <div className="space-y-4">
-          {media.isError && (
-            <Alert variant="destructive">
-              <TriangleAlert />
-              <AlertDescription className="flex flex-wrap items-center gap-x-2">
-                {texts.media.refreshFailed}
-                <Button
-                  variant="link"
-                  className="h-auto p-0"
-                  onClick={() => media.refetch()}
-                >
-                  {texts.common.retry}
-                </Button>
-              </AlertDescription>
-            </Alert>
-          )}
+          <RefreshFailed query={media} text={texts.media.refreshFailed} />
           {media.data.length === 0 ? (
             <ListEmpty
               icon={filtering ? Search : UploadCloud}

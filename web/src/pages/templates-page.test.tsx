@@ -394,7 +394,9 @@ describe("section Modèles", () => {
     expect(templatesApi.listTemplateUses).not.toHaveBeenCalledWith([RETENIR])
     const toast = await screen.findByText(labels.trashed("À retenir"))
     fireEvent.click(
-      within(toast.closest("li")!).getByRole("button", { name: labels.undo })
+      within(toast.closest("li")!).getByRole("button", {
+        name: texts.common.undo,
+      })
     )
     await waitFor(() =>
       expect(publicationApi.restoreContent).toHaveBeenCalledWith(RETENIR)
@@ -443,7 +445,7 @@ describe("section Modèles", () => {
     fireEvent.click(
       within(screen.getByText(labels.trashedMany(2)).closest("li")!).getByRole(
         "button",
-        { name: labels.undo }
+        { name: texts.common.undo }
       )
     )
     expect(await screen.findByText(labels.restoredMany(2))).toBeVisible()

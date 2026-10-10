@@ -5,15 +5,7 @@ import { useState } from "react"
 import { IconBadge } from "@/components/icon-badge"
 import { useCategoryRemoval } from "@/components/categories/use-category-removal"
 import { UsesBadgeButton, UsesDialog } from "@/components/uses-dialog"
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import { ConfirmDialog } from "@/components/confirm-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
@@ -151,36 +143,23 @@ function RemoveDialog({
     count("draftOnly") > 0 ? words.confirm.draftOnly(count("draftOnly")) : null,
   ].filter((line): line is string => line !== null)
   return (
-    <AlertDialog
+    <ConfirmDialog
       open={uses !== null}
-      onOpenChange={(next) => {
-        if (!next && !pending) onCancel()
-      }}
-    >
-      {uses && (
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {words.confirm.title(uses.length)}
-            </AlertDialogTitle>
-            <AlertDialogDescription className="flex flex-col gap-2">
-              {lines.map((line) => (
-                <span key={line}>{line}</span>
-              ))}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={pending}>
-              {texts.common.cancel}
-            </AlertDialogCancel>
-            <Button disabled={pending} onClick={onConfirm}>
-              {pending ? <Spinner /> : <Unlink />}
-              {words.confirm.confirm}
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      )}
-    </AlertDialog>
+      title={words.confirm.title(uses?.length ?? 0)}
+      description={
+        <span className="flex flex-col gap-2">
+          {lines.map((line) => (
+            <span key={line}>{line}</span>
+          ))}
+        </span>
+      }
+      confirmLabel={words.confirm.confirm}
+      pending={pending}
+      onCancel={onCancel}
+      onConfirm={onConfirm}
+      icon={<Unlink />}
+      destructive={false}
+    />
   )
 }
 

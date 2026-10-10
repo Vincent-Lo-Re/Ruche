@@ -107,7 +107,7 @@ export function CategoryDialog({
           <DialogFooter>
             <Button type="submit" disabled={pending || taken}>
               {pending && <Spinner />}
-              {labels.dialog.save}
+              {texts.common.save}
             </Button>
           </DialogFooter>
         </form>

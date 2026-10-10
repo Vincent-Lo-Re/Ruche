@@ -23,7 +23,7 @@ import {
   type ContentSettings,
 } from "@/lib/contents/api"
 import { getPublication } from "@/lib/contents/publication"
-import { saveFromList } from "@/lib/contents/settings"
+import { heldMessage, saveFromList } from "@/lib/contents/settings"
 import type { RefusedSlug } from "@/lib/contents/slug"
 import { errorMessage } from "@/lib/errors"
 import { texts } from "@/texts"
@@ -74,19 +74,12 @@ export function ListSettingsSheet({
   // Qui écrit ce contenu en ce moment : lu à l'ouverture (session neuve, qui ne tient rien).
   const [session] = useState(() => crypto.randomUUID())
   const lock = useQuery({
-    queryKey: [...contentKeys.detail(item.id), "verrou", session],
+    queryKey: contentKeys.lock(item.id, session),
     queryFn: () => lockStatus(item.id, session),
     staleTime: 0,
   })
-  const holder =
-    lock.data?.is_active && lock.data.holder_id !== null ? lock.data : null
-  const heldMessage =
-    held ??
-    (holder
-      ? holder.holder_id === myId
-        ? labels.heldSelf
-        : labels.heldBy(holder.holder_name ?? texts.editor.lock.someone)
-      : null)
+  const heldBy =
+    held ?? (lock.data ? heldMessage(lock.data, myId, labels) : null)
   const publication = useQuery({
     queryKey: contentKeys.publication(item.id),
     queryFn: () => getPublication(item.id),
@@ -127,7 +120,7 @@ export function ListSettingsSheet({
   const titleTaken =
     hasUniqueTitle(kind) &&
     (titleCheck.takenBy !== null || refusedTitle === title)
-  const editable = !lock.isPending && heldMessage === null && !save.isPending
+  const editable = !lock.isPending && heldBy === null && !save.isPending
 
   return (
     <ContentSettingsSheet
@@ -148,7 +141,7 @@ export function ListSettingsSheet({
       }
       settings={settings}
       editable={editable}
-      notice={lock.isPending ? labels.checking : (heldMessage ?? undefined)}
+      notice={lock.isPending ? labels.checking : (heldBy ?? undefined)}
       levels={levels}
       levelsFailed={levelsFailed}
       live={publication.data?.live ?? null}
@@ -168,7 +161,7 @@ export function ListSettingsSheet({
             onClick={() => save.mutate()}
           >
             {save.isPending && <Spinner />}
-            {labels.save}
+            {texts.common.save}
           </Button>
         </>
       }

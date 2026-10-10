@@ -5,7 +5,7 @@ export const fiche: HelpFiche = {
   theme: "equipe",
   title: "Changer le nom et les logos de la marque",
   summary:
-    "Un admin donne son nom, son logotype, son monogramme et l'image de l'écran de connexion à l'administration, pour toute l'équipe.",
+    "Un admin donne son nom, son logotype, son monogramme et l'image de l'écran de connexion à l'admin, pour toute l'équipe.",
   keywords: [
     "marque",
     "nom",

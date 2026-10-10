@@ -284,7 +284,7 @@ export async function trashContent(contentId: string): Promise<Trashed> {
 
 // addressRemoved : une page revient sans adresse ; renamedTo : son nouveau titre, si un autre
 // contenu de la section a pris le sien entre-temps (sinon null).
-type Restored = {
+export type Restored = {
   restored: number
   addressRemoved: boolean
   renamedTo: string | null

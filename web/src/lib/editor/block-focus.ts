@@ -73,7 +73,7 @@ function afterScroll(scroller: HTMLElement | null, then: () => void) {
 export function focusBlockSoon(id: string, attempts = 20, top = false) {
   const element = document.querySelector<HTMLElement>(`[data-block-id="${id}"]`)
   const found = element?.querySelector<HTMLElement>('[contenteditable="true"]')
-  // Le texte du bloc lui-même : pas celui d'un bloc de sa section, qui deviendrait le bloc
+  // Le texte du bloc lui-même : pas celui d'un bloc de son encadré, qui deviendrait le bloc
   // choisi en recevant le curseur.
   const editable =
     found && found.closest("[data-block-id]") === element ? found : null
@@ -112,7 +112,7 @@ export function focusBlockSoon(id: string, attempts = 20, top = false) {
 
 /**
  * En Lecture, un bloc choisi dans le plan monte en haut de l'écran du téléphone, sans être choisi
- * (QCM du 04/10/2026) ; rien s'il n'est pas montré (section vide, contenu réservé).
+ * (QCM du 04/10/2026) ; rien s'il n'est pas montré (encadré vide, contenu réservé).
  */
 export function scrollToReadBlock(id: string) {
   document

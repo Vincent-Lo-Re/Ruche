@@ -57,7 +57,7 @@ async function newPage(page: Page, title: string): Promise<string> {
 }
 
 /**
- * Éditeur du Fil : « Ajouter un bloc » (en bas de la colonne de gauche) ouvre les Blocs, puis
+ * Éditeur des contenus : « Ajouter un bloc » (en bas de la colonne de gauche) ouvre les Blocs, puis
  * « Mes blocs » › « Ajouter <nom> ».
  */
 async function insertTemplate(page: Page, name: string) {
@@ -122,12 +122,12 @@ test("bloc partagé : deux pages, correction, mise à jour de l'app, détacher, 
   await create.getByRole("button", { name: labels.create.submit }).click()
   await expect(page).toHaveURL(/\/templates\/[0-9a-f-]{36}$/)
   const templateId = contentIdFromUrl(page.url())
-  // L'éditeur du Fil : la sorte à droite, la règle d'un seul bloc à gauche ([D11]).
+  // L'éditeur des contenus : la sorte à droite, la règle d'un seul bloc à gauche ([D11]).
   await expect(
     page.getByRole("region", { name: labels.sorts.shared.title })
   ).toBeVisible()
   await expect(page.getByText(labels.editor.sharedLimit)).toBeVisible()
-  // Une section (par les Blocs), puis un texte dedans (« Ajouter dans la section »).
+  // Un encadré (par les Blocs), puis un texte dedans (« Ajouter dans l'encadré »).
   const add = page.locator("#colonne-gauche-ajouter")
   const library = page.getByRole("region", { name: editor.columns.blocks })
   await add.click()

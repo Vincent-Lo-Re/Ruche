@@ -73,7 +73,7 @@ describe("pages de connexion (modèle login-04)", () => {
     // Sous la carte, le © de l'année en cours.
     expect(
       screen.getByText(
-        texts.copyright(new Date().getFullYear(), texts.app.name)
+        texts.common.copyright(new Date().getFullYear(), texts.app.name)
       )
     ).toBeVisible()
   })

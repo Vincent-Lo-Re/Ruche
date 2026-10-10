@@ -37,7 +37,7 @@ export function AuthLayout() {
         {/* Le nom de la marque lu : pas de « © 2026 » seul le temps du chargement. */}
         {brand && (
           <FieldDescription className="shrink-0 px-6 text-center">
-            {texts.copyright(new Date().getFullYear(), brand)}
+            {texts.common.copyright(new Date().getFullYear(), brand)}
           </FieldDescription>
         )}
       </div>

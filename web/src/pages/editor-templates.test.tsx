@@ -504,7 +504,9 @@ describe("« Enregistrer comme modèle »", () => {
     )
     const toast = await screen.findByText(saveAs.saved("Deux textes"))
     fireEvent.click(
-      within(toast.closest("li")!).getByRole("button", { name: saveAs.open })
+      within(toast.closest("li")!).getByRole("button", {
+        name: texts.common.open,
+      })
     )
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(`/templates/${STYLE_ID}`)
@@ -758,7 +760,7 @@ describe("éditeur d'un modèle", () => {
     expect(publicationApi.getPublication).not.toHaveBeenCalled()
   })
 
-  it("le plan d'un bloc partagé : « Dupliquer » et « Sortir de la section » grisés, pas de « Mes blocs »", async () => {
+  it("le plan d'un bloc partagé : « Dupliquer » et « Sortir de l'encadré » grisés, pas de « Mes blocs »", async () => {
     vi.mocked(api.getContent).mockResolvedValue(
       template("shared", [contactBox])
     )

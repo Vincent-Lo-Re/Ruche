@@ -6,6 +6,7 @@ import type { PostgrestError } from "@supabase/supabase-js"
 
 import type { TablesInsert } from "@/lib/database.types"
 import { supabase } from "@/lib/supabase"
+import { CodedError, isErrorCode } from "@/lib/errors"
 import { texts } from "@/texts"
 
 export type AccessLevel = { id: string; name: string; rank: number }
@@ -41,22 +42,15 @@ export function liveLevelName(
 type AccessLevelErrorCode = keyof typeof texts.settings.accessLevels.errors
 
 /** Erreur de la base sur une formule, avec son code (s'il est connu). */
-export class AccessLevelError extends Error {
-  readonly code: AccessLevelErrorCode | null
-
+export class AccessLevelError extends CodedError<AccessLevelErrorCode> {
   constructor(code: AccessLevelErrorCode | null) {
-    super(
-      code ? texts.settings.accessLevels.errors[code] : texts.common.unexpected
-    )
-    this.name = "AccessLevelError"
-    this.code = code
+    super("AccessLevelError", texts.settings.accessLevels.errors, code)
   }
 }
 
 function toAccessLevelError(error: PostgrestError): AccessLevelError {
-  const known = texts.settings.accessLevels.errors
-  if (Object.hasOwn(known, error.message)) {
-    return new AccessLevelError(error.message as AccessLevelErrorCode)
+  if (isErrorCode(texts.settings.accessLevels.errors, error.message)) {
+    return new AccessLevelError(error.message)
   }
   // Nom déjà pris (index unique, à la casse près).
   if (error.code === "23505") return new AccessLevelError("nom_en_double")

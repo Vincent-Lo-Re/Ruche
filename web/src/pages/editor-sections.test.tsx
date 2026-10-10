@@ -380,7 +380,7 @@ describe("éditeur d'un article (Blog)", () => {
     const toast = await screen.findByText(words.cover.removed)
     fireEvent.click(
       within(toast.closest("li")!).getByRole("button", {
-        name: texts.editor.settings.undo,
+        name: texts.common.undo,
       })
     )
     expect(
@@ -1097,7 +1097,7 @@ describe("éditeur d'un article (Blog)", () => {
     )
   })
 
-  it("« Ajouter dans la section » : les Blocs ajoutent à la fin de la section, sans section ni bloc enregistré", async () => {
+  it("« Ajouter dans l'encadré » : les Blocs ajoutent à la fin de l'encadré, sans encadré ni bloc enregistré", async () => {
     Element.prototype.scrollIntoView = vi.fn()
     const BOX = "00000000-0000-4000-8000-0000000000e1"
     vi.mocked(api.getContent).mockResolvedValue(
@@ -1881,7 +1881,7 @@ describe("éditeur d'un épisode (Podcasts, dans l'éditeur des contenus)", () =
     const toast = await screen.findByText(words.audio.removed)
     fireEvent.click(
       within(toast.closest("li")!).getByRole("button", {
-        name: texts.editor.settings.undo,
+        name: texts.common.undo,
       })
     )
     expect(await within(audioCard()).findByText("entretien.mp3")).toBeVisible()
@@ -2260,7 +2260,7 @@ describe("éditeur des contenus : le builder relu sur un article complet (03/10/
     ).toBeVisible()
   })
 
-  it("un bloc sort de sa section : « Monter hors de la section », et « Sortir de la section » du plan", async () => {
+  it("un bloc sort de son encadré : « Monter hors de l'encadré », et « Sortir de l'encadré » du plan", async () => {
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
     choose(texts.editor.blockLabel.text("Astuce"))

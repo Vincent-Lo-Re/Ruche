@@ -2,18 +2,22 @@ import { cn } from "cn"
 import { CircleCheck, RefreshCw } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
+import { CHECK_DELAY_MS } from "@/hooks/use-debounced-value"
 import { Button } from "@/components/ui/button"
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { findPageBySlug } from "@/lib/contents/api"
 import type { LiveVersion } from "@/lib/contents/publication"
-import { checkSlug, slugFromTitle, type RefusedSlug } from "@/lib/contents/slug"
+import {
+  checkSlug,
+  SLUG_MAX,
+  slugFromTitle,
+  type RefusedSlug,
+} from "@/lib/contents/slug"
+import { formatCount } from "@/lib/media/format"
 import { texts } from "@/texts"
 
 const labels = texts.publication.settings.slug
-
-// Le temps laissé entre deux touches avant de demander à la base si l'adresse est libre.
-const CHECK_DELAY_MS = 400
 
 type Status =
   | { kind: "idle" }
@@ -107,7 +111,9 @@ export function SlugField({
       setStatus({
         kind: "error",
         message:
-          checked.reason === "too_long" ? labels.tooLong : labels.invalid,
+          checked.reason === "too_long"
+            ? labels.tooLong(formatCount(SLUG_MAX))
+            : labels.invalid,
       })
       return
     }

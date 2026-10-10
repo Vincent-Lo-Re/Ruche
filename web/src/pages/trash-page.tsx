@@ -11,26 +11,18 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
 import { toast } from "sonner"
 
+import { announceRestore } from "@/components/contents/announce-restore"
 import { ListCard, ListEmpty } from "@/components/list-card"
 import { SelectAllHead } from "@/components/bulk-selection"
-import { LoadState } from "@/components/load-state"
+import { LoadState, RefreshFailed } from "@/components/load-state"
 import { kindIcons } from "@/components/media/media-kinds"
 import { PageHeader } from "@/components/page-header"
 import { useAccessCheck } from "@/components/team/use-access-check"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import { ConfirmDialog } from "@/components/confirm-dialog"
+import { TruncatedText } from "@/components/truncated-text"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Spinner } from "@/components/ui/spinner"
 import {
   Table,
   TableBody,
@@ -46,6 +38,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useAddressState } from "@/hooks/use-address-state"
+import { selectionOf, toggleAll, toggleSelected } from "@/lib/bulk-trash"
 import { trashFilterFromAddress, writeTrashFilter } from "@/lib/address"
 import { ContentError, contentKeys } from "@/lib/contents/api"
 import { formatDate, formatDateTime } from "@/lib/dates"
@@ -115,23 +108,21 @@ export function TrashPage() {
           ? contentEditorPath(item.kind, item.id)
           : null
       const action = path
-        ? { label: texts.trash.open, onClick: () => void navigate(path) }
+        ? { label: texts.common.open, onClick: () => void navigate(path) }
         : undefined
-      if (renamedTo !== null) {
-        toast.warning(texts.trash.restoredRenamed(name, renamedTo), { action })
-      }
-      if (addressRemoved) {
-        toast.warning(texts.trash.restoredWithoutAddress(name), { action })
-      } else if (renamedTo === null) {
-        toast.success(texts.trash.restored(name), {
+      announceRestore(
+        name,
+        { addressRemoved, renamedTo },
+        {
+          success: texts.trash.restored(name),
+          // Un modèle ne se publie pas : rien à dire de l'app.
           description:
-            // Un modèle ne se publie pas : rien à dire de l'app.
             item.item_type === "content" && item.kind !== "template"
               ? texts.trash.restoredDraft
               : undefined,
           action,
-        })
-      }
+        }
+      )
     },
     onError: (error) => {
       toast.error(error.message, {
@@ -177,18 +168,12 @@ export function TrashPage() {
     activeFilter
   )
   const shown = paged.items
-  const shownKeys = new Set(shown.map(keyOf))
-  const selection = shown.filter((item) => selected.has(keyOf(item)))
+  const checked = selectionOf(selected, shown, keyOf)
+  const selection = checked.items
   const busy = restore.isPending || erase.isPending
 
-  const toggle = (item: TrashItem, checked: boolean) =>
-    setSelected((current) => {
-      const next = new Set(current)
-      if (checked) next.add(keyOf(item))
-      else next.delete(keyOf(item))
-      return next
-    })
-  const allChecked = shown.length > 0 && selection.length === shown.length
+  const toggle = (item: TrashItem, on: boolean) =>
+    setSelected((current) => toggleSelected(current, keyOf(item), on))
 
   const confirm = () => {
     if (!confirmation) return
@@ -254,21 +239,7 @@ export function TrashPage() {
         </ListCard>
       ) : (
         <div className="space-y-4">
-          {trash.isError && (
-            <Alert variant="destructive">
-              <TriangleAlert />
-              <AlertDescription className="flex flex-wrap items-center gap-x-2">
-                {texts.trash.refreshFailed}
-                <Button
-                  variant="link"
-                  className="h-auto p-0"
-                  onClick={() => trash.refetch()}
-                >
-                  {texts.common.retry}
-                </Button>
-              </AlertDescription>
-            </Alert>
-          )}
+          <RefreshFailed query={trash} text={texts.trash.refreshFailed} />
           {items.length === 0 ? (
             <ListEmpty
               icon={Eraser}
@@ -283,19 +254,13 @@ export function TrashPage() {
                 <TableHeader>
                   <TableRow>
                     <SelectAllHead
-                      all={allChecked}
-                      some={selection.length > 0 && !allChecked}
+                      all={checked.all}
+                      some={checked.some}
                       disabled={busy}
-                      onToggleAll={(checked) =>
-                        setSelected((current) => {
-                          const next = new Set(
-                            [...current].filter((key) => !shownKeys.has(key))
-                          )
-                          if (checked) {
-                            for (const key of shownKeys) next.add(key)
-                          }
-                          return next
-                        })
+                      onToggleAll={(on) =>
+                        setSelected((current) =>
+                          toggleAll(current, shown, on, keyOf)
+                        )
                       }
                     />
                     <TableHead>{texts.trash.columns.name}</TableHead>
@@ -327,64 +292,42 @@ export function TrashPage() {
         </div>
       )}
 
-      <AlertDialog
+      <ConfirmDialog
         open={confirmation !== null}
-        onOpenChange={(open) => {
-          if (!open && !erase.isPending) setConfirmation(null)
-        }}
-      >
-        {confirmation && (
-          <AlertDialogContent>
-            <ConfirmationText confirmation={confirmation} />
-            <AlertDialogFooter>
-              <AlertDialogCancel disabled={erase.isPending}>
-                {texts.common.cancel}
-              </AlertDialogCancel>
-              <Button
-                variant="destructive"
-                onClick={confirm}
-                disabled={erase.isPending}
-              >
-                {erase.isPending && <Spinner />}
-                {confirmation.scope === "all"
-                  ? texts.trash.confirmEmpty.confirm
-                  : confirmation.scope === "selection"
-                    ? texts.trash.confirmSelection.confirm
-                    : texts.trash.confirmErase.confirm}
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        )}
-      </AlertDialog>
+        {...confirmationWords(confirmation)}
+        pending={erase.isPending}
+        onCancel={() => setConfirmation(null)}
+        onConfirm={confirm}
+      />
     </>
   )
 }
 
-function ConfirmationText({ confirmation }: { confirmation: Confirmation }) {
-  let title: string
-  let description: string
+/** Le titre, la description et le bouton d'une confirmation (tout, la sélection, un élément). */
+function confirmationWords(confirmation: Confirmation | null) {
+  if (!confirmation) return { title: "", description: "", confirmLabel: "" }
   if (confirmation.scope === "all") {
-    title = texts.trash.confirmEmpty.title
-    description = texts.trash.confirmEmpty.description(
-      confirmation.items.length
-    )
-  } else if (confirmation.scope === "selection") {
-    title = texts.trash.confirmSelection.title(confirmation.items.length)
-    description = texts.trash.confirmSelection.description(
-      confirmation.items.length
-    )
-  } else {
-    title = texts.trash.confirmErase.title
-    description = texts.trash.confirmErase.description(
-      displayTitle(confirmation.item.title)
-    )
+    const words = texts.trash.confirmEmpty
+    return {
+      title: words.title,
+      description: words.description(confirmation.items.length),
+      confirmLabel: words.confirm,
+    }
   }
-  return (
-    <AlertDialogHeader>
-      <AlertDialogTitle>{title}</AlertDialogTitle>
-      <AlertDialogDescription>{description}</AlertDialogDescription>
-    </AlertDialogHeader>
-  )
+  if (confirmation.scope === "selection") {
+    const words = texts.trash.confirmSelection
+    return {
+      title: words.title(confirmation.items.length),
+      description: words.description(confirmation.items.length),
+      confirmLabel: texts.common.deletePermanently,
+    }
+  }
+  const words = texts.trash.confirmErase
+  return {
+    title: words.title,
+    description: words.description(displayTitle(confirmation.item.title)),
+    confirmLabel: texts.common.deletePermanently,
+  }
 }
 
 function TrashRow({
@@ -420,12 +363,7 @@ function TrashRow({
       <TableCell className="max-w-80">
         <div className="flex items-center gap-2">
           <Icon aria-hidden className="size-4 shrink-0 text-muted-foreground" />
-          <Tooltip>
-            <TooltipTrigger render={<span className="truncate font-medium" />}>
-              {name}
-            </TooltipTrigger>
-            <TooltipContent>{name}</TooltipContent>
-          </Tooltip>
+          <TruncatedText as="span" text={name} className="font-medium" />
         </div>
       </TableCell>
       <TableCell>{trashTypeLabel(item)}</TableCell>
@@ -479,7 +417,7 @@ function TrashRow({
             >
               <Eraser />
             </TooltipTrigger>
-            <TooltipContent>{texts.trash.erase}</TooltipContent>
+            <TooltipContent>{texts.common.deletePermanently}</TooltipContent>
           </Tooltip>
         </div>
       </TableCell>

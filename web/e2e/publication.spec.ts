@@ -66,7 +66,7 @@ async function newPage(page: Page, title: string) {
   await createBlankPage(page, title)
 }
 
-/** Éditeur du Fil : un bloc ajouté par les Blocs (« Ajouter un bloc » en bas à gauche). */
+/** Éditeur des contenus : un bloc ajouté par les Blocs (« Ajouter un bloc » en bas à gauche). */
 async function addBlock(page: Page, type: "text" | "image") {
   await page.locator("#colonne-gauche-ajouter").click()
   await page
@@ -206,9 +206,10 @@ async function scheduleInTwoDays(page: Page) {
     .getByRole("button", { name: labels.scheduleDialog.confirm })
     .click()
   await expect(dialog).toHaveCount(0)
-  await expect(
-    page.locator('[data-schedule-banner="scheduled"]')
-  ).toContainText("à 08h00 : ce que tu écris partira")
+  // L'heure choisie, puis la suite du bandeau (après la date).
+  const banner = page.locator('[data-schedule-banner="scheduled"]')
+  await expect(banner).toContainText("08h00")
+  await expect(banner).toContainText(labels.banner.scheduled("|").split("|")[1])
 }
 
 test("publier une page, la modifier sans toucher à l'app, republier, revenir à une version", async ({

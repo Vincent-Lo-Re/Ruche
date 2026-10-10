@@ -11,6 +11,7 @@ import {
   useUploadQueueWatch,
 } from "@/components/media/use-upload-queue"
 import { SearchInput } from "@/components/search-input"
+import { HiddenFileInput } from "@/components/file-input"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -31,7 +32,7 @@ import {
 } from "@/components/ui/item"
 import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useDebouncedValue } from "@/hooks/use-debounced-value"
+import { SEARCH_DELAY_MS, useDebouncedValue } from "@/hooks/use-debounced-value"
 import { listMedia, mediaKeys, type MediaFilters } from "@/lib/media/api"
 import type { Media } from "@/lib/media/constants"
 import { formatDuration, formatPercent } from "@/lib/media/format"
@@ -115,7 +116,7 @@ function PickerBody({
 }) {
   const labels = pickerLabels[kind]
   const [search, setSearch] = useState("")
-  const debounced = useDebouncedValue(search, 250)
+  const debounced = useDebouncedValue(search, SEARCH_DELAY_MS)
   const filters: MediaFilters = { kind, search: debounced, unused: false }
   const media = useQuery({
     queryKey: mediaKeys.list(filters),
@@ -285,17 +286,12 @@ function PickerUpload({
 
   return (
     <>
-      <input
+      <HiddenFileInput
         ref={input}
-        type="file"
         accept={kind === "audio" ? acceptByKind.audio : acceptedImages}
-        className="sr-only"
         tabIndex={-1}
         aria-label={labels.uploadInput}
-        onChange={(event) => {
-          onFiles(event.target.files)
-          event.target.value = ""
-        }}
+        onFiles={onFiles}
       />
       <Button
         variant="outline"

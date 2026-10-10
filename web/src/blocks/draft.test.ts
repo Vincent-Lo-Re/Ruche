@@ -4,6 +4,7 @@ import { validateDraft } from "@/blocks/generated/validators"
 import {
   canShift,
   DRAFT_MAX_BYTES,
+  draftToPlainText,
   findBlock,
   prepareDraft,
   readingStats,
@@ -196,6 +197,34 @@ describe("readingStats", () => {
   })
 })
 
+describe("draftToPlainText (« Copier mon texte »)", () => {
+  it("rend le titre, les textes et les légendes des images", () => {
+    const draft = draftWith([
+      {
+        id: TEXT_ID,
+        type: "image",
+        mediaId: BOX_ID,
+        alt: "",
+        caption: "  Une légende  ",
+      } as Block,
+      {
+        id: INNER_ID,
+        type: "text",
+        doc: {
+          type: "doc",
+          content: [
+            {
+              type: "paragraph",
+              content: [{ type: "text", text: "Un texte" }],
+            },
+          ],
+        } as unknown as Doc,
+      },
+    ])
+    expect(draftToPlainText(draft)).toBe("Page\n\nUne légende\n\nUn texte")
+  })
+})
+
 describe("Monter et Descendre", () => {
   const OTHER_ID = "00000000-0000-4000-8000-000000000004"
   const text = (id: string): TextBlock => ({
@@ -215,7 +244,7 @@ describe("Monter et Descendre", () => {
     ])
   const ids = (blocks: Block[]) => blocks.map((block) => block.id)
 
-  it("le premier bloc d'une section qu'on monte en sort, juste au-dessus d'elle", () => {
+  it("le premier bloc d'un encadré qu'on monte en sort, juste au-dessus de lui", () => {
     const next = shiftBlock(draft(), INNER_ID, -1)!
     expect(ids(next.blocks)).toEqual([TEXT_ID, INNER_ID, BOX_ID])
     expect(findBlock(next, OTHER_ID)?.container).toBe(BOX_ID)
@@ -226,7 +255,7 @@ describe("Monter et Descendre", () => {
     expect(ids(next.blocks)).toEqual([TEXT_ID, BOX_ID, OTHER_ID])
   })
 
-  it("dans la section, il change seulement de place", () => {
+  it("dans l'encadré, il change seulement de place", () => {
     const next = shiftBlock(draft(), INNER_ID, 1)!
     const box = next.blocks[1] as Block & { type: "box" }
     expect(ids(box.blocks)).toEqual([OTHER_ID, INNER_ID])
@@ -234,7 +263,7 @@ describe("Monter et Descendre", () => {
     expect(shiftLeavesBox(findBlock(draft(), INNER_ID)!, -1)).toBe(true)
   })
 
-  it("rien au bout de la page, ni hors d'une section quand la page est pleine (bloc partagé)", () => {
+  it("rien au bout de la page, ni hors d'un encadré quand la page est pleine (bloc partagé)", () => {
     expect(canShift(draft(), TEXT_ID, -1)).toBe(false)
     expect(canShift(draft(), BOX_ID, 1)).toBe(false)
     expect(canShift(draft(), INNER_ID, -1)).toBe(true)

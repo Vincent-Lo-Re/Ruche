@@ -62,7 +62,7 @@ export function useSaveAsTemplate({
       void queryClient.invalidateQueries({ queryKey: templateKeys.all })
       const name = created.title.trim() || texts.templates.list.untitled
       const open = {
-        label: words.open,
+        label: texts.common.open,
         onClick: () => void navigate(editorPath("templates", created.id)),
       }
       if (values.sort === "shared" && saved.length === 1 && editable) {

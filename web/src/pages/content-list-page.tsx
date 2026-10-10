@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
-  Ellipsis,
   FilePlus2,
   Plus,
   FileText,
@@ -9,7 +8,6 @@ import {
   Settings2,
   SquarePen,
   Eraser,
-  TriangleAlert,
   ArrowDownToLine,
   ArrowUpToLine,
 } from "lucide-react"
@@ -18,6 +16,7 @@ import { Link, useNavigate } from "react-router"
 
 import { toast } from "sonner"
 
+import { announceRestore } from "@/components/contents/announce-restore"
 import {
   BulkTrashButton,
   KeptNotice,
@@ -40,22 +39,19 @@ import { SortableRow } from "@/components/contents/sortable-rows"
 import { useCovers } from "@/components/contents/use-covers"
 import { LiveBadge, ScheduleBadge } from "@/components/editor/publication"
 import { SortableList } from "@/components/list-sorting"
-import { LoadState } from "@/components/load-state"
+import { LoadState, RefreshFailed } from "@/components/load-state"
 import { PageHeader } from "@/components/page-header"
 import { SearchInput } from "@/components/search-input"
 import { useAccessCheck } from "@/components/team/use-access-check"
-import { TrashDialog } from "@/components/trash-dialog"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { TrashDialog } from "@/components/confirm-dialog"
+import { RowActionsMenu } from "@/components/row-actions-menu"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Spinner } from "@/components/ui/spinner"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
   Select,
@@ -109,7 +105,7 @@ import { restoreContent, trashContent } from "@/lib/contents/publication"
 import { createWithSettings } from "@/lib/contents/settings"
 import { contentProfile } from "@/lib/editor/profile"
 import { useCategories } from "@/hooks/use-categories"
-import { useDebouncedValue } from "@/hooks/use-debounced-value"
+import { SEARCH_DELAY_MS, useDebouncedValue } from "@/hooks/use-debounced-value"
 import { usePagination } from "@/hooks/use-pagination"
 import { errorMessage } from "@/lib/errors"
 import { kickFiles } from "@/lib/media/api"
@@ -168,7 +164,7 @@ export function ContentListPage({
     listFiltersFromAddress,
     writeListFilters
   )
-  const search = useDebouncedValue(filters.search, 150)
+  const search = useDebouncedValue(filters.search, SEARCH_DELAY_MS)
 
   const known = useMemo(
     () =>
@@ -208,7 +204,7 @@ export function ContentListPage({
   // et listé.
   const bulk = useContentsSelection({
     shown: paged.items,
-    words: { ...kindLabels, undo: labels.undo },
+    words: kindLabels,
     nameOf: (item) => displayTitle(item.title),
   })
   const { selection } = bulk
@@ -223,12 +219,9 @@ export function ContentListPage({
   const undo = async (item: ContentListItem) => {
     const name = displayTitle(item.title)
     try {
-      const { addressRemoved, renamedTo } = await restoreContent(item.id)
-      if (renamedTo !== null)
-        toast.warning(texts.trash.restoredRenamed(name, renamedTo))
-      if (addressRemoved)
-        toast.warning(texts.trash.restoredWithoutAddress(name))
-      else if (renamedTo === null) toast.success(kindLabels.restored(name))
+      announceRestore(name, await restoreContent(item.id), {
+        success: kindLabels.restored(name),
+      })
     } catch (error) {
       toast.error(errorMessage(error))
     } finally {
@@ -242,7 +235,7 @@ export function ContentListPage({
       setToTrash(null)
       bulk.toggle(item, false)
       toast.success(labels.trashed(displayTitle(item.title)), {
-        action: { label: labels.undo, onClick: () => void undo(item) },
+        action: { label: texts.common.undo, onClick: () => void undo(item) },
       })
       // Ses fichiers redeviennent peut-être protégés : tout de suite.
       if (result.needsFileSync) void kickFiles()
@@ -342,12 +335,7 @@ export function ContentListPage({
       </ListCard>
     ) : (
       <div className="space-y-4">
-        {list.isError && (
-          <Alert variant="destructive">
-            <TriangleAlert />
-            <AlertDescription>{labels.refreshFailed}</AlertDescription>
-          </Alert>
-        )}
+        <RefreshFailed query={list} text={labels.refreshFailed} />
         <KeptNotice
           kept={bulk.kept}
           nameOf={(item) => displayTitle(item.title)}
@@ -879,42 +867,33 @@ function RowActions({
 }) {
   const navigate = useNavigate()
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        disabled={disabled}
-        aria-label={labels.actions(title)}
-        render={<Button variant="ghost" size="icon-sm" />}
-      >
-        <Ellipsis />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-44">
-        <DropdownMenuItem onClick={() => void navigate(editPath)}>
-          <SquarePen />
-          {labels.open}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={onSettings}>
-          <Settings2 />
-          {labels.settings.action}
-        </DropdownMenuItem>
-        {onMove && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => onMove("top")}>
-              <ArrowUpToLine />
-              {labels.order.moveTop}
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onMove("bottom")}>
-              <ArrowDownToLine />
-              {labels.order.moveBottom}
-            </DropdownMenuItem>
-          </>
-        )}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" onClick={onTrash}>
-          <Eraser />
-          {labels.trash}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <RowActionsMenu label={labels.actions(title)} disabled={disabled}>
+      <DropdownMenuItem onClick={() => void navigate(editPath)}>
+        <SquarePen />
+        {texts.common.open}
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={onSettings}>
+        <Settings2 />
+        {labels.settings.action}
+      </DropdownMenuItem>
+      {onMove && (
+        <>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => onMove("top")}>
+            <ArrowUpToLine />
+            {labels.order.moveTop}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onMove("bottom")}>
+            <ArrowDownToLine />
+            {labels.order.moveBottom}
+          </DropdownMenuItem>
+        </>
+      )}
+      <DropdownMenuSeparator />
+      <DropdownMenuItem variant="destructive" onClick={onTrash}>
+        <Eraser />
+        {labels.trash}
+      </DropdownMenuItem>
+    </RowActionsMenu>
   )
 }

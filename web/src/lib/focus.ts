@@ -30,27 +30,38 @@ export function focusSoon(
 /**
  * Montre une zone à régler dès qu'elle existe : elle vient sous les yeux, et sa bordure s'allume
  * deux fois (index.css, [data-highlight]). Un second appel relance l'animation. Réessaie à
- * chaque image, pendant FOCUS_PATIENCE_MS au plus (le temps qu'un onglet s'ouvre).
+ * chaque image, pendant FOCUS_PATIENCE_MS au plus (le temps qu'un onglet s'ouvre). attribute :
+ * l'attribut qui allume (data-returned pour la ligne d'une liste où l'on revient) ; smooth :
+ * faux pour y aller sans défiler en douceur.
  */
 export function highlightSoon(
   find: () => HTMLElement | null,
-  until = performance.now() + FOCUS_PATIENCE_MS
+  {
+    attribute = "data-highlight",
+    smooth = true,
+    until = performance.now() + FOCUS_PATIENCE_MS,
+  }: { attribute?: string; smooth?: boolean; until?: number } = {}
 ) {
   const element = find()
   if (!element) {
     if (performance.now() < until) {
-      requestAnimationFrame(() => highlightSoon(find, until))
+      requestAnimationFrame(() =>
+        highlightSoon(find, { attribute, smooth, until })
+      )
     }
     return
   }
-  element.scrollIntoView({ block: "nearest", behavior: "smooth" })
-  element.removeAttribute("data-highlight")
+  element.scrollIntoView({
+    block: "nearest",
+    behavior: smooth ? "smooth" : "auto",
+  })
+  element.removeAttribute(attribute)
   // Lire une mesure fait repartir l'animation de zéro.
   void element.offsetWidth
-  element.setAttribute("data-highlight", "")
+  element.setAttribute(attribute, "")
   element.addEventListener(
     "animationend",
-    () => element.removeAttribute("data-highlight"),
+    () => element.removeAttribute(attribute),
     { once: true }
   )
 }

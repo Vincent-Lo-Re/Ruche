@@ -1,3 +1,5 @@
+import { readStored, writeStored } from "@/lib/stored-choice"
+
 // Le fuseau horaire de l'admin (Paramètres › Avancé), choisi une fois au chargement comme la
 // langue : les dates s'affichent à son heure, et l'heure d'une publication programmée s'y comprend.
 // Il est gardé sur ce navigateur pour être connu dès le chargement ; s'il change, la page se
@@ -18,25 +20,14 @@ export function isTimeZone(value: unknown): value is string {
   }
 }
 
-function read(): string | null {
-  try {
-    const stored = localStorage.getItem(KEY)
-    return isTimeZone(stored) ? stored : null
-  } catch {
-    // Stockage indisponible.
-    return null
-  }
-}
-
-export const timeZone: string = read() ?? DEFAULT_TIME_ZONE
+const stored = readStored(KEY)
+export const timeZone: string =
+  stored !== null && isTimeZone(stored) ? stored : DEFAULT_TIME_ZONE
 
 /** Le fuseau de toute l'admin, gardé sur ce navigateur ; la page se recharge s'il a changé. */
 export function applyAdminTimeZone(next: string): void {
-  try {
-    localStorage.setItem(KEY, next)
-  } catch {
-    // Le fuseau vaut pour cette visite ; il reste enregistré dans la base.
-  }
+  // Sans stockage, le fuseau vaut pour cette visite ; il reste enregistré dans la base.
+  writeStored(KEY, next)
   if (next !== timeZone) window.location.reload()
 }
 

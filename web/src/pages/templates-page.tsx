@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
-  Ellipsis,
   Layers,
   LayoutTemplate,
   type LucideIcon,
@@ -14,6 +13,7 @@ import { useEffect, useMemo, useState } from "react"
 import { Link, useNavigate } from "react-router"
 import { toast } from "sonner"
 
+import { announceRestore } from "@/components/contents/announce-restore"
 import {
   BulkTrashButton,
   KeptNotice,
@@ -23,15 +23,16 @@ import {
 import { ListCard, ListEmpty } from "@/components/list-card"
 import { SavedCell } from "@/components/contents/row-cells"
 import { useContentsSelection } from "@/components/contents/use-contents-selection"
-import { LoadState } from "@/components/load-state"
+import { LoadState, RefreshFailed } from "@/components/load-state"
 import { PageHeader } from "@/components/page-header"
 import { useAccessCheck } from "@/components/team/use-access-check"
 import { TemplateDialog } from "@/components/templates/template-dialog"
 import { templateSortIcons } from "@/components/templates/sort-icons"
 import { TemplateStatus } from "@/components/templates/template-uses"
 import { UsesList } from "@/components/templates/uses-list"
-import { TrashDialog } from "@/components/trash-dialog"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { TrashDialog } from "@/components/confirm-dialog"
+import { RowActionsMenu } from "@/components/row-actions-menu"
+import { Alert, AlertTitle } from "@/components/ui/alert"
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -45,11 +46,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Spinner } from "@/components/ui/spinner"
 import {
@@ -68,7 +66,6 @@ import { restoreContent, trashContent } from "@/lib/contents/publication"
 import {
   createTemplate,
   detachTemplateEverywhere,
-  listTemplateUses,
   templateKeys,
   templateSorts,
   type NewTemplate,
@@ -77,7 +74,11 @@ import {
 } from "@/lib/contents/templates"
 import { errorMessage } from "@/lib/errors"
 import { kickFiles } from "@/lib/media/api"
-import { templateListRead, templateUsageRead } from "@/lib/reads"
+import {
+  templateListRead,
+  templateUsageRead,
+  templateUsesRead,
+} from "@/lib/reads"
 import { refreshAfterContentTrash } from "@/lib/refresh"
 import { editorPath, sections } from "@/navigation"
 import { ListPagination } from "@/components/list-pagination"
@@ -205,12 +206,7 @@ export function TemplatesPage() {
         />
       ) : (
         <div className="space-y-4">
-          {list.isError && (
-            <Alert variant="destructive">
-              <TriangleAlert />
-              <AlertDescription>{labels.refreshFailed}</AlertDescription>
-            </Alert>
-          )}
+          <RefreshFailed query={list} text={labels.refreshFailed} />
           <KeptNotice
             kept={bulk.kept}
             nameOf={nameOf}
@@ -427,27 +423,19 @@ function RowActions({
 }) {
   const navigate = useNavigate()
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        aria-label={labels.actions(nameOf(item))}
-        render={<Button variant="ghost" size="icon-sm" />}
+    <RowActionsMenu label={labels.actions(nameOf(item))}>
+      <DropdownMenuItem
+        onClick={() => void navigate(editorPath("templates", item.id))}
       >
-        <Ellipsis />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-44">
-        <DropdownMenuItem
-          onClick={() => void navigate(editorPath("templates", item.id))}
-        >
-          <SquarePen />
-          {labels.open}
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" onClick={onTrash}>
-          <Eraser />
-          {labels.trash}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        <SquarePen />
+        {texts.common.open}
+      </DropdownMenuItem>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem variant="destructive" onClick={onTrash}>
+        <Eraser />
+        {labels.trash}
+      </DropdownMenuItem>
+    </RowActionsMenu>
   )
 }
 
@@ -468,8 +456,7 @@ function TrashTemplateDialog({
   const shared = template.sort === "shared"
 
   const uses = useQuery({
-    queryKey: templateKeys.usesOf(template.id),
-    queryFn: () => listTemplateUses([template.id]),
+    ...templateUsesRead(template.id),
     enabled: shared,
     // Toujours relue à l'ouverture : un brouillon a pu l'insérer entre-temps.
     staleTime: 0,
@@ -480,10 +467,9 @@ function TrashTemplateDialog({
 
   const undo = async () => {
     try {
-      const { renamedTo } = await restoreContent(template.id)
-      if (renamedTo !== null)
-        toast.warning(texts.trash.restoredRenamed(name, renamedTo))
-      else toast.success(labels.restored(name))
+      announceRestore(name, await restoreContent(template.id), {
+        success: labels.restored(name),
+      })
     } catch (error) {
       toast.error(errorMessage(error))
     } finally {
@@ -517,7 +503,7 @@ function TrashTemplateDialog({
     onSuccess: (result) => {
       onClose()
       toast.success(labels.trashed(name), {
-        action: { label: labels.undo, onClick: () => void undo() },
+        action: { label: texts.common.undo, onClick: () => void undo() },
       })
       if (result.needsFileSync) void kickFiles()
     },

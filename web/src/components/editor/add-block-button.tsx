@@ -5,7 +5,7 @@ import type { ComponentProps, MouseEventHandler } from "react"
 import { Button } from "@/components/ui/button"
 
 /**
- * Éditeur des contenus : « Ajouter un bloc » (ou « Ajouter dans la section »), en pointillés, à la
+ * Éditeur des contenus : « Ajouter un bloc » (ou « Ajouter dans l'encadré »), en pointillés, à la
  * largeur de ce qui l'entoure : dans le téléphone, le plan vide et le bas de la colonne de gauche.
  * Il ouvre les Blocs (ADMIN § 4).
  */

@@ -1,20 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Save } from "lucide-react"
+import { useQuery } from "@tanstack/react-query"
 import { Controller, useForm, useWatch } from "react-hook-form"
-import { toast } from "sonner"
 
 import { LoadState } from "@/components/load-state"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { SaveFooter } from "@/components/settings/save-footer"
+import { Card, CardContent } from "@/components/ui/card"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Spinner } from "@/components/ui/spinner"
-import {
-  adminBrandKey,
-  brandInitial,
-  saveBrandDetails,
-} from "@/lib/admin-identity"
+import { useBrandMutation } from "@/hooks/use-brand-name"
+import { brandInitial, saveBrandDetails } from "@/lib/admin-identity"
 import { adminBrandRead } from "@/lib/reads"
 import { adminNameSchema } from "@/lib/schemas"
 import { texts } from "@/texts"
@@ -57,7 +51,6 @@ function BrandDetailsForm({
   contactEmail: string | null
   websiteUrl: string | null
 }) {
-  const queryClient = useQueryClient()
   const form = useForm({
     resolver: zodResolver(adminNameSchema),
     defaultValues: {
@@ -68,7 +61,7 @@ function BrandDetailsForm({
     },
   })
 
-  const save = useMutation({
+  const save = useBrandMutation({
     // Vides : la base garde null (le nom à défaut, pas d'adresse, pas de lien).
     mutationFn: (values: {
       name: string
@@ -82,12 +75,8 @@ function BrandDetailsForm({
         contactEmail: values.contactEmail || null,
         websiteUrl: values.websiteUrl || null,
       }),
-    onSuccess: async (_, values) => {
-      form.reset(values)
-      await queryClient.invalidateQueries({ queryKey: adminBrandKey })
-      toast.success(labels.saved)
-    },
-    onError: () => toast.error(texts.common.unexpected),
+    saved: labels.saved,
+    onSaved: (values) => form.reset(values),
   })
 
   const onSubmit = form.handleSubmit((values) => save.mutate(values))
@@ -172,17 +161,7 @@ function BrandDetailsForm({
             )}
           />
         </CardContent>
-        {/* « Enregistrer » à droite dans le pied gris ; sur toute la largeur dans une carte étroite. */}
-        <CardFooter>
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={save.isPending || !form.formState.isDirty}
-          >
-            {save.isPending ? <Spinner /> : <Save aria-hidden />}
-            {labels.save}
-          </Button>
-        </CardFooter>
+        <SaveFooter pending={save.isPending} dirty={form.formState.isDirty} />
       </Card>
     </form>
   )

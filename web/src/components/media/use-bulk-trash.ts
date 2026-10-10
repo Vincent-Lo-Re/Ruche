@@ -1,11 +1,8 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
+import { useQueryClient } from "@tanstack/react-query"
 
-import { useAccessCheck } from "@/components/team/use-access-check"
-import { errorMessage } from "@/lib/errors"
-import { restoreMany, trashMany, type BulkTrashResult } from "@/lib/bulk-trash"
+import { useTrashMany } from "@/hooks/use-trash-many"
+import type { BulkTrashResult } from "@/lib/bulk-trash"
 import {
-  kickFiles,
   mediaKeys,
   restoreMedia,
   trashKey,
@@ -17,48 +14,25 @@ import { texts } from "@/texts"
 
 /**
  * Mise à la corbeille des fichiers cochés, avec « Annuler » dans le message (comme depuis la
- * fiche d'un fichier). onDone reçoit ce qui est parti, ce qui est gardé, et l'erreur éventuelle.
+ * fiche d'un fichier) ; un fichier encore utilisé est gardé. onDone reçoit ce qui est parti, ce
+ * qui est gardé, et l'erreur éventuelle.
  */
 export function useBulkTrash(onDone: (result: BulkTrashResult<Media>) => void) {
   const queryClient = useQueryClient()
-  const checkAccess = useAccessCheck()
-
-  const refresh = () =>
-    Promise.all([
-      queryClient.invalidateQueries({ queryKey: mediaKeys.all }),
-      queryClient.invalidateQueries({ queryKey: trashKey }),
-    ])
-
-  const undo = async (ids: string[]) => {
-    const { restored, error } = await restoreMany(ids, restoreMedia)
-    if (restored.length > 0)
-      toast.success(texts.media.selection.restored(restored.length))
-    if (error) toast.error(errorMessage(error))
-    await refresh()
-  }
-
-  return useMutation({
-    mutationFn: (items: Media[]) =>
-      trashMany(items, trashMedia, usedFileDetail),
-    onSuccess: (result) => {
-      if (result.trashed.length > 0) {
-        const ids = result.trashed.map((media) => media.id)
-        toast.success(texts.media.selection.trashed(ids.length), {
-          action: {
-            label: texts.media.detail.undo,
-            onClick: () => void undo(ids),
-          },
-        })
-        // La corbeille rend les fichiers protégés tout de suite (fonction « files »).
-        void kickFiles()
-      }
-      if (result.error) {
-        toast.error(errorMessage(result.error))
-        checkAccess(result.error)
-      }
-      onDone(result)
+  return useTrashMany({
+    trash: trashMedia,
+    keptDetail: usedFileDetail,
+    restore: restoreMedia,
+    refresh: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: mediaKeys.all }),
+        queryClient.invalidateQueries({ queryKey: trashKey }),
+      ]),
+    words: texts.media.selection,
+    // La corbeille rend les fichiers protégés tout de suite (fonction « files »).
+    needsFileSync: () => true,
+    onDone: (result: BulkTrashResult<Media> | null) => {
+      if (result) onDone(result)
     },
-    onError: (error) => toast.error(errorMessage(error)),
-    onSettled: refresh,
   })
 }

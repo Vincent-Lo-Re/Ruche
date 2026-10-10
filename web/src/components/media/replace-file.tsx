@@ -10,6 +10,7 @@ import {
 } from "@/components/media/use-upload-queue"
 import { PanelCard } from "@/components/panel-card"
 import { useAccessCheck } from "@/components/team/use-access-check"
+import { HiddenFileInput } from "@/components/file-input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
@@ -156,17 +157,12 @@ export function ReplaceFile({
     <PanelCard id="media-replace" icon={Replace} title={labels.title}>
       <div className="space-y-3" data-replace-file>
         <p className="text-sm text-muted-foreground">{labels.description}</p>
-        <input
+        <HiddenFileInput
           ref={input}
-          type="file"
           accept={acceptByKind[media.kind]}
-          className="sr-only"
           tabIndex={-1}
           aria-label={labels.input}
-          onChange={(event) => {
-            choose(event.target.files?.[0])
-            event.target.value = ""
-          }}
+          onFiles={(files) => choose(files?.[0])}
         />
         {replacedCount === null && (
           <Button

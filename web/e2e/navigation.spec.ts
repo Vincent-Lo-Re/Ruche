@@ -18,7 +18,7 @@ import {
 
 const sections = texts.sections
 
-/** Ouvre une section par le menu (en haut, ou en bas pour Équipe et Paramètres). */
+/** Ouvre une section par le menu de gauche, ou par le header pour La team et Paramètres. */
 async function menu(page: Page, title: string) {
   await page.getByRole("link", { name: title, exact: true }).first().click()
   await expect(
@@ -26,7 +26,7 @@ async function menu(page: Page, title: string) {
   ).toBeVisible()
 }
 
-/** Revient d'un éditeur à sa liste (« ← Le Fil »). */
+/** Revient d'un éditeur à sa liste (« Retour à Blog »). */
 async function back(page: Page, section: string) {
   await page.getByRole("link", { name: texts.editor.back(section) }).click()
   await expect(

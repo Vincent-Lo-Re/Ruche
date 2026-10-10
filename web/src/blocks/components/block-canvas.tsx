@@ -112,7 +112,7 @@ const LinkedBlockView = memo(function LinkedBlockView({
   )
 })
 
-/** Une section : ses blocs (Texte et Image), et « Ajouter dans la section », qui ouvre les Blocs. */
+/** Un encadré : ses blocs (Texte et Image), et « Ajouter dans l'encadré », qui ouvre les Blocs. */
 const BoxBlockView = memo(function BoxBlockView({
   block,
 }: {

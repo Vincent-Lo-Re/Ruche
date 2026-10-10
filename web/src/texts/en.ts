@@ -20,6 +20,13 @@ export const en = {
 
   // Les mots de l'interface qui ne dépendent pas de la page : une seule fois ici.
   common: {
+    // En bas du menu et sous la carte des pages de connexion, au nom de la marque (« Ruche »
+    // sans nom enregistré).
+    copyright: (year: number, brand: string) =>
+      `© ${year} ${brand}. All rights reserved.`,
+    // Ce que les lecteurs d'écran annoncent d'un carrousel (components/ui/carousel.tsx).
+    carousel: "carousel",
+    slide: "slide",
     // La pagination des listes (lib/pagination.ts).
     pagination: {
       label: "Pages",
@@ -33,6 +40,9 @@ export const en = {
     cancel: "Cancel",
     retry: "Try again",
     save: "Save",
+    undo: "Undo",
+    open: "Open",
+    deletePermanently: "Delete permanently",
     untitled: "Untitled",
     actions: "Actions",
     clearSearch: "Clear search",
@@ -108,9 +118,6 @@ export const en = {
     },
     // La barre du haut, pendant que la page suivante se prépare.
     pageLoading: "Loading page",
-    // En bas du menu : le copyright au nom de la marque (« Ruche » sans nom enregistré).
-    copyright: (year: number, brand: string) =>
-      `© ${year} ${brand}. All rights reserved.`,
   },
 
   // Titre et présentation de chaque section, dans le menu et en tête de page.
@@ -180,9 +187,6 @@ export const en = {
   },
 
   // Connexion : e-mail, puis code reçu par e-mail, puis double vérification.
-  // Sous la carte des pages de connexion : « © 2026 Ruche · Tous droits réservés ».
-  copyright: (year: number, brand: string) =>
-    `© ${year} ${brand} · All rights reserved`,
   signIn: {
     title: "Sign in",
     // En bas de l'étape de l'adresse (AuthNote).
@@ -278,10 +282,10 @@ export const en = {
         "Your name is how your team knows you, in the team list and the version history.",
       name: "Name",
       namePlaceholder: "First and last name",
-      nameTooLong: "The name can't be longer than 100 characters.",
+      nameTooLong: (max: string) =>
+        `The name can't be longer than ${max} characters.`,
       saved: "Name saved.",
       email: "Email address",
-      role: "Role",
       // Lu par les lecteurs d'écran devant le rôle.
       rolePrefix: "Role: ",
     },
@@ -358,7 +362,8 @@ export const en = {
     invalidEmail: "Enter a valid email address.",
     name: "Name (optional)",
     namePlaceholder: "First and last name",
-    nameTooLong: "The name can't be longer than 100 characters.",
+    nameTooLong: (max: string) =>
+      `The name can't be longer than ${max} characters.`,
     role: "Role",
     sendInvitation: "Send invitation",
     invited: (email: string) => `Invitation sent to ${email}.`,
@@ -707,16 +712,18 @@ export const en = {
       lottieFailed: "Couldn't load the animation preview.",
       name: "Name",
       nameRequired: "Give the file a name.",
-      nameTooLong: "The name can't be longer than 255 characters.",
+      nameTooLong: (max: string) =>
+        `The name can't be longer than ${max} characters.`,
       alt: "Alt text",
       altHint:
         "Describe the image in one sentence for people who can't see it. Leave it blank if it's purely decorative.",
-      altTooLong: "Alt text can't be longer than 1,000 characters.",
+      altTooLong: (max: string) =>
+        `Alt text can't be longer than ${max} characters.`,
       transcript: "Transcript",
       transcriptHint:
         "A text version of the audio for people who can't listen to it.",
-      transcriptTooLong:
-        "The transcript can't be longer than 200,000 characters.",
+      transcriptTooLong: (max: string) =>
+        `The transcript can't be longer than ${max} characters.`,
       saved: "File details saved.",
       // La carte du nom et du texte alternatif (ou de la transcription).
       description: "Description",
@@ -766,7 +773,6 @@ export const en = {
       },
       trash: "Move to Trash",
       trashed: "File moved to the Trash.",
-      undo: "Undo",
       restored: "File restored.",
       used: "This file is still in use. Remove it from your content first. Content in the Trash still counts until it's permanently deleted.",
     },
@@ -815,6 +821,8 @@ export const en = {
     itemTypes: {
       file: "File",
     },
+    // Un fichier et sa sorte : « File · Image ».
+    fileOfKind: (kind: string) => `File · ${kind}`,
     // Sorte d'un contenu dans la corbeille.
     contentKinds: {
       article: "Post",
@@ -832,7 +840,6 @@ export const en = {
         count === 1
           ? "The selected item will be permanently deleted. This can't be undone."
           : `The ${count} selected items will be permanently deleted. This can't be undone.`,
-      confirm: "Delete permanently",
     },
     // Seules les pages ont une adresse.
     restoredWithoutAddress: (name: string) =>
@@ -841,7 +848,6 @@ export const en = {
     restoredRenamed: (name: string, title: string) =>
       `“${name}” was restored as “${title}” because its title was taken in the meantime.`,
     restoredDraft: "Restored as a draft. Nothing is put back in the app.",
-    open: "Open",
     columns: {
       name: "Name",
       type: "Type",
@@ -857,7 +863,6 @@ export const en = {
     // Sans accord : l'élément peut être un fichier, une page, un article…
     restored: (name: string) => `“${name}” restored.`,
     eraseItem: (name: string) => `Delete ${name} permanently`,
-    erase: "Delete permanently",
     empty: "Empty Trash",
     emptied: (count: number) =>
       count === 0
@@ -875,7 +880,6 @@ export const en = {
       title: "Delete permanently?",
       description: (name: string) =>
         `“${name}” will be permanently deleted. This can't be undone.`,
-      confirm: "Delete permanently",
     },
     emptyState: {
       title: "The Trash is empty",
@@ -1043,13 +1047,11 @@ export const en = {
         : `${shown} of ${total}`,
     noCategory: "Uncategorized",
     actions: (title: string) => `Actions for ${title}`,
-    open: "Open",
     trash: "Move to Trash",
     confirmTrash: {
       confirm: "Move to Trash",
     },
     trashed: (title: string) => `“${title}” moved to the Trash.`,
-    undo: "Undo",
     // Fenêtre « Nouvel article » (…) : le titre, un point de départ, les réglages ([D42]).
     newContent: {
       description:
@@ -1095,7 +1097,6 @@ export const en = {
     // « Réglages » dans le menu d'une ligne : les mêmes réglages que dans l'éditeur.
     settings: {
       action: "Settings",
-      save: "Save",
       saved: (title: string) => `Settings saved for “${title}”.`,
       unchanged: "No changes to save.",
       checking: "Checking if someone is editing…",
@@ -1213,14 +1214,13 @@ export const en = {
       editTitle: "Edit category",
       description:
         "New categories are added at the bottom of the list. Drag them into place.",
-      save: "Save",
     },
     name: "Name",
     // Le champ pour en créer une au passage (fenêtre d'un nouveau contenu, réglages).
-    add: "Add",
     namePlaceholder: "e.g. Sleep",
     nameRequired: "Give the category a name.",
-    nameTooLong: "The name can't be longer than 100 characters.",
+    nameTooLong: (max: string) =>
+      `The name can't be longer than ${max} characters.`,
     added: (name: string) => `Category “${name}” added.`,
     renamed: "Category saved.",
     edit: "Edit",
@@ -1379,7 +1379,6 @@ export const en = {
       emptySort: "No templates of this type yet",
       usesLoading: "Checking which drafts use it…",
       actions: (name: string) => `Actions for ${name}`,
-      open: "Open",
       trash: "Move to Trash",
       loadFailed: "Couldn't load the templates.",
       refreshFailed:
@@ -1392,7 +1391,6 @@ export const en = {
         confirm: "Move to Trash",
       },
       trashed: (name: string) => `“${name}” moved to the Trash.`,
-      undo: "Undo",
       restored: (name: string) => `“${name}” restored.`,
       // Sélection en masse.
       confirmTrashManyTitle: (count: number) =>
@@ -1437,7 +1435,8 @@ export const en = {
       nameTaken:
         "Another template already has this name. Choose a different one.",
       nameRequired: "Give the template a name.",
-      nameTooLong: "The name can't be longer than 200 characters.",
+      nameTooLong: (max: string) =>
+        `The name can't be longer than ${max} characters.`,
       sort: "Type",
       section: "Section",
       sectionPlaceholder: "Choose a section",
@@ -1535,7 +1534,6 @@ export const en = {
         "This block is now synced with the template: edits there will show up here too.",
       submit: "Save template",
       saved: (name: string) => `Template “${name}” saved.`,
-      open: "Open",
     },
   },
 
@@ -1576,7 +1574,7 @@ export const en = {
       label: "Add block",
       inBox: "Add to box",
     },
-    // Rien ne se dépose dans une section du téléphone (« Ajouter dans la section » est juste
+    // Rien ne se dépose dans un encadré du téléphone (« Ajouter dans l'encadré » est juste
     // dessous) ; ce que dit aussi le plan.
     emptyBox: "This box is empty and won't appear in the app.",
     handle: (label: string) => `Move ${label}`,
@@ -1637,7 +1635,6 @@ export const en = {
       bold: "Bold",
       italic: "Italic",
       link: "Link",
-      undo: "Undo",
       redo: "Redo",
     },
     link: {
@@ -1810,7 +1807,7 @@ export const en = {
       addLabel: (label: string) => `Add ${label} block`,
       // La glissière des Blocs, par-dessus le Plan (éditeur des contenus).
       close: "Close Blocks",
-      // La cible d'un ajout : « Ajouter dans la section ».
+      // La cible d'un ajout : « Ajouter dans l'encadré ».
       target: {
         box: "Adding to the box: text or images only",
         cancel: "Stop adding to the box",
@@ -1878,10 +1875,6 @@ export const en = {
           page: "Optional. It appears at the top of the page.",
         },
       },
-      categories: {
-        add: "Add",
-        addLabel: "Add a category",
-      },
       stats: {
         words: (count: string) =>
           count === "1" ? `${count} word` : `${count} words`,
@@ -1931,7 +1924,6 @@ export const en = {
       moveDownOut: "Move down out of the box",
       remove: "Delete block",
       removed: (label: string) => `Block deleted: ${label}.`,
-      undo: "Undo",
       // Annoncé après « Monter » ou « Descendre ».
       moved: (position: number, count: number, container: string) =>
         `Block ${position} of ${count}, in ${container}.`,
@@ -2104,7 +2096,6 @@ export const en = {
   // Publication (étape 5) : barre de publication, programmation, historique, réglages.
   publication: {
     status: {
-      label: "Publishing status",
       draft: "Draft",
       withdrawn: "Unpublished",
       live: "Published",
@@ -2321,7 +2312,8 @@ export const en = {
         placeholder: "e.g. legal-notice",
         invalid:
           "Use only lowercase letters (no accents), numbers, and single hyphens, with no hyphen at the start or end.",
-        tooLong: "The URL can't be longer than 100 characters.",
+        tooLong: (max: string) =>
+          `The URL can't be longer than ${max} characters.`,
         fromTitle: "Use title",
         live: (slug: string) => `Published version: ${slug}`,
         missing: "Choose a page URL before publishing.",
@@ -2361,11 +2353,11 @@ export const en = {
         "** Shown on the sign-in screen for anyone who needs help.",
       ],
       name: "Brand name",
-      save: "Save",
-      nameTooLong: "The name can't be longer than 40 characters.",
+      nameTooLong: (max: string) =>
+        `The name can't be longer than ${max} characters.`,
       // Les initiales, à la place d'un monogramme pas encore envoyé (onglet, connexion).
       initials: "Initials",
-      initialsTooLong: "Initials are 1 to 3 characters.",
+      initialsTooLong: (max: string) => `Initials are 1 to ${max} characters.`,
       // L'adresse de contact, montrée sur l'écran de connexion à qui a besoin d'aide.
       email: "Contact email",
       emailPlaceholder: "contact@example.com",
@@ -2530,7 +2522,7 @@ export const en = {
         title: "Section names",
         description: [
           "Rename the Blog and Podcasts in each admin language, for the whole team*. The page reloads after saving.",
-          "* In French, write three forms by hand: the name alone (menu, page titles), with its article (le Fil, la Gazette, l'Agenda, les Épisodes), and with “de” (du Fil, de la Gazette, de l'Agenda, des Épisodes), so every sentence reads right. Leave them empty to keep the original name.",
+          "* In French, write three forms by hand: the name alone (menu, page titles), with its article (le Journal, la Gazette, l'Agenda, les Épisodes), and with “de” (du Journal, de la Gazette, de l'Agenda, des Épisodes), so every sentence reads right. Leave them empty to keep the original name.",
         ],
         // Les noms d'origine, en tête de chaque bloc.
         sections: { blog: "Blog", podcasts: "Podcasts" },
@@ -2548,7 +2540,7 @@ export const en = {
         exampleDu: (du: string) => `Example: “Dans la liste ${du}”`,
         exampleEn: (name: string) => `Example: “In the ${name} list”`,
         incomplete: "Fill in all three French forms, or none.",
-        tooLong: "40 characters at most.",
+        tooLong: (max: string) => `${max} characters at most.`,
         saved: "Section names saved.",
       },
     },
@@ -2564,7 +2556,8 @@ export const en = {
       addDescription:
         "It's added at the bottom, as your top plan. Then drag it into place.",
       nameRequired: "Give the plan a name.",
-      nameTooLong: "The name can't be longer than 100 characters.",
+      nameTooLong: (max: string) =>
+        `The name can't be longer than ${max} characters.`,
       add: "Add",
       added: (name: string) => `Plan “${name}” added.`,
       rank: (position: number) => `#${position}`,

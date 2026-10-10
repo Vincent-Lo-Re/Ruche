@@ -7,7 +7,7 @@ const names = sectionNamesFor("fr")
 export const fiche: HelpFiche = {
   slug: "utiliser-la-corbeille",
   theme: "corbeille",
-  title: "Restaurer ou effacer depuis la corbeille",
+  title: "Restaurer ou effacer depuis la Corbeille",
   summary:
     "Tout ce qui est mis à la corbeille y reste 30 jours, le temps de le restaurer, puis il est effacé définitivement.",
   keywords: [

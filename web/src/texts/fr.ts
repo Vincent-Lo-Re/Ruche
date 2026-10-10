@@ -20,6 +20,13 @@ export const fr: Texts = {
 
   // Les mots de l'interface qui ne dépendent pas de la page : une seule fois ici.
   common: {
+    // En bas du menu et sous la carte des pages de connexion, au nom de la marque (« Ruche »
+    // sans nom enregistré).
+    copyright: (year: number, brand: string) =>
+      `© ${year} ${brand}. Tous droits réservés.`,
+    // Ce que les lecteurs d'écran annoncent d'un carrousel (components/ui/carousel.tsx).
+    carousel: "carrousel",
+    slide: "diapositive",
     // La pagination des listes (lib/pagination.ts).
     pagination: {
       label: "Pages",
@@ -33,6 +40,9 @@ export const fr: Texts = {
     cancel: "Annuler",
     retry: "Réessayer",
     save: "Enregistrer",
+    undo: "Annuler",
+    open: "Ouvrir",
+    deletePermanently: "Supprimer définitivement",
     untitled: "Sans titre",
     actions: "Actions",
     clearSearch: "Effacer la recherche",
@@ -108,9 +118,6 @@ export const fr: Texts = {
     },
     // La barre du haut, pendant que la page suivante se prépare.
     pageLoading: "Chargement de la page",
-    // En bas du menu : le copyright au nom de la marque (« Ruche » sans nom enregistré).
-    copyright: (year: number, brand: string) =>
-      `© ${year} ${brand}. Tous droits réservés.`,
   },
 
   // Titre et présentation de chaque section, dans le menu et en tête de page.
@@ -182,9 +189,6 @@ export const fr: Texts = {
   },
 
   // Connexion : e-mail, puis code reçu par e-mail, puis double vérification.
-  // Sous la carte des pages de connexion : « © 2026 Ruche · Tous droits réservés ».
-  copyright: (year: number, brand: string) =>
-    `© ${year} ${brand} · Tous droits réservés`,
   signIn: {
     title: "Connexion",
     // En bas de l'étape de l'adresse (AuthNote).
@@ -281,10 +285,10 @@ export const fr: Texts = {
         "Ton nom permet à l'équipe de te reconnaître, dans la liste de l'équipe et dans l'historique.",
       name: "Nom",
       namePlaceholder: "Prénom Nom",
-      nameTooLong: "Le nom ne doit pas dépasser 100 caractères.",
+      nameTooLong: (max: string) =>
+        `Le nom ne doit pas dépasser ${max} caractères.`,
       saved: "Nom enregistré.",
       email: "Adresse e-mail",
-      role: "Rôle",
       // Lu par les lecteurs d'écran devant le rôle.
       rolePrefix: "Rôle : ",
     },
@@ -362,7 +366,8 @@ export const fr: Texts = {
     invalidEmail: "Saisis une adresse e-mail valide.",
     name: "Nom (facultatif)",
     namePlaceholder: "Prénom Nom",
-    nameTooLong: "Le nom ne doit pas dépasser 100 caractères.",
+    nameTooLong: (max: string) =>
+      `Le nom ne doit pas dépasser ${max} caractères.`,
     role: "Rôle",
     sendInvitation: "Envoyer l'invitation",
     invited: (email: string) => `Invitation envoyée à ${email}.`,
@@ -721,15 +726,17 @@ export const fr: Texts = {
       lottieFailed: "L'aperçu de l'animation n'a pas pu s'afficher.",
       name: "Nom",
       nameRequired: "Donne un nom au fichier.",
-      nameTooLong: "Le nom ne doit pas dépasser 255 caractères.",
+      nameTooLong: (max: string) =>
+        `Le nom ne doit pas dépasser ${max} caractères.`,
       alt: "Texte alternatif",
       altHint:
         "Décris l'image en une phrase pour les personnes qui ne la voient pas. Laisse vide si elle est purement décorative.",
-      altTooLong: "Le texte alternatif ne doit pas dépasser 1 000 caractères.",
+      altTooLong: (max: string) =>
+        `Le texte alternatif ne doit pas dépasser ${max} caractères.`,
       transcript: "Transcription",
       transcriptHint: "Le texte de l'audio, pour qui ne peut pas l'écouter.",
-      transcriptTooLong:
-        "La transcription ne doit pas dépasser 200 000 caractères.",
+      transcriptTooLong: (max: string) =>
+        `La transcription ne doit pas dépasser ${max} caractères.`,
       saved: "Fiche enregistrée.",
       // La carte du nom et du texte alternatif (ou de la transcription).
       description: "Description",
@@ -782,7 +789,6 @@ export const fr: Texts = {
       },
       trash: "Mettre à la corbeille",
       trashed: "Fichier mis à la corbeille.",
-      undo: "Annuler",
       restored: "Fichier restauré.",
       used: "Ce fichier est encore utilisé : retire-le d'abord des contenus. Les contenus de la Corbeille comptent encore, tant qu'ils ne sont pas supprimés définitivement.",
     },
@@ -832,6 +838,8 @@ export const fr: Texts = {
     itemTypes: {
       file: "Fichier",
     },
+    // Un fichier et sa sorte : « Fichier · Image ».
+    fileOfKind: (kind: string) => `Fichier · ${kind}`,
     // Sorte d'un contenu dans la corbeille.
     contentKinds: {
       article: "Article",
@@ -849,7 +857,6 @@ export const fr: Texts = {
         count === 1
           ? "L'élément sélectionné sera supprimé définitivement. Tu ne pourras pas revenir en arrière."
           : `Les ${count} éléments sélectionnés seront supprimés définitivement. Tu ne pourras pas revenir en arrière.`,
-      confirm: "Supprimer définitivement",
     },
     // Son titre a été repris entre-temps (un contenu de sa section, un modèle) : il revient numéroté.
     restoredRenamed: (name: string, title: string) =>
@@ -858,7 +865,6 @@ export const fr: Texts = {
     restoredWithoutAddress: (name: string) =>
       `La page « ${name} » est restaurée, mais sans adresse : une autre page a pris la sienne entre-temps. Choisis-en une autre avant de la publier.`,
     restoredDraft: "Retour en brouillon : rien n'est republié dans l'app.",
-    open: "Ouvrir",
     columns: {
       name: "Nom",
       type: "Type",
@@ -874,7 +880,6 @@ export const fr: Texts = {
     // Sans accord : l'élément peut être un fichier, une page, un article…
     restored: (name: string) => `« ${name} » est de retour.`,
     eraseItem: (name: string) => `Supprimer définitivement ${name}`,
-    erase: "Supprimer définitivement",
     empty: "Vider la corbeille",
     emptied: (count: number) =>
       count === 0
@@ -892,7 +897,6 @@ export const fr: Texts = {
       title: "Supprimer définitivement ?",
       description: (name: string) =>
         `Suppression définitive de « ${name} » : tu ne pourras pas revenir en arrière.`,
-      confirm: "Supprimer définitivement",
     },
     emptyState: {
       title: "La Corbeille est vide",
@@ -1062,13 +1066,11 @@ export const fr: Texts = {
         : `${shown} sur ${total}`,
     noCategory: "Aucune",
     actions: (title: string) => `Actions pour ${title}`,
-    open: "Ouvrir",
     trash: "Mettre à la corbeille",
     confirmTrash: {
       confirm: "Mettre à la corbeille",
     },
     trashed: (title: string) => `« ${title} » est dans la Corbeille.`,
-    undo: "Annuler",
     // Fenêtre « Nouvel article » (…) : le titre, un point de départ, les réglages ([D42]).
     newContent: {
       description:
@@ -1116,7 +1118,6 @@ export const fr: Texts = {
     // « Réglages » dans le menu d'une ligne : les mêmes réglages que dans l'éditeur.
     settings: {
       action: "Réglages",
-      save: "Enregistrer",
       saved: (title: string) => `Réglages de « ${title} » enregistrés.`,
       unchanged: "Rien n'a changé.",
       checking: "On vérifie que personne n'écrit ce contenu…",
@@ -1236,14 +1237,13 @@ export const fr: Texts = {
       editTitle: "Modifier la catégorie",
       description:
         "Une nouvelle catégorie arrive en bas de la liste. Range-la ensuite à sa place.",
-      save: "Enregistrer",
     },
     name: "Nom",
     // Le champ pour en créer une au passage (fenêtre d'un nouveau contenu, réglages).
-    add: "Ajouter",
     namePlaceholder: "Par exemple : Sommeil",
     nameRequired: "Donne un nom à la catégorie.",
-    nameTooLong: "Le nom ne doit pas dépasser 100 caractères.",
+    nameTooLong: (max: string) =>
+      `Le nom ne doit pas dépasser ${max} caractères.`,
     added: (name: string) => `Catégorie « ${name} » ajoutée.`,
     renamed: "Catégorie enregistrée.",
     edit: "Modifier",
@@ -1410,7 +1410,6 @@ export const fr: Texts = {
       emptySort: "Aucun modèle de ce type pour l'instant",
       usesLoading: "Recherche des brouillons…",
       actions: (name: string) => `Actions pour ${name}`,
-      open: "Ouvrir",
       trash: "Mettre à la corbeille",
       loadFailed: "La liste des modèles n'a pas pu être chargée.",
       refreshFailed:
@@ -1423,7 +1422,6 @@ export const fr: Texts = {
         confirm: "Mettre à la corbeille",
       },
       trashed: (name: string) => `« ${name} » est dans la Corbeille.`,
-      undo: "Annuler",
       restored: (name: string) => `« ${name} » est restauré.`,
       // Sélection en masse.
       confirmTrashManyTitle: (count: number) =>
@@ -1466,7 +1464,8 @@ export const fr: Texts = {
       namePlaceholder: "Par exemple : Contact",
       nameTaken: "Un autre modèle porte déjà ce nom : choisis-en un autre.",
       nameRequired: "Donne un nom au modèle.",
-      nameTooLong: "Le nom ne doit pas dépasser 200 caractères.",
+      nameTooLong: (max: string) =>
+        `Le nom ne doit pas dépasser ${max} caractères.`,
       sort: "Type",
       section: "Section",
       sectionPlaceholder: "Choisis une section",
@@ -1566,7 +1565,6 @@ export const fr: Texts = {
         "Le bloc suit maintenant le modèle : le corriger dans le modèle le corrigera ici aussi.",
       submit: "Enregistrer le modèle",
       saved: (name: string) => `Modèle « ${name} » enregistré.`,
-      open: "Ouvrir",
     },
   },
 
@@ -1608,7 +1606,7 @@ export const fr: Texts = {
       label: "Ajouter un bloc",
       inBox: "Ajouter dans l'encadré",
     },
-    // Rien ne se dépose dans une section du téléphone (« Ajouter dans la section » est juste
+    // Rien ne se dépose dans un encadré du téléphone (« Ajouter dans l'encadré » est juste
     // dessous) ; ce que dit aussi le plan.
     emptyBox: "Encadré vide : il n'apparaîtra pas dans l'app.",
     handle: (label: string) => `Déplacer : ${label}`,
@@ -1668,7 +1666,6 @@ export const fr: Texts = {
       bold: "Gras",
       italic: "Italique",
       link: "Lien",
-      undo: "Annuler",
       redo: "Rétablir",
     },
     link: {
@@ -1842,7 +1839,7 @@ export const fr: Texts = {
       addLabel: (label: string) => `Ajouter un bloc ${label}`,
       // La glissière des Blocs, par-dessus le Plan (éditeur des contenus).
       close: "Fermer les Blocs",
-      // La cible d'un ajout : « Ajouter dans la section ».
+      // La cible d'un ajout : « Ajouter dans l'encadré ».
       target: {
         box: "Ajout dans l'encadré : texte ou image seulement",
         cancel: "Annuler l'ajout dans l'encadré",
@@ -1910,10 +1907,6 @@ export const fr: Texts = {
           page: "Facultative : elle s'affiche en tête de la page.",
         },
       },
-      categories: {
-        add: "Ajouter",
-        addLabel: "Ajouter une catégorie",
-      },
       stats: {
         words: (count: string) =>
           count === "0" || count === "1" ? `${count} mot` : `${count} mots`,
@@ -1964,7 +1957,6 @@ export const fr: Texts = {
       moveDownOut: "Descendre hors de l'encadré",
       remove: "Supprimer le bloc",
       removed: (label: string) => `Bloc supprimé : ${label}.`,
-      undo: "Annuler",
       // Annoncé après « Monter » ou « Descendre ».
       moved: (position: number, count: number, container: string) =>
         `Bloc n° ${position} sur ${count}, dans ${container}.`,
@@ -2143,7 +2135,6 @@ export const fr: Texts = {
   // Publication (étape 5) : barre de publication, programmation, historique, réglages.
   publication: {
     status: {
-      label: "État de la publication",
       draft: "Brouillon",
       withdrawn: "Retiré de l'app",
       live: "En ligne",
@@ -2368,7 +2359,8 @@ export const fr: Texts = {
         placeholder: "mentions-legales",
         invalid:
           "Des lettres minuscules sans accent, des chiffres et des tirets seulement (pas de tiret au début, à la fin ni deux de suite).",
-        tooLong: "L'adresse ne doit pas dépasser 100 caractères.",
+        tooLong: (max: string) =>
+          `L'adresse ne doit pas dépasser ${max} caractères.`,
         fromTitle: "Reprendre le titre",
         live: (slug: string) => `En ligne : ${slug}`,
         missing: "Choisis l'adresse de la page avant de la publier.",
@@ -2408,11 +2400,12 @@ export const fr: Texts = {
         "** Affichée sur l'écran de connexion, pour qui a besoin d'aide.",
       ],
       name: "Le nom de ta marque",
-      save: "Enregistrer",
-      nameTooLong: "Le nom ne doit pas dépasser 40 caractères.",
+      nameTooLong: (max: string) =>
+        `Le nom ne doit pas dépasser ${max} caractères.`,
       // Les initiales, à la place d'un monogramme pas encore envoyé (onglet, connexion).
       initials: "Initiale(s)",
-      initialsTooLong: "Les initiales font 1 à 3 caractères.",
+      initialsTooLong: (max: string) =>
+        `Les initiales font 1 à ${max} caractères.`,
       // L'adresse de contact, montrée sur l'écran de connexion à qui a besoin d'aide.
       email: "Adresse e-mail de contact",
       emailPlaceholder: "contact@exemple.fr",
@@ -2577,7 +2570,7 @@ export const fr: Texts = {
         title: "Noms des sections",
         description: [
           "Renomme le Blog et les Podcasts dans chaque langue de l'admin, pour toute l'équipe*. La page se recharge après l'enregistrement.",
-          "* En français, écris trois formes à la main : le nom seul (menu, titres des pages), avec son article (le Fil, la Gazette, l'Agenda, les Épisodes) et avec « de » (du Fil, de la Gazette, de l'Agenda, des Épisodes), pour que chaque phrase reste juste. Vides : le nom d'origine.",
+          "* En français, écris trois formes à la main : le nom seul (menu, titres des pages), avec son article (le Journal, la Gazette, l'Agenda, les Épisodes) et avec « de » (du Journal, de la Gazette, de l'Agenda, des Épisodes), pour que chaque phrase reste juste. Vides : le nom d'origine.",
         ],
         sections: { blog: "Blog", podcasts: "Podcasts" },
         french: "Français",
@@ -2591,7 +2584,7 @@ export const fr: Texts = {
         exampleDu: (du: string) => `Exemple : « Dans la liste ${du} »`,
         exampleEn: (name: string) => `Exemple : « In the ${name} list »`,
         incomplete: "Remplis les trois formes françaises, ou aucune.",
-        tooLong: "40 caractères au plus.",
+        tooLong: (max: string) => `${max} caractères au plus.`,
         saved: "Noms des sections enregistrés.",
       },
     },
@@ -2608,7 +2601,8 @@ export const fr: Texts = {
       addDescription:
         "Elle se place en bas, comme la plus complète. Glisse-la ensuite à sa juste place.",
       nameRequired: "Donne un nom à la formule.",
-      nameTooLong: "Le nom ne doit pas dépasser 100 caractères.",
+      nameTooLong: (max: string) =>
+        `Le nom ne doit pas dépasser ${max} caractères.`,
       add: "Ajouter",
       added: (name: string) => `Formule « ${name} » ajoutée.`,
       rank: (position: number) => `n° ${position}`,
@@ -2698,7 +2692,7 @@ export const fr: Texts = {
       mediatheque: "Médiathèque",
       modeles: "Modèles de bloc",
       corbeille: "Corbeille",
-      equipe: "Équipe et compte",
+      equipe: "La team et Mon compte",
     },
   },
 

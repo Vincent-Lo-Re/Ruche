@@ -799,7 +799,7 @@ describe("Blog", () => {
       name: texts.publication.settings.title,
     })
     const save = within(sheet).getByRole("button", {
-      name: labels.settings.save,
+      name: texts.common.save,
     })
     await waitFor(() => expect(save).toBeEnabled())
     fireEvent.change(
@@ -853,7 +853,7 @@ describe("Blog", () => {
       await within(sheet).findByText(labels.settings.heldBy("Claire Martin"))
     ).toBeVisible()
     expect(
-      within(sheet).getByRole("button", { name: labels.settings.save })
+      within(sheet).getByRole("button", { name: texts.common.save })
     ).toBeDisabled()
     expect(
       within(sheet).getByLabelText(texts.publication.settings.titleLabel)
@@ -889,7 +889,9 @@ describe("Blog", () => {
     await waitFor(() => expect(mediaApi.kickFiles).toHaveBeenCalled())
     const toast = await screen.findByText(labels.trashed("Sans rangement"))
     fireEvent.click(
-      within(toast.closest("li")!).getByRole("button", { name: labels.undo })
+      within(toast.closest("li")!).getByRole("button", {
+        name: texts.common.undo,
+      })
     )
     expect(
       await screen.findByText(labels.kinds.article.restored("Sans rangement"))
@@ -955,7 +957,7 @@ describe("Blog", () => {
     fireEvent.click(
       within(screen.getByText(article.trashedMany(2)).closest("li")!).getByRole(
         "button",
-        { name: labels.undo }
+        { name: texts.common.undo }
       )
     )
     expect(await screen.findByText(article.restoredMany(2))).toBeVisible()

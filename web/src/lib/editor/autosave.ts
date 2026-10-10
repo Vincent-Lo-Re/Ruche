@@ -83,6 +83,8 @@ export class AutosaveController<T> {
   private retryTimer: Timer | null = null
   private attempt = 0
   private inFlight: Promise<void> | null = null
+  // Change à chaque reset : la réponse d'un envoi parti avant ne touche plus à rien.
+  private generation = 0
   private dueWhileSaving = false
   // Envoi resté sans réponse (réseau, serveur) : peut-être enregistré. Il repart tel quel.
   private uncertain: { value: T; baseRev: number } | null = null
@@ -198,13 +200,17 @@ export class AutosaveController<T> {
     this.dirty = replay !== null && this.latest !== replay
     if (this.dirty) this.dueWhileSaving = true
     else this.firstChangeAt = null
-    const request = this.send(value, baseRev)
+    const request = this.send(value, baseRev, this.generation)
     this.inFlight = request
     this.update({ status: "saving", error: null })
     return request
   }
 
-  private async send(value: T, baseRev: number): Promise<void> {
+  private async send(
+    value: T,
+    baseRev: number,
+    generation: number
+  ): Promise<void> {
     let error: ContentError | null = null
     let result: SavedDraft | null = null
     try {
@@ -225,7 +231,15 @@ export class AutosaveController<T> {
         reportError(caught)
       }
     }
+    // Un brouillon relu entre-temps (reset) : cet envoi ne compte plus.
+    if (generation !== this.generation) return
     this.inFlight = null
+
+    // Arrêté pendant l'envoi (main perdue) : on retient seulement ce que la base a enregistré.
+    if (this.current.status === "stopped") {
+      if (result) this.update({ rev: result.rev, savedAt: result.savedAt })
+      return
+    }
 
     if (result) {
       this.attempt = 0
@@ -327,6 +341,8 @@ export class AutosaveController<T> {
   /** Repart d'un brouillon relu dans la base (lecture seule, reprise de la main). */
   reset(rev: number, savedAt: string | null) {
     this.clearTimers()
+    this.generation += 1
+    this.inFlight = null
     this.latest = null
     this.dirty = false
     this.firstChangeAt = null

@@ -7,6 +7,7 @@ import {
   MediaThumbnail,
   MediaUseIcon,
 } from "@/components/media/media-visuals"
+import { TruncatedText } from "@/components/truncated-text"
 import {
   Card,
   CardContent,
@@ -119,12 +120,7 @@ export function MediaGrid({
                   />
                   <CardHeader>
                     <CardTitle className="min-w-0">
-                      <Tooltip>
-                        <TooltipTrigger render={<p className="truncate" />}>
-                          {media.name}
-                        </TooltipTrigger>
-                        <TooltipContent>{media.name}</TooltipContent>
-                      </Tooltip>
+                      <TruncatedText as="p" text={media.name} />
                     </CardTitle>
                     <CardDescription>
                       {texts.media.kinds[media.kind]} ·{" "}

@@ -1,18 +1,46 @@
-// Les appels de Supabase Auth faits par les pages de connexion, d'invitation, de double
-// vérification et du compte. Les pages n'appellent pas Supabase elles-mêmes.
+// Les appels de Supabase Auth faits par la session, les pages de connexion, d'invitation, de
+// double vérification et du compte. Les pages n'appellent pas Supabase elles-mêmes.
 
-import { isAuthApiError } from "@supabase/supabase-js"
+import {
+  isAuthApiError,
+  type AuthChangeEvent,
+  type Session,
+} from "@supabase/supabase-js"
 
 import {
   authErrorMessage,
   isNotAMemberError,
   isRateLimitError,
 } from "@/lib/auth-errors"
+import type { Profile } from "@/auth/auth-context"
 import { brandName, getAdminBrand } from "@/lib/admin-identity"
 import type { Language } from "@/lib/language"
 import type { RegionalFormat } from "@/lib/regional-format"
 import { detachedAuth, supabase } from "@/lib/supabase"
 import { texts } from "@/texts"
+
+/**
+ * Suit la session : le rappel reçoit chaque changement (connexion, rafraîchissement,
+ * déconnexion). Rappel synchrone, sans autre appel à Supabase : la version asynchrone peut
+ * bloquer le rafraîchissement de la session. Renvoie de quoi arrêter de suivre.
+ */
+export function onSessionChange(
+  listener: (event: AuthChangeEvent, session: Session | null) => void
+): () => void {
+  const { data } = supabase.auth.onAuthStateChange(listener)
+  return () => data.subscription.unsubscribe()
+}
+
+/** La fiche d'un membre ; null s'il n'en a plus (retiré de l'équipe). */
+export async function fetchProfile(userId: string): Promise<Profile | null> {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, email, full_name, role")
+    .eq("id", userId)
+    .maybeSingle()
+  if (error) throw error
+  return data
+}
 
 // « Code envoyé », « code déjà envoyé il y a moins d'une minute » (le code précédent reste
 // valable), ou message d'erreur à afficher.

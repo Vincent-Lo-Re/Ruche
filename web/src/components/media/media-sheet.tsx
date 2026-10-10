@@ -700,7 +700,7 @@ function TrashBar({
     onSuccess: () => {
       toast.success(texts.media.detail.trashed, {
         action: {
-          label: texts.media.detail.undo,
+          label: texts.common.undo,
           onClick: () => void undo(),
         },
       })

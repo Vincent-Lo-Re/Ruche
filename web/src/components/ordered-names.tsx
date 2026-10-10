@@ -6,7 +6,7 @@ import {
   type UseQueryResult,
 } from "@tanstack/react-query"
 import { cn } from "cn"
-import { Ellipsis, Pencil, Plus, Eraser } from "lucide-react"
+import { Pencil, Plus, Eraser } from "lucide-react"
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -15,15 +15,8 @@ import type { z } from "zod"
 import { DragHandle, SortableList } from "@/components/list-sorting"
 import { LoadState } from "@/components/load-state"
 import { useAccessCheck } from "@/components/team/use-access-check"
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import { ConfirmDialog } from "@/components/confirm-dialog"
+import { RowActionsMenu } from "@/components/row-actions-menu"
 import { Button } from "@/components/ui/button"
 import { ButtonGroup } from "@/components/ui/button-group"
 import {
@@ -34,11 +27,8 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
@@ -245,41 +235,21 @@ export function OrderedNames<T extends Named>({
         </CardContent>
       </Card>
 
-      <AlertDialog
+      <ConfirmDialog
         open={toRemove !== null}
-        onOpenChange={(open) => {
-          if (!open && !remove.isPending) setToRemove(null)
+        title={labels.confirmRemove.title}
+        description={
+          toRemove ? labels.confirmRemove.description(toRemove.name) : ""
+        }
+        confirmLabel={labels.confirmRemove.confirm}
+        pending={remove.isPending}
+        onCancel={() => setToRemove(null)}
+        onConfirm={() => {
+          if (toRemove) remove.mutate(toRemove)
         }}
-      >
-        {toRemove && (
-          <AlertDialogContent
-            finalFocus={() =>
-              // Après une suppression, le focus est placé ci-dessus, une fois la liste relue.
-              focusAfterRemove.current === undefined
-            }
-          >
-            <AlertDialogHeader>
-              <AlertDialogTitle>{labels.confirmRemove.title}</AlertDialogTitle>
-              <AlertDialogDescription>
-                {labels.confirmRemove.description(toRemove.name)}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel disabled={remove.isPending}>
-                {texts.common.cancel}
-              </AlertDialogCancel>
-              <Button
-                variant="destructive"
-                disabled={remove.isPending}
-                onClick={() => remove.mutate(toRemove)}
-              >
-                {remove.isPending && <Spinner />}
-                {labels.confirmRemove.confirm}
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        )}
-      </AlertDialog>
+        // Après une suppression, le focus est placé ci-dessus, une fois la liste relue.
+        finalFocus={() => focusAfterRemove.current === undefined}
+      />
     </div>
   )
 }
@@ -380,28 +350,22 @@ function SortableName<T extends Named>({
               <ItemTitle className="block w-full truncate">
                 {item.name}
               </ItemTitle>
-            </ItemContent>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                disabled={disabled}
-                aria-label={labels.actions(item.name)}
-                data-row-menu
-                render={<Button variant="ghost" size="icon-sm" />}
-              >
-                <Ellipsis />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-44">
-                <DropdownMenuItem onClick={() => onRename(true)}>
-                  <Pencil />
-                  {labels.rename}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive" onClick={onRemove}>
-                  <Eraser />
-                  {labels.remove}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            </ItemContent>{" "}
+            <RowActionsMenu
+              label={labels.actions(item.name)}
+              disabled={disabled}
+              data-row-menu=""
+            >
+              <DropdownMenuItem onClick={() => onRename(true)}>
+                <Pencil />
+                {labels.rename}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem variant="destructive" onClick={onRemove}>
+                <Eraser />
+                {labels.remove}
+              </DropdownMenuItem>
+            </RowActionsMenu>
           </>
         )}
       </Item>

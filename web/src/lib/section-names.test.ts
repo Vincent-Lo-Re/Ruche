@@ -8,7 +8,7 @@ import {
 
 const custom: CustomSectionNames = {
   fr: {
-    blog: { name: "Le Fil", le: "le Fil", du: "du Fil" },
+    blog: { name: "Le Journal", le: "le Journal", du: "du Journal" },
     podcasts: null,
   },
   en: { blog: "The Feed", podcasts: null },
@@ -27,7 +27,11 @@ describe("les noms du Blog et des Podcasts", () => {
 
   it("prend chaque forme écrite par l'admin, dans la langue demandée", () => {
     const fr = resolveSectionNames(custom, "fr")
-    expect(fr.blog).toEqual({ name: "Le Fil", le: "le Fil", du: "du Fil" })
+    expect(fr.blog).toEqual({
+      name: "Le Journal",
+      le: "le Journal",
+      du: "du Journal",
+    })
     // Une section non renommée garde son nom d'origine.
     expect(fr.podcasts.du).toBe("des Podcasts")
     expect(resolveSectionNames(custom, "en").blog.name).toBe("The Feed")

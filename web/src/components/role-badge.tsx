@@ -13,7 +13,7 @@ const roleIcons: Record<TeamRole, LucideIcon> = {
 /**
  * Le rôle d'un membre en pastille, son icône devant le mot, dans la couleur des boutons de la
  * palette : en grand en haut à droite de Mon compte (les lecteurs d'écran entendent « Rôle : … »),
- * à sa taille dans la colonne « Rôle » de l'Équipe.
+ * à sa taille dans la colonne « Rôle » de La team.
  */
 export function RoleBadge({
   role,

@@ -1,15 +1,10 @@
 import { cn } from "cn"
-import { ImageIcon, ImagePlus, Eraser, UploadCloud } from "lucide-react"
+import { ImageIcon, ImagePlus, UploadCloud } from "lucide-react"
 import { useId } from "react"
 
-import { Button } from "@/components/ui/button"
+import { HiddenFileInput, RemoveFileButton } from "@/components/file-input"
 import { Item } from "@/components/ui/item"
 import { Spinner } from "@/components/ui/spinner"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 import { useFileDrop } from "@/hooks/use-file-drop"
 import { texts } from "@/texts"
 
@@ -107,38 +102,23 @@ export function FileSlot({
           </span>
         </label>
         {url && !busy && (
-          <Tooltip>
-            <TooltipTrigger
-              render={
-                <Button
-                  variant="destructive"
-                  size="icon-sm"
-                  // Un fond plein sous le rouge pâle : l'icône se voit sur n'importe quelle image.
-                  className={cn(
-                    "absolute top-2 right-2 bg-background opacity-0 transition-opacity group-hover/slot:opacity-100 focus-visible:opacity-100",
-                    dark && "shadow-sm ring-1 ring-foreground/10"
-                  )}
-                  aria-label={labels.remove}
-                  onClick={onRemove}
-                />
-              }
-            >
-              <Eraser />
-            </TooltipTrigger>
-            <TooltipContent>{labels.remove}</TooltipContent>
-          </Tooltip>
+          <RemoveFileButton
+            label={labels.remove}
+            onClick={onRemove}
+            className={cn(
+              "group-hover/slot:opacity-100",
+              dark && "shadow-sm ring-1 ring-foreground/10"
+            )}
+          />
         )}
       </Item>
-      <input
+      <HiddenFileInput
         id={inputId}
-        type="file"
         accept={accept}
         aria-label={label}
-        className="sr-only"
         disabled={busy}
-        onChange={(event) => {
-          const chosen = event.target.files?.[0]
-          event.target.value = ""
+        onFiles={(files) => {
+          const chosen = files?.[0]
           if (chosen) onChoose(chosen)
         }}
       />
