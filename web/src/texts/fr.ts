@@ -2661,7 +2661,7 @@ export const fr: Texts = {
     },
     publish: "Publier",
     published: "Charte publiée. L'app s'en sert dès maintenant.",
-    discard: "Revenir à la version publiée",
+    discard: "Revenir",
     discardTitle: "Revenir à la version publiée ?",
     discardDescription:
       "Le brouillon revient à la charte publiée, ou à la charte neutre si rien n'a encore été publié.",
@@ -2669,7 +2669,7 @@ export const fr: Texts = {
     discarded: "Le brouillon est revenu à la version publiée.",
     // Les vérifications qui empêchent d'enregistrer le brouillon (même règle que la base).
     blocked: "Corrige les noms signalés pour enregistrer le brouillon.",
-    // Les sections de l'onglet : la colonne des liens, ou « Aller à la section » sur un écran plus étroit.
+    // Les familles de réglages de l'onglet, sous « Charte graphique » dans la colonne de gauche.
     sections: {
       label: "Sections de la charte",
       groups: {
@@ -2678,7 +2678,6 @@ export const fr: Texts = {
         text: "Texte",
         shapes: "Formes et fichier",
       },
-      jumpTo: "Aller à la section",
       hardToRead: "Un texte se lit mal ici",
       hint: "Clique sur un élément du téléphone pour aller à son réglage.",
     },

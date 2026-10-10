@@ -1,10 +1,10 @@
-// Les sections de l'onglet « Charte graphique », dans l'ordre et par groupe : la colonne des
-// sections (liens), la liste « Aller à la section » des écrans plus étroits, et les éléments du
-// téléphone qui mènent à leur réglage.
+// Les sections de l'onglet « Charte graphique », dans l'ordre et par famille : une famille à la
+// fois dans la colonne des réglages, choisie à gauche ; les éléments du téléphone mènent à leur
+// réglage.
 
 import type { ReadabilityIssue } from "@/lib/app-style/problems"
 
-export const styleSections = [
+const styleSections = [
   { key: "darkMode", group: "colors" },
   { key: "colors", group: "colors" },
   { key: "roles", group: "colors" },
@@ -22,7 +22,7 @@ export const styleSections = [
 export type StyleSection = (typeof styleSections)[number]["key"]
 export type StyleSectionGroup = (typeof styleSections)[number]["group"]
 
-/** Les groupes, dans l'ordre, avec leurs sections. */
+/** Les familles, dans l'ordre, avec leurs sections. */
 export const styleSectionGroups = styleSections.reduce<
   { group: StyleSectionGroup; sections: StyleSection[] }[]
 >((groups, { key, group }) => {
@@ -37,15 +37,20 @@ export function sectionAnchor(section: StyleSection): string {
   return `style-${section.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}`
 }
 
-/** Les sections où un texte se lit mal (un point orange devant leur lien). */
-export function sectionsWithIssues(
+/** La famille d'une section. */
+export function groupOf(section: StyleSection): StyleSectionGroup {
+  return styleSections.find(({ key }) => key === section)!.group
+}
+
+/** Les familles où un texte se lit mal (un point orange devant leur nom). */
+export function groupsWithIssues(
   issues: readonly ReadabilityIssue[]
-): Set<StyleSection> {
+): Set<StyleSectionGroup> {
   const where: Record<ReadabilityIssue["kind"], StyleSection> = {
     role: "roles",
     tint: "tints",
     badge: "badges",
     button: "buttons",
   }
-  return new Set(issues.map((issue) => where[issue.kind]))
+  return new Set(issues.map((issue) => groupOf(where[issue.kind])))
 }

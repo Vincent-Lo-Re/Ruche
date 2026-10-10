@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest"
 
 import {
+  groupOf,
+  groupsWithIssues,
   sectionAnchor,
-  sectionsWithIssues,
   styleSectionGroups,
 } from "@/lib/app-style/sections"
 
@@ -25,12 +26,17 @@ describe("les sections de la charte", () => {
     expect(sectionAnchor("fontRoles")).toBe("style-font-roles")
   })
 
-  it("les sections où un texte se lit mal", () => {
+  it("la famille d'une section", () => {
+    expect(groupOf("darkMode")).toBe("colors")
+    expect(groupOf("file")).toBe("shapes")
+  })
+
+  it("les familles où un texte se lit mal", () => {
     expect(
-      sectionsWithIssues([
+      groupsWithIssues([
         { kind: "role", role: "muted", mode: "light", ratio: 2, min: 4.5 },
         { kind: "button", id: "x", mode: "dark", ratio: 2, min: 4.5 },
       ])
-    ).toEqual(new Set(["roles", "buttons"]))
+    ).toEqual(new Set(["colors", "elements"]))
   })
 })

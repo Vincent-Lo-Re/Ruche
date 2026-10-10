@@ -15,7 +15,7 @@ export function SettingsSection({
   extra,
   children,
 }: {
-  // Une ancre (la colonne des sections de la charte de l'app y mène, le focus aussi).
+  // Une ancre (un élément du téléphone de la charte de l'app y mène, le focus aussi).
   id?: string
   title: string
   description: string | readonly string[]

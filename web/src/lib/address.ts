@@ -5,6 +5,7 @@
  * une liste telle quelle, et la retrouver en y revenant. Sans React.
  */
 
+import type { StyleSectionGroup } from "@/lib/app-style/sections"
 import type { TemplateSort } from "@/lib/contents/templates"
 import {
   ALL_CATEGORIES,
@@ -253,6 +254,32 @@ export function appTabFromAddress(params: URLSearchParams): AppTab {
 /** Écrit l'onglet de la section « App » dans l'adresse. */
 export function writeAppTab(params: URLSearchParams, tab: AppTab) {
   writeChoice(params, appTabChoice, tab)
+}
+
+const styleGroupChoice: Choice<StyleSectionGroup> = {
+  name: "group",
+  words: {
+    colors: "colors",
+    elements: "elements",
+    text: "text",
+    shapes: "shapes",
+  },
+  fallback: "colors",
+}
+
+/** La famille de réglages ouverte dans la charte graphique (les couleurs par défaut). */
+export function styleGroupFromAddress(
+  params: URLSearchParams
+): StyleSectionGroup {
+  return readChoice(params, styleGroupChoice)
+}
+
+/** Écrit la famille de réglages de la charte graphique dans l'adresse. */
+export function writeStyleGroup(
+  params: URLSearchParams,
+  group: StyleSectionGroup
+) {
+  writeChoice(params, styleGroupChoice, group)
 }
 
 // --- Corbeille ------------------------------------------------------------------------------

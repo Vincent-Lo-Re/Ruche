@@ -1,5 +1,5 @@
 import { ALargeSmall, Moon, Sun, type LucideIcon } from "lucide-react"
-import type { ComponentType, ReactNode, SVGProps } from "react"
+import type { ComponentType, ReactNode, Ref, SVGProps } from "react"
 
 import { AndroidLogo, AppleLogo } from "@/components/brand-icons"
 import { Toggle } from "@/components/ui/toggle"
@@ -30,9 +30,17 @@ export type ToolChoices<T extends string> = Record<
  * La barre verticale à droite d'un téléphone (éditeur des contenus, charte de l'app) : une icône
  * par choix, son sens dans l'infobulle.
  */
-export function PreviewToolbar({ children }: { children: ReactNode }) {
+export function PreviewToolbar({
+  ref,
+  children,
+}: {
+  // La barre mesurée (la charte de l'app réduit le téléphone pour la garder à côté).
+  ref?: Ref<HTMLDivElement>
+  children: ReactNode
+}) {
   return (
     <div
+      ref={ref}
       role="toolbar"
       aria-label={labels.tools}
       aria-orientation="vertical"

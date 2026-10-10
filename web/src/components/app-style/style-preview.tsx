@@ -28,6 +28,7 @@ import {
 import { partVariables, styleVariables } from "@/lib/app-style/variables"
 import {
   deviceHeightOf,
+  deviceWidthOf,
   phoneScale,
   type PreviewSettings,
 } from "@/lib/editor/preview"
@@ -48,28 +49,52 @@ const tabs: { key: keyof typeof labels.tabs; icon: LucideIcon }[] = [
   { key: "profile", icon: CircleUser },
 ]
 
-// L'air au-dessus et au-dessous du téléphone (py-6), dans la hauteur collée en haut.
-const STAGE_PADDING = 24
+// L'air autour du téléphone (py-6 px-3), et entre le téléphone et sa barre d'outils (gap-4).
+const STAGE_PADDING_Y = 24
+const STAGE_PADDING_X = 12
+const TOOLBAR_GAP = 16
 
-/** La réduction du téléphone pour tenir dans la hauteur donnée, comme dans l'éditeur. */
-function usePhoneScale(device: PreviewSettings["device"], height: number) {
+/**
+ * La réduction du téléphone pour tenir tout entier dans sa colonne, en hauteur comme en largeur
+ * (à côté de sa barre d'outils), avec la règle de l'éditeur. Relue quand la colonne change.
+ */
+function usePhoneScale(device: PreviewSettings["device"]) {
+  const stage = useRef<HTMLDivElement>(null)
   const holder = useRef<HTMLDivElement>(null)
+  const toolbar = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(1)
   useEffect(() => {
-    if (holder.current && height > 0)
-      setScale(
-        phoneScale(deviceHeightOf(holder.current), height - STAGE_PADDING * 2)
-      )
-  }, [device, height])
-  return { holder, scale }
+    const element = stage.current
+    if (!element || !holder.current) return
+    const phone = holder.current
+    const measure = () => {
+      const height = element.clientHeight - STAGE_PADDING_Y * 2
+      const width =
+        element.clientWidth -
+        STAGE_PADDING_X * 2 -
+        TOOLBAR_GAP -
+        (toolbar.current?.offsetWidth ?? 0)
+      if (height > 0 && width > 0)
+        setScale(
+          Math.min(
+            phoneScale(deviceHeightOf(phone), height),
+            phoneScale(deviceWidthOf(phone), width)
+          )
+        )
+    }
+    const observer = new ResizeObserver(measure)
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [device])
+  return { stage, holder, toolbar, scale }
 }
 
 /**
- * L'aperçu de la charte, au centre de l'onglet : le téléphone de l'éditeur, à sa taille (tout
- * entier dans la hauteur du panneau, collé en haut pendant que les réglages défilent), avec un
- * article imaginaire aux couleurs, polices et formes du brouillon. À droite, sa barre d'outils :
- * l'appareil, clair ou sombre (pas de choix si la charte garde un seul mode) et le grand texte.
- * Un élément du téléphone mène à son réglage (onPick).
+ * L'aperçu de la charte, au centre de l'onglet : le téléphone de l'éditeur sur le même fond à
+ * points, tout entier dans sa colonne, avec un article imaginaire aux couleurs, polices et formes
+ * du brouillon. À droite, sa barre d'outils : l'appareil, clair ou sombre (pas de choix si la
+ * charte garde un seul mode) et le grand texte. Un élément du téléphone mène à son réglage
+ * (onPick).
  */
 export function StylePreview({
   appStyle: style,
@@ -78,10 +103,7 @@ export function StylePreview({
   largeText,
   onLargeTextChange,
   onPick,
-  frame,
 }: {
-  // La place collée en haut (useStickyFrame) : sa position et sa hauteur.
-  frame: { top: number; height: number } | null
   appStyle: AppStyle
   mode: StyleMode
   onModeChange: (mode: StyleMode) => void
@@ -91,13 +113,12 @@ export function StylePreview({
 }) {
   const brand = useBrandName()
   const [device, setDevice] = useState<PreviewSettings["device"]>("ios")
-  const { holder, scale } = usePhoneScale(device, frame?.height ?? 0)
+  const { stage, holder, toolbar, scale } = usePhoneScale(device)
   const locked = styleModes(style).length === 1
   return (
     <div
-      className="sticky flex justify-center gap-4 py-6"
-      // eslint-disable-next-line no-restricted-syntax -- position et hauteur tirées d'une mesure (le panneau visible)
-      style={frame ? { top: frame.top, height: frame.height } : undefined}
+      ref={stage}
+      className="flex h-style-stage min-h-0 justify-center gap-4 overflow-hidden rounded-xl bg-dot-grid px-3 py-6 lg:h-full"
     >
       <div
         ref={holder}
@@ -109,7 +130,7 @@ export function StylePreview({
           ...styleVariables(style, mode),
           "--blocks-device-scale": String(scale),
         })}
-        // La souris seulement : au clavier, la colonne des sections mène aux mêmes réglages.
+        // La souris seulement : au clavier, les familles à gauche mènent aux mêmes réglages.
         onClick={(event) => {
           const target =
             event.target instanceof Element
@@ -148,7 +169,7 @@ export function StylePreview({
           <SampleArticle appStyle={style} mode={mode} />
         </PhoneDevice>
       </div>
-      <PreviewToolbar>
+      <PreviewToolbar ref={toolbar}>
         <DeviceTool value={device} onChange={setDevice} />
         {!locked && (
           <>

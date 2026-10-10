@@ -2616,7 +2616,7 @@ export const en = {
     },
     publish: "Publish",
     published: "Style published. The app uses it from now on.",
-    discard: "Revert to published",
+    discard: "Revert",
     discardTitle: "Revert to the published style?",
     discardDescription:
       "The draft goes back to the published style, or to the neutral style if nothing has been published yet.",
@@ -2624,7 +2624,7 @@ export const en = {
     discarded: "Draft reverted to the published style.",
     // Les vérifications qui empêchent d'enregistrer le brouillon (même règle que la base).
     blocked: "Fix the highlighted names to save the draft.",
-    // Les sections de l'onglet : la colonne des liens, ou « Go to section » sur un écran plus étroit.
+    // Les familles de réglages de l'onglet, sous « Charte graphique » dans la colonne de gauche.
     sections: {
       label: "Style sections",
       groups: {
@@ -2633,7 +2633,6 @@ export const en = {
         text: "Text",
         shapes: "Shapes and file",
       },
-      jumpTo: "Go to section",
       hardToRead: "Some text is hard to read here",
       hint: "Click an element in the phone to go to its setting.",
     },

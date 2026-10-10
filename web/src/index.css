@@ -184,14 +184,10 @@
   grid-template-columns: minmax(0, 1fr) --spacing(80);
 }
 
-/* La charte de l'app (section « App ») : le téléphone, puis les réglages ; sur un écran large,
-   la colonne des sections d'abord. */
-@utility grid-cols-style-workspace {
-  grid-template-columns: auto minmax(0, 1fr);
-}
-
-@utility grid-cols-style-workspace-wide {
-  grid-template-columns: --spacing(52) auto minmax(0, 1fr);
+/* Charte graphique de l'app : la hauteur du téléphone quand les trois colonnes s'empilent (sous
+   lg, la page défile ; au-dessus, il prend la hauteur de sa colonne). */
+@utility h-style-stage {
+  height: --spacing(160);
 }
 
 /* Une ligne d'usage de la charte : son nom (et sa lisibilité), puis le choix. */

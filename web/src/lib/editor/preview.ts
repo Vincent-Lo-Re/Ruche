@@ -131,12 +131,23 @@ export function previewLocked(
   )
 }
 
+/** Lit les variables en pixels d'un élément (preview.css). */
+function pixelsOf(element: Element) {
+  const style = getComputedStyle(element)
+  return (name: string) => parseFloat(style.getPropertyValue(name)) || 0
+}
+
 /**
  * La hauteur du téléphone entier, d'après les variables de l'élément (preview.css,
  * .blocks-preview-layout[data-device]) : l'écran et deux fois le cadre.
  */
 export function deviceHeightOf(element: Element): number {
-  const style = getComputedStyle(element)
-  const px = (name: string) => parseFloat(style.getPropertyValue(name)) || 0
+  const px = pixelsOf(element)
   return px("--blocks-screen-height") + 2 * px("--blocks-device-padding")
+}
+
+/** La largeur du téléphone entier, de même : l'écran et deux fois le cadre. */
+export function deviceWidthOf(element: Element): number {
+  const px = pixelsOf(element)
+  return px("--blocks-phone-width") + 2 * px("--blocks-device-padding")
 }
