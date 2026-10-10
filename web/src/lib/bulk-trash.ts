@@ -1,7 +1,10 @@
-// Sélection en masse (Médiathèque, listes de contenus) : cocher des lignes, puis les mettre à la
-// corbeille d'un coup. Sans React : les pages ne font que brancher ces règles.
+// Sélection en masse (Médiathèque, listes de contenus, Catégories, Corbeille) : cocher des
+// lignes, puis les mettre à la corbeille d'un coup. Sans React : les pages ne font que brancher
+// ces règles. Une ligne se reconnaît à son id, ou à la clé que donne keyOf (Corbeille : un
+// fichier et un contenu peuvent avoir le même id).
 
 type Row = { id: string }
+const byId = (row: Row) => row.id
 
 /** Coche ou décoche une ligne. */
 export function toggleSelected(
@@ -19,15 +22,16 @@ export function toggleSelected(
  * « Tout sélectionner » : coche ou décoche toutes les lignes affichées. Celles que la recherche
  * ou un filtre cache ne changent pas.
  */
-export function toggleAll(
+export function toggleAll<T extends Row>(
   selected: ReadonlySet<string>,
-  shown: readonly Row[],
-  checked: boolean
+  shown: readonly T[],
+  checked: boolean,
+  keyOf: (row: T) => string = byId
 ): Set<string> {
   const next = new Set(selected)
   for (const row of shown) {
-    if (checked) next.add(row.id)
-    else next.delete(row.id)
+    if (checked) next.add(keyOf(row))
+    else next.delete(keyOf(row))
   }
   return next
 }
@@ -38,9 +42,10 @@ export function toggleAll(
  */
 export function selectionOf<T extends Row>(
   selected: ReadonlySet<string>,
-  shown: readonly T[]
+  shown: readonly T[],
+  keyOf: (row: T) => string = byId
 ): { items: T[]; all: boolean; some: boolean } {
-  const items = shown.filter((row) => selected.has(row.id))
+  const items = shown.filter((row) => selected.has(keyOf(row)))
   const all = shown.length > 0 && items.length === shown.length
   return { items, all, some: items.length > 0 && !all }
 }

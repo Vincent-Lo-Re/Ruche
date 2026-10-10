@@ -14,6 +14,7 @@ import { useEffect, useMemo, useState } from "react"
 import { Link, useNavigate } from "react-router"
 import { toast } from "sonner"
 
+import { announceRestore } from "@/components/contents/announce-restore"
 import {
   BulkTrashButton,
   KeptNotice,
@@ -477,10 +478,9 @@ function TrashTemplateDialog({
 
   const undo = async () => {
     try {
-      const { renamedTo } = await restoreContent(template.id)
-      if (renamedTo !== null)
-        toast.warning(texts.trash.restoredRenamed(name, renamedTo))
-      else toast.success(labels.restored(name))
+      announceRestore(name, await restoreContent(template.id), {
+        success: labels.restored(name),
+      })
     } catch (error) {
       toast.error(errorMessage(error))
     } finally {

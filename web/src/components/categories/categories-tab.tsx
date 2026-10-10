@@ -48,6 +48,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { selectionOf, toggleAll, toggleSelected } from "@/lib/bulk-trash"
 import {
   categoryKeys,
   createCategory,
@@ -130,7 +131,7 @@ export function CategoriesTab({
     if ([...selected].some((id) => !visible.has(id)))
       setSelected(new Set([...selected].filter((id) => visible.has(id))))
   }, [pageItems, selected, setSelected])
-  const checked = pageItems.filter((category) => selected.has(category.id))
+  const checked = selectionOf(selected, pageItems).items
 
   // Les listes du Blog ou des Podcasts montrent les noms : relues aussi.
   const refresh = () =>
@@ -167,7 +168,7 @@ export function CategoriesTab({
     mutationFn: (category: Category) => deleteCategory(category.id),
     onSuccess: (_, category) => {
       toast.success(labels.removed(category.name))
-      setSelected((previous) => without(previous, [category.id]))
+      setSelected((previous) => toggleSelected(previous, category.id, false))
     },
     onError,
     onSettled: async () => {
@@ -202,11 +203,7 @@ export function CategoriesTab({
   const busy =
     remove.isPending || bulk.removeMany.isPending || reorder.isPending
   const toggle = (category: Category, on: boolean) =>
-    setSelected((previous) =>
-      on
-        ? new Set([...previous, category.id])
-        : without(previous, [category.id])
-    )
+    setSelected((previous) => toggleSelected(previous, category.id, on))
 
   const dialog = (
     <CategoryDialog
@@ -314,14 +311,7 @@ export function CategoriesTab({
                 reorderDisabled={filtering || busy}
                 onToggle={toggle}
                 onToggleAll={(on) =>
-                  setSelected(
-                    on
-                      ? new Set(pageItems.map((category) => category.id))
-                      : without(
-                          selected,
-                          pageItems.map((category) => category.id)
-                        )
-                  )
+                  setSelected(toggleAll(selected, pageItems, on))
                 }
                 // Rangée dans la page : toute la liste suit (sans recherche, shown est la
                 // liste entière, dans son ordre).
@@ -395,12 +385,6 @@ const usageItems = usageFilters.map((value) => ({
 }))
 function isUsageFilter(value: unknown): value is UsageFilter {
   return usageFilters.includes(value as UsageFilter)
-}
-
-function without(set: ReadonlySet<string>, ids: string[]): Set<string> {
-  const next = new Set(set)
-  for (const id of ids) next.delete(id)
-  return next
 }
 
 function CategoryTable({

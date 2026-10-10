@@ -3,8 +3,15 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import { useAccessCheck } from "@/components/team/use-access-check"
-import { categoryKeys, deleteCategory, type Category } from "@/lib/categories"
+import { trashMany } from "@/lib/bulk-trash"
+import {
+  CategoryError,
+  categoryKeys,
+  deleteCategory,
+  type Category,
+} from "@/lib/categories"
 import { contentKeys } from "@/lib/contents/api"
+import { errorMessage } from "@/lib/errors"
 import { texts } from "@/texts"
 
 const labels = texts.categories
@@ -22,22 +29,20 @@ export function useCategoriesBulk() {
   const [confirming, setConfirming] = useState(false)
 
   const removeMany = useMutation({
-    mutationFn: async (items: Category[]) => {
-      let done = 0
-      for (const item of items) {
-        try {
-          await deleteCategory(item.id)
-          done += 1
-        } catch (error) {
-          if (done > 0) toast.success(labels.removedMany(done))
-          throw error
-        }
-      }
-      return done
-    },
-    onSuccess: (done) => {
-      toast.success(labels.removedMany(done))
-      setSelected(new Set())
+    // Une catégorie déjà supprimée ailleurs est passée : les autres continuent.
+    mutationFn: (items: Category[]) =>
+      trashMany(items, deleteCategory, (error) =>
+        error instanceof CategoryError && error.code === "introuvable"
+          ? error.message
+          : null
+      ),
+    onSuccess: (result) => {
+      if (result.trashed.length > 0)
+        toast.success(labels.removedMany(result.trashed.length))
+      if (result.error) {
+        toast.error(errorMessage(result.error))
+        checkAccess(result.error)
+      } else setSelected(new Set())
     },
     onError: (error) => {
       toast.error(error.message)

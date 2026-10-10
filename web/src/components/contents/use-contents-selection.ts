@@ -1,15 +1,13 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useQueryClient } from "@tanstack/react-query"
 import { useRef, useState } from "react"
-import { toast } from "sonner"
 
+import { announceRestore } from "@/components/contents/announce-restore"
 import type { SelectAll } from "@/components/bulk-selection"
-import { useAccessCheck } from "@/components/team/use-access-check"
+import { useTrashMany } from "@/hooks/use-trash-many"
 import {
-  restoreMany,
   selectionOf,
   toggleAll,
   toggleSelected,
-  trashMany,
   type BulkTrashResult,
   type Kept,
 } from "@/lib/bulk-trash"
@@ -19,10 +17,7 @@ import {
   trashContent,
   type Trashed,
 } from "@/lib/contents/publication"
-import { errorMessage } from "@/lib/errors"
-import { kickFiles } from "@/lib/media/api"
 import { refreshAfterContentTrash } from "@/lib/refresh"
-import { texts } from "@/texts"
 
 type Row = { id: string; title: string }
 
@@ -114,51 +109,19 @@ function useBulkTrash<T extends Row>({
   onDone: (result: BulkTrashResult<T, Trashed> | null) => void
 }) {
   const queryClient = useQueryClient()
-  const checkAccess = useAccessCheck()
-  const refresh = () => refreshAfterContentTrash(queryClient)
-
-  const undo = async (items: T[]) => {
-    const { restored, error } = await restoreMany(
-      items.map((item) => item.id),
-      restoreContent
-    )
-    if (restored.length > 0) toast.success(words.restoredMany(restored.length))
-    restored.forEach(({ addressRemoved, renamedTo }, index) => {
-      const name = nameOf(items[index])
-      if (renamedTo !== null)
-        toast.warning(texts.trash.restoredRenamed(name, renamedTo))
-      if (addressRemoved)
-        toast.warning(texts.trash.restoredWithoutAddress(name))
-    })
-    if (error) toast.error(errorMessage(error))
-    await refresh()
-  }
-
-  return useMutation({
-    mutationFn: (items: T[]) =>
-      trashMany(items, trashContent, keptContentDetail),
-    onSuccess: (result) => {
-      if (result.trashed.length > 0) {
-        toast.success(words.trashedMany(result.trashed.length), {
-          action: {
-            label: texts.common.undo,
-            onClick: () => void undo(result.trashed),
-          },
-        })
-        // Leurs fichiers redeviennent peut-être protégés : tout de suite.
-        if (result.results.some((trashed) => trashed.needsFileSync))
-          void kickFiles()
-      }
-      if (result.error) {
-        toast.error(errorMessage(result.error))
-        checkAccess(result.error)
-      }
-      onDone(result)
-    },
-    onError: (error) => {
-      toast.error(errorMessage(error))
-      onDone(null)
-    },
-    onSettled: refresh,
+  return useTrashMany({
+    trash: trashContent,
+    keptDetail: keptContentDetail,
+    restore: restoreContent,
+    refresh: () => refreshAfterContentTrash(queryClient),
+    words: { trashed: words.trashedMany, restored: words.restoredMany },
+    // Leurs fichiers redeviennent peut-être protégés : tout de suite.
+    needsFileSync: (result) =>
+      result.results.some((trashed) => trashed.needsFileSync),
+    onRestored: (items, restored) =>
+      restored.forEach((result, index) =>
+        announceRestore(nameOf(items[index]), result)
+      ),
+    onDone,
   })
 }

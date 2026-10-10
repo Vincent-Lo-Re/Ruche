@@ -17,6 +17,7 @@ import { Link, useNavigate } from "react-router"
 
 import { toast } from "sonner"
 
+import { announceRestore } from "@/components/contents/announce-restore"
 import {
   BulkTrashButton,
   KeptNotice,
@@ -221,12 +222,9 @@ export function ContentListPage({
   const undo = async (item: ContentListItem) => {
     const name = displayTitle(item.title)
     try {
-      const { addressRemoved, renamedTo } = await restoreContent(item.id)
-      if (renamedTo !== null)
-        toast.warning(texts.trash.restoredRenamed(name, renamedTo))
-      if (addressRemoved)
-        toast.warning(texts.trash.restoredWithoutAddress(name))
-      else if (renamedTo === null) toast.success(kindLabels.restored(name))
+      announceRestore(name, await restoreContent(item.id), {
+        success: kindLabels.restored(name),
+      })
     } catch (error) {
       toast.error(errorMessage(error))
     } finally {

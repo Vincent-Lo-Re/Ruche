@@ -11,6 +11,7 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
 import { toast } from "sonner"
 
+import { announceRestore } from "@/components/contents/announce-restore"
 import { ListCard, ListEmpty } from "@/components/list-card"
 import { SelectAllHead } from "@/components/bulk-selection"
 import { LoadState, RefreshFailed } from "@/components/load-state"
@@ -37,6 +38,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useAddressState } from "@/hooks/use-address-state"
+import { selectionOf, toggleAll, toggleSelected } from "@/lib/bulk-trash"
 import { trashFilterFromAddress, writeTrashFilter } from "@/lib/address"
 import { ContentError, contentKeys } from "@/lib/contents/api"
 import { formatDate, formatDateTime } from "@/lib/dates"
@@ -108,21 +110,19 @@ export function TrashPage() {
       const action = path
         ? { label: texts.common.open, onClick: () => void navigate(path) }
         : undefined
-      if (renamedTo !== null) {
-        toast.warning(texts.trash.restoredRenamed(name, renamedTo), { action })
-      }
-      if (addressRemoved) {
-        toast.warning(texts.trash.restoredWithoutAddress(name), { action })
-      } else if (renamedTo === null) {
-        toast.success(texts.trash.restored(name), {
+      announceRestore(
+        name,
+        { addressRemoved, renamedTo },
+        {
+          success: texts.trash.restored(name),
+          // Un modèle ne se publie pas : rien à dire de l'app.
           description:
-            // Un modèle ne se publie pas : rien à dire de l'app.
             item.item_type === "content" && item.kind !== "template"
               ? texts.trash.restoredDraft
               : undefined,
           action,
-        })
-      }
+        }
+      )
     },
     onError: (error) => {
       toast.error(error.message, {
@@ -168,18 +168,12 @@ export function TrashPage() {
     activeFilter
   )
   const shown = paged.items
-  const shownKeys = new Set(shown.map(keyOf))
-  const selection = shown.filter((item) => selected.has(keyOf(item)))
+  const checked = selectionOf(selected, shown, keyOf)
+  const selection = checked.items
   const busy = restore.isPending || erase.isPending
 
-  const toggle = (item: TrashItem, checked: boolean) =>
-    setSelected((current) => {
-      const next = new Set(current)
-      if (checked) next.add(keyOf(item))
-      else next.delete(keyOf(item))
-      return next
-    })
-  const allChecked = shown.length > 0 && selection.length === shown.length
+  const toggle = (item: TrashItem, on: boolean) =>
+    setSelected((current) => toggleSelected(current, keyOf(item), on))
 
   const confirm = () => {
     if (!confirmation) return
@@ -260,19 +254,13 @@ export function TrashPage() {
                 <TableHeader>
                   <TableRow>
                     <SelectAllHead
-                      all={allChecked}
-                      some={selection.length > 0 && !allChecked}
+                      all={checked.all}
+                      some={checked.some}
                       disabled={busy}
-                      onToggleAll={(checked) =>
-                        setSelected((current) => {
-                          const next = new Set(
-                            [...current].filter((key) => !shownKeys.has(key))
-                          )
-                          if (checked) {
-                            for (const key of shownKeys) next.add(key)
-                          }
-                          return next
-                        })
+                      onToggleAll={(on) =>
+                        setSelected((current) =>
+                          toggleAll(current, shown, on, keyOf)
+                        )
                       }
                     />
                     <TableHead>{texts.trash.columns.name}</TableHead>
