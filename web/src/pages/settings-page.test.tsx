@@ -186,7 +186,7 @@ describe("Paramètres : le format régional de l'admin (Avancé)", () => {
 })
 
 describe("Paramètres : les onglets", () => {
-  it("quatre onglets ; le premier s'ouvre au départ, l'onglet choisi va dans l'adresse", async () => {
+  it("trois onglets ; le premier s'ouvre au départ, l'onglet choisi va dans l'adresse", async () => {
     const { router } = await renderApp("/settings")
 
     const tabs = await screen.findByRole("tablist", {
@@ -198,7 +198,6 @@ describe("Paramètres : les onglets", () => {
         .map((tab) => tab.textContent)
     ).toEqual([
       texts.settings.tabs.admin,
-      texts.settings.tabs.app,
       texts.settings.tabs.plans,
       texts.settings.tabs.advanced,
     ])

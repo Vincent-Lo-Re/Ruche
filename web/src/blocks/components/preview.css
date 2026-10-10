@@ -296,9 +296,11 @@
 }
 
 /* Les mesures de chaque téléphone, une seule fois, sur la grille de l'aperçu (qui contient le
-   téléphone, ses barres et les messages au-dessus de lui). La hauteur de l'écran et le cadre
+   téléphone, ses barres et les messages au-dessus de lui), ou sur ce qui tient le téléphone de
+   l'aperçu de la charte (.blocks-phone-holder). La hauteur de l'écran et le cadre
    donnent aussi la réduction du téléphone (deviceHeightOf de lib/editor/preview.ts). */
-.blocks-preview-layout[data-device="ios"] {
+.blocks-preview-layout[data-device="ios"],
+.blocks-phone-holder[data-device="ios"] {
   --blocks-phone-width: 402px;
   --blocks-screen-height: 874px;
   --blocks-screen-radius: 52px;
@@ -307,7 +309,8 @@
   --blocks-status-height: 50px;
 }
 
-.blocks-preview-layout[data-device="android"] {
+.blocks-preview-layout[data-device="android"],
+.blocks-phone-holder[data-device="android"] {
   --blocks-phone-width: 412px;
   --blocks-screen-height: 915px;
   --blocks-screen-radius: 32px;

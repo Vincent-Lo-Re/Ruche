@@ -30,6 +30,10 @@
 | Corbeille | Trash | Ce qu'on supprime y reste 30 jours avant l'effacement. | Poubelle / Bin, Recycle bin |
 | La team | Team | Les membres et leurs rôles (admins seulement). Le nom de la section depuis le 09/10/2026 (avant, « Équipe ») ; « l'équipe » reste dans les phrases. | Utilisateurs / Users |
 | Paramètres | Settings | Les réglages de toute l'admin (admins seulement). | Configuration / Preferences |
+| App | App | Section de ce que voient les lecteurs de l'app mobile (admins seulement), en onglets : Identité, Charte graphique, Navigation, Mises en page (10/10/2026). | Application, Apparence / Application, Appearance |
+| Charte graphique | Style | Onglet de la section App : couleurs, polices et formes de l'app, en brouillon puis publiées. | Thème, Design / Theme, Brand kit |
+| Teinte (d'un encadré) | Box tint | Fond, bordure, titre, texte et lien d'un encadré, nommés par le client. | Couleur d'encadré / Box color |
+| Pastille | Badge | Petite étiquette de l'app (catégorie, « Abonnés »…), dont la charte fixe les styles. | Étiquette, tag / Tag, Label |
 | Mon compte | My account | Profil, double vérification et thème de chaque membre. | Profil (seul) / Profile (seul) |
 | Contenus (groupe du menu) | Content | Blog, Podcasts, Pages. | — / Contents |
 | Outils (groupe du menu) | Tools | Modèles de bloc, Médiathèque, Corbeille. | — |
@@ -179,7 +183,7 @@
 
 | Français | English | Définition | À éviter (FR / EN) |
 |---|---|---|---|
-| Identité de l'admin / de l'app | Admin branding / App branding | Onglets des Paramètres. | — / Admin identity |
+| Identité de l'admin | Admin branding | Onglet des Paramètres. L'identité de l'app est un onglet de la section App (Identité / Identity). | — / Admin identity |
 | marque, nom de la marque | brand, brand name | Le nom affiché partout ; « Ruche » à défaut. Les e-mails, qui ne lisent pas la base, disent « ton administration » / « your admin ». | un nom de client (dans les e-mails) |
 | Ruche | Ruche | Nom à défaut. Ne se traduit pas, n'apparaît jamais dans les textes. | — / Hive |
 | à défaut | default | Ce qui s'affiche quand rien n'est choisi. | — |

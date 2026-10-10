@@ -204,14 +204,13 @@ export function writeTemplateTab(
 // --- Paramètres -----------------------------------------------------------------------------
 
 /** Les onglets de Paramètres, dans l'ordre (ADMIN § 7). */
-export const settingsTabs = ["admin", "app", "plans", "advanced"] as const
+export const settingsTabs = ["admin", "plans", "advanced"] as const
 export type SettingsTab = (typeof settingsTabs)[number]
 
 const settingsTabChoice: Choice<SettingsTab> = {
   name: "tab",
   words: {
     admin: "admin",
-    app: "app",
     plans: "plans",
     advanced: "advanced",
   },
@@ -226,6 +225,34 @@ export function settingsTabFromAddress(params: URLSearchParams): SettingsTab {
 /** Écrit l'onglet de Paramètres dans l'adresse. */
 export function writeSettingsTab(params: URLSearchParams, tab: SettingsTab) {
   writeChoice(params, settingsTabChoice, tab)
+}
+
+// --- App ----------------------------------------------------------------------------------
+
+/** Les onglets de la section « App », dans l'ordre (ADMIN § 1). */
+export const appTabs = ["identity", "style", "navigation", "layouts"] as const
+export type AppTab = (typeof appTabs)[number]
+
+const appTabChoice: Choice<AppTab> = {
+  name: "tab",
+  words: {
+    identity: "identity",
+    style: "style",
+    navigation: "navigation",
+    layouts: "layouts",
+  },
+  // La charte graphique, le seul onglet construit avant l'app mobile.
+  fallback: "style",
+}
+
+/** L'onglet de la section « App », lu dans l'adresse (la charte graphique par défaut). */
+export function appTabFromAddress(params: URLSearchParams): AppTab {
+  return readChoice(params, appTabChoice)
+}
+
+/** Écrit l'onglet de la section « App » dans l'adresse. */
+export function writeAppTab(params: URLSearchParams, tab: AppTab) {
+  writeChoice(params, appTabChoice, tab)
 }
 
 // --- Corbeille ------------------------------------------------------------------------------

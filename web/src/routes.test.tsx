@@ -23,6 +23,7 @@ describe("menu", () => {
     const main = screen.getByRole("navigation", { name: texts.nav.label })
     expect(within(main).getByText(texts.nav.groups.contents)).toBeVisible()
     expect(within(main).getByText(texts.nav.groups.tools)).toBeVisible()
+    expect(within(main).getByText(texts.nav.groups.app)).toBeVisible()
     expect(
       within(main)
         .getAllByRole("link")
@@ -35,6 +36,7 @@ describe("menu", () => {
       "Modèles de bloc",
       "Médiathèque",
       "Corbeille",
+      "App",
     ])
 
     // Le compte, l'équipe et les paramètres sont dans le header (sans site web réglé, pas de

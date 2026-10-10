@@ -1,6 +1,5 @@
 import {
   ALargeSmall,
-  BatteryFull,
   Bookmark,
   ChevronLeft,
   Eye,
@@ -9,11 +8,9 @@ import {
   Moon,
   Pencil,
   Share,
-  Signal,
   Sun,
   UserCheck,
   UserX,
-  Wifi,
   type LucideIcon,
 } from "lucide-react"
 import {
@@ -29,6 +26,7 @@ import {
 import type { BlockMedia } from "@/blocks/components/context"
 import { StaticBlock } from "@/blocks/components/static-block"
 import { AndroidLogo, AppleLogo } from "@/components/brand-icons"
+import { PhoneDevice } from "@/components/phone-device"
 import type { Block, Draft } from "@/blocks/types"
 import { AudioPreview, CoverPreview } from "@/components/editor/presentation"
 import { Kbd } from "@/components/ui/kbd"
@@ -127,29 +125,14 @@ export function FeedPreview({
         data-backdrop
         className="blocks-preview-frame flex min-h-0 flex-col items-center"
       >
-        <div
-          role="region"
-          aria-label={labels.screen[preview.device]}
-          className="blocks-device"
-          data-device={preview.device}
-          data-blocks-theme={preview.theme}
-          data-large-text={preview.largeText || undefined}
+        <PhoneDevice
+          device={preview.device}
+          theme={preview.theme}
+          largeText={preview.largeText}
+          appBar={appBar}
         >
-          <div className="blocks-screen">
-            <div aria-hidden className="blocks-status">
-              <span>{labels.time[preview.device]}</span>
-              <span className="blocks-camera" />
-              <span className="blocks-status-icons">
-                <Signal />
-                <Wifi />
-                <BatteryFull />
-              </span>
-            </div>
-            {appBar}
-            <div className="blocks-screen-scroll">{children}</div>
-            <div aria-hidden className="blocks-home" />
-          </div>
-        </div>
+          {children}
+        </PhoneDevice>
       </div>
       <div className="blocks-preview-tools">
         <PreviewTools

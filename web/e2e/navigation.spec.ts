@@ -67,6 +67,7 @@ test("le tour de l'admin : chaque page arrive préparée, sans lecture oubliée"
     sections.templates,
     sections.media,
     sections.trash,
+    sections.app,
     sections.team,
     sections.settings,
   ]) {

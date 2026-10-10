@@ -104,6 +104,7 @@ export const fr: Texts = {
     groups: {
       contents: "Contenus",
       tools: "Outils",
+      app: "App mobile",
     },
     // La barre du haut, pendant que la page suivante se prépare.
     pageLoading: "Chargement de la page",
@@ -132,6 +133,10 @@ export const fr: Texts = {
       title: "Modèles de bloc",
       description: "Les modèles de bloc, à réutiliser dans les contenus.",
     },
+    app: {
+      title: "App",
+      description: "Ce que voient les lecteurs de ton app mobile.",
+    },
     media: {
       title: "Médiathèque",
       description:
@@ -149,7 +154,7 @@ export const fr: Texts = {
     settings: {
       title: "Paramètres",
       description:
-        "Donne un visage à ton admin et à ton app, compose tes formules et ajuste les réglages avancés.",
+        "Donne un visage à ton admin, compose tes formules et ajuste les réglages avancés.",
     },
     account: {
       title: "Mon compte",
@@ -2363,7 +2368,6 @@ export const fr: Texts = {
     tabs: {
       label: "Onglets des Paramètres",
       admin: "Identité de l'admin",
-      app: "Identité de l'app",
       plans: "Formules",
       advanced: "Avancé",
     },
@@ -2564,11 +2568,6 @@ export const fr: Texts = {
         saved: "Noms des sections enregistrés.",
       },
     },
-    // Un onglet pas encore rempli.
-    empty: {
-      title: "Rien ici pour l'instant",
-      description: "Cet onglet arrive bientôt.",
-    },
     accessLevels: {
       title: "Formules d'abonnement",
       description:
@@ -2625,6 +2624,368 @@ export const fr: Texts = {
           "La liste a changé entre-temps. Recharge la page, puis réessaie.",
         introuvable: "Cette formule n'existe plus. Recharge la page.",
       },
+    },
+  },
+
+  // La section « App » (ADMIN § 1) : tout ce que voient les lecteurs de l'app, en onglets.
+  appPage: {
+    tabs: {
+      label: "Onglets de l'app",
+      identity: "Identité",
+      style: "Charte graphique",
+      navigation: "Navigation",
+      layouts: "Mises en page",
+    },
+    // Les onglets construits avec l'app mobile.
+    soon: {
+      title: "Arrive avec l'app mobile",
+      description:
+        "Cet onglet sera construit en même temps que les écrans de l'app mobile.",
+    },
+  },
+
+  // Onglet « Charte graphique » de la section « App » : la charte que composent les admins, en
+  // brouillon, puis publiée pour l'app.
+  appStyle: {
+    loadFailed: "Impossible de charger la charte de l'app.",
+    status: {
+      never: "Jamais publiée",
+      published: (date: string) => `Publiée le ${date}`,
+      modified: "Modifications non publiées",
+      saving: "Enregistrement…",
+      saved: "Brouillon enregistré",
+      failed: "Non enregistré",
+    },
+    publish: "Publier",
+    published: "Charte publiée. L'app s'en sert dès maintenant.",
+    discard: "Revenir à la version publiée",
+    discardTitle: "Revenir à la version publiée ?",
+    discardDescription:
+      "Le brouillon revient à la charte publiée, ou à la charte neutre si rien n'a encore été publié.",
+    discardConfirm: "Revenir à la version publiée",
+    discarded: "Le brouillon est revenu à la version publiée.",
+    // Les vérifications qui empêchent d'enregistrer le brouillon (même règle que la base).
+    blocked: "Corrige les noms signalés pour enregistrer le brouillon.",
+    darkMode: {
+      title: "Mode sombre",
+      description:
+        "L'app peut suivre le réglage du téléphone, ou rester toujours dans le même mode.",
+      label: "Mode sombre",
+      auto: "Suit le téléphone",
+      light: "Toujours clair",
+      dark: "Toujours sombre",
+    },
+    colors: {
+      title: "Couleurs",
+      description:
+        "Tes couleurs, avec le nom que tu veux. Chacune a sa valeur en mode clair et en mode sombre.",
+      name: "Nom",
+      light: "Clair",
+      dark: "Sombre",
+      add: "Ajouter une couleur",
+      newName: "Nouvelle couleur",
+      remove: (name: string) => `Retirer « ${name} »`,
+      inUse: "Utilisée : choisis d'abord une autre couleur là où elle sert.",
+      pick: (name: string, mode: string) => `Modifier « ${name} » (${mode})`,
+      hex: "Code hexadécimal",
+      hexInvalid: "Saisis un code comme #9b3b5e.",
+      unused: "Couleur inutilisée",
+    },
+    roles: {
+      title: "Où va chaque couleur",
+      description:
+        "L'app a besoin de savoir quelle couleur sert à quoi. Choisis parmi tes couleurs.",
+      groups: {
+        screen: "Écran",
+        text: "Texte",
+        bars: "Barres",
+        fields: "Champs",
+        states: "États",
+      },
+      names: {
+        background: "Fond de l'écran",
+        card: "Cartes et champs",
+        border: "Bordures",
+        text: "Texte",
+        muted: "Texte secondaire",
+        link: "Liens",
+        primary: "Couleur principale (filets, citations)",
+        topBar: "Fond de la barre du haut",
+        topBarText: "Texte de la barre du haut",
+        tabBar: "Fond de la barre de navigation",
+        tabOn: "Onglet choisi",
+        tabOff: "Onglets non choisis",
+        focus: "Bordure d'un champ actif",
+        success: "Réussite (« Enregistré »)",
+        warning: "Avertissement (« Hors ligne »)",
+        error: "Erreur",
+      },
+      readable: "Lisible",
+    },
+    // La lisibilité (contrastes WCAG), signalée sans rien refuser.
+    readability: {
+      hard: "Peu lisible",
+      light: "mode clair",
+      dark: "mode sombre",
+      ratio: (ratio: string, min: string, mode: string) =>
+        `Contraste de ${ratio}:1 en ${mode} ; il faut ${min}:1.`,
+      title: "Lisibilité",
+      allGood: "Tous les textes sont lisibles.",
+      count: (count: number) =>
+        count === 1 ? "1 texte peu lisible" : `${count} textes peu lisibles`,
+      role: (name: string) => name,
+      tint: (name: string, part: string) => `Encadré « ${name} », ${part}`,
+      badge: (name: string) => `Pastille « ${name} »`,
+      button: (name: string) => `Bouton « ${name} »`,
+    },
+    tints: {
+      title: "Teintes des encadrés",
+      description:
+        "Autant de teintes que tu veux. Dans le bloc Encadré, on choisit ensuite l'une d'elles.",
+      add: "Ajouter une teinte",
+      newName: "Nouvelle teinte",
+      parts: {
+        fill: "Fond",
+        border: "Bordure",
+        title: "Titre",
+        text: "Texte",
+        link: "Lien",
+      },
+      minOne: "Il faut au moins une teinte.",
+    },
+    badges: {
+      title: "Pastilles",
+      description:
+        "Les petites étiquettes : la catégorie d'un article, « Abonnés », « Gratuit ». Autant que tu veux. La première sert aux catégories.",
+      add: "Ajouter une pastille",
+      newName: "Nouvelle pastille",
+      first: "Catégories",
+      parts: {
+        fill: "Fond",
+        border: "Bordure",
+        text: "Texte",
+      },
+      minOne: "Il faut au moins une pastille.",
+    },
+    buttons: {
+      title: "Boutons",
+      description:
+        "Autant de boutons que tu veux, chacun avec son style. Dans le bloc Bouton, on choisit ensuite l'un d'eux. Le premier sert aux boutons de l'app (« Continuer », « S'abonner »). Appuyé ou désactivé, un bouton change de lui-même.",
+      add: "Ajouter un bouton",
+      newName: "Nouveau bouton",
+      first: "Boutons de l'app",
+      kind: "Style",
+      kinds: {
+        flat: "Aplat",
+        gradient: "Dégradé",
+        outline: "Bordure",
+        text: "Texte seul",
+      },
+      shape: "Forme",
+      shapes: {
+        rounded: "Arrondi de la charte",
+        pill: "Pilule",
+        square: "Carré",
+      },
+      parts: {
+        fill: "Fond",
+        start: "Début",
+        end: "Fin",
+        border: "Bordure",
+        label: "Texte",
+      },
+      minOne: "Il faut au moins un bouton.",
+    },
+    fields: {
+      title: "Champs",
+      description:
+        "Les cases où le lecteur écrit (prénom, e-mail, recherche). La bordure d'un champ actif se règle dans « Où va chaque couleur ».",
+      label: "Style des champs",
+      outline: "Avec bordure",
+      filled: "Fond plein",
+      underline: "Souligné",
+    },
+    fonts: {
+      title: "Polices",
+      description:
+        "Tes polices : celle du téléphone, ou une police libre de Google Fonts, avec son épaisseur. Trois au moins.",
+      name: "Nom",
+      family: "Police",
+      weight: "Épaisseur",
+      sample: "Aperçu",
+      sampleText: "Aa Bb 123",
+      system: "Police du téléphone",
+      weights: {
+        400: "Normale",
+        500: "Moyenne",
+        600: "Demi-grasse",
+        700: "Grasse",
+      },
+      add: "Ajouter une police",
+      newName: "Nouvelle police",
+      remove: (name: string) => `Retirer « ${name} »`,
+      minFonts: "Il faut au moins trois polices.",
+      inUse: "Utilisée : choisis d'abord une autre police là où elle sert.",
+    },
+    fontRoles: {
+      title: "Où va chaque police",
+      description: "Comme pour les couleurs : choisis parmi tes polices.",
+      names: {
+        brand: "Nom de la marque (barre du haut)",
+        title: "Titre d'un contenu",
+        heading: "Intertitres",
+        body: "Texte courant",
+        quote: "Citations",
+        small: "Petits textes (dates, légendes, champs)",
+        boxTitle: "Titres des encadrés",
+        button: "Boutons et pastilles",
+        tabs: "Onglets de navigation",
+      },
+    },
+    sizes: {
+      title: "Tailles du texte",
+      description:
+        "En points, pour un texte de taille normale. Le réglage « grand texte » du téléphone les agrandit toutes ensemble (essaie « Grand texte » sous l'aperçu).",
+      text: "Texte",
+      size: "Taille",
+      lineHeight: "Interligne",
+      points: "pt",
+      sizeOf: (name: string) => `${name} : taille`,
+      lineHeightOf: (name: string) => `${name} : interligne`,
+      names: {
+        title: "Titre d'un contenu",
+        heading: "Intertitres",
+        body: "Texte courant",
+        quote: "Citations",
+        small: "Petits textes",
+      },
+    },
+    shapes: {
+      title: "Formes et effets",
+      description: "Pour toute l'app, neutres au départ.",
+      radius: "Arrondi des cartes et encadrés",
+      imageRadius: "Arrondi des images",
+      shadow: "Ombres des cartes",
+      shadows: {
+        none: "Aucune",
+        light: "Légère",
+        medium: "Marquée",
+        strong: "Forte",
+      },
+      links: "Liens dans le texte",
+      underlined: "Soulignés",
+      plain: "Sans soulignement",
+      points: (value: number) => `${value} pt`,
+    },
+    file: {
+      title: "Fichier de la charte",
+      description:
+        "Pour garder ta charte, ou la reprendre dans une autre installation.",
+      export: "Exporter",
+      import: "Importer",
+      fileName: "charte-app.json",
+      invalid: "Ce fichier n'est pas une charte de l'app.",
+      imported:
+        "Charte importée dans le brouillon. Vérifie-la, puis publie-la.",
+    },
+    // Les noms donnés aux couleurs, teintes, pastilles, boutons et polices.
+    names: {
+      empty: "Saisis un nom.",
+      tooLong: "Un nom ne dépasse pas 40 caractères.",
+      taken: "Ce nom est déjà pris dans cette liste.",
+    },
+    partOf: (name: string, part: string) => `${name} : ${part}`,
+    remove: (name: string) => `Retirer « ${name} »`,
+    handle: (name: string) => `Déplacer « ${name} »`,
+    // Glisser-déposer : annonces lues par les lecteurs d'écran.
+    dnd: {
+      roleDescription: "élément déplaçable",
+      instructions:
+        "Pour déplacer un élément, appuie sur Espace ou Entrée sur sa poignée. Déplace-le avec les flèches, puis appuie de nouveau sur Espace ou Entrée pour le déposer, ou sur Échap pour annuler.",
+      start: (name: string) => `« ${name} » est pris.`,
+      over: (name: string, position: number, count: number) =>
+        `« ${name} » est en position ${position} sur ${count}.`,
+      end: (name: string, position: number, count: number) =>
+        `« ${name} » est déposé en position ${position} sur ${count}.`,
+      cancel: (name: string) =>
+        `Déplacement annulé. « ${name} » reprend sa place.`,
+    },
+    // L'aperçu : un téléphone avec un article imaginaire, aux couleurs du brouillon.
+    preview: {
+      label: "Aperçu de l'app",
+      mode: "Mode de l'aperçu",
+      light: "Clair",
+      dark: "Sombre",
+      text: "Taille du texte",
+      normalText: "Texte normal",
+      largeText: "Grand texte",
+      title: "Titre de l'article",
+      meta: "12 oct. · 6 min de lecture",
+      category: "Catégorie",
+      bodyStart: "Le texte courant de l'article, avec",
+      link: "un lien",
+      bodyEnd: "au milieu de la phrase.",
+      heading: "Un intertitre",
+      body2: "Un deuxième paragraphe, sous l'intertitre.",
+      quote: "« Une citation, mise en valeur dans le texte. »",
+      caption: "La légende d'une image.",
+      boxText: "Un encadré de cette teinte, avec son texte.",
+      boxLink: "En savoir plus",
+      card: "Un article de la liste",
+      cardMeta: "4 min de lecture",
+      saved: "Enregistré",
+      offline: "Hors ligne : les nouveautés arriveront avec le réseau.",
+      firstName: "Ton prénom",
+      firstNamePlaceholder: "Écris ton prénom…",
+      search: "Recherche",
+      searchValue: "Recette",
+      email: "E-mail",
+      emailValue: "adresse@",
+      emailError: "Cette adresse n'est pas complète.",
+      tabs: {
+        home: "Accueil",
+        blog: names.blog.name,
+        podcasts: names.podcasts.name,
+        profile: "Profil",
+      },
+    },
+    // La charte neutre de Ruche : les noms de ses couleurs, teinte, pastille, boutons et polices.
+    neutral: {
+      colors: {
+        white: "Blanc",
+        lightGray: "Gris clair",
+        borderGray: "Gris bordure",
+        textGray: "Gris texte",
+        black: "Noir",
+        green: "Vert réussite",
+        orange: "Orange avertissement",
+        red: "Rouge erreur",
+      },
+      tint: "Neutre",
+      badge: "Catégorie",
+      buttons: {
+        primary: "Principal",
+        secondary: "Secondaire",
+        subtle: "Discret",
+      },
+      fonts: {
+        headings: "Titres",
+        text: "Texte",
+        accent: "Accent",
+      },
+    },
+    // La copie des polices dans le stockage, faite par l'admin avant de publier.
+    copyFailed:
+      "Impossible de copier les polices dans ton stockage. Publie de nouveau.",
+    errors: {
+      charte_invalide:
+        "La charte contient une erreur : elle n'a pas été enregistrée. Vérifie les noms et réessaie.",
+      conflit_revision:
+        "Un autre admin vient de modifier la charte. Elle a été rechargée.",
+      police_manquante:
+        "Une police n'a pas pu être copiée dans ton stockage. Publie de nouveau.",
+      reserve_aux_admins:
+        "Seuls les admins peuvent modifier la charte de l'app.",
     },
   },
 

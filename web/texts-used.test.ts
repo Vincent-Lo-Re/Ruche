@@ -40,6 +40,7 @@ const serverCodeMaps = [
   "publication.scheduleErrors",
   "categories.errors",
   "accessLevels.errors",
+  "appStyle.errors",
 ]
 const server =
   read(join(repo, "supabase", "migrations"), (path) => path.endsWith(".sql")) +
