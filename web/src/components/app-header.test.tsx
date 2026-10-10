@@ -148,7 +148,7 @@ describe("header (ADMIN § 7, « Un header sur toute la largeur »)", () => {
     expect(await within(dialog).findByText(texts.help.empty)).toBeVisible()
   })
 
-  it("les palettes : l'icône en dernier ouvre une glissière, et le choix est gardé comme dans Mon compte", async () => {
+  it("les palettes : l'icône avant l'avatar ouvre une glissière, et le choix est gardé comme dans Mon compte", async () => {
     await renderApp("/", fakeAuth({ role: "editor" }))
     // Le header de la page : celui qui porte le menu du haut.
     const header = screen
@@ -158,7 +158,8 @@ describe("header (ADMIN § 7, « Un header sur toute la largeur »)", () => {
     const open = within(header).getByRole("button", {
       name: texts.theme.openPalettes,
     })
-    expect(buttons.at(-1)).toBe(open)
+    // Tout à droite, l'avatar du membre (account-menu.test.tsx).
+    expect(buttons.at(-2)).toBe(open)
 
     fireEvent.click(open)
     const sheet = await screen.findByRole("dialog", { name: texts.theme.title })

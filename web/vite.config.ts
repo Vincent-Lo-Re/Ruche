@@ -1,5 +1,6 @@
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
+import { readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { defineConfig, loadEnv, type Plugin } from "vite"
 import { configDefaults } from "vitest/config"
@@ -26,9 +27,17 @@ function securityPolicy(): Plugin {
   }
 }
 
+// La version de l'admin (package.json), affichée en bas des pages avec le menu.
+const { version } = JSON.parse(
+  readFileSync(new URL("./package.json", import.meta.url), "utf8")
+) as { version: string }
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss(), securityPolicy()],
+  define: {
+    "import.meta.env.VITE_APP_VERSION": JSON.stringify(version),
+  },
   // Même adresse que site_url dans supabase/config.toml : les liens des e-mails
   // (invitation) et la session restent sur une seule origine.
   server: {

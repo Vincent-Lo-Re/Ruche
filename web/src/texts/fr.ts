@@ -108,6 +108,9 @@ export const fr: Texts = {
     },
     // La barre du haut, pendant que la page suivante se prépare.
     pageLoading: "Chargement de la page",
+    // En bas du menu : le copyright au nom de la marque (« Ruche » sans nom enregistré).
+    copyright: (year: number, brand: string) =>
+      `© ${year} ${brand}. Tous droits réservés.`,
   },
 
   // Titre et présentation de chaque section, dans le menu et en tête de page.
@@ -2660,6 +2663,12 @@ export const fr: Texts = {
     unmute: "Remettre le son",
     failed:
       "Cet audio n'a pas pu être lu. Vérifie ta connexion, puis réessaie.",
+  },
+
+  // En bas à droite du contenu des pages avec le menu : la version de l'admin et le contact.
+  footer: {
+    version: (version: string) => `Version ${version}`,
+    feedback: "Une fonctionnalité, un bug ?",
   },
 
   // Menu de l'avatar, en haut à droite de chaque page.

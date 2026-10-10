@@ -17,10 +17,8 @@ import { authPaths, sections } from "@/navigation"
 import { texts } from "@/texts"
 
 /**
- * Le membre, en bas du menu de gauche : son avatar (initiale du prénom), son nom et, dessous, son
- * rôle ; le tout ouvre son menu (nom et e-mail, « Mon compte », puis « Se déconnecter » ; Mon compte
- * est aussi dans le header, avec le thème).
- * L'avatar commence avec les icônes du menu (les marges d'une ligne du menu).
+ * Le membre, tout à droite du header : son avatar seul (initiale du prénom), aux couleurs du
+ * header ; il ouvre son menu (nom, e-mail et rôle, « Mon compte », puis « Se déconnecter »).
  */
 export function AccountMenu() {
   const { profile } = useAuth()
@@ -31,25 +29,14 @@ export function AccountMenu() {
 
   return (
     <DropdownMenu>
-      {/* Encadré comme les blocs de la colonne de gauche de la page du preset (ring-foreground/10). */}
-      <DropdownMenuTrigger className="flex min-w-0 items-center gap-2 rounded-lg px-2.5 py-2 text-left ring-1 ring-sidebar-foreground/15 outline-none hover:bg-sidebar-accent focus-visible:ring-sidebar-foreground/50 data-popup-open:bg-sidebar-accent">
-        {/*
-          Le bouton se lit par ce qu'il montre, le nom puis le rôle, et ce qu'il fait ; pas
-          l'initiale. Les espaces séparent ces mots à la lecture (une grille ou une rangée ne les
-          affiche pas).
-        */}
+      {/* Le bouton se lit par ce qu'il fait, pas par l'initiale. */}
+      <DropdownMenuTrigger className="rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
         <Avatar aria-hidden>
           <AvatarFallback>{initial(profile)}</AvatarFallback>
         </Avatar>
-        <span className="grid min-w-0 flex-1 leading-tight">
-          <span className="truncate text-sm font-medium">{name}</span>{" "}
-          <span className="truncate text-xs text-sidebar-foreground/70">
-            {texts.roles[profile.role]}
-          </span>
-        </span>{" "}
         <span className="sr-only">{texts.accountMenu.open}</span>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="top" align="start" className="w-60">
+      <DropdownMenuContent side="bottom" align="end" className="w-60">
         <DropdownMenuGroup>
           <DropdownMenuLabel className="flex flex-col gap-0.5 text-sm">
             <span className="truncate text-foreground">{name}</span>
@@ -58,6 +45,9 @@ export function AccountMenu() {
                 {profile.email}
               </span>
             )}
+            <span className="truncate text-xs font-normal">
+              {texts.roles[profile.role]}
+            </span>
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
