@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maquette — charte graphique de l'app</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&family=Inter:wght@400;600;700&family=Lora:wght@400;700&family=Merriweather:wght@400;700&family=Nunito:wght@400;700&family=Playfair+Display:wght@400;700&family=Work+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f4f5;--card:#fff;--line:#e4e4e7;--muted:#71717a;--text:#18181b;--accent:#f4f4f5;--primary:#18181b;--warn:#b45309;--warn-bg:#fffbeb;--ok:#15803d}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;color:var(--text);background:var(--bg)}
+.note{background:#fef3c7;border-bottom:1px solid #fde68a;padding:6px 16px;font-size:12px;color:#92400e}
+.app{display:flex;min-height:calc(100vh - 29px)}
+nav.menu{width:220px;flex:none;background:#18181b;color:#d4d4d8;padding:16px 10px;display:flex;flex-direction:column;gap:2px}
+nav.menu .brand{color:#fff;font-weight:700;padding:4px 10px 16px}
+nav.menu a{padding:7px 10px;border-radius:8px;color:inherit;text-decoration:none}
+nav.menu a.on{background:#27272a;color:#fff;font-weight:600}
+main{flex:1;min-width:0;padding:20px 24px 60px}
+h1{font-size:22px;margin:0 0 4px}
+.lead{color:var(--muted);margin:0 0 16px}
+.tabs{display:flex;gap:4px;background:#e4e4e7;border-radius:10px;padding:3px;width:max-content;max-width:100%;overflow:auto;margin-bottom:20px}
+.tabs button{border:0;background:none;padding:6px 12px;border-radius:7px;font:inherit;color:var(--muted);cursor:pointer;white-space:nowrap}
+.tabs button.on{background:#fff;color:var(--text);font-weight:600;box-shadow:0 1px 2px #0001}
+.tabs button:disabled{cursor:not-allowed;opacity:.6}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start}
+.stack{display:flex;flex-direction:column;gap:20px}
+section.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+section.card h2{font-size:15px;margin:0 0 2px}
+section.card .desc{color:var(--muted);margin:0 0 14px;font-size:13px}
+button{font:inherit;cursor:pointer}
+.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 10px;color:var(--text)}
+.btn:hover{background:#fafafa}
+.btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn.ghost{border-color:transparent;background:none;color:var(--muted)}
+.btn.dashed{border-style:dashed;color:var(--muted)}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;font-weight:500;color:var(--muted);text-align:left;padding:4px 6px;border-bottom:1px solid var(--line)}
+td{padding:6px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+input[type=text],select{font:inherit;border:1px solid var(--line);border-radius:7px;padding:5px 8px;background:#fff;color:var(--text);min-width:0}
+input[type=text]{width:100%}
+input[type=color]{width:34px;height:28px;border:1px solid var(--line);border-radius:6px;padding:2px;background:#fff;cursor:pointer}
+.hex{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--muted)}
+.sw{display:inline-block;width:16px;height:16px;border-radius:4px;border:1px solid #0002;vertical-align:middle;flex:none}
+.pick{display:flex;align-items:center;gap:6px}
+.pick select{flex:1}
+.warn{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--warn);background:var(--warn-bg);border:1px solid #fde68a;border-radius:999px;padding:1px 8px;white-space:nowrap}
+.ok{font-size:12px;color:var(--ok);white-space:nowrap}
+.tint{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:10px}
+.tint-head{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.tint-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.tint-grid label,.field-label{font-size:12px;color:var(--muted);display:block;margin-bottom:3px}
+.opt-grid{display:grid;grid-template-columns:160px 1fr;gap:12px 16px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:#fff;padding:5px 10px;color:var(--muted)}
+.seg button.on{background:var(--primary);color:#fff}
+.side{position:sticky;top:16px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.side .seg{align-self:center}
+.legend{font-size:12px;color:var(--muted);text-align:center;max-width:300px}
+/* téléphone */
+.phone{width:300px;height:620px;border-radius:40px;background:#111;padding:10px;box-shadow:0 20px 50px #0003}
+.screen{width:100%;height:100%;border-radius:31px;overflow:hidden;display:flex;flex-direction:column;background:var(--p-bg);color:var(--p-text);font-family:var(--p-body)}
+.status{height:30px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 22px;font-size:11px;font-weight:600}
+.topbar{height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--p-border)}
+.topbar b{font-family:var(--p-title);font-size:17px}
+.dots{display:flex;gap:4px}.dots i{width:4px;height:4px;border-radius:50%;background:var(--p-muted)}
+.feed{flex:1;overflow:auto;padding:16px}
+.feed::-webkit-scrollbar{display:none}
+.cover{height:140px;border-radius:var(--p-radius);background:linear-gradient(135deg,var(--p-card),var(--p-border));margin-bottom:14px}
+.p-title{font-family:var(--p-title);font-size:24px;line-height:1.2;margin:0 0 6px;font-weight:700}
+.p-meta{color:var(--p-muted);font-size:12px;margin-bottom:12px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.p-badge{border:1px solid var(--p-primary);color:var(--p-link);border-radius:999px;padding:1px 8px;font-size:11px}
+.p-text{font-size:14px;line-height:1.5;margin:0 0 14px}
+.p-text a{color:var(--p-link)}
+.p-box{border:1px solid;border-radius:var(--p-radius);padding:12px;margin-bottom:12px;font-size:13px;line-height:1.45}
+.p-box b{display:block;font-family:var(--p-title);font-size:15px;margin-bottom:2px}
+.p-box a{display:inline-block;margin-top:4px;font-weight:600}
+.p-card{background:var(--p-card);border:1px solid var(--p-border);border-radius:var(--p-radius);padding:12px;margin-bottom:14px;box-shadow:var(--p-shadow);display:flex;gap:10px;align-items:center}
+.p-card .th{width:44px;height:44px;border-radius:calc(var(--p-radius) * .6);background:var(--p-border);flex:none}
+.p-card small{color:var(--p-muted);display:block;font-size:11px}
+.p-field{margin-bottom:12px}
+.p-field label{font-size:12px;color:var(--p-muted);display:block;margin-bottom:4px}
+.p-field div{border:1px solid var(--p-border);border-radius:calc(var(--p-radius) * .7);padding:9px 11px;font-size:13px;background:var(--p-card)}
+.p-field .ph{color:var(--p-muted)}
+.p-field.err div{border-color:var(--p-error);border-width:2px}
+.p-field.err small{color:var(--p-error);font-size:12px;display:block;margin-top:4px}
+.p-btn{display:block;width:100%;border:0;border-radius:var(--p-radius);padding:12px;font-weight:700;font-size:14px;margin-bottom:8px;font-family:var(--p-body)}
+.p-btn.main{background:var(--p-btn);color:var(--p-on)}
+.p-btn.second{background:none;border:1px solid var(--p-primary);color:var(--p-link)}
+.tabbar{height:56px;flex:none;border-top:1px solid var(--p-border);display:flex;justify-content:space-around;align-items:center;font-size:10px;color:var(--p-muted);background:var(--p-bg)}
+.tabbar span{display:flex;flex-direction:column;align-items:center;gap:3px}
+.tabbar span i{width:18px;height:18px;border-radius:5px;border:2px solid currentColor}
+.tabbar span.on{color:var(--p-primary);font-weight:700}
+.sum{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;width:300px;font-size:12px}
+.sum h3{font-size:13px;margin:0 0 6px}
+.sum ul{margin:0;padding-left:16px;color:var(--warn)}
+@media (max-width:1100px){nav.menu{display:none}}
+@media (max-width:860px){.layout{grid-template-columns:1fr}.side{position:static}main{padding:16px}}
+</style>
+</head>
+<body>
+<div class="note">Maquette, rien n'est construit. Section « App », onglet « Charte graphique » : la charte de Ruche part neutre ; chaque client compose la sienne. Tout se modifie ici, et le téléphone suit.</div>
+<div class="app">
+  <nav class="menu">
+    <div class="brand">Ma marque</div>
+    <a>Tableau de bord</a><a>Blog</a><a>Podcasts</a><a>Pages</a><a>Médiathèque</a><a>Modèles de bloc</a>
+    <a class="on">App</a><a>Paramètres</a>
+  </nav>
+  <main>
+    <h1>App</h1>
+    <p class="lead">Tout ce que voient les lecteurs de l'app.</p>
+    <div class="tabs">
+      <button disabled title="Pas dans cette maquette">Identité</button>
+      <button class="on">Charte graphique</button>
+      <button disabled title="Pas dans cette maquette">Navigation</button>
+      <button disabled title="Pas dans cette maquette">Mises en page</button>
+    </div>
+    <div class="layout">
+      <div class="stack">
+        <section class="card">
+          <div class="row" style="justify-content:space-between">
+            <div><h2>Pour essayer</h2><p class="desc" style="margin:0">Montre la même charte, remplie par un client imaginaire.</p></div>
+            <div class="row">
+              <button class="btn" id="example">Charger un exemple</button>
+              <button class="btn ghost" id="reset">Revenir au neutre</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Couleurs</h2>
+          <p class="desc">Tes couleurs, avec le nom que tu veux. Chacune a sa valeur en mode clair et en mode sombre.</p>
+          <table><thead><tr><th>Nom</th><th>Clair</th><th>Sombre</th><th></th></tr></thead><tbody id="palette"></tbody></table>
+          <button class="btn dashed" id="addColor" style="margin-top:10px">+ Ajouter une couleur</button>
+        </section>
+
+        <section class="card">
+          <h2>Où va chaque couleur</h2>
+          <p class="desc">L'app a besoin de savoir quelle couleur sert à quoi. Choisis parmi tes couleurs.</p>
+          <table><tbody id="roles"></tbody></table>
+        </section>
+
+        <section class="card">
+          <h2>Teintes des encadrés</h2>
+          <p class="desc">Autant de teintes que tu veux. Dans le bloc Encadré, on choisit ensuite l'une d'elles.</p>
+          <div id="tints"></div>
+          <button class="btn dashed" id="addTint">+ Ajouter une teinte</button>
+        </section>
+
+        <section class="card">
+          <h2>Formes et effets</h2>
+          <p class="desc">Des réglages simples, neutres au départ.</p>
+          <div class="opt-grid">
+            <span>Boutons</span>
+            <div class="row"><div class="seg" id="btnStyle"><button data-v="flat">Aplat</button><button data-v="gradient">Dégradé</button></div><span class="pick" id="gradEndWrap"></span></div>
+            <span>Arrondi des angles</span>
+            <div class="row"><input type="range" min="0" max="24" id="radius"> <span id="radiusVal" class="hex"></span></div>
+            <span>Ombres des cartes</span>
+            <div class="seg" id="shadow"><button data-v="none">Aucune</button><button data-v="light">Légère</button><button data-v="medium">Marquée</button><button data-v="strong">Forte</button></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Polices</h2>
+          <p class="desc">La police du téléphone au départ, ou une police libre de Google Fonts.</p>
+          <div class="opt-grid">
+            <span>Titres</span><select id="fontTitle"></select>
+            <span>Texte</span><select id="fontBody"></select>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="row" style="justify-content:space-between">
+            <div><h2>Fichier de la charte</h2><p class="desc" style="margin:0">Pour la garder, ou la reprendre dans une autre installation.</p></div>
+            <div class="row">
+              <button class="btn" id="export">Exporter</button>
+              <label class="btn">Importer<input type="file" id="import" accept="application/json" hidden></label>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="side">
+        <div class="seg" id="mode"><button data-v="light">Clair</button><button data-v="dark">Sombre</button></div>
+        <div class="phone"><div class="screen" id="screen"></div></div>
+        <div class="sum" id="summary"></div>
+        <p class="legend">L'aperçu suit chaque changement. Les textes difficiles à lire sont signalés.</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const FONTS = [
+  ["system", "Police du téléphone", "-apple-system, system-ui, 'Segoe UI', Roboto, sans-serif"],
+  ["Inter", "Inter", "Inter, sans-serif"],
+  ["DM Sans", "DM Sans", "'DM Sans', sans-serif"],
+  ["Work Sans", "Work Sans", "'Work Sans', sans-serif"],
+  ["Nunito", "Nunito", "Nunito, sans-serif"],
+  ["Lora", "Lora", "Lora, serif"],
+  ["Merriweather", "Merriweather", "Merriweather, serif"],
+  ["Playfair Display", "Playfair Display", "'Playfair Display', serif"],
+];
+const ROLES = [
+  ["background", "Fond de l'écran"],
+  ["card", "Cartes et champs"],
+  ["border", "Bordures"],
+  ["text", "Texte", "background"],
+  ["muted", "Texte secondaire", "background"],
+  ["primary", "Couleur principale (boutons)", null],
+  ["onPrimary", "Texte sur les boutons", "primary"],
+  ["link", "Liens", "background"],
+  ["error", "Erreur", "background"],
+];
+const TINT_PARTS = [["fill", "Fond"], ["border", "Bordure"], ["title", "Titre"], ["text", "Texte"], ["link", "Lien"]];
+const SHADOWS = { none: "none", light: "0 2px 8px", medium: "0 4px 14px", strong: "0 6px 16px" };
+const SHADOW_ALPHA = { light: [0.08, 0.3], medium: [0.14, 0.4], strong: [0.3, 0.55] };
+
+let n = 0;
+const id = () => "c" + (++n);
+
+function neutral() {
+  const c = (name, light, dark) => ({ id: id(), name, light, dark });
+  const palette = [
+    c("Blanc", "#ffffff", "#121214"),
+    c("Gris clair", "#f4f4f5", "#1f1f23"),
+    c("Gris bordure", "#e4e4e7", "#3a3a3f"),
+    c("Gris texte", "#6b6b72", "#a1a1aa"),
+    c("Noir", "#18181b", "#f4f4f5"),
+    c("Rouge erreur", "#b42318", "#f97066"),
+  ];
+  const [w, g, b, m, k, e] = palette.map((p) => p.id);
+  return {
+    palette,
+    roles: { background: w, card: g, border: b, text: k, muted: m, primary: k, onPrimary: w, link: k, error: e },
+    tints: [{ id: id(), name: "Neutre", fill: g, border: b, title: k, text: k, link: k }],
+    button: { style: "flat", end: k },
+    radius: 12, shadow: "none",
+    fonts: { title: "system", body: "system" },
+    mode: "light",
+  };
+}
+
+// Un client imaginaire, pour montrer la liberté du système.
+function example() {
+  const c = (name, light, dark) => ({ id: id(), name, light, dark });
+  const palette = [
+    c("Papier", "#fbf8f2", "#16181d"),
+    c("Carte", "#ffffff", "#20232a"),
+    c("Filet", "#e9e3d6", "#343843"),
+    c("Encre", "#1f2a44", "#e8ebf2"),
+    c("Ardoise", "#5b6478", "#a3abbd"),
+    c("Ocre", "#a5631a", "#e9a85a"),
+    c("Ocre clair", "#c98a3c", "#f2c27f"),
+    c("Blanc", "#ffffff", "#16181d"),
+    c("Sauge", "#e6efe6", "#1b2a20"),
+    c("Sauge foncée", "#2f5d3a", "#8fd0a0"),
+    c("Brique", "#fde8e4", "#3a1c18"),
+    c("Brique foncée", "#9b2c1f", "#f39a8c"),
+  ];
+  const P = Object.fromEntries(palette.map((p) => [p.name, p.id]));
+  return {
+    palette,
+    roles: { background: P.Papier, card: P.Carte, border: P.Filet, text: P.Encre, muted: P.Ardoise, primary: P.Ocre, onPrimary: P.Blanc, link: P.Ocre, error: P["Brique foncée"] },
+    tints: [
+      { id: id(), name: "Simple", fill: P.Carte, border: P.Filet, title: P.Encre, text: P.Encre, link: P.Ocre },
+      { id: id(), name: "Conseil", fill: P.Sauge, border: P.Sauge, title: P["Sauge foncée"], text: P.Encre, link: P["Sauge foncée"] },
+      { id: id(), name: "Attention", fill: P.Brique, border: P.Brique, title: P["Brique foncée"], text: P.Encre, link: P["Brique foncée"] },
+    ],
+    button: { style: "gradient", end: P["Ocre clair"] },
+    radius: 16, shadow: "light",
+    fonts: { title: "Playfair Display", body: "Work Sans" },
+    mode: "light",
+  };
+}
+
+let S = neutral();
+
+const $ = (s) => document.querySelector(s);
+const esc = (t) => String(t).replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]);
+const color = (cid, mode = S.mode) => { const p = S.palette.find((x) => x.id === cid); return p ? p[mode] : "#ff00ff"; };
+const fontCss = (key) => (FONTS.find((f) => f[0] === key) || FONTS[0])[2];
+
+// Contraste WCAG.
+function lum(hex) {
+  const v = hex.replace("#", "").match(/../g).map((h) => parseInt(h, 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
+}
+function ratio(a, b) { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); }
+const fmt = (r) => r.toFixed(1).replace(".", ",") + ":1";
+
+function problems() {
+  const out = [];
+  for (const mode of ["light", "dark"]) {
+    const M = mode === "light" ? "clair" : "sombre";
+    for (const [key, label, against] of ROLES) {
+      if (!against) continue;
+      const r = ratio(color(S.roles[key], mode), color(S.roles[against], mode));
+      if (r < 4.5) out.push({ key, mode, text: `${label} (${M}) : contraste ${fmt(r)}, il faut 4,5:1` });
+    }
+    for (const t of S.tints) {
+      for (const part of ["title", "text", "link"]) {
+        const r = ratio(color(t[part], mode), color(t.fill, mode));
+        if (r < 4.5) out.push({ tint: t.id, mode, text: `Teinte « ${t.name} », ${TINT_PARTS.find((p) => p[0] === part)[1].toLowerCase()} (${M}) : ${fmt(r)}` });
+      }
+    }
+  }
+  return out;
+}
+
+function options(selected) {
+  return S.palette.map((p) => `<option value="${p.id}" ${p.id === selected ? "selected" : ""}>${esc(p.name)}</option>`).join("");
+}
+function picker(selected, attrs) {
+  return `<span class="pick"><span class="sw" style="background:${color(selected)}"></span><select ${attrs}>${options(selected)}</select></span>`;
+}
+
+function renderPalette() {
+  $("#palette").innerHTML = S.palette.map((p) => {
+    const used = Object.values(S.roles).includes(p.id) || S.tints.some((t) => TINT_PARTS.some(([k]) => t[k] === p.id)) || S.button.end === p.id;
+    return `<tr data-id="${p.id}">
+      <td><input type="text" value="${esc(p.name)}" data-name></td>
+      <td><span class="row"><input type="color" value="${p.light}" data-light><span class="hex">${p.light}</span></span></td>
+      <td><span class="row"><input type="color" value="${p.dark}" data-dark><span class="hex">${p.dark}</span></span></td>
+      <td><button class="btn ghost" data-del ${used ? 'disabled title="Utilisée : choisis d\'abord une autre couleur là où elle sert"' : 'title="Supprimer"'}>✕</button></td>
+    </tr>`;
+  }).join("");
+}
+
+function renderRoles(issues) {
+  $("#roles").innerHTML = ROLES.map(([key, label]) => {
+    const bad = issues.filter((i) => i.key === key);
+    return `<tr><td style="width:45%">${label}</td><td>${picker(S.roles[key], `data-role="${key}"`)}</td>
+      <td style="width:1%">${bad.length ? `<span class="warn" title="${esc(bad.map((b) => b.text).join("\n"))}">⚠ Peu lisible</span>` : ROLES.find((r) => r[0] === key)[2] ? '<span class="ok">✓ Lisible</span>' : ""}</td></tr>`;
+  }).join("");
+}
+
+function renderTints(issues) {
+  $("#tints").innerHTML = S.tints.map((t) => {
+    const bad = issues.filter((i) => i.tint === t.id);
+    return `<div class="tint" data-tint="${t.id}">
+      <div class="tint-head"><input type="text" value="${esc(t.name)}" data-tname style="max-width:220px">
+        ${bad.length ? `<span class="warn" title="${esc(bad.map((b) => b.text).join("\n"))}">⚠ Peu lisible</span>` : ""}
+        <span style="flex:1"></span>
+        <button class="btn ghost" data-tdel ${S.tints.length === 1 ? 'disabled title="Il faut au moins une teinte"' : 'title="Supprimer"'}>✕</button></div>
+      <div class="tint-grid">${TINT_PARTS.map(([k, l]) => `<div><label>${l}</label>${picker(t[k], `data-tpart="${k}"`)}</div>`).join("")}</div>
+    </div>`;
+  }).join("");
+}
+
+function renderOptions() {
+  document.querySelectorAll("#btnStyle button").forEach((b) => b.classList.toggle("on", b.dataset.v === S.button.style));
+  $("#gradEndWrap").innerHTML = S.button.style === "gradient" ? `vers ${picker(S.button.end, 'id="gradEnd"')}` : "";
+  $("#radius").value = S.radius; $("#radiusVal").textContent = S.radius + " pt";
+  document.querySelectorAll("#shadow button").forEach((b) => b.classList.toggle("on", b.dataset.v === S.shadow));
+  document.querySelectorAll("#mode button").forEach((b) => b.classList.toggle("on", b.dataset.v === S.mode));
+  for (const [sel, key] of [["#fontTitle", "title"], ["#fontBody", "body"]]) {
+    $(sel).innerHTML = FONTS.map(([k, l, css]) => `<option value="${k}" ${S.fonts[key] === k ? "selected" : ""} style="font-family:${css}">${l}</option>`).join("");
+  }
+}
+
+function renderPhone() {
+  const r = (k) => color(S.roles[k]);
+  const el = $("#screen");
+  const shadowColor = S.mode === "dark" ? "0,0,0" : "24,24,27";
+  const alpha = S.shadow === "none" ? 0 : SHADOW_ALPHA[S.shadow][S.mode === "dark" ? 1 : 0];
+  const vars = {
+    "--p-bg": r("background"), "--p-card": r("card"), "--p-border": r("border"), "--p-text": r("text"), "--p-muted": r("muted"),
+    "--p-primary": r("primary"), "--p-on": r("onPrimary"), "--p-link": r("link"), "--p-error": r("error"),
+    "--p-btn": S.button.style === "gradient" ? `linear-gradient(90deg, ${r("primary")}, ${color(S.button.end)})` : r("primary"),
+    "--p-radius": S.radius + "px",
+    "--p-shadow": S.shadow === "none" ? "none" : `${SHADOWS[S.shadow]} rgba(${shadowColor},${alpha})`,
+    "--p-title": fontCss(S.fonts.title), "--p-body": fontCss(S.fonts.body),
+  };
+  Object.entries(vars).forEach(([k, v]) => el.style.setProperty(k, v));
+  el.innerHTML = `
+    <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+    <div class="topbar"><b>Ma marque</b><div class="dots"><i></i><i></i><i></i></div></div>
+    <div class="feed">
+      <div class="cover"></div>
+      <h1 class="p-title">Titre de l'article</h1>
+      <div class="p-meta">12 oct. · 6 min de lecture <span class="p-badge">Catégorie</span></div>
+      <p class="p-text">Le texte courant de l'article, avec <a href="#" onclick="return false">un lien</a> au milieu de la phrase, pour juger de la lisibilité.</p>
+      ${S.tints.map((t) => `<div class="p-box" style="background:${color(t.fill)};border-color:${color(t.border)};color:${color(t.text)}">
+        <b style="color:${color(t.title)}">${esc(t.name)}</b>Un encadré de cette teinte, avec son texte.<br><a style="color:${color(t.link)}">En savoir plus</a></div>`).join("")}
+      <div class="p-card"><div class="th"></div><div><b>Un article de la liste</b><small>Carte · 4 min</small></div></div>
+      <div class="p-field"><label>Ton prénom</label><div class="ph">Écris ton prénom…</div></div>
+      <div class="p-field err"><label>E-mail</label><div>adresse@</div><small>Cette adresse n'est pas complète.</small></div>
+      <button class="p-btn main">Continuer</button>
+      <button class="p-btn second">Plus tard</button>
+    </div>
+    <div class="tabbar"><span class="on"><i></i>Accueil</span><span><i></i>Blog</span><span><i></i>Podcasts</span><span><i></i>Profil</span></div>`;
+}
+
+function renderSummary(issues) {
+  $("#summary").innerHTML = issues.length
+    ? `<h3>${issues.length} point${issues.length > 1 ? "s" : ""} de lisibilité</h3><ul>${issues.map((i) => `<li>${esc(i.text)}</li>`).join("")}</ul>`
+    : `<h3 style="color:var(--ok);margin:0">✓ Tous les textes sont lisibles, en clair et en sombre</h3>`;
+}
+
+function render(withPalette = true) {
+  const issues = problems();
+  if (withPalette) renderPalette();
+  renderRoles(issues); renderTints(issues); renderOptions(); renderPhone(); renderSummary(issues);
+}
+
+// Événements.
+document.addEventListener("input", (e) => {
+  const t = e.target, tr = t.closest("tr[data-id]");
+  if (tr && (t.dataset.light !== undefined || t.dataset.dark !== undefined)) {
+    const p = S.palette.find((x) => x.id === tr.dataset.id);
+    p[t.dataset.light !== undefined ? "light" : "dark"] = t.value;
+    t.nextElementSibling.textContent = t.value;
+    render(false);
+  }
+  if (t.id === "radius") { S.radius = +t.value; render(false); }
+});
+document.addEventListener("change", (e) => {
+  const t = e.target;
+  if (t.dataset.name !== undefined) { S.palette.find((x) => x.id === t.closest("tr").dataset.id).name = t.value.trim() || "Sans nom"; render(); }
+  if (t.dataset.role) { S.roles[t.dataset.role] = t.value; render(); }
+  if (t.dataset.tname !== undefined) { S.tints.find((x) => x.id === t.closest("[data-tint]").dataset.tint).name = t.value.trim() || "Sans nom"; render(); }
+  if (t.dataset.tpart) { S.tints.find((x) => x.id === t.closest("[data-tint]").dataset.tint)[t.dataset.tpart] = t.value; render(); }
+  if (t.id === "gradEnd") { S.button.end = t.value; render(); }
+  if (t.id === "fontTitle") { S.fonts.title = t.value; render(); }
+  if (t.id === "fontBody") { S.fonts.body = t.value; render(); }
+  if (t.id === "import" && t.files[0]) {
+    t.files[0].text().then((txt) => { try { S = JSON.parse(txt); render(); } catch { alert("Ce fichier n'est pas une charte."); } });
+    t.value = "";
+  }
+});
+document.addEventListener("click", (e) => {
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.dataset.del !== undefined) { S.palette = S.palette.filter((x) => x.id !== t.closest("tr").dataset.id); render(); }
+  if (t.dataset.tdel !== undefined) { S.tints = S.tints.filter((x) => x.id !== t.closest("[data-tint]").dataset.tint); render(); }
+  if (t.closest("#btnStyle")) { S.button.style = t.dataset.v; render(); }
+  if (t.closest("#shadow")) { S.shadow = t.dataset.v; render(); }
+  if (t.closest("#mode")) { S.mode = t.dataset.v; render(); }
+  if (t.id === "addColor") { S.palette.push({ id: id(), name: "Nouvelle couleur", light: "#888888", dark: "#888888" }); render(); }
+  if (t.id === "addTint") { const r = S.roles; S.tints.push({ id: id(), name: "Nouvelle teinte", fill: r.card, border: r.border, title: r.text, text: r.text, link: r.link }); render(); }
+  if (t.id === "example") { const mode = S.mode; S = example(); S.mode = mode; render(); }
+  if (t.id === "reset") { const mode = S.mode; S = neutral(); S.mode = mode; render(); }
+  if (t.id === "export") {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(S, null, 2)], { type: "application/json" }));
+    a.download = "charte.json"; a.click();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
