@@ -1004,6 +1004,24 @@ describe("éditeur d'un article (Blog)", () => {
     expect(left).not.toHaveClass("hidden")
   })
 
+  it("la barre de mise en forme ne disparaît jamais : en Lecture, elle reste là, inactive", async () => {
+    vi.mocked(api.getContent).mockResolvedValue(contentOf(ARTICLE, "article"))
+    await renderApp(`/blog/${ARTICLE}`)
+    await editable()
+    const tools = screen.getByRole("toolbar", { name: preview.tools })
+    fireEvent.click(
+      within(tools).getByRole("button", { name: preview.mode.read })
+    )
+    const toolbar = screen.getByRole("toolbar", {
+      name: texts.editor.toolbar.label,
+    })
+    expect(toolbar).toBeVisible()
+    expect(toolbar.parentElement).not.toHaveClass("invisible")
+    for (const button of within(toolbar).getAllByRole("button")) {
+      expect(button).toBeDisabled()
+    }
+  })
+
   it("le téléphone est toujours en entier, réduit d'après la hauteur disponible, en Édition comme en Lecture", async () => {
     // jsdom n'a pas ResizeObserver : la hauteur mesurée est 0, le téléphone descend à 40 %.
     vi.stubGlobal(

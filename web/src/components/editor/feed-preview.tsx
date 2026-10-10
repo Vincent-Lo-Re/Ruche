@@ -1,4 +1,3 @@
-import { cn } from "cn"
 import {
   ALargeSmall,
   BatteryFull,
@@ -78,7 +77,8 @@ export function FeedPreview({
   readers?: boolean
   // Concentration (⌘ . ou Ctrl + .) : sous Édition et Lecture, dans la barre de l'aperçu.
   focus: FocusTool
-  // La barre de mise en forme : cachée en Lecture, sa place gardée (le téléphone ne bouge pas).
+  // La barre de mise en forme : toujours là, inactive quand elle ne peut pas servir (Lecture,
+  // aucun bloc, bloc qui n'est pas un texte, lecture seule).
   toolbar: ReactNode
   // Messages au-dessus du téléphone (brouillon trop lourd, échec d'enregistrement).
   notices: ReactNode
@@ -121,14 +121,7 @@ export function FeedPreview({
       >
         {notices}
       </div>
-      <div
-        className={cn(
-          "blocks-preview-toolbar",
-          preview.mode === "read" && "invisible"
-        )}
-      >
-        {toolbar}
-      </div>
+      <div className="blocks-preview-toolbar">{toolbar}</div>
       <div
         ref={frame}
         data-backdrop

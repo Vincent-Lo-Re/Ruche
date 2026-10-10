@@ -925,7 +925,7 @@ function ContentEditor({
             toolbar={
               <FormatToolbar
                 editor={editing.toolbarEditor}
-                editable={editable}
+                editable={editable && !reading}
               />
             }
             focus={tool}

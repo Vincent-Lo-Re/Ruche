@@ -91,7 +91,8 @@ function useFormats(editor: Editor | null): Formats {
 
 /**
  * Barre de mise en forme, verticale, à gauche du téléphone : elle agit sur le texte du bloc
- * choisi. Désactivée en lecture seule, ou quand le bloc choisi n'est pas un texte.
+ * choisi. Toujours affichée (10/10/2026) ; inactive en Lecture, en lecture seule, sans bloc ou
+ * quand le bloc choisi n'est pas un texte.
  */
 export function FormatToolbar({
   editor,
