@@ -181,6 +181,8 @@ export function prepareEditor(kind: ContentKind): Prepare {
     const profile = contentProfile(kind, templateSort)
     await Promise.all([
       ready(queryClient, accessLevelsRead()),
+      // La charte publiée de l'app habille le téléphone.
+      fresh(queryClient, appStyleRead()),
       profile.categories &&
         ready(queryClient, categoriesRead(profile.categories)),
       profile.publication === "own" &&

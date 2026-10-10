@@ -48,9 +48,13 @@
   outline: none;
   background: transparent;
   color: inherit;
+  font-family: var(--blocks-font-title-family, inherit);
   font-size: var(--blocks-size-title);
   line-height: var(--blocks-font-title-line-height);
-  font-weight: var(--blocks-font-heading-weight);
+  font-weight: var(
+    --blocks-font-title-weight,
+    var(--blocks-font-heading-weight)
+  );
   margin-bottom: var(--blocks-space-block-gap);
 }
 
@@ -111,6 +115,18 @@
   );
 }
 
+/* Les intertitres : la police de la charte de l'app (--blocks-font-heading-family), sinon celle du
+   texte ; dans un encadré, le titre de sa teinte. */
+.blocks-text h2,
+.blocks-text h3 {
+  font-family: var(--blocks-font-heading-family, inherit);
+}
+
+.blocks-box h2,
+.blocks-box h3 {
+  color: var(--blocks-tint-title, inherit);
+}
+
 .blocks-text h2 {
   font-size: var(--blocks-size-h2);
   line-height: var(--blocks-font-h2-line-height);
@@ -147,7 +163,11 @@
 
 .blocks-text a {
   color: var(--blocks-color-link);
-  text-decoration: underline;
+  text-decoration: var(--blocks-link-decoration, underline);
+}
+
+.blocks-box .blocks-text a {
+  color: var(--blocks-tint-link, var(--blocks-color-link));
 }
 
 /* Le texte d'aide d'un texte vide : sous le curseur, et il peut passer à la ligne (une section
@@ -203,6 +223,7 @@
 .blocks-meta,
 .blocks-locked-text,
 .blocks-locked-action {
+  font-family: var(--blocks-font-caption-family, inherit);
   font-size: var(--blocks-size-caption);
   line-height: var(--blocks-font-caption-line-height);
 }
@@ -229,14 +250,21 @@
   padding: var(--blocks-space-box-padding);
 }
 
+/* Un encadré prend les couleurs de sa teinte de la charte de l'app (--blocks-tint-*, posées sur
+   le téléphone pour la première teinte, et sur l'encadré qui en a choisi une autre). */
+.blocks-box {
+  color: var(--blocks-tint-text, inherit);
+}
+
 .blocks-box[data-look="fill"],
 .blocks-audio {
-  background: var(--blocks-color-box-fill);
+  background: var(--blocks-tint-fill, var(--blocks-color-box-fill));
 }
 
 .blocks-box[data-look="border"],
 .blocks-locked {
-  border: var(--blocks-border-box-width) solid var(--blocks-color-box-border);
+  border: var(--blocks-border-box-width) solid
+    var(--blocks-tint-border, var(--blocks-color-box-border));
 }
 
 /* Présentation d'un article ou d'un épisode (étape 7) : image mise en avant, audio,

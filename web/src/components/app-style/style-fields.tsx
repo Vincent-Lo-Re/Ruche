@@ -38,7 +38,7 @@ import { texts } from "@/texts"
 const labels = texts.appStyle
 
 /** Un carré de la couleur d'une charte (choisie par le client : une valeur qui change en direct). */
-function Swatch({
+export function Swatch({
   color,
   className,
 }: {

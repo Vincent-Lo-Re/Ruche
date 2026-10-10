@@ -1,5 +1,5 @@
 import { BatteryFull, Signal, Wifi } from "lucide-react"
-import type { ReactNode } from "react"
+import type { CSSProperties, ReactNode } from "react"
 
 import type { PreviewSettings } from "@/lib/editor/preview"
 import { texts } from "@/texts"
@@ -21,8 +21,11 @@ export function PhoneDevice({
   largeText,
   appBar,
   footer,
+  variables,
   children,
 }: Pick<PreviewSettings, "device" | "theme" | "largeText"> & {
+  // La charte de l'app en variables CSS (lib/app-style/variables.ts), posées sur le téléphone.
+  variables?: Record<string, string>
   appBar?: ReactNode
   // Sous ce qui défile, au-dessus de la barre d'accueil (la barre de navigation de l'app).
   footer?: ReactNode
@@ -36,6 +39,8 @@ export function PhoneDevice({
       data-device={device}
       data-blocks-theme={theme}
       data-large-text={largeText || undefined}
+      // eslint-disable-next-line no-restricted-syntax -- les valeurs de la charte de l'app, choisies par le client
+      style={variables as CSSProperties | undefined}
     >
       <div className="blocks-screen">
         <div aria-hidden className="blocks-status">

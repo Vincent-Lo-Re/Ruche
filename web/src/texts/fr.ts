@@ -1929,6 +1929,9 @@ export const fr: Texts = {
         fill: "Fond",
         border: "Bordure",
         hint: "Un encadré contient des textes et des images, pas d'autre encadré.",
+        tint: "Teinte",
+        tintHint:
+          "Les teintes des encadrés de ta charte (App › Charte graphique).",
       },
       moveUp: "Monter",
       moveDown: "Descendre",

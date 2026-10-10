@@ -72,3 +72,69 @@ export function partVariables(
     ])
   )
 }
+
+/** Les couleurs d'une teinte d'encadré (absente, ou disparue de la charte : la première). */
+export function tintVariables(
+  style: AppStyle,
+  mode: StyleMode,
+  tintId?: string
+): Record<string, string> {
+  const tint = style.tints.find((t) => t.id === tintId) ?? style.tints[0]
+  const value = (id: string) => colorValue(style, id, mode) ?? "transparent"
+  return {
+    "--blocks-tint-fill": value(tint.fill),
+    "--blocks-tint-border": value(tint.border),
+    "--blocks-tint-title": value(tint.title),
+    "--blocks-tint-text": value(tint.text),
+    "--blocks-tint-link": value(tint.link),
+  }
+}
+
+/**
+ * La charte en variables du téléphone de l'éditeur (preview.css, --blocks-*) : couleurs, polices,
+ * tailles, arrondis et liens, et la première teinte pour les encadrés. Les espacements restent
+ * ceux de blocks.tokens.json.
+ */
+export function blocksVariables(
+  style: AppStyle,
+  mode: StyleMode
+): Record<string, string> {
+  const color = (role: ColorRole) =>
+    colorValue(style, style.roles[role], mode) ?? "transparent"
+  const font = (role: (typeof fontRoles)[number]) =>
+    style.fonts.find((f) => f.id === style.fontRoles[role]) ?? style.fonts[0]
+  const { title, heading, body, small } = style.sizes
+  // L'intertitre de niveau 3, entre l'intertitre et le texte courant (la charte n'en a qu'un).
+  const subheading = Math.round((heading.size + body.size) / 2)
+  const firstTint = tintVariables(style, mode)
+  return {
+    "--blocks-color-background": color("background"),
+    "--blocks-color-text": color("text"),
+    "--blocks-color-text-muted": color("muted"),
+    "--blocks-color-link": color("link"),
+    "--blocks-color-box-fill": firstTint["--blocks-tint-fill"],
+    "--blocks-color-box-border": firstTint["--blocks-tint-border"],
+    "--blocks-color-image-placeholder": color("card"),
+    "--blocks-font-family": fontStack(font("body")),
+    "--blocks-font-regular-weight": String(font("body").weight),
+    "--blocks-font-title-family": fontStack(font("title")),
+    "--blocks-font-title-weight": String(font("title").weight),
+    "--blocks-font-heading-family": fontStack(font("heading")),
+    "--blocks-font-heading-weight": String(font("heading").weight),
+    "--blocks-font-caption-family": fontStack(font("small")),
+    "--blocks-font-title-size": `${title.size}px`,
+    "--blocks-font-title-line-height": String(title.lineHeight),
+    "--blocks-font-h2-size": `${heading.size}px`,
+    "--blocks-font-h2-line-height": String(heading.lineHeight),
+    "--blocks-font-h3-size": `${subheading}px`,
+    "--blocks-font-h3-line-height": String(heading.lineHeight),
+    "--blocks-font-body-size": `${body.size}px`,
+    "--blocks-font-body-line-height": String(body.lineHeight),
+    "--blocks-font-caption-size": `${small.size}px`,
+    "--blocks-font-caption-line-height": String(small.lineHeight),
+    "--blocks-radius-box": `${style.radius}px`,
+    "--blocks-radius-image": `${style.imageRadius}px`,
+    "--blocks-link-decoration": style.underlineLinks ? "underline" : "none",
+    ...firstTint,
+  }
+}

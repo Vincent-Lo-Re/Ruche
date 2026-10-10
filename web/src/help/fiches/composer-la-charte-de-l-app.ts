@@ -39,6 +39,7 @@ export const fiche: HelpFiche = {
     "Une couleur ou une police qui sert quelque part ne se supprime pas : choisis-en d'abord une autre là où elle sert. Il faut trois polices au moins.",
     "Deux couleurs (ou deux teintes, pastilles, boutons, polices) ne portent pas le même nom, majuscules et espaces ignorés.",
     "Les polices de Google Fonts sont copiées dans ton stockage à la publication : ni l'admin ni l'app n'appellent Google.",
+    "Dans l'éditeur, le téléphone montre la charte publiée ; les réglages d'un encadré proposent ses teintes. Si la charte reste toujours claire (ou sombre), l'éditeur ne propose plus que ce mode.",
     "« Exporter » enregistre la charte dans un fichier ; « Importer » remplace le brouillon par celle d'un fichier.",
   ],
 }
