@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
-  Ellipsis,
   FilterX,
   Search,
   SquarePen,
@@ -24,14 +23,12 @@ import { LoadState } from "@/components/load-state"
 import { SearchInput } from "@/components/search-input"
 import { useAccessCheck } from "@/components/team/use-access-check"
 import { TrashDialog } from "@/components/confirm-dialog"
+import { RowActionsMenu } from "@/components/row-actions-menu"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
   Select,
@@ -478,46 +475,42 @@ function CategoryTable({
                   {formatDateTime(category.created_at)}
                 </TableCell>
                 <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      disabled={disabled}
-                      aria-label={labels.actions(category.name)}
-                      render={<Button variant="ghost" size="icon-sm" />}
+                  {" "}
+                  <RowActionsMenu
+                    label={labels.actions(category.name)}
+                    disabled={disabled}
+                    width="w-52"
+                  >
+                    <DropdownMenuItem onClick={() => onEdit(category)}>
+                      <SquarePen />
+                      {labels.edit}
+                    </DropdownMenuItem>
+                    {!reorderDisabled && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => onMove(category, "top")}
+                        >
+                          <ArrowUpToLine />
+                          {texts.contentList.order.moveTop}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => onMove(category, "bottom")}
+                        >
+                          <ArrowDownToLine />
+                          {texts.contentList.order.moveBottom}
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onClick={() => onRemove(category)}
                     >
-                      <Ellipsis />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-52">
-                      <DropdownMenuItem onClick={() => onEdit(category)}>
-                        <SquarePen />
-                        {labels.edit}
-                      </DropdownMenuItem>
-                      {!reorderDisabled && (
-                        <>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={() => onMove(category, "top")}
-                          >
-                            <ArrowUpToLine />
-                            {texts.contentList.order.moveTop}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => onMove(category, "bottom")}
-                          >
-                            <ArrowDownToLine />
-                            {texts.contentList.order.moveBottom}
-                          </DropdownMenuItem>
-                        </>
-                      )}
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        variant="destructive"
-                        onClick={() => onRemove(category)}
-                      >
-                        <Eraser />
-                        {labels.remove}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                      <Eraser />
+                      {labels.remove}
+                    </DropdownMenuItem>
+                  </RowActionsMenu>
                 </TableCell>
               </SortableRow>
             ))}

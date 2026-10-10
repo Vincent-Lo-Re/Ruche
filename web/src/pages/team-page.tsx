@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { cn } from "cn"
 import {
-  Ellipsis,
   KeyRound,
   Mail,
   ShieldAlert,
@@ -20,15 +19,13 @@ import { RoleBadge } from "@/components/role-badge"
 import { InviteDialog } from "@/components/team/invite-dialog"
 import { useAccessCheck } from "@/components/team/use-access-check"
 import { ConfirmDialog } from "@/components/confirm-dialog"
+import { RowActionsMenu } from "@/components/row-actions-menu"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
   Table,
@@ -272,54 +269,44 @@ function MemberActions({
   const nextRole = member.role === "admin" ? "editor" : "admin"
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            disabled={disabled}
-            aria-label={texts.team.actions.open(displayName(member))}
-          />
+    <RowActionsMenu
+      label={texts.team.actions.open(displayName(member))}
+      disabled={disabled}
+      width="w-auto"
+    >
+      {member.status === "invited" && (
+        <DropdownMenuItem
+          onClick={() => onAction({ action: "resend", user_id: member.id })}
+        >
+          <Mail />
+          {texts.team.actions.resend}
+        </DropdownMenuItem>
+      )}
+      <DropdownMenuItem
+        onClick={() =>
+          onAction({ action: "set_role", user_id: member.id, role: nextRole })
         }
       >
-        <Ellipsis />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-auto">
-        {member.status === "invited" && (
-          <DropdownMenuItem
-            onClick={() => onAction({ action: "resend", user_id: member.id })}
-          >
-            <Mail />
-            {texts.team.actions.resend}
-          </DropdownMenuItem>
-        )}
-        <DropdownMenuItem
-          onClick={() =>
-            onAction({ action: "set_role", user_id: member.id, role: nextRole })
-          }
-        >
-          {nextRole === "admin" ? <ShieldCheck /> : <UserPen />}
-          {nextRole === "admin"
-            ? texts.team.actions.makeAdmin
-            : texts.team.actions.makeEditor}
+        {nextRole === "admin" ? <ShieldCheck /> : <UserPen />}
+        {nextRole === "admin"
+          ? texts.team.actions.makeAdmin
+          : texts.team.actions.makeEditor}
+      </DropdownMenuItem>
+      {member.mfa_enabled && (
+        <DropdownMenuItem onClick={() => onConfirm("reset_mfa")}>
+          <KeyRound />
+          {texts.team.actions.resetMfa}
         </DropdownMenuItem>
-        {member.mfa_enabled && (
-          <DropdownMenuItem onClick={() => onConfirm("reset_mfa")}>
-            <KeyRound />
-            {texts.team.actions.resetMfa}
-          </DropdownMenuItem>
-        )}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          variant="destructive"
-          onClick={() => onConfirm("remove")}
-        >
-          <UserMinus />
-          {texts.team.actions.remove}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      )}
+      <DropdownMenuSeparator />
+      <DropdownMenuItem
+        variant="destructive"
+        onClick={() => onConfirm("remove")}
+      >
+        <UserMinus />
+        {texts.team.actions.remove}
+      </DropdownMenuItem>
+    </RowActionsMenu>
   )
 }
 

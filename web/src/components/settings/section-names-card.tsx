@@ -1,13 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useQuery } from "@tanstack/react-query"
-import { Save } from "lucide-react"
 import { Fragment } from "react"
 import { Controller, useForm, useWatch, type Control } from "react-hook-form"
 import type { z } from "zod"
 
 import { LoadState } from "@/components/load-state"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { SaveFooter } from "@/components/settings/save-footer"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Field,
   FieldDescription,
@@ -16,7 +15,6 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { Spinner } from "@/components/ui/spinner"
 import { useBrandMutation } from "@/hooks/use-brand-name"
 import { saveSectionNames } from "@/lib/admin-identity"
 import { adminBrandRead } from "@/lib/reads"
@@ -105,16 +103,7 @@ function SectionNamesForm({ names }: { names: CustomSectionNames }) {
             </Fragment>
           ))}
         </CardContent>
-        <CardFooter>
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={save.isPending || !form.formState.isDirty}
-          >
-            {save.isPending ? <Spinner /> : <Save aria-hidden />}
-            {texts.common.save}
-          </Button>
-        </CardFooter>
+        <SaveFooter pending={save.isPending} dirty={form.formState.isDirty} />
       </Card>
     </form>
   )

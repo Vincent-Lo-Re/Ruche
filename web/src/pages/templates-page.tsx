@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
-  Ellipsis,
   Layers,
   LayoutTemplate,
   type LucideIcon,
@@ -32,6 +31,7 @@ import { templateSortIcons } from "@/components/templates/sort-icons"
 import { TemplateStatus } from "@/components/templates/template-uses"
 import { UsesList } from "@/components/templates/uses-list"
 import { TrashDialog } from "@/components/confirm-dialog"
+import { RowActionsMenu } from "@/components/row-actions-menu"
 import { Alert, AlertTitle } from "@/components/ui/alert"
 import {
   AlertDialog,
@@ -46,11 +46,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Spinner } from "@/components/ui/spinner"
 import {
@@ -426,27 +423,19 @@ function RowActions({
 }) {
   const navigate = useNavigate()
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        aria-label={labels.actions(nameOf(item))}
-        render={<Button variant="ghost" size="icon-sm" />}
+    <RowActionsMenu label={labels.actions(nameOf(item))}>
+      <DropdownMenuItem
+        onClick={() => void navigate(editorPath("templates", item.id))}
       >
-        <Ellipsis />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-44">
-        <DropdownMenuItem
-          onClick={() => void navigate(editorPath("templates", item.id))}
-        >
-          <SquarePen />
-          {texts.common.open}
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" onClick={onTrash}>
-          <Eraser />
-          {labels.trash}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        <SquarePen />
+        {texts.common.open}
+      </DropdownMenuItem>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem variant="destructive" onClick={onTrash}>
+        <Eraser />
+        {labels.trash}
+      </DropdownMenuItem>
+    </RowActionsMenu>
   )
 }
 

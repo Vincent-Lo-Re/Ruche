@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
-  Ellipsis,
   FilePlus2,
   Plus,
   FileText,
@@ -45,16 +44,14 @@ import { PageHeader } from "@/components/page-header"
 import { SearchInput } from "@/components/search-input"
 import { useAccessCheck } from "@/components/team/use-access-check"
 import { TrashDialog } from "@/components/confirm-dialog"
+import { RowActionsMenu } from "@/components/row-actions-menu"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Spinner } from "@/components/ui/spinner"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
   Select,
@@ -870,42 +867,33 @@ function RowActions({
 }) {
   const navigate = useNavigate()
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        disabled={disabled}
-        aria-label={labels.actions(title)}
-        render={<Button variant="ghost" size="icon-sm" />}
-      >
-        <Ellipsis />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-44">
-        <DropdownMenuItem onClick={() => void navigate(editPath)}>
-          <SquarePen />
-          {texts.common.open}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={onSettings}>
-          <Settings2 />
-          {labels.settings.action}
-        </DropdownMenuItem>
-        {onMove && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => onMove("top")}>
-              <ArrowUpToLine />
-              {labels.order.moveTop}
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onMove("bottom")}>
-              <ArrowDownToLine />
-              {labels.order.moveBottom}
-            </DropdownMenuItem>
-          </>
-        )}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" onClick={onTrash}>
-          <Eraser />
-          {labels.trash}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <RowActionsMenu label={labels.actions(title)} disabled={disabled}>
+      <DropdownMenuItem onClick={() => void navigate(editPath)}>
+        <SquarePen />
+        {texts.common.open}
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={onSettings}>
+        <Settings2 />
+        {labels.settings.action}
+      </DropdownMenuItem>
+      {onMove && (
+        <>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => onMove("top")}>
+            <ArrowUpToLine />
+            {labels.order.moveTop}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onMove("bottom")}>
+            <ArrowDownToLine />
+            {labels.order.moveBottom}
+          </DropdownMenuItem>
+        </>
+      )}
+      <DropdownMenuSeparator />
+      <DropdownMenuItem variant="destructive" onClick={onTrash}>
+        <Eraser />
+        {labels.trash}
+      </DropdownMenuItem>
+    </RowActionsMenu>
   )
 }
