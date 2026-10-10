@@ -1,5 +1,5 @@
-// En-têtes CORS : seule l'administration peut appeler la fonction depuis un navigateur.
-// Même code que ../equipe/cors.ts (vérifié par cors.test.ts) : mêmes origines acceptées.
+// En-têtes CORS des fonctions « equipe » et « files » : seule l'admin peut les appeler depuis un
+// navigateur.
 
 // Les adresses de l'admin en ligne sont propres à chaque installation : le secret ADMIN_ORIGINS
 // les donne, séparées par des virgules (`supabase secrets set`). Une étoile tient la place d'un
