@@ -66,7 +66,8 @@ export function ListSettingsSheet({
   const [refusedSlug, setRefusedSlug] = useState<RefusedSlug | null>(null)
   // Un titre que la base a refusé (un autre contenu de la section l'a pris entre-temps).
   const [refusedTitle, setRefusedTitle] = useState<string | null>(null)
-  const titleCheck = useTitleCheck(kind, title, item.id)
+  // Son propre titre, la base le sait libre : seul un titre changé est vérifié.
+  const titleCheck = useTitleCheck(kind, title, item.id, title !== item.title)
   const [held, setHeld] = useState<string | null>(null)
 
   // Qui écrit ce contenu en ce moment : lu à l'ouverture (session neuve, qui ne tient rien).

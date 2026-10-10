@@ -95,6 +95,8 @@ export function useDraftSaving({
   const sentTitle = useRef(initial.draft.title)
   // Le titre à l'écran envoyé avec le dernier enregistrement (pour reconnaître son refus).
   const sentScreenTitle = useRef(initial.draft.title)
+  // Le titre de la base, pour l'écran : la base le sait libre, il n'est pas vérifié.
+  const [baseTitle, setBaseTitle] = useState(initial.draft.title)
   // Un titre que la base a refusé (titre_pris) : il reste à l'écran, avec la raison.
   const [refusedTitle, setRefusedTitle] = useState<string | null>(null)
   // Le titre pris à l'écran (vérifié en tapant, ou refusé) : il part sous l'ancien.
@@ -121,6 +123,7 @@ export function useDraftSaving({
         setLoadedRev(result.rev)
         savedSettings.current = saved.settings
         savedTitle.current = sentTitle.current
+        setBaseTitle(sentTitle.current)
         queryClient.setQueryData<Content | null>(
           contentKeys.detail(contentId),
           (old) =>
@@ -172,7 +175,12 @@ export function useDraftSaving({
   // Deux contenus d'une section ne portent pas le même titre : vérifié pendant qu'on tape, et
   // refusé par la base (titre_pris). Le titre pris reste à l'écran ; l'enregistrement garde
   // l'ancien (takenTitle) jusqu'à ce qu'il change.
-  const titleCheck = useTitleCheck(kind, draft.title, contentId)
+  const titleCheck = useTitleCheck(
+    kind,
+    draft.title,
+    contentId,
+    draft.title !== baseTitle
+  )
   const titleTaken =
     hasUniqueTitle(kind) &&
     (titleCheck.takenBy !== null || refusedTitle === draft.title)
@@ -288,6 +296,7 @@ export function useDraftSaving({
       const freshSettings = settingsOf(fresh)
       savedSettings.current = freshSettings
       savedTitle.current = fresh.draft.title
+      setBaseTitle(fresh.draft.title)
       sentTitle.current = fresh.draft.title
       setRefusedTitle(null)
       synced.current = { draft: fresh.draft, settings: freshSettings }
