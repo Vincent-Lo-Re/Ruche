@@ -11,6 +11,7 @@ import {
   useUploadQueueWatch,
 } from "@/components/media/use-upload-queue"
 import { SearchInput } from "@/components/search-input"
+import { HiddenFileInput } from "@/components/file-input"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -285,17 +286,12 @@ function PickerUpload({
 
   return (
     <>
-      <input
+      <HiddenFileInput
         ref={input}
-        type="file"
         accept={kind === "audio" ? acceptByKind.audio : acceptedImages}
-        className="sr-only"
         tabIndex={-1}
         aria-label={labels.uploadInput}
-        onChange={(event) => {
-          onFiles(event.target.files)
-          event.target.value = ""
-        }}
+        onFiles={onFiles}
       />
       <Button
         variant="outline"

@@ -1,3 +1,5 @@
+import { highlightSoon } from "@/lib/focus"
+
 /**
  * Retrouver sa place en revenant à une liste (ADMIN § 7, « Une navigation sans à-coups ») : la
  * position de défilement et les réglages (l'adresse) de chaque page, par son chemin, et le dernier
@@ -92,29 +94,14 @@ export function scrollPageBackTo(
 }
 
 /** Allume un instant la ligne d'un contenu (data-content-row) dès qu'elle apparaît. */
-export function lightRowSoon(
-  contentId: string,
-  until = performance.now() + PATIENCE_MS
-) {
-  const row = document.querySelector<HTMLElement>(
-    `[data-content-row="${contentId}"]`
-  )
-  if (!row) {
-    if (performance.now() < until) {
-      requestAnimationFrame(() => lightRowSoon(contentId, until))
-    }
-    return
-  }
-  row.scrollIntoView({ block: "nearest" })
-  row.removeAttribute("data-returned")
-  // Lire une mesure fait repartir l'animation de zéro.
-  void row.offsetWidth
-  row.setAttribute("data-returned", "")
-  row.addEventListener(
-    "animationend",
-    () => row.removeAttribute("data-returned"),
+export function lightRowSoon(contentId: string) {
+  highlightSoon(
+    () =>
+      document.querySelector<HTMLElement>(`[data-content-row="${contentId}"]`),
     {
-      once: true,
+      attribute: "data-returned",
+      smooth: false,
+      until: performance.now() + PATIENCE_MS,
     }
   )
 }

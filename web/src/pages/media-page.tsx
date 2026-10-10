@@ -8,13 +8,7 @@ import {
   Upload,
   UploadCloud,
 } from "lucide-react"
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type ChangeEvent,
-} from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useSearchParams } from "react-router"
 import { toast } from "sonner"
 
@@ -38,6 +32,7 @@ import { usePreviewUrls } from "@/components/media/use-preview-urls"
 import { PageHeader } from "@/components/page-header"
 import { SearchInput } from "@/components/search-input"
 import { useAccessCheck } from "@/components/team/use-access-check"
+import { HiddenFileInput } from "@/components/file-input"
 import { Button } from "@/components/ui/button"
 import {
   Empty,
@@ -243,12 +238,6 @@ export function MediaPage() {
     }
   }, [addFiles])
 
-  const onInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    addFiles(event.target.files)
-    // Le même fichier pourra être choisi de nouveau.
-    event.target.value = ""
-  }
-
   const filtering = debouncedSearch.trim() !== "" || kind !== "all" || unused
   // « Non utilisés » seul et rien à montrer : tout sert, ce n'est pas une recherche ratée.
   const emptyText = !filtering
@@ -328,15 +317,13 @@ export function MediaPage() {
         description={description}
         actions={
           <>
-            <input
+            <HiddenFileInput
               ref={fileInput}
-              type="file"
               multiple
               accept={acceptedFiles}
-              className="sr-only"
               tabIndex={-1}
               aria-label={texts.media.uploadInput}
-              onChange={onInputChange}
+              onFiles={addFiles}
             />
             <BulkTrashButton
               count={selection.items.length}

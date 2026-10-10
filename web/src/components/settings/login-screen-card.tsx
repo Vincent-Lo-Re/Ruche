@@ -1,10 +1,10 @@
 import { cn } from "cn"
-import { Eraser, ImagePlus, UploadCloud } from "lucide-react"
+import { ImagePlus, UploadCloud } from "lucide-react"
 import { useId } from "react"
 
 import { AnimatedMonogram } from "@/components/auth/animated-monogram"
 import { InfoTip } from "@/components/info-tip"
-import { Button } from "@/components/ui/button"
+import { HiddenFileInput, RemoveFileButton } from "@/components/file-input"
 import { Card } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -18,11 +18,6 @@ import {
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { Switch } from "@/components/ui/switch"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 import { useFileDrop } from "@/hooks/use-file-drop"
 import { useMonogramSvg } from "@/hooks/use-monogram-svg"
 import { useBrand, useBrandMutation } from "@/hooks/use-brand-name"
@@ -159,37 +154,22 @@ export function LoginScreenCard() {
               </>
             )}
           </label>
-          <input
+          <HiddenFileInput
             id={inputId}
-            type="file"
             accept={loginImageAccept}
             aria-label={labels.title}
-            className="sr-only"
             disabled={busy}
-            onChange={(event) => {
-              const chosen = event.target.files?.[0]
-              event.target.value = ""
-              if (chosen) save.mutate(chosen)
+            onFiles={(chosen) => {
+              if (chosen?.[0]) save.mutate(chosen[0])
             }}
           />
           {image && !busy && (
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <Button
-                    variant="destructive"
-                    size="icon-sm"
-                    // Comme sur les logos : un fond plein sous le rouge pâle, visible sur toute image.
-                    className="absolute top-2 right-2 bg-background opacity-0 shadow-sm ring-1 ring-foreground/10 transition-opacity group-hover/preview:opacity-100 focus-visible:opacity-100"
-                    aria-label={files.remove}
-                    onClick={() => remove.mutate(image.path)}
-                  />
-                }
-              >
-                <Eraser />
-              </TooltipTrigger>
-              <TooltipContent>{files.remove}</TooltipContent>
-            </Tooltip>
+            // Comme sur les logos : un fond plein sous le rouge pâle, visible sur toute image.
+            <RemoveFileButton
+              label={files.remove}
+              onClick={() => remove.mutate(image.path)}
+              className="shadow-sm ring-1 ring-foreground/10 group-hover/preview:opacity-100"
+            />
           )}
         </div>
         <ItemGroup className="justify-center gap-0 divide-y p-2 @lg:w-80">

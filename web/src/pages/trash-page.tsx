@@ -18,6 +18,7 @@ import { kindIcons } from "@/components/media/media-kinds"
 import { PageHeader } from "@/components/page-header"
 import { useAccessCheck } from "@/components/team/use-access-check"
 import { ConfirmDialog } from "@/components/confirm-dialog"
+import { TruncatedText } from "@/components/truncated-text"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -374,12 +375,7 @@ function TrashRow({
       <TableCell className="max-w-80">
         <div className="flex items-center gap-2">
           <Icon aria-hidden className="size-4 shrink-0 text-muted-foreground" />
-          <Tooltip>
-            <TooltipTrigger render={<span className="truncate font-medium" />}>
-              {name}
-            </TooltipTrigger>
-            <TooltipContent>{name}</TooltipContent>
-          </Tooltip>
+          <TruncatedText as="span" text={name} className="font-medium" />
         </div>
       </TableCell>
       <TableCell>{trashTypeLabel(item)}</TableCell>
