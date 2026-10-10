@@ -1,0 +1,18 @@
+{
+  "description": "Encadré teinté d'une version publiée",
+  "variant": "published",
+  "valid": true,
+  "data": {
+    "v": 1,
+    "title": "Encadré teinté",
+    "blocks": [
+      {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "type": "box",
+        "look": "border",
+        "tint": "00000000-0000-4000-8000-000000000300",
+        "blocks": []
+      }
+    ]
+  }
+}

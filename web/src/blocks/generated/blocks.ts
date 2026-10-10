@@ -425,6 +425,7 @@ export interface BoxBlock {
   id: Uuid
   type: "box"
   look: "fill" | "border"
+  tint?: Uuid
   blocks: BoxChild[]
 }
 /**
@@ -479,6 +480,7 @@ export interface PublishedBoxBlock {
   id: Uuid
   type: "box"
   look: "fill" | "border"
+  tint?: Uuid
   blocks: PublishedBoxChild[]
   templateId?: Uuid
 }

@@ -288,7 +288,7 @@
       }
     },
     "boxBlock": {
-      "$comment": "Encadré : un seul niveau, Texte et Image seulement (ni encadré, ni bloc lié).",
+      "$comment": "Encadré : un seul niveau, Texte et Image seulement (ni encadré, ni bloc lié). tint : l'identifiant d'une teinte de la charte de l'app (variante « style ») ; absente, ou disparue de la charte, la première teinte (10/10/2026).",
       "type": "object",
       "additionalProperties": false,
       "required": ["id", "type", "look", "blocks"],
@@ -296,6 +296,7 @@
         "id": { "$ref": "#/definitions/uuid" },
         "type": { "const": "box" },
         "look": { "enum": ["fill", "border"] },
+        "tint": { "$ref": "#/definitions/uuid" },
         "blocks": {
           "type": "array",
           "items": { "$ref": "#/definitions/boxChild" }
@@ -486,6 +487,7 @@
         "id": { "$ref": "#/definitions/uuid" },
         "type": { "const": "box" },
         "look": { "enum": ["fill", "border"] },
+        "tint": { "$ref": "#/definitions/uuid" },
         "blocks": {
           "type": "array",
           "items": { "$ref": "#/definitions/publishedBoxChild" }

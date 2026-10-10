@@ -43,7 +43,7 @@ var require_ucs2length = __commonJS({
 
 // style-validator.raw.mjs
 var validateStyle = validate177
-var schema111 = {
+var schema114 = {
   $schema: "http://json-schema.org/draft-07/schema#",
   $id: "https://github.com/Vincent-Lo-Re/Ruche/blob/main/blocks/generated/style.schema.json",
   $comment:
@@ -386,7 +386,7 @@ var schema111 = {
     },
     boxBlock: {
       $comment:
-        "Encadr\xE9 : un seul niveau, Texte et Image seulement (ni encadr\xE9, ni bloc li\xE9).",
+        "Encadr\xE9 : un seul niveau, Texte et Image seulement (ni encadr\xE9, ni bloc li\xE9). tint : l'identifiant d'une teinte de la charte de l'app (variante \xAB style \xBB) ; absente, ou disparue de la charte, la premi\xE8re teinte (10/10/2026).",
       type: "object",
       additionalProperties: false,
       required: ["id", "type", "look", "blocks"],
@@ -394,6 +394,7 @@ var schema111 = {
         id: { $ref: "#/definitions/uuid" },
         type: { const: "box" },
         look: { enum: ["fill", "border"] },
+        tint: { $ref: "#/definitions/uuid" },
         blocks: { type: "array", items: { $ref: "#/definitions/boxChild" } },
       },
     },
@@ -580,6 +581,7 @@ var schema111 = {
         id: { $ref: "#/definitions/uuid" },
         type: { const: "box" },
         look: { enum: ["fill", "border"] },
+        tint: { $ref: "#/definitions/uuid" },
         blocks: {
           type: "array",
           items: { $ref: "#/definitions/publishedBoxChild" },
@@ -957,8 +959,8 @@ var pattern0 = new RegExp(
   "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
   "u"
 )
-var pattern27 = new RegExp("^\\S(.*\\S)?$", "u")
-var pattern28 = new RegExp("^#[0-9a-f]{6}$", "u")
+var pattern30 = new RegExp("^\\S(.*\\S)?$", "u")
+var pattern31 = new RegExp("^#[0-9a-f]{6}$", "u")
 var func2 = require_ucs2length().default
 function validate178(
   data,
@@ -1078,7 +1080,7 @@ function validate178(
                       ]
                       return false
                     } else {
-                      if (!pattern27.test(data1)) {
+                      if (!pattern30.test(data1)) {
                         validate178.errors = [
                           {
                             instancePath: instancePath + "/name",
@@ -1116,7 +1118,7 @@ function validate178(
                 const _errs12 = errors
                 if (errors === _errs12) {
                   if (typeof data2 === "string") {
-                    if (!pattern28.test(data2)) {
+                    if (!pattern31.test(data2)) {
                       validate178.errors = [
                         {
                           instancePath: instancePath + "/light",
@@ -1152,7 +1154,7 @@ function validate178(
                   const _errs16 = errors
                   if (errors === _errs16) {
                     if (typeof data3 === "string") {
-                      if (!pattern28.test(data3)) {
+                      if (!pattern31.test(data3)) {
                         validate178.errors = [
                           {
                             instancePath: instancePath + "/dark",
@@ -1202,7 +1204,7 @@ function validate178(
   validate178.errors = vErrors
   return errors === 0
 }
-var schema117 = {
+var schema120 = {
   title: "StyleColorRoles",
   $comment:
     "O\xF9 va chaque couleur : l'identifiant d'une couleur de la palette pour chaque usage de l'app. Un usage ajout\xE9 plus tard sera facultatif, pour qu'une charte d\xE9j\xE0 enregistr\xE9e reste valable.",
@@ -1285,7 +1287,7 @@ function validate180(
       } else {
         const _errs2 = errors
         for (const key0 in data) {
-          if (!func19.call(schema117.properties, key0)) {
+          if (!func19.call(schema120.properties, key0)) {
             validate180.errors = [
               {
                 instancePath,
@@ -2118,7 +2120,7 @@ function validate182(
                       ]
                       return false
                     } else {
-                      if (!pattern27.test(data1)) {
+                      if (!pattern30.test(data1)) {
                         validate182.errors = [
                           {
                             instancePath: instancePath + "/name",
@@ -2493,7 +2495,7 @@ function validate184(
                       ]
                       return false
                     } else {
-                      if (!pattern27.test(data1)) {
+                      if (!pattern30.test(data1)) {
                         validate184.errors = [
                           {
                             instancePath: instancePath + "/name",
@@ -2666,7 +2668,7 @@ function validate184(
   validate184.errors = vErrors
   return errors === 0
 }
-var schema148 = {
+var schema151 = {
   title: "StyleButton",
   $comment:
     "Un bouton : aplat (fill), d\xE9grad\xE9 (de fill \xE0 end), bordure (border) ou texte seul ; label est la couleur du texte. Toutes les couleurs restent, m\xEAme celles que le style n'emploie pas : changer de style ne perd rien. rounded : l'arrondi de la charte. Le premier sert aux boutons de l'app.",
@@ -2810,7 +2812,7 @@ function validate186(
                       ]
                       return false
                     } else {
-                      if (!pattern27.test(data1)) {
+                      if (!pattern30.test(data1)) {
                         validate186.errors = [
                           {
                             instancePath: instancePath + "/name",
@@ -2856,7 +2858,7 @@ function validate186(
                       instancePath: instancePath + "/kind",
                       schemaPath: "#/properties/kind/enum",
                       keyword: "enum",
-                      params: { allowedValues: schema148.properties.kind.enum },
+                      params: { allowedValues: schema151.properties.kind.enum },
                       message: "must be equal to one of the allowed values",
                     },
                   ]
@@ -2881,7 +2883,7 @@ function validate186(
                         schemaPath: "#/properties/shape/enum",
                         keyword: "enum",
                         params: {
-                          allowedValues: schema148.properties.shape.enum,
+                          allowedValues: schema151.properties.shape.enum,
                         },
                         message: "must be equal to one of the allowed values",
                       },
@@ -3077,7 +3079,7 @@ function validate186(
   validate186.errors = vErrors
   return errors === 0
 }
-var schema155 = {
+var schema158 = {
   title: "StyleFont",
   $comment:
     "Une police : system (celle du t\xE9l\xE9phone) ou une police libre de Google Fonts, copi\xE9e dans le stockage de l'installation. On ne fait qu'ajouter des familles ; les \xE9paisseurs de chacune sont dans l'admin.",
@@ -3226,7 +3228,7 @@ function validate188(
                       ]
                       return false
                     } else {
-                      if (!pattern27.test(data1)) {
+                      if (!pattern30.test(data1)) {
                         validate188.errors = [
                           {
                             instancePath: instancePath + "/name",
@@ -3283,7 +3285,7 @@ function validate188(
                       schemaPath: "#/properties/family/enum",
                       keyword: "enum",
                       params: {
-                        allowedValues: schema155.properties.family.enum,
+                        allowedValues: schema158.properties.family.enum,
                       },
                       message: "must be equal to one of the allowed values",
                     },
@@ -3310,7 +3312,7 @@ function validate188(
                         schemaPath: "#/properties/weight/enum",
                         keyword: "enum",
                         params: {
-                          allowedValues: schema155.properties.weight.enum,
+                          allowedValues: schema158.properties.weight.enum,
                         },
                         message: "must be equal to one of the allowed values",
                       },
@@ -3342,7 +3344,7 @@ function validate188(
   validate188.errors = vErrors
   return errors === 0
 }
-var schema158 = {
+var schema161 = {
   title: "StyleFontRoles",
   $comment:
     "O\xF9 va chaque police : l'identifiant d'une police de la liste pour chaque usage.",
@@ -3404,7 +3406,7 @@ function validate190(
       } else {
         const _errs2 = errors
         for (const key0 in data) {
-          if (!func19.call(schema158.properties, key0)) {
+          if (!func19.call(schema161.properties, key0)) {
             validate190.errors = [
               {
                 instancePath,
@@ -4824,7 +4826,7 @@ function validate177(
       } else {
         const _errs2 = errors
         for (const key0 in data) {
-          if (!func19.call(schema111.properties, key0)) {
+          if (!func19.call(schema114.properties, key0)) {
             validate177.errors = [
               {
                 instancePath,
@@ -4872,7 +4874,7 @@ function validate177(
                     schemaPath: "#/properties/darkMode/enum",
                     keyword: "enum",
                     params: {
-                      allowedValues: schema111.properties.darkMode.enum,
+                      allowedValues: schema114.properties.darkMode.enum,
                     },
                     message: "must be equal to one of the allowed values",
                   },
@@ -5210,7 +5212,7 @@ function validate177(
                                 keyword: "enum",
                                 params: {
                                   allowedValues:
-                                    schema111.properties.fields.enum,
+                                    schema114.properties.fields.enum,
                                 },
                                 message:
                                   "must be equal to one of the allowed values",
@@ -5495,7 +5497,7 @@ function validate177(
                                             keyword: "enum",
                                             params: {
                                               allowedValues:
-                                                schema111.properties.shadow
+                                                schema114.properties.shadow
                                                   .enum,
                                             },
                                             message:

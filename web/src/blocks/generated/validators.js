@@ -3161,7 +3161,7 @@ function validate52(
 }
 var schema37 = {
   $comment:
-    "Encadr\xE9 : un seul niveau, Texte et Image seulement (ni encadr\xE9, ni bloc li\xE9).",
+    "Encadr\xE9 : un seul niveau, Texte et Image seulement (ni encadr\xE9, ni bloc li\xE9). tint : l'identifiant d'une teinte de la charte de l'app (variante \xAB style \xBB) ; absente, ou disparue de la charte, la premi\xE8re teinte (10/10/2026).",
   type: "object",
   additionalProperties: false,
   required: ["id", "type", "look", "blocks"],
@@ -3169,10 +3169,11 @@ var schema37 = {
     id: { $ref: "#/definitions/uuid" },
     type: { const: "box" },
     look: { enum: ["fill", "border"] },
+    tint: { $ref: "#/definitions/uuid" },
     blocks: { type: "array", items: { $ref: "#/definitions/boxChild" } },
   },
 }
-var schema39 = {
+var schema40 = {
   tsType: "TextBlock | ImageBlock",
   if: {
     type: "object",
@@ -3358,7 +3359,7 @@ function validate55(
                     schemaPath: "#/else/else/properties/type/enum",
                     keyword: "enum",
                     params: {
-                      allowedValues: schema39.else.else.properties.type.enum,
+                      allowedValues: schema40.else.else.properties.type.enum,
                     },
                     message: "must be equal to one of the allowed values",
                   },
@@ -3457,6 +3458,7 @@ function validate54(
             key0 === "id" ||
             key0 === "type" ||
             key0 === "look" ||
+            key0 === "tint" ||
             key0 === "blocks"
           )) {
             validate54.errors = [
@@ -3552,42 +3554,36 @@ function validate54(
                 var valid0 = true
               }
               if (valid0) {
-                if (data.blocks !== void 0) {
-                  let data3 = data.blocks
+                if (data.tint !== void 0) {
+                  let data3 = data.tint
                   const _errs9 = errors
-                  if (errors === _errs9) {
-                    if (Array.isArray(data3)) {
-                      var valid2 = true
-                      const len0 = data3.length
-                      for (let i0 = 0; i0 < len0; i0++) {
-                        const _errs11 = errors
-                        if (
-                          !validate55(data3[i0], {
-                            instancePath: instancePath + "/blocks/" + i0,
-                            parentData: data3,
-                            parentDataProperty: i0,
-                            rootData,
-                          })
-                        ) {
-                          vErrors =
-                            vErrors === null
-                              ? validate55.errors
-                              : vErrors.concat(validate55.errors)
-                          errors = vErrors.length
-                        }
-                        var valid2 = _errs11 === errors
-                        if (!valid2) {
-                          break
-                        }
+                  const _errs10 = errors
+                  if (errors === _errs10) {
+                    if (typeof data3 === "string") {
+                      if (!pattern0.test(data3)) {
+                        validate54.errors = [
+                          {
+                            instancePath: instancePath + "/tint",
+                            schemaPath: "#/definitions/uuid/pattern",
+                            keyword: "pattern",
+                            params: {
+                              pattern:
+                                "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                            },
+                            message:
+                              'must match pattern "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"',
+                          },
+                        ]
+                        return false
                       }
                     } else {
                       validate54.errors = [
                         {
-                          instancePath: instancePath + "/blocks",
-                          schemaPath: "#/properties/blocks/type",
+                          instancePath: instancePath + "/tint",
+                          schemaPath: "#/definitions/uuid/type",
                           keyword: "type",
-                          params: { type: "array" },
-                          message: "must be array",
+                          params: { type: "string" },
+                          message: "must be string",
                         },
                       ]
                       return false
@@ -3596,6 +3592,53 @@ function validate54(
                   var valid0 = _errs9 === errors
                 } else {
                   var valid0 = true
+                }
+                if (valid0) {
+                  if (data.blocks !== void 0) {
+                    let data4 = data.blocks
+                    const _errs13 = errors
+                    if (errors === _errs13) {
+                      if (Array.isArray(data4)) {
+                        var valid3 = true
+                        const len0 = data4.length
+                        for (let i0 = 0; i0 < len0; i0++) {
+                          const _errs15 = errors
+                          if (
+                            !validate55(data4[i0], {
+                              instancePath: instancePath + "/blocks/" + i0,
+                              parentData: data4,
+                              parentDataProperty: i0,
+                              rootData,
+                            })
+                          ) {
+                            vErrors =
+                              vErrors === null
+                                ? validate55.errors
+                                : vErrors.concat(validate55.errors)
+                            errors = vErrors.length
+                          }
+                          var valid3 = _errs15 === errors
+                          if (!valid3) {
+                            break
+                          }
+                        }
+                      } else {
+                        validate54.errors = [
+                          {
+                            instancePath: instancePath + "/blocks",
+                            schemaPath: "#/properties/blocks/type",
+                            keyword: "type",
+                            params: { type: "array" },
+                            message: "must be array",
+                          },
+                        ]
+                        return false
+                      }
+                    }
+                    var valid0 = _errs13 === errors
+                  } else {
+                    var valid0 = true
+                  }
                 }
               }
             }
@@ -4501,7 +4544,7 @@ function validate64(
   validate64.errors = vErrors
   return errors === 0
 }
-var schema46 = {
+var schema47 = {
   $comment:
     "Un bloc au premier niveau d'un mod\xE8le : pas de bloc li\xE9 (ni cha\xEEne ni boucle).",
   tsType: "TextBlock | ImageBlock | BoxBlock",
@@ -7550,7 +7593,7 @@ function validate108(
                     schemaPath: "#/else/else/properties/type/enum",
                     keyword: "enum",
                     params: {
-                      allowedValues: schema39.else.else.properties.type.enum,
+                      allowedValues: schema40.else.else.properties.type.enum,
                     },
                     message: "must be equal to one of the allowed values",
                   },
@@ -7649,6 +7692,7 @@ function validate107(
             key0 === "id" ||
             key0 === "type" ||
             key0 === "look" ||
+            key0 === "tint" ||
             key0 === "blocks"
           )) {
             validate107.errors = [
@@ -7744,42 +7788,36 @@ function validate107(
                 var valid0 = true
               }
               if (valid0) {
-                if (data.blocks !== void 0) {
-                  let data3 = data.blocks
+                if (data.tint !== void 0) {
+                  let data3 = data.tint
                   const _errs9 = errors
-                  if (errors === _errs9) {
-                    if (Array.isArray(data3)) {
-                      var valid2 = true
-                      const len0 = data3.length
-                      for (let i0 = 0; i0 < len0; i0++) {
-                        const _errs11 = errors
-                        if (
-                          !validate108(data3[i0], {
-                            instancePath: instancePath + "/blocks/" + i0,
-                            parentData: data3,
-                            parentDataProperty: i0,
-                            rootData,
-                          })
-                        ) {
-                          vErrors =
-                            vErrors === null
-                              ? validate108.errors
-                              : vErrors.concat(validate108.errors)
-                          errors = vErrors.length
-                        }
-                        var valid2 = _errs11 === errors
-                        if (!valid2) {
-                          break
-                        }
+                  const _errs10 = errors
+                  if (errors === _errs10) {
+                    if (typeof data3 === "string") {
+                      if (!pattern0.test(data3)) {
+                        validate107.errors = [
+                          {
+                            instancePath: instancePath + "/tint",
+                            schemaPath: "#/definitions/uuid/pattern",
+                            keyword: "pattern",
+                            params: {
+                              pattern:
+                                "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                            },
+                            message:
+                              'must match pattern "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"',
+                          },
+                        ]
+                        return false
                       }
                     } else {
                       validate107.errors = [
                         {
-                          instancePath: instancePath + "/blocks",
-                          schemaPath: "#/properties/blocks/type",
+                          instancePath: instancePath + "/tint",
+                          schemaPath: "#/definitions/uuid/type",
                           keyword: "type",
-                          params: { type: "array" },
-                          message: "must be array",
+                          params: { type: "string" },
+                          message: "must be string",
                         },
                       ]
                       return false
@@ -7788,6 +7826,53 @@ function validate107(
                   var valid0 = _errs9 === errors
                 } else {
                   var valid0 = true
+                }
+                if (valid0) {
+                  if (data.blocks !== void 0) {
+                    let data4 = data.blocks
+                    const _errs13 = errors
+                    if (errors === _errs13) {
+                      if (Array.isArray(data4)) {
+                        var valid3 = true
+                        const len0 = data4.length
+                        for (let i0 = 0; i0 < len0; i0++) {
+                          const _errs15 = errors
+                          if (
+                            !validate108(data4[i0], {
+                              instancePath: instancePath + "/blocks/" + i0,
+                              parentData: data4,
+                              parentDataProperty: i0,
+                              rootData,
+                            })
+                          ) {
+                            vErrors =
+                              vErrors === null
+                                ? validate108.errors
+                                : vErrors.concat(validate108.errors)
+                            errors = vErrors.length
+                          }
+                          var valid3 = _errs15 === errors
+                          if (!valid3) {
+                            break
+                          }
+                        }
+                      } else {
+                        validate107.errors = [
+                          {
+                            instancePath: instancePath + "/blocks",
+                            schemaPath: "#/properties/blocks/type",
+                            keyword: "type",
+                            params: { type: "array" },
+                            message: "must be array",
+                          },
+                        ]
+                        return false
+                      }
+                    }
+                    var valid0 = _errs13 === errors
+                  } else {
+                    var valid0 = true
+                  }
                 }
               }
             }
@@ -8047,7 +8132,7 @@ function validate67(
                       keyword: "enum",
                       params: {
                         allowedValues:
-                          schema46.else.else.else.properties.type.enum,
+                          schema47.else.else.else.properties.type.enum,
                       },
                       message: "must be equal to one of the allowed values",
                     },
@@ -8859,7 +8944,7 @@ function validate120(
   validate120.errors = vErrors
   return errors === 0
 }
-var schema76 = {
+var schema78 = {
   $comment:
     "Un bloc au premier niveau d'une version publi\xE9e : jamais de bloc li\xE9 (il est r\xE9solu en copie).",
   tsType: "PublishedTextBlock | PublishedTopImageBlock | PublishedBoxBlock",
@@ -11556,7 +11641,7 @@ function validate124(
   validate124.errors = vErrors
   return errors === 0
 }
-var schema97 = {
+var schema99 = {
   $comment:
     "Image au premier niveau d'une version publi\xE9e (comme publishedImageBlock), avec le marqueur templateId d'une copie de mod\xE8le.",
   type: "object",
@@ -11732,7 +11817,7 @@ function validate161(
                         instancePath: instancePath + "/caption",
                         schemaPath: "#/properties/caption/type",
                         keyword: "type",
-                        params: { type: schema97.properties.caption.type },
+                        params: { type: schema99.properties.caption.type },
                         message: "must be string,null",
                       },
                     ]
@@ -11877,7 +11962,7 @@ function validate161(
   validate161.errors = vErrors
   return errors === 0
 }
-var schema101 = {
+var schema103 = {
   $comment:
     "Encadr\xE9 d'une version publi\xE9e : Texte et Image (fichier obligatoire) seulement, avec le marqueur templateId d'une copie de mod\xE8le.",
   type: "object",
@@ -11887,6 +11972,7 @@ var schema101 = {
     id: { $ref: "#/definitions/uuid" },
     type: { const: "box" },
     look: { enum: ["fill", "border"] },
+    tint: { $ref: "#/definitions/uuid" },
     blocks: {
       type: "array",
       items: { $ref: "#/definitions/publishedBoxChild" },
@@ -11894,7 +11980,7 @@ var schema101 = {
     templateId: { $ref: "#/definitions/uuid" },
   },
 }
-var schema103 = {
+var schema106 = {
   tsType: "TextBlock | PublishedImageBlock",
   if: {
     type: "object",
@@ -12057,7 +12143,7 @@ function validate165(
   validate165.errors = vErrors
   return errors === 0
 }
-var schema106 = {
+var schema109 = {
   $comment:
     "Image d'une version publi\xE9e (dans un encadr\xE9) : fichier obligatoire, texte alternatif r\xE9solu (\xA7 2.4). altFromLibrary : ce texte vient de la m\xE9diath\xE8que (alt null dans le brouillon) ; \xAB Revenir \xE0 cette version \xBB remet alt \xE0 null. L'app l'ignore.",
   type: "object",
@@ -12231,7 +12317,7 @@ function validate168(
                         instancePath: instancePath + "/caption",
                         schemaPath: "#/properties/caption/type",
                         keyword: "type",
-                        params: { type: schema106.properties.caption.type },
+                        params: { type: schema109.properties.caption.type },
                         message: "must be string,null",
                       },
                     ]
@@ -12501,7 +12587,7 @@ function validate164(
                     schemaPath: "#/else/else/properties/type/enum",
                     keyword: "enum",
                     params: {
-                      allowedValues: schema103.else.else.properties.type.enum,
+                      allowedValues: schema106.else.else.properties.type.enum,
                     },
                     message: "must be equal to one of the allowed values",
                   },
@@ -12600,6 +12686,7 @@ function validate163(
             key0 === "id" ||
             key0 === "type" ||
             key0 === "look" ||
+            key0 === "tint" ||
             key0 === "blocks" ||
             key0 === "templateId"
           )) {
@@ -12685,7 +12772,7 @@ function validate163(
                       instancePath: instancePath + "/look",
                       schemaPath: "#/properties/look/enum",
                       keyword: "enum",
-                      params: { allowedValues: schema101.properties.look.enum },
+                      params: { allowedValues: schema103.properties.look.enum },
                       message: "must be equal to one of the allowed values",
                     },
                   ]
@@ -12696,42 +12783,36 @@ function validate163(
                 var valid0 = true
               }
               if (valid0) {
-                if (data.blocks !== void 0) {
-                  let data3 = data.blocks
+                if (data.tint !== void 0) {
+                  let data3 = data.tint
                   const _errs9 = errors
-                  if (errors === _errs9) {
-                    if (Array.isArray(data3)) {
-                      var valid2 = true
-                      const len0 = data3.length
-                      for (let i0 = 0; i0 < len0; i0++) {
-                        const _errs11 = errors
-                        if (
-                          !validate164(data3[i0], {
-                            instancePath: instancePath + "/blocks/" + i0,
-                            parentData: data3,
-                            parentDataProperty: i0,
-                            rootData,
-                          })
-                        ) {
-                          vErrors =
-                            vErrors === null
-                              ? validate164.errors
-                              : vErrors.concat(validate164.errors)
-                          errors = vErrors.length
-                        }
-                        var valid2 = _errs11 === errors
-                        if (!valid2) {
-                          break
-                        }
+                  const _errs10 = errors
+                  if (errors === _errs10) {
+                    if (typeof data3 === "string") {
+                      if (!pattern0.test(data3)) {
+                        validate163.errors = [
+                          {
+                            instancePath: instancePath + "/tint",
+                            schemaPath: "#/definitions/uuid/pattern",
+                            keyword: "pattern",
+                            params: {
+                              pattern:
+                                "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                            },
+                            message:
+                              'must match pattern "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"',
+                          },
+                        ]
+                        return false
                       }
                     } else {
                       validate163.errors = [
                         {
-                          instancePath: instancePath + "/blocks",
-                          schemaPath: "#/properties/blocks/type",
+                          instancePath: instancePath + "/tint",
+                          schemaPath: "#/definitions/uuid/type",
                           keyword: "type",
-                          params: { type: "array" },
-                          message: "must be array",
+                          params: { type: "string" },
+                          message: "must be string",
                         },
                       ]
                       return false
@@ -12742,44 +12823,91 @@ function validate163(
                   var valid0 = true
                 }
                 if (valid0) {
-                  if (data.templateId !== void 0) {
-                    let data5 = data.templateId
-                    const _errs12 = errors
+                  if (data.blocks !== void 0) {
+                    let data4 = data.blocks
                     const _errs13 = errors
                     if (errors === _errs13) {
-                      if (typeof data5 === "string") {
-                        if (!pattern0.test(data5)) {
-                          validate163.errors = [
-                            {
-                              instancePath: instancePath + "/templateId",
-                              schemaPath: "#/definitions/uuid/pattern",
-                              keyword: "pattern",
-                              params: {
-                                pattern:
-                                  "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
-                              },
-                              message:
-                                'must match pattern "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"',
-                            },
-                          ]
-                          return false
+                      if (Array.isArray(data4)) {
+                        var valid3 = true
+                        const len0 = data4.length
+                        for (let i0 = 0; i0 < len0; i0++) {
+                          const _errs15 = errors
+                          if (
+                            !validate164(data4[i0], {
+                              instancePath: instancePath + "/blocks/" + i0,
+                              parentData: data4,
+                              parentDataProperty: i0,
+                              rootData,
+                            })
+                          ) {
+                            vErrors =
+                              vErrors === null
+                                ? validate164.errors
+                                : vErrors.concat(validate164.errors)
+                            errors = vErrors.length
+                          }
+                          var valid3 = _errs15 === errors
+                          if (!valid3) {
+                            break
+                          }
                         }
                       } else {
                         validate163.errors = [
                           {
-                            instancePath: instancePath + "/templateId",
-                            schemaPath: "#/definitions/uuid/type",
+                            instancePath: instancePath + "/blocks",
+                            schemaPath: "#/properties/blocks/type",
                             keyword: "type",
-                            params: { type: "string" },
-                            message: "must be string",
+                            params: { type: "array" },
+                            message: "must be array",
                           },
                         ]
                         return false
                       }
                     }
-                    var valid0 = _errs12 === errors
+                    var valid0 = _errs13 === errors
                   } else {
                     var valid0 = true
+                  }
+                  if (valid0) {
+                    if (data.templateId !== void 0) {
+                      let data6 = data.templateId
+                      const _errs16 = errors
+                      const _errs17 = errors
+                      if (errors === _errs17) {
+                        if (typeof data6 === "string") {
+                          if (!pattern0.test(data6)) {
+                            validate163.errors = [
+                              {
+                                instancePath: instancePath + "/templateId",
+                                schemaPath: "#/definitions/uuid/pattern",
+                                keyword: "pattern",
+                                params: {
+                                  pattern:
+                                    "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                                },
+                                message:
+                                  'must match pattern "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"',
+                              },
+                            ]
+                            return false
+                          }
+                        } else {
+                          validate163.errors = [
+                            {
+                              instancePath: instancePath + "/templateId",
+                              schemaPath: "#/definitions/uuid/type",
+                              keyword: "type",
+                              params: { type: "string" },
+                              message: "must be string",
+                            },
+                          ]
+                          return false
+                        }
+                      }
+                      var valid0 = _errs16 === errors
+                    } else {
+                      var valid0 = true
+                    }
                   }
                 }
               }
@@ -13042,7 +13170,7 @@ function validate123(
                       keyword: "enum",
                       params: {
                         allowedValues:
-                          schema76.else.else.else.properties.type.enum,
+                          schema78.else.else.else.properties.type.enum,
                       },
                       message: "must be equal to one of the allowed values",
                     },
@@ -13581,7 +13709,7 @@ function validate173(
                       keyword: "enum",
                       params: {
                         allowedValues:
-                          schema76.else.else.else.properties.type.enum,
+                          schema78.else.else.else.properties.type.enum,
                       },
                       message: "must be equal to one of the allowed values",
                     },
