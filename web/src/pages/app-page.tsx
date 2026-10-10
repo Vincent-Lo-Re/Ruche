@@ -20,7 +20,7 @@ const labels = texts.appPage
 
 /**
  * La section « App » (admins seulement, ADMIN § 1) : tout ce que voient les lecteurs de l'app, en
- * trois colonnes de même largeur qui tiennent dans le panneau. À gauche, le titre et les quatre
+ * trois colonnes qui tiennent dans le panneau (la plus large au centre, pour le téléphone). À gauche, le titre et les quatre
  * onglets (sous la charte graphique, ses familles de réglages) ; au centre, le téléphone ; à
  * droite, les réglages. Seule la charte graphique est construite ; l'identité, la navigation et
  * les mises en page arrivent avec l'app mobile. L'onglet et la famille ouverts sont dans
@@ -57,7 +57,7 @@ export function AppPage() {
   return (
     // Sur un écran large, la page tient dans le panneau (posée sur lui, avec ses marges) : seules
     // les colonnes défilent. Plus étroit, les colonnes s'empilent et la page défile.
-    <div className="grid gap-6 lg:absolute lg:inset-0 lg:grid-cols-3 lg:grid-rows-1 lg:p-8 lg:pb-page">
+    <div className="grid gap-6 lg:absolute lg:inset-0 lg:grid-cols-app-page lg:grid-rows-1 lg:p-8 lg:pb-page">
       {tab === "style" ? (
         <StyleTab group={group} onGroup={openGroup} aside={aside} />
       ) : (

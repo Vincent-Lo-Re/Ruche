@@ -184,6 +184,12 @@
   grid-template-columns: minmax(0, 1fr) --spacing(80);
 }
 
+/* La page App : à gauche le titre et les onglets (15 rem), à droite les réglages (25 rem), et au
+   centre, le reste pour le téléphone. */
+@utility grid-cols-app-page {
+  grid-template-columns: --spacing(60) minmax(0, 1fr) --spacing(100);
+}
+
 /* Charte graphique de l'app : la hauteur du téléphone quand les trois colonnes s'empilent (sous
    lg, la page défile ; au-dessus, il prend la hauteur de sa colonne). */
 @utility h-style-stage {
