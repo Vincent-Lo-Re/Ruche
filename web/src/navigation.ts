@@ -1,13 +1,17 @@
 import {
   ArchiveX,
   CircleUser,
+  Compass,
+  Fingerprint,
   Images,
   Layers,
   LayoutDashboard,
+  LayoutTemplate,
   MicAudioLines,
+  Palette,
   Rss,
+  Shapes,
   SlidersVertical,
-  Smartphone,
   SquareText,
   UserGroup,
   type LucideIcon,
@@ -33,7 +37,11 @@ export const sections = {
   templates: { path: "/templates", icon: Layers },
   media: { path: "/media", icon: Images },
   trash: { path: "/trash", icon: ArchiveX },
-  app: { path: "/app", icon: Smartphone },
+  appIdentity: { path: "/app/identity", icon: Fingerprint },
+  appStyle: { path: "/app/style", icon: Palette },
+  appShapes: { path: "/app/shapes", icon: Shapes },
+  appNavigation: { path: "/app/navigation", icon: Compass },
+  appLayouts: { path: "/app/layouts", icon: LayoutTemplate },
   team: { path: "/team", icon: UserGroup },
   settings: { path: "/settings", icon: SlidersVertical },
   account: { path: "/account", icon: CircleUser },
@@ -46,8 +54,20 @@ export const authPaths = {
   signOut: "/sign-out",
 } as const
 
+// Les pages « App mobile » (ADMIN § 1), dans l'ordre du menu.
+export const appSections = [
+  "appIdentity",
+  "appStyle",
+  "appShapes",
+  "appNavigation",
+  "appLayouts",
+] as const satisfies readonly SectionKey[]
+
 // Sections réservées aux admins : cachées dans le menu d'un éditeur.
-export const adminOnlySections: readonly SectionKey[] = ["app", "settings"]
+export const adminOnlySections: readonly SectionKey[] = [
+  ...appSections,
+  "settings",
+]
 
 // Rangement du menu de gauche : l'accueil, puis les groupes. Le compte, l'équipe et les
 // paramètres sont dans le header (`header`).
@@ -64,7 +84,7 @@ export const menu = {
     },
     {
       label: texts.nav.groups.app,
-      items: ["app"],
+      items: [...appSections],
     },
   ],
 } satisfies {

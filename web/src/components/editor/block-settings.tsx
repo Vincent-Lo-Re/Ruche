@@ -33,8 +33,6 @@ import {
   type Draft,
   type ImageBlock,
 } from "@/blocks/types"
-import { useBlocksStyle } from "@/blocks/components/style-context"
-import { Swatch } from "@/components/app-style/style-fields"
 import { LoadState } from "@/components/load-state"
 import { ColumnHeader } from "@/components/editor/column-header"
 import { MediaFileLink } from "@/components/media/media-file-link"
@@ -42,13 +40,6 @@ import { Button, buttonVariants } from "@/components/ui/button"
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
 import { Item, ItemContent, ItemMedia, ItemTitle } from "@/components/ui/item"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
@@ -58,7 +49,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { colorValue } from "@/lib/app-style/style"
 import { editorPath, sections } from "@/navigation"
 import { texts } from "@/texts"
 
@@ -539,88 +529,29 @@ function BoxSettings({
   onUpdate: Props["onUpdate"]
 }) {
   const box = labels.box
-  const shown = useBlocksStyle()
-  const tints = shown?.style.tints ?? []
-  // Sans teinte choisie, ou une teinte disparue de la charte : la première.
-  const tint =
-    tints.find((candidate) => candidate.id === block.tint) ?? tints[0]
-  const tintItems = tints.map((candidate) => ({
-    value: candidate.id,
-    label: candidate.name,
-  }))
   return (
-    <>
-      {shown && tint && (
-        <Field>
-          <FieldLabel htmlFor="box-tint">{box.tint}</FieldLabel>
-          <Select
-            items={tintItems}
-            value={tint.id}
-            disabled={!editable}
-            onValueChange={(value) => {
-              if (value !== null)
-                onUpdate<BoxBlock>(block.id, (previous) => ({
-                  ...previous,
-                  tint: value,
-                }))
-            }}
-          >
-            <SelectTrigger id="box-tint" className="w-full">
-              <SelectValue>
-                {(id: string) => (
-                  <>
-                    <Swatch
-                      color={colorValue(
-                        shown.style,
-                        tints.find((t) => t.id === id)?.fill ?? "",
-                        shown.mode
-                      )}
-                    />
-                    {tints.find((t) => t.id === id)?.name}
-                  </>
-                )}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {tints.map((candidate) => (
-                <SelectItem key={candidate.id} value={candidate.id}>
-                  <Swatch
-                    color={colorValue(shown.style, candidate.fill, shown.mode)}
-                  />
-                  {candidate.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <FieldDescription>{box.tintHint}</FieldDescription>
-        </Field>
-      )}
-      <Field>
-        <FieldLabel>{box.look}</FieldLabel>
-        <ToggleGroup
-          variant="outline"
-          aria-label={box.look}
-          value={[block.look]}
-          disabled={!editable}
-          onValueChange={(value: string[]) => {
-            const look = value[0]
-            if (look === "fill" || look === "border") {
-              onUpdate<BoxBlock>(block.id, (previous) => ({
-                ...previous,
-                look,
-              }))
-            }
-          }}
-        >
-          <ToggleGroupItem value="fill">{box.fill}</ToggleGroupItem>
-          <ToggleGroupItem value="border">{box.border}</ToggleGroupItem>
-        </ToggleGroup>
-        {/* Le choix Fond/Bordure porte data-horizontal : sans ce réglage, la phrase serait
+    <Field>
+      <FieldLabel>{box.look}</FieldLabel>
+      <ToggleGroup
+        variant="outline"
+        aria-label={box.look}
+        value={[block.look]}
+        disabled={!editable}
+        onValueChange={(value: string[]) => {
+          const look = value[0]
+          if (look === "fill" || look === "border") {
+            onUpdate<BoxBlock>(block.id, (previous) => ({ ...previous, look }))
+          }
+        }}
+      >
+        <ToggleGroupItem value="fill">{box.fill}</ToggleGroupItem>
+        <ToggleGroupItem value="border">{box.border}</ToggleGroupItem>
+      </ToggleGroup>
+      {/* Le choix Fond/Bordure porte data-horizontal : sans ce réglage, la phrase serait
           « équilibrée » (text-balance) sur la moitié de la colonne. */}
-        <FieldDescription className="group-has-data-horizontal/field:text-wrap">
-          {box.hint}
-        </FieldDescription>
-      </Field>
-    </>
+      <FieldDescription className="group-has-data-horizontal/field:text-wrap">
+        {box.hint}
+      </FieldDescription>
+    </Field>
   )
 }

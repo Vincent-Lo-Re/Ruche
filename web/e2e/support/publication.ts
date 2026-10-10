@@ -205,20 +205,3 @@ export async function deleteAccessLevels(id: string) {
     await sql.end()
   }
 }
-
-/** La charte de l'app publiée, comme la lit l'app (null : jamais publiée). */
-export function appStyle(): Promise<{
-  fonts: { family: string; weight: number }[]
-} | null> {
-  return appRpc("app_style", {})
-}
-
-/** Remet la charte de l'app à zéro (ni brouillon ni version publiée), après un parcours. */
-export async function resetAppStyle() {
-  const sql = database()
-  try {
-    await sql`update public.app_style set draft = null, published = null, published_at = null`
-  } finally {
-    await sql.end()
-  }
-}

@@ -65,8 +65,3 @@ export function formatCount(value: number): string {
 export function formatPercent(fraction: number): string {
   return units.percent(Math.round(fraction * 100))
 }
-
-/** Un nombre à une décimale au plus, dans le format régional : « 4,5 » (contraste, interligne). */
-export function formatDecimal(value: number): string {
-  return oneDecimal.format(value)
-}

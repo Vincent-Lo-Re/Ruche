@@ -36,7 +36,11 @@ describe("menu", () => {
       "Modèles de bloc",
       "Médiathèque",
       "Corbeille",
-      "App",
+      "Identité",
+      "Charte graphique",
+      "Formes et fichier",
+      "Navigation",
+      "Mises en page",
     ])
 
     // Le compte, l'équipe et les paramètres sont dans le header (sans site web réglé, pas de
@@ -199,5 +203,26 @@ describe("pages chargées à part et préparées (ADMIN § 7)", () => {
       expect(handle && "prepare" in handle, route.path).toBe(true)
       if (!auth) expect(route.loader, route.path).toBeTypeOf("function")
     }
+  })
+
+  it("cache le groupe « App mobile » à un éditeur, et lui réserve ses pages", async () => {
+    await renderApp("/app/style", fakeAuth({ role: "editor" }))
+
+    expect(screen.queryByText(texts.nav.groups.app)).toBeNull()
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      texts.adminOnly.title
+    )
+  })
+
+  it("ouvre chaque page « App mobile » à un admin, vide pour l'instant", async () => {
+    await renderApp("/app/shapes")
+
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      texts.sections.appShapes.title
+    )
+    expect(screen.getByText(texts.appPages.soon.title)).toBeVisible()
+    expect(
+      screen.getByRole("link", { name: texts.sections.appShapes.title })
+    ).toHaveAttribute("aria-current", "page")
   })
 })
