@@ -485,10 +485,12 @@ function ContentEditor({
     [draft, resolveLinked]
   )
 
-  // En tête de l'aperçu : l'image de présentation, le titre et l'audio, comme dans l'app.
+  // En tête de l'aperçu : l'image mise en avant, le titre et l'audio, comme dans l'app.
   const phoneTop = (
     <>
-      {profile.cover === "required" && (
+      {/* Facultative (une page) : seulement une fois choisie ; elle se choisit dans sa carte. */}
+      {(profile.cover === "required" ||
+        (profile.cover === "optional" && Boolean(draft.cover))) && (
         <CoverPreview
           media={mediaFor(draft.cover?.mediaId ?? null)}
           editable={editable}
@@ -943,7 +945,8 @@ function ContentEditor({
                   draft={draft}
                   title={title.trim() || untitled}
                   cover={
-                    profile.cover === "required"
+                    profile.cover === "required" ||
+                    (profile.cover === "optional" && draft.cover)
                       ? mediaFor(draft.cover?.mediaId ?? null)
                       : null
                   }

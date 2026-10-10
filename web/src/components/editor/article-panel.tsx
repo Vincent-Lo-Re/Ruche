@@ -8,9 +8,9 @@ import {
   CircleCheck,
   Clock,
   Headphones,
+  ImageIcon,
   ImagePlus,
   KeyRound,
-  LayoutList,
   Link2,
   Pencil,
   Plus,
@@ -22,6 +22,7 @@ import { useState, type ReactNode } from "react"
 
 import type { BlockMedia } from "@/blocks/components/context"
 import type { Draft } from "@/blocks/types"
+import { MediaImage } from "@/blocks/components/media-state"
 import { MediaFileLink } from "@/components/media/media-file-link"
 import { MediaThumbnail } from "@/components/media/media-visuals"
 import { InfoTip } from "@/components/info-tip"
@@ -74,17 +75,11 @@ import type { LiveVersion } from "@/lib/contents/publication"
 import type { ReadyItem } from "@/lib/contents/requirements"
 import { formatDateTime, formatShortDateTime } from "@/lib/dates"
 import type { RefusedSlug } from "@/lib/contents/slug"
-import {
-  contentProfile,
-  isListedKind,
-  type ListedKind,
-  type PublishedKind,
-} from "@/lib/editor/profile"
+import { contentProfile, type PublishedKind } from "@/lib/editor/profile"
 import { READY_IDS, showReadySetting } from "@/lib/editor/ready-targets"
 import { focusSoon } from "@/lib/focus"
 import { locale } from "@/lib/regional-format"
 import { formatDuration } from "@/lib/media/format"
-import { displayTitle } from "@/lib/titles"
 import { texts } from "@/texts"
 
 const labels = texts.editor.article
@@ -110,7 +105,7 @@ const statTrigger =
 
 /**
  * L'Article (l'Épisode, la Page), dans la colonne de droite de l'éditeur des contenus (ADMIN § 4) :
- * ce qui manque pour publier, la carte de la liste (image de présentation), l'audio d'un
+ * ce qui manque pour publier, la carte de la liste (image mise en avant), l'audio d'un
  * épisode, l'adresse d'une page, le niveau d'accès et les catégories. Tout part avec le
  * brouillon.
  */
@@ -164,8 +159,6 @@ export function ArticlePanel({
   onChooseAudio: () => void
   onRemoveAudio: () => void
 }) {
-  // Une page n'est dans aucune liste de l'app : ni carte, ni image de présentation.
-  const listed = isListedKind(kind) ? kind : null
   return (
     <div className="space-y-3">
       <ReadyCard
@@ -180,10 +173,9 @@ export function ArticlePanel({
             : texts.editor.settings.readOnly}
         </p>
       )}
-      {listed && (
+      {contentProfile(kind).cover !== null && (
         <CoverCard
-          kind={listed}
-          draft={draft}
+          kind={kind}
           editable={editable}
           cover={cover}
           onChooseCover={onChooseCover}
@@ -456,20 +448,18 @@ function ReadyRow({
 }
 
 /**
- * La carte du contenu dans la liste de sa section (Blog, Podcasts) : son image de
- * présentation (la vignette, qui est aussi en tête du contenu) et son titre. Pas de résumé
- * (03/10/2026, ADMIN § 4).
+ * L'image mise en avant (10/10/2026, ADMIN § 4) : la vignette des listes de l'app et l'image en
+ * tête du contenu. Exigée pour un article ou un épisode ([D45]), facultative pour une page. La
+ * carte ne montre que l'image, à ses proportions ; un clic la choisit ou la change.
  */
 function CoverCard({
   kind,
-  draft,
   editable,
   cover,
   onChooseCover,
   onRemoveCover,
 }: {
-  kind: ListedKind
-  draft: Draft
+  kind: PublishedKind
   editable: boolean
   cover: BlockMedia
   onChooseCover: () => void
@@ -481,49 +471,41 @@ function CoverCard({
   return (
     <PanelCard
       id={READY_IDS.cover.card}
-      icon={LayoutList}
-      title={labels.feed.title[kind]}
+      icon={ImageIcon}
+      title={labels.feed.title}
       aside={<InfoTip text={labels.feed.hint[kind]} />}
     >
-      <Item variant="muted" size="sm">
-        <ItemMedia>
-          {/* data-presentation-choose : là où revient le focus quand le bouton utilisé a disparu
-            (choix fait depuis l'aperçu ou depuis la fenêtre Publier). */}
-          <button
-            type="button"
-            id={READY_IDS.cover.control}
-            data-presentation-choose="cover"
-            disabled={!editable}
-            aria-label={
-              chosen ? labels.feed.replaceLabel : labels.feed.chooseLabel
-            }
-            className={cn(
-              "flex size-16 shrink-0 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-md text-xs text-muted-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50 enabled:hover:text-foreground",
-              !file && "border border-dashed bg-background"
-            )}
-            onClick={onChooseCover}
-          >
-            {file ? (
-              <MediaThumbnail
-                media={file}
-                url={cover.state === "ready" ? cover.url : undefined}
-                className="size-16"
-                iconClassName="size-5"
-              />
-            ) : (
-              <>
-                <ImagePlus aria-hidden className="size-5" />
-                {editable && labels.feed.choose}
-              </>
-            )}
-          </button>
-        </ItemMedia>
-        <ItemContent className="min-w-0">
-          <ItemTitle className="line-clamp-3">
-            {displayTitle(draft.title)}
-          </ItemTitle>
-        </ItemContent>
-      </Item>
+      {/* data-presentation-choose : là où revient le focus quand le bouton utilisé a disparu
+        (choix fait depuis l'aperçu ou depuis la fenêtre Publier). */}
+      <button
+        type="button"
+        id={READY_IDS.cover.control}
+        data-presentation-choose="cover"
+        disabled={!editable}
+        aria-label={chosen ? labels.feed.replaceLabel : labels.feed.chooseLabel}
+        className={cn(
+          "flex w-full items-center justify-center overflow-hidden rounded-md text-sm text-muted-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50 enabled:hover:text-foreground enabled:hover:opacity-90",
+          !file &&
+            "aspect-video flex-col gap-1 border border-dashed bg-background"
+        )}
+        onClick={onChooseCover}
+      >
+        {cover.state === "ready" && cover.url ? (
+          <MediaImage media={cover} alt="" />
+        ) : file ? (
+          <MediaThumbnail
+            media={file}
+            url={undefined}
+            className="aspect-video w-full"
+            iconClassName="size-6"
+          />
+        ) : (
+          <>
+            <ImagePlus aria-hidden className="size-6" />
+            {editable && labels.feed.choose}
+          </>
+        )}
+      </button>
       {cover.state === "missing" && (
         <p className="mt-2 text-xs text-destructive">
           {texts.editor.presentation.cover.missing}
@@ -543,7 +525,7 @@ function CoverCard({
             variant="ghost"
             onClick={() => {
               onRemoveCover()
-              // « Retirer » disparaît : le focus passe à la vignette, juste au-dessus.
+              // « Retirer » disparaît : le focus passe à l'image, juste au-dessus.
               document.getElementById(READY_IDS.cover.control)?.focus()
             }}
           >

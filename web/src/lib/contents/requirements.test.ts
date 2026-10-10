@@ -76,7 +76,7 @@ describe("ce qui manque pour publier", () => {
     ).toEqual({ key: "title", done: false })
   })
 
-  it("un article sans image de présentation", () => {
+  it("un article sans image mise en avant", () => {
     expect(
       publishChecks("article", { title: "Titre", cover: null }, mediaFor({}))
         .missing
@@ -169,7 +169,7 @@ describe("ce qui manque pour publier", () => {
 })
 
 describe("prêt à publier (éditeur des contenus)", () => {
-  it("le titre, l'image de présentation, puis le niveau d'accès", () => {
+  it("le titre, l'image mise en avant, puis le niveau d'accès", () => {
     expect(
       readyItems(
         "article",

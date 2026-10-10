@@ -179,7 +179,7 @@ export function shownFiles(items: readonly Media[]): Media[] {
   return items.filter((media) => media.status === "ready" && !media.deleted_at)
 }
 
-/** Les images de présentation d'une liste de contenus, sans doublon et triées. */
+/** Les images mises en avant d'une liste de contenus, sans doublon et triées. */
 export function coverIds(
   items: readonly { cover_id: string | null }[]
 ): string[] {

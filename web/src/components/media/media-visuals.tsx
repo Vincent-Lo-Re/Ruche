@@ -17,7 +17,7 @@ import { texts } from "@/texts"
 
 /**
  * Vignette : l'image ou le SVG (dans un <img>, qui n'exécute jamais de script), sinon l'icône
- * (celle d'une image quand il n'y a pas de fichier : une image de présentation pas choisie).
+ * (celle d'une image quand il n'y a pas de fichier : une image mise en avant pas choisie).
  */
 export function MediaThumbnail({
   media,

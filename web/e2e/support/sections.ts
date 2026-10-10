@@ -51,6 +51,15 @@ export async function appFeed(
   return feed.items
 }
 
+/** Une page en ligne, comme l'app la lit par son adresse (app_page) ; null si aucune. */
+export function appPage(slug: string): Promise<{
+  title: string
+  cover: { mediaId: string } | null
+  files: Record<string, { kind: string }>
+} | null> {
+  return appRpc("app_page", { slug })
+}
+
 /** Les catégories d'une section, dans l'ordre de l'app. */
 export function appCategories(
   section: "blog" | "podcasts"

@@ -54,12 +54,12 @@ type PublicationBridge = {
   /** « Reprendre la main » (confirmé par la fenêtre du refus [D14]). */
   takeLock: () => void
   /**
-   * Ce qui manque pour publier (image de présentation, audio : [D45]) et les conseils
+   * Ce qui manque pour publier (image mise en avant, audio : [D45]) et les conseils
    * (transcription : [D46]). Absent : rien n'est exigé (page).
    */
   checks?: PublishChecks
   /**
-   * Mène à ce qui manque : le titre, le choix d'un fichier (image de présentation, audio), ou la
+   * Mène à ce qui manque : le titre, le choix d'un fichier (image mise en avant, audio), ou la
    * carte de l'adresse d'une page.
    */
   onFix?: (key: Requirement["key"] | "address") => void

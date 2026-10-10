@@ -130,7 +130,7 @@ export type ContentListItem = {
   title: string
   // Adresse de la page dans le brouillon (pages seulement).
   slug: string | null
-  // Image de présentation du brouillon (id du fichier), s'il y en a une.
+  // Image mise en avant du brouillon (id du fichier), s'il y en a une.
   cover_id: string | null
   // Article, épisode : sa place dans la liste de sa section ([D47]) ; null pour une page.
   list_position: number | null

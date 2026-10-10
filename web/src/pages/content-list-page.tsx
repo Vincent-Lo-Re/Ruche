@@ -146,10 +146,10 @@ export function ContentListPage({
   const categories = useCategories(categorySection)
   // Les formules : réglages d'une ligne.
   const levels = useQuery(accessLevelsRead())
-  // Blog, Podcasts : l'image de présentation de chacun, en vignette (celles
+  // Blog, Podcasts : l'image mise en avant de chacun, en vignette (celles
   // de toute la liste : une recherche ou un filtre ne les relit pas).
   const coverFor = useCovers(
-    contentProfile(kind).cover === "required" ? (list.data ?? []) : []
+    contentProfile(kind).listed ? (list.data ?? []) : []
   )
   const items = list.data
   // Blog, Podcasts : l'onglet ouvert, gardé dans l'adresse.
@@ -655,13 +655,13 @@ function ContentTable({
   // Blog, Podcasts : le glisser-déposer ([D47]) ; disabled pendant une
   // recherche, un filtre ou un enregistrement (on ne range que la liste complète).
   order?: { disabled: boolean; onReorder: (ids: string[]) => void }
-  // L'image de présentation de chacun (celles de toute la liste, lues en une fois).
+  // L'image mise en avant de chacun (celles de toute la liste, lues en une fois).
   coverFor: ReturnType<typeof useCovers>
 }) {
   const profile = contentProfile(kind)
   const withCategories = profile.categories !== null
-  // Blog, Podcasts : l'image de présentation de chacun, en vignette.
-  const withCover = profile.cover === "required"
+  // Blog, Podcasts : l'image mise en avant de chacun, en vignette.
+  const withCover = profile.listed
   const table = (
     <ListCard>
       <Table>

@@ -86,7 +86,7 @@ export type OutlineSelection = {
 
 /**
  * Le plan de l'éditeur des contenus (ADMIN § 4, « Les finitions », « Le plan retouché ») : les blocs
- * seulement (l'image de présentation se règle dans la colonne de droite), chacun par son contenu
+ * seulement (l'image mise en avant se règle dans la colonne de droite), chacun par son contenu
  * (l'icône dit le type), une vignette par image, les sections repliables, ce qui manque en icône
  * (le détail dans son infobulle), un menu ⋮ par ligne, et le survol partagé avec l'aperçu.
  */

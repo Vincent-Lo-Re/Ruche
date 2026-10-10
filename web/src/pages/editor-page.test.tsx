@@ -586,7 +586,7 @@ describe("éditeur d'une page (éditeur des contenus)", () => {
     await waitFor(() => expect(title).not.toHaveAttribute("readonly"))
   }
 
-  it("la colonne « Page » : titre, adresse et niveau d'accès ; ni image, ni catégories, ni carte de liste", async () => {
+  it("la colonne « Page » : titre, adresse, niveau d'accès et image mise en avant facultative ; ni catégories", async () => {
     vi.mocked(api.saveDraft).mockResolvedValue({
       rev: 5,
       savedAt: "2026-09-27T12:31:00Z",
@@ -635,12 +635,13 @@ describe("éditeur d'une page (éditeur des contenus)", () => {
     expect(
       within(panel).queryByText(texts.publication.settings.categories.label)
     ).toBeNull()
+    // L'image mise en avant, facultative : sa carte, sans étape dans « Prêt à publier ? ».
     expect(
-      within(panel).queryByRole("region", {
-        name: texts.editor.article.feed.title.article,
+      within(panel).getByRole("region", {
+        name: texts.editor.article.feed.title,
       })
-    ).toBeNull()
-    // Le téléphone commence par le titre : pas d'image de présentation.
+    ).toBeVisible()
+    // Pas encore choisie : le téléphone commence par le titre.
     expect(document.querySelector('[data-presentation="cover"]')).toBeNull()
     // Pas de barre du haut : l'adresse est dans la colonne de droite.
     expect(document.querySelector("header")).toBeNull()

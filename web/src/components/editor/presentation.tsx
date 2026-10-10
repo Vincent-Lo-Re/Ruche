@@ -12,7 +12,7 @@ const labels = texts.editor.presentation
 // ---------------------------------------------------------------------------------------------
 
 /**
- * L'image de présentation, en tête de l'aperçu, comme dans l'app. Cliquer dessus montre la
+ * L'image mise en avant, en tête de l'aperçu, comme dans l'app. Cliquer dessus montre la
  * présentation dans le panneau de droite ; le bouton ouvre le choix d'une image.
  */
 export function CoverPreview({
@@ -101,7 +101,7 @@ export function AudioPreview({
 }
 
 /**
- * Le texte alternatif de l'image de présentation (médiathèque), s'il y en a un : il n'est plus
+ * Le texte alternatif de l'image mise en avant (médiathèque), s'il y en a un : il n'est plus
  * réclamé (02/10/2026, [D15]).
  */
 export function CoverAlt({ cover }: { cover: BlockMedia }) {

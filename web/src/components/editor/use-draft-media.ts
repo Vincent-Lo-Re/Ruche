@@ -10,7 +10,7 @@ import { mediaByIdsRead, shownFiles } from "@/lib/reads"
 
 /**
  * Les fichiers d'un brouillon : ceux des blocs Image (blocs partagés compris, linkedBlocks),
- * l'image de présentation et l'audio, avec leurs adresses d'aperçu. mediaFor dit à chaque bloc ce
+ * l'image mise en avant et l'audio, avec leurs adresses d'aperçu. mediaFor dit à chaque bloc ce
  * qu'il en est (absent, en lecture, supprimé, pas prêt, illisible, prêt). Un fichier choisi à
  * l'instant (rememberMedia) se montre sans attendre la relecture de la base.
  */

@@ -59,7 +59,7 @@ import { texts } from "@/texts"
 const COVER_PICKER = "presentation:cover"
 const AUDIO_PICKER = "presentation:audio"
 
-/** « Choisir… » ou « Changer… » de l'image de présentation ou de l'audio, dans le panneau. */
+/** « Choisir… » ou « Changer… » de l'image mise en avant ou de l'audio, dans le panneau. */
 function presentationChooseButton(key: "cover" | "audio"): HTMLElement | null {
   return document.querySelector<HTMLElement>(
     `[data-presentation-choose="${key}"]`
@@ -117,7 +117,7 @@ export function useBlockEditing({
     return () => element?.removeAttribute("data-hovered")
   }, [hoveredId])
   const [pickerFor, setPickerFor] = useState<string | null>(null)
-  // Le choix de l'image de présentation ou de l'audio : ce qui avait le focus à l'ouverture. Si
+  // Le choix de l'image mise en avant ou de l'audio : ce qui avait le focus à l'ouverture. Si
   // ce bouton a disparu à la fermeture (« Choisir… » de l'aperçu, remplacé par l'image, ou la
   // fenêtre Publier, refermée), le focus va au bouton du panneau.
   const presentationPicker = useRef<{
@@ -308,7 +308,7 @@ export function useBlockEditing({
     }))
   }
 
-  /** Retire l'image de présentation ou l'audio, avec « Annuler » dans le message. */
+  /** Retire l'image mise en avant ou l'audio, avec « Annuler » dans le message. */
   const removePresentationFile = (key: "cover" | "audio") => {
     const previous = draft[key] ?? null
     if (!previous) return
@@ -321,7 +321,7 @@ export function useBlockEditing({
     )
   }
 
-  /** Ouvre le choix de l'image de présentation ou de l'audio (s'il manque pour publier). */
+  /** Ouvre le choix de l'image mise en avant ou de l'audio (s'il manque pour publier). */
   const openPresentationPicker = useCallback(
     (key: "cover" | "audio") => {
       if (!editable) return

@@ -1646,7 +1646,7 @@ export const en = {
         `“${name}” was added to the Media library, but an episode only accepts audio (MP3 or M4A).`,
       noTranscript: "No transcript",
     },
-    // Présentation d'un article ou d'un épisode (étape 7) : image de présentation, audio,
+    // Présentation d'un article ou d'un épisode (étape 7) : image mise en avant, audio,
     // catégories. [D45], [D46]. Plus de résumé depuis le 03/10/2026.
     presentation: {
       cover: {
@@ -1827,18 +1827,14 @@ export const en = {
             : `${count} warnings in the Outline`,
       },
       feed: {
-        title: {
-          article: `In the ${names.blog.name} list`,
-          episode: `In the ${names.podcasts.name} list`,
-        },
+        title: "Featured image",
         choose: "Choose",
         chooseLabel: "Choose featured image",
         replaceLabel: "Replace featured image",
         hint: {
-          article:
-            "Required to publish. It also appears at the top of the post.",
-          episode:
-            "Required to publish. It also appears at the top of the episode.",
+          article: `Required to publish. It's the thumbnail in the ${names.blog.name} list and appears at the top of the post.`,
+          episode: `Required to publish. It's the thumbnail in the ${names.podcasts.name} list and appears at the top of the episode.`,
+          page: "Optional. It appears at the top of the page.",
         },
       },
       categories: {

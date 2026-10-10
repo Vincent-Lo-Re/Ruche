@@ -703,7 +703,7 @@ export const fr: Texts = {
       visibility: "Accès",
       public: "Public",
       publicHint:
-        "Utilisé par un contenu gratuit en ligne, ou comme image de présentation.",
+        "Utilisé par un contenu gratuit en ligne, ou comme image mise en avant.",
       protected: "Protégé",
       uses: "Utilisé dans",
       usesCount: (count: number) =>
@@ -985,14 +985,14 @@ export const fr: Texts = {
           count === 1 ? "Il reste sélectionné." : "Ils restent sélectionnés.",
         emptyTitle: "Aucun épisode pour l'instant",
         emptyDescription:
-          "Crée un épisode : il s'ouvre aussitôt dans l'éditeur. Choisis ensuite son image de présentation et son audio.",
+          "Crée un épisode : il s'ouvre aussitôt dans l'éditeur. Choisis ensuite son image mise en avant et son audio.",
         search: "Rechercher un épisode",
         noResults:
           "Aucun épisode ne correspond à ta recherche ou à tes filtres.",
       },
     },
     columns: {
-      cover: "Image de présentation",
+      cover: "Image mise en avant",
       title: "Titre",
       publication: "État",
       categories: "Catégories",
@@ -1678,14 +1678,14 @@ export const fr: Texts = {
         `« ${name} » est dans la Médiathèque, mais un épisode n'accepte qu'un audio (MP3 ou M4A).`,
       noTranscript: "Sans transcription",
     },
-    // Présentation d'un article ou d'un épisode (étape 7) : image de présentation, audio,
+    // Présentation d'un article ou d'un épisode (étape 7) : image mise en avant, audio,
     // catégories. [D45], [D46]. Plus de résumé depuis le 03/10/2026.
     presentation: {
       cover: {
-        choose: "Choisir l'image de présentation",
+        choose: "Choisir l'image mise en avant",
         remove: "Retirer l'image",
-        removed: "Image de présentation retirée.",
-        none: "Pas encore d'image de présentation",
+        removed: "Image mise en avant retirée.",
+        none: "Pas encore d'image mise en avant",
         missing: "Image indisponible : choisis-en une autre.",
         notReady: "Cette image n'est pas prête : choisis-en une autre.",
         alt: (alt: string) => `Texte alternatif (Médiathèque) : « ${alt} »`,
@@ -1845,7 +1845,7 @@ export const fr: Texts = {
         count: (done: number, total: number) => `${done} / ${total}`,
         items: {
           title: "Titre",
-          cover: "Image de présentation",
+          cover: "Image mise en avant",
           audio: "Audio",
           address: "Adresse de la page",
           access: "Niveau d'accès",
@@ -1859,18 +1859,14 @@ export const fr: Texts = {
             : `${count} points à vérifier dans le Plan`,
       },
       feed: {
-        title: {
-          article: `Dans la liste ${names.blog.du}`,
-          episode: `Dans la liste ${names.podcasts.du}`,
-        },
+        title: "Image mise en avant",
         choose: "Choisir",
-        chooseLabel: "Choisir l'image de présentation",
-        replaceLabel: "Changer l'image de présentation",
+        chooseLabel: "Choisir l'image mise en avant",
+        replaceLabel: "Changer l'image mise en avant",
         hint: {
-          article:
-            "L'image est obligatoire pour publier : c'est aussi celle en tête de l'article.",
-          episode:
-            "L'image est obligatoire pour publier : c'est aussi celle en tête de l'épisode.",
+          article: `Obligatoire pour publier : c'est la vignette de la liste ${names.blog.du}, et l'image en tête de l'article.`,
+          episode: `Obligatoire pour publier : c'est la vignette de la liste ${names.podcasts.du}, et l'image en tête de l'épisode.`,
+          page: "Facultative : elle s'affiche en tête de la page.",
         },
       },
       categories: {
@@ -2077,11 +2073,11 @@ export const fr: Texts = {
       titre_manquant: "Donne un titre avant de publier.",
       // Étape 7 : [D45].
       image_de_presentation_manquante:
-        "Choisis l'image de présentation avant de publier : c'est la vignette des listes de l'app.",
+        "Pour publier, choisis l'image mise en avant : c'est la vignette des listes de l'app.",
       image_sans_fichier:
         "Un bloc Image n'a pas de fichier : choisis-en un, ou supprime le bloc.",
       fichier_inadapte:
-        "Un fichier n'est pas du bon type : une photo ou une image pour un bloc Image ou l'image de présentation, un audio pour un épisode.",
+        "Un fichier n'est pas du bon type : une photo ou une image pour un bloc Image ou l'image mise en avant, un audio pour un épisode.",
       niveau_invalide:
         "Cette formule n'existe plus. Choisis un autre niveau d'accès.",
       date_passee:
@@ -2192,9 +2188,9 @@ export const fr: Texts = {
       writeTitle: "Écrire le titre",
       titleTaken: "Un titre qu'aucun autre contenu de la section ne porte.",
       changeTitle: "Changer le titre",
-      cover: "L'image de présentation (la vignette des listes de l'app).",
+      cover: "L'image mise en avant (la vignette des listes de l'app).",
       coverUnavailable:
-        "Une image de présentation disponible (l'actuelle est dans la Corbeille ou pas encore prête).",
+        "Une image mise en avant disponible (l'actuelle est dans la Corbeille ou pas encore prête).",
       audio: "L'audio de l'épisode.",
       audioUnavailable:
         "Un audio disponible (le fichier actuel est dans la Corbeille ou pas encore prêt).",

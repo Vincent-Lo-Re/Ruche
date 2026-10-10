@@ -63,7 +63,7 @@
 
 - **Les fonctions `equipe` et `files` vérifient elles-mêmes** la session et le rôle, n'acceptent que les adresses de l'admin de leur installation (secret `ADMIN_ORIGINS`, lu par `cors.ts`) et peuvent être relancées sans risque.
 - **La clé secrète reste côté serveur** ; le navigateur et l'app n'ont que la clé publishable.
-- **SVG et Lottie** : nettoyés ou vérifiés dans l'admin, puis vérifiés par le serveur avec une liste blanche. Les fichiers restent protégés, sauf ceux d'un contenu gratuit en ligne et les images de présentation.
+- **SVG et Lottie** : nettoyés ou vérifiés dans l'admin, puis vérifiés par le serveur avec une liste blanche. Les fichiers restent protégés, sauf ceux d'un contenu gratuit en ligne et les images mises en avant.
 
 ## 6. Tests
 

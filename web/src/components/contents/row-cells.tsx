@@ -12,7 +12,7 @@ export function SavedCell({ savedAt }: { savedAt: string }) {
   )
 }
 
-/** L'image de présentation d'une ligne de liste, en vignette (l'icône d'une image s'il n'y en a pas). */
+/** L'image mise en avant d'une ligne de liste, en vignette (l'icône d'une image s'il n'y en a pas). */
 export function CoverCell({
   media,
   url,
