@@ -233,7 +233,7 @@ function PreviewTools({
       role="toolbar"
       aria-label={labels.tools}
       aria-orientation="vertical"
-      className="flex shrink-0 flex-col items-center gap-1 self-start rounded-lg border bg-background p-1 shadow-xs"
+      className="flex shrink-0 flex-col items-center gap-0.5 self-start rounded-lg border bg-background p-1 shadow-xs"
     >
       <ToolGroup
         label={labels.device.label}
@@ -254,7 +254,7 @@ function PreviewTools({
         <TooltipTrigger
           render={
             <Toggle
-              size="icon"
+              size="icon-sm"
               aria-label={texts.editor.focusMode.label}
               aria-keyshortcuts={focus.keys}
               pressed={focus.on}
@@ -281,7 +281,7 @@ function PreviewTools({
         <TooltipTrigger
           render={
             <Toggle
-              size="icon"
+              size="icon-sm"
               aria-label={labels.largeText}
               pressed={preview.largeText}
               onPressedChange={(largeText) =>
@@ -349,6 +349,7 @@ function ToolGroup<T extends string>({
     <ToggleGroup
       aria-label={label}
       orientation="vertical"
+      spacing={0.5}
       className="flex-col"
       value={[value]}
       onValueChange={(next: string[]) => {
@@ -364,7 +365,7 @@ function ToolGroup<T extends string>({
               render={
                 <ToggleGroupItem
                   value={candidate}
-                  size="icon"
+                  size="icon-sm"
                   aria-label={itemLabel}
                 />
               }
