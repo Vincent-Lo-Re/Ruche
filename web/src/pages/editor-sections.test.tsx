@@ -3,8 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import type { Doc, Draft } from "@/blocks/types"
 import * as levelsApi from "@/lib/access-levels"
-import * as styleApi from "@/lib/app-style/api"
-import { neutralStyle } from "@/lib/app-style/style"
 import * as categoriesApi from "@/lib/categories"
 import * as api from "@/lib/contents/api"
 import * as publicationApi from "@/lib/contents/publication"
@@ -874,69 +872,6 @@ describe("éditeur d'un article (Blog)", () => {
       document.querySelector(`[data-block-id="${BLOCK}"]`)
     )
   })
-
-  it("un encadré prend une teinte de la charte publiée de l'app", async () => {
-    const neutral = neutralStyle(texts.appStyle.neutral)
-    const green = neutral.colors.find(
-      (color) => color.name === texts.appStyle.neutral.colors.green
-    )!
-    const advice = {
-      ...neutral.tints[0],
-      id: "00000000-0000-4000-8000-000000000301",
-      name: "Conseil",
-      fill: green.id,
-    }
-    vi.mocked(styleApi.getAppStyle).mockResolvedValue({
-      draft: null,
-      revision: 1,
-      published: { ...neutral, tints: [...neutral.tints, advice] },
-      publishedAt: "2026-10-10T08:00:00Z",
-    })
-    vi.mocked(api.getContent).mockResolvedValue(
-      contentOf(ARTICLE, "article", {
-        blocks: [
-          {
-            id: "00000000-0000-4000-8000-0000000000f8",
-            type: "box",
-            look: "fill",
-            blocks: [],
-          },
-        ],
-      })
-    )
-    await renderApp(`/blog/${ARTICLE}`)
-    await editable()
-    const plan = screen.getByRole("navigation", { name: outline.title })
-    fireEvent.click(
-      within(plan).getByRole("button", {
-        name: outline.select(texts.editor.blockLabel.box(outline.box.fill, 0)),
-      })
-    )
-    // Sans teinte choisie : la première de la charte.
-    const tint = await screen.findByRole("combobox", {
-      name: texts.editor.settings.box.tint,
-    })
-    expect(tint).toHaveTextContent(neutral.tints[0].name)
-    fireEvent.click(tint)
-    const option = await screen.findByRole("option", { name: advice.name })
-    // Base UI ne retient un clic de souris que s'il a commencé sur l'option.
-    fireEvent.pointerDown(option, { pointerType: "mouse" })
-    fireEvent.click(option)
-
-    // L'encadré prend ses couleurs, et la teinte part avec le brouillon.
-    await waitFor(() =>
-      expect(
-        document
-          .querySelector<HTMLElement>(".blocks-box")!
-          .style.getPropertyValue("--blocks-tint-fill")
-      ).toBe(green.light)
-    )
-    await waitFor(() => expect(api.saveDraft).toHaveBeenCalled(), {
-      timeout: 4000,
-    })
-    const saved = vi.mocked(api.saveDraft).mock.calls.at(-1)![2]
-    expect(saved.blocks[0]).toMatchObject({ type: "box", tint: advice.id })
-  }, 10_000)
 
   it("« Bloc choisi » : les actions en icônes, dans une barre en bas de l'onglet", async () => {
     vi.mocked(api.getContent).mockResolvedValue(

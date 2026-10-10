@@ -11,7 +11,6 @@ import {
   prepareContentList,
   prepareEditor,
   prepareMedia,
-  prepareApp,
   prepareSettings,
   prepareTeam,
   prepareTemplates,
@@ -23,7 +22,13 @@ import {
   type PageHandle,
   type Prepare,
 } from "@/lib/preparation"
-import { authPaths, menuRouteId, sections, type SectionKey } from "@/navigation"
+import {
+  appSections,
+  authPaths,
+  menuRouteId,
+  sections,
+  type SectionKey,
+} from "@/navigation"
 import { ErrorPage } from "@/pages/error-page"
 
 /**
@@ -64,6 +69,8 @@ function authPage<M>(
 
 const editorCode = () => import("@/pages/editor-page")
 const listCode = () => import("@/pages/content-list-page")
+// Les cinq pages « App mobile » : une seule page, chargée une fois.
+const appSectionCode = () => import("@/pages/app-section-page")
 // Les éditeurs plein écran : la section (pour « ← Blog »), la sorte de contenu et l'adresse.
 type EditorRoute = { section: SectionKey; kind: ContentKind; path: string }
 
@@ -191,11 +198,13 @@ export const routes: RouteObject[] = [
                   {
                     element: <RequireAdmin />,
                     children: [
-                      page(
-                        sections.app.path,
-                        () => import("@/pages/app-page"),
-                        (m) => <m.AppPage />,
-                        prepareApp
+                      ...appSections.map((section) =>
+                        page(
+                          sections[section].path,
+                          appSectionCode,
+                          (m) => <m.AppSectionPage section={section} />,
+                          null
+                        )
                       ),
                       page(
                         sections.settings.path,

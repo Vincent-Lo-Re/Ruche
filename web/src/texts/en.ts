@@ -131,13 +131,29 @@ export const en = {
       title: "Pages",
       description: "Static pages in your app, like About or Privacy Policy.",
     },
+    appIdentity: {
+      title: "App identity",
+      description: "Your app's name, icon and splash screen.",
+    },
+    appStyle: {
+      title: "Style",
+      description: "Your app's colors, fonts and elements.",
+    },
+    appShapes: {
+      title: "Shapes and file",
+      description: "Your app's shapes, and its style in a file.",
+    },
+    appNavigation: {
+      title: "Navigation",
+      description: "Your app's tabs and menus.",
+    },
+    appLayouts: {
+      title: "Layouts",
+      description: "How each section of your app lays out its content.",
+    },
     templates: {
       title: "Block templates",
       description: "Reusable blocks for your content.",
-    },
-    app: {
-      title: "App",
-      description: "What readers see in your mobile app.",
     },
     media: {
       title: "Media library",
@@ -322,6 +338,14 @@ export const en = {
         title: "Lost your phone?",
         text: "Ask an admin to reset your two-step verification.",
       },
+    },
+  },
+
+  // Les pages « App mobile » (ADMIN § 1) : construites avec l'app mobile.
+  appPages: {
+    soon: {
+      title: "Coming soon",
+      description: "This page will be built along with the mobile app.",
     },
   },
 
@@ -1899,8 +1923,6 @@ export const en = {
         fill: "Background",
         border: "Border",
         hint: "A box can hold text and images, but not another box.",
-        tint: "Tint",
-        tintHint: "The box tints of your app style (App › Style).",
       },
       moveUp: "Move up",
       moveDown: "Move down",
@@ -2321,7 +2343,7 @@ export const en = {
     },
   },
 
-  // Paramètres (admins) : quatre onglets, dont les formules d'abonnement.
+  // Paramètres (admins) : trois onglets, dont les formules d'abonnement.
   settings: {
     tabs: {
       label: "Settings tabs",
@@ -2585,375 +2607,6 @@ export const en = {
           "The list changed in the meantime. Reload the page and try again.",
         introuvable: "This plan no longer exists. Reload the page.",
       },
-    },
-  },
-
-  // La section « App » (ADMIN § 1) : tout ce que voient les lecteurs de l'app, en onglets.
-  appPage: {
-    tabs: {
-      label: "App tabs",
-      identity: "Identity",
-      style: "Style",
-      navigation: "Navigation",
-      layouts: "Layouts",
-    },
-    // Les onglets construits avec l'app mobile.
-    soon: {
-      title: "Coming with the mobile app",
-      description:
-        "This tab will be built along with the mobile app's screens.",
-    },
-  },
-
-  // Onglet « Charte graphique » de la section « App » : la charte que composent les admins, en
-  // brouillon, puis publiée pour l'app.
-  appStyle: {
-    loadFailed: "Couldn't load the app style.",
-    status: {
-      never: "Never published",
-      published: (date: string) => `Published ${date}`,
-      modified: "Unpublished changes",
-      saving: "Saving…",
-      saved: "Draft saved",
-      failed: "Not saved",
-    },
-    publish: "Publish",
-    published: "Style published. The app uses it from now on.",
-    discard: "Revert",
-    discardTitle: "Revert to the published style?",
-    discardDescription:
-      "The draft goes back to the published style, or to the neutral style if nothing has been published yet.",
-    discardConfirm: "Revert to published",
-    discarded: "Draft reverted to the published style.",
-    // Les vérifications qui empêchent d'enregistrer le brouillon (même règle que la base).
-    blocked: "Fix the highlighted names to save the draft.",
-    // Les familles de réglages de l'onglet, sous « Charte graphique » dans la colonne de gauche.
-    sections: {
-      label: "Style sections",
-      groups: {
-        colors: "Colors",
-        elements: "Elements",
-        text: "Text",
-        shapes: "Shapes and file",
-      },
-      hardToRead: "Some text is hard to read here",
-      hint: "Click an element in the phone to go to its setting.",
-    },
-    darkMode: {
-      title: "Dark mode",
-      description:
-        "The app can follow the phone's setting, or always stay in the same mode.",
-      label: "Dark mode",
-      auto: "Follow the phone",
-      light: "Always light",
-      dark: "Always dark",
-    },
-    colors: {
-      title: "Colors",
-      description:
-        "Your colors, named the way you like. Each one has a value for light mode and one for dark mode.",
-      name: "Name",
-      light: "Light",
-      dark: "Dark",
-      add: "Add a color",
-      newName: "New color",
-      remove: (name: string) => `Remove “${name}”`,
-      inUse: "In use: choose another color wherever it's used first.",
-      pick: (name: string, mode: string) => `Change “${name}” (${mode})`,
-      hex: "Hex code",
-      hexInvalid: "Enter a code like #9b3b5e.",
-      unused: "Unused color",
-    },
-    roles: {
-      title: "Color usage",
-      description:
-        "The app needs to know which color goes where. Choose from your colors.",
-      groups: {
-        screen: "Screen",
-        text: "Text",
-        bars: "Bars",
-        fields: "Fields",
-        states: "States",
-      },
-      names: {
-        background: "Screen background",
-        card: "Cards and fields",
-        border: "Borders",
-        text: "Text",
-        muted: "Secondary text",
-        link: "Links",
-        primary: "Main color (dividers, quotes)",
-        topBar: "Top bar background",
-        topBarText: "Top bar text",
-        tabBar: "Tab bar background",
-        tabOn: "Selected tab",
-        tabOff: "Other tabs",
-        focus: "Active field border",
-        success: "Success (“Saved”)",
-        warning: "Warning (“Offline”)",
-        error: "Error",
-      },
-      readable: "Easy to read",
-    },
-    // La lisibilité (contrastes WCAG), signalée sans rien refuser.
-    readability: {
-      hard: "Hard to read",
-      light: "light mode",
-      dark: "dark mode",
-      ratio: (ratio: string, min: string, mode: string) =>
-        `Contrast ${ratio}:1 in ${mode}; ${min}:1 is needed.`,
-      title: "Readability",
-      allGood: "All text is easy to read.",
-      count: (count: number) =>
-        count === 1
-          ? "1 text is hard to read"
-          : `${count} texts are hard to read`,
-      role: (name: string) => name,
-      tint: (name: string, part: string) => `Box “${name}”, ${part}`,
-      badge: (name: string) => `Badge “${name}”`,
-      button: (name: string) => `Button “${name}”`,
-    },
-    tints: {
-      title: "Box tints",
-      description:
-        "As many tints as you like. In the Box block, you then choose one of them.",
-      add: "Add a tint",
-      newName: "New tint",
-      parts: {
-        fill: "Background",
-        border: "Border",
-        title: "Title",
-        text: "Text",
-        link: "Link",
-      },
-      minOne: "You need at least one tint.",
-    },
-    badges: {
-      title: "Badges",
-      description:
-        "Small labels: a post's category, “Subscribers”, “Free”. As many as you like. The first one is used for categories.",
-      add: "Add a badge",
-      newName: "New badge",
-      first: "Categories",
-      parts: {
-        fill: "Background",
-        border: "Border",
-        text: "Text",
-      },
-      minOne: "You need at least one badge.",
-    },
-    buttons: {
-      title: "Buttons",
-      description:
-        "As many buttons as you like, each with its own style. In the Button block, you then choose one of them. The first one is used for the app's own buttons (“Continue”, “Subscribe”). Pressed and disabled states are handled automatically.",
-      add: "Add a button",
-      newName: "New button",
-      first: "App buttons",
-      kind: "Style",
-      kinds: {
-        flat: "Solid",
-        gradient: "Gradient",
-        outline: "Outline",
-        text: "Text only",
-      },
-      shape: "Shape",
-      shapes: {
-        rounded: "Style's corners",
-        pill: "Pill",
-        square: "Square",
-      },
-      parts: {
-        fill: "Background",
-        start: "Start",
-        end: "End",
-        border: "Border",
-        label: "Text",
-      },
-      details: (name: string) => `Settings for “${name}”`,
-      minOne: "You need at least one button.",
-    },
-    fields: {
-      title: "Input fields",
-      description:
-        "Where readers type (first name, email, search). The active field border is set in Color usage.",
-      label: "Field style",
-      outline: "Outlined",
-      filled: "Filled",
-      underline: "Underlined",
-    },
-    fonts: {
-      title: "Fonts",
-      description:
-        "Your fonts: the phone's font, or a free Google Fonts font, with its weight. At least three.",
-      name: "Name",
-      family: "Font",
-      weight: "Weight",
-      sample: "Sample",
-      sampleText: "Aa Bb 123",
-      system: "Phone font",
-      weights: {
-        400: "Regular",
-        500: "Medium",
-        600: "Semibold",
-        700: "Bold",
-      },
-      add: "Add a font",
-      newName: "New font",
-      remove: (name: string) => `Remove “${name}”`,
-      minFonts: "You need at least three fonts.",
-      inUse: "In use: choose another font wherever it's used first.",
-    },
-    fontRoles: {
-      title: "Font usage",
-      description: "Just like colors: choose from your fonts.",
-      names: {
-        brand: "Brand name (top bar)",
-        title: "Content title",
-        heading: "Headings",
-        body: "Body text",
-        quote: "Quotes",
-        small: "Small text (dates, captions, fields)",
-        boxTitle: "Box titles",
-        button: "Buttons and badges",
-        tabs: "Tab bar",
-      },
-    },
-    sizes: {
-      title: "Text sizes",
-      description:
-        "In points, for normal-size text. The phone's “larger text” setting scales them all together (try “Large text” under the preview).",
-      text: "Text",
-      size: "Size",
-      lineHeight: "Line height",
-      points: "pt",
-      sizeOf: (name: string) => `${name}: size`,
-      lineHeightOf: (name: string) => `${name}: line height`,
-      names: {
-        title: "Content title",
-        heading: "Headings",
-        body: "Body text",
-        quote: "Quotes",
-        small: "Small text",
-      },
-    },
-    shapes: {
-      title: "Shapes and effects",
-      description: "For the whole app. Neutral to start with.",
-      radius: "Card and box corners",
-      imageRadius: "Image corners",
-      shadow: "Card shadows",
-      shadows: {
-        none: "None",
-        light: "Light",
-        medium: "Medium",
-        strong: "Strong",
-      },
-      links: "Links in text",
-      underlined: "Underlined",
-      plain: "Not underlined",
-      points: (value: number) => `${value} pt`,
-    },
-    file: {
-      title: "Style file",
-      description:
-        "Keep a copy of your style, or reuse it in another installation.",
-      export: "Export",
-      import: "Import",
-      fileName: "app-style.json",
-      invalid: "This file isn't an app style.",
-      imported: "Style imported into the draft. Check it, then publish.",
-    },
-    // Les noms donnés aux couleurs, teintes, pastilles, boutons et polices.
-    names: {
-      empty: "Enter a name.",
-      tooLong: "Names can't be longer than 40 characters.",
-      taken: "This name is already used in this list.",
-    },
-    partOf: (name: string, part: string) => `${name}: ${part}`,
-    remove: (name: string) => `Remove “${name}”`,
-    handle: (name: string) => `Move “${name}”`,
-    // Glisser-déposer : annonces lues par les lecteurs d'écran.
-    dnd: {
-      roleDescription: "draggable item",
-      instructions:
-        "To move an item, press Space or Enter on its drag handle. Use the arrow keys to move it, then press Space or Enter again to drop it, or Escape to cancel.",
-      start: (name: string) => `Picked up “${name}”.`,
-      over: (name: string, position: number, count: number) =>
-        `“${name}” is in position ${position} of ${count}.`,
-      end: (name: string, position: number, count: number) =>
-        `Dropped “${name}” in position ${position} of ${count}.`,
-      cancel: (name: string) =>
-        `Move canceled. “${name}” is back in its place.`,
-    },
-    // L'aperçu : un téléphone avec un article imaginaire, aux couleurs du brouillon.
-    preview: {
-      label: "App preview",
-      title: "Post title",
-      meta: "Oct 12 · 6 min read",
-      category: "Category",
-      bodyStart: "The body text of the post, with",
-      link: "a link",
-      bodyEnd: "in the middle of the sentence.",
-      heading: "A heading",
-      body2: "A second paragraph, under the heading.",
-      quote: "“A quote, highlighted in the text.”",
-      caption: "An image caption.",
-      boxText: "A box in this tint, with its text.",
-      boxLink: "Learn more",
-      card: "A post in the list",
-      cardMeta: "4 min read",
-      saved: "Saved",
-      offline: "Offline: new content will arrive when you're back online.",
-      firstName: "First name",
-      firstNamePlaceholder: "Enter your first name…",
-      search: "Search",
-      searchValue: "Recipe",
-      email: "Email",
-      emailValue: "address@",
-      emailError: "This address is incomplete.",
-      tabs: {
-        home: "Home",
-        blog: names.blog.name,
-        podcasts: names.podcasts.name,
-        profile: "Profile",
-      },
-    },
-    // La charte neutre de Ruche : les noms de ses couleurs, teinte, pastille, boutons et polices.
-    neutral: {
-      colors: {
-        white: "White",
-        lightGray: "Light gray",
-        borderGray: "Border gray",
-        textGray: "Text gray",
-        black: "Black",
-        green: "Success green",
-        orange: "Warning orange",
-        red: "Error red",
-      },
-      tint: "Neutral",
-      badge: "Category",
-      buttons: {
-        primary: "Primary",
-        secondary: "Secondary",
-        subtle: "Subtle",
-      },
-      fonts: {
-        headings: "Headings",
-        text: "Text",
-        accent: "Accent",
-      },
-    },
-    // La copie des polices dans le stockage, faite par l'admin avant de publier.
-    copyFailed:
-      "Couldn't copy the fonts to your storage. Try publishing again.",
-    errors: {
-      charte_invalide:
-        "The style has an error, so it wasn't saved. Check the names and try again.",
-      conflit_revision:
-        "Another admin just changed the style. It has been reloaded.",
-      police_manquante:
-        "A font couldn't be copied to your storage. Try publishing again.",
-      reserve_aux_admins: "Only admins can change the app style.",
     },
   },
 

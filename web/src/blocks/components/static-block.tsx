@@ -1,6 +1,5 @@
 import { Fragment, type ReactNode } from "react"
 
-import { BoxFrame } from "@/blocks/components/box-frame"
 import { ImageBlockView } from "@/blocks/components/image-block"
 import type { Block, Doc } from "@/blocks/types"
 
@@ -112,7 +111,7 @@ function StaticBody({
       // Une section vide ne s'affiche pas (comme dans l'app) : le plan la signale.
       if (shown.blocks.length === 0) return null
       return (
-        <BoxFrame block={shown}>
+        <div className="blocks-box" data-look={shown.look}>
           <div className="blocks-box-list">
             {shown.blocks.map((child) => (
               <StaticBlock
@@ -122,7 +121,7 @@ function StaticBody({
               />
             ))}
           </div>
-        </BoxFrame>
+        </div>
       )
     case "linked":
       return null

@@ -1,5 +1,6 @@
 import { NavLink, useLocation } from "react-router"
 
+import { useAuth } from "@/auth/auth-context"
 import { Separator } from "@/components/ui/separator"
 import {
   Sidebar,
@@ -12,12 +13,33 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { isInSection, menu, sections, type SectionKey } from "@/navigation"
 import { useBrandName } from "@/hooks/use-brand-name"
+import {
+  adminOnlySections,
+  isInSection,
+  menu,
+  sections,
+  type SectionKey,
+} from "@/navigation"
 import { texts } from "@/texts"
 
-/** Le menu de gauche, toujours ouvert (docs/ADMINISTRATION.md § 7). */
+/**
+ * Le menu de gauche, toujours ouvert (docs/ADMINISTRATION.md § 7). Un éditeur n'y voit pas les
+ * sections des admins, ni un groupe qui n'aurait plus rien (« App mobile »).
+ */
 export function AppSidebar() {
+  const { profile } = useAuth()
+  const groups =
+    profile?.role === "admin"
+      ? menu.groups
+      : menu.groups
+          .map((group) => ({
+            ...group,
+            items: group.items.filter(
+              (key) => !adminOnlySections.includes(key)
+            ),
+          }))
+          .filter((group) => group.items.length > 0)
   return (
     <Sidebar>
       {/* Sans en-tête (la marque est dans le header) : de l'air au-dessus du premier lien. */}
@@ -28,7 +50,7 @@ export function AppSidebar() {
               <MenuItems sectionKeys={menu.top} />
             </SidebarGroupContent>
           </SidebarGroup>
-          {menu.groups.map((group) => (
+          {groups.map((group) => (
             <SidebarGroup key={group.label}>
               <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
               <SidebarGroupContent>
