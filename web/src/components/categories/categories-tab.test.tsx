@@ -118,6 +118,17 @@ describe("Blog : l'onglet Catégories", () => {
     expect(await within(dialog).findByText(labels.nameRequired)).toBeVisible()
     expect(categoriesApi.createCategory).not.toHaveBeenCalled()
 
+    // Un nom déjà porté (majuscules et espaces ignorés) est refusé en tapant.
+    fireEvent.change(within(dialog).getByLabelText(labels.name), {
+      target: { value: "  SOMMEIL " },
+    })
+    expect(
+      await within(dialog).findByText(labels.errors.nom_en_double)
+    ).toBeVisible()
+    expect(
+      within(dialog).getByRole("button", { name: labels.dialog.save })
+    ).toBeDisabled()
+
     fireEvent.change(within(dialog).getByLabelText(labels.name), {
       target: { value: "Respiration" },
     })
@@ -134,6 +145,28 @@ describe("Blog : l'onglet Catégories", () => {
     expect(
       await screen.findByRole("button", { name: "Respiration" })
     ).toBeVisible()
+  })
+
+  it("« Modifier » : garder son propre nom est permis, prendre celui d'une autre non", async () => {
+    await renderApp("/blog?tab=categories")
+    fireEvent.click(
+      await screen.findByRole("button", { name: labels.actions("Sommeil") })
+    )
+    fireEvent.click(await screen.findByRole("menuitem", { name: labels.edit }))
+    const dialog = await screen.findByRole("dialog", {
+      name: labels.dialog.editTitle,
+    })
+    const save = within(dialog).getByRole("button", {
+      name: labels.dialog.save,
+    })
+    expect(save).toBeEnabled()
+    fireEvent.change(within(dialog).getByLabelText(labels.name), {
+      target: { value: "stress" },
+    })
+    expect(
+      await within(dialog).findByText(labels.errors.nom_en_double)
+    ).toBeVisible()
+    expect(save).toBeDisabled()
   })
 
   it("« Modifier » ouvre la même fenêtre, avec le nom", async () => {

@@ -1,16 +1,13 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Plus } from "lucide-react"
-import { useState, type ReactNode } from "react"
+import type { ReactNode } from "react"
 
 import { singleLine } from "@/blocks/components/fields"
 import { TITLE_MAX } from "@/blocks/draft"
+import { CategoryPicker } from "@/components/categories/category-picker"
 import { AccessLevelChoice } from "@/components/editor/access-level-choice"
 import { SlugField } from "@/components/editor/slug-field"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import {
   Sheet,
@@ -21,19 +18,11 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Spinner } from "@/components/ui/spinner"
 import { liveLevelName, type AccessLevel } from "@/lib/access-levels"
-import {
-  categoryKeys,
-  createCategory,
-  type Category,
-  type CategorySection,
-} from "@/lib/categories"
+import type { Category, CategorySection } from "@/lib/categories"
 import type { ContentKind, ContentSettings } from "@/lib/contents/api"
 import type { LiveVersion } from "@/lib/contents/publication"
 import type { RefusedSlug } from "@/lib/contents/slug"
-import { errorMessage } from "@/lib/errors"
-import { categoryNameSchema } from "@/lib/schemas"
 import { texts } from "@/texts"
 
 const labels = texts.publication.settings
@@ -211,9 +200,8 @@ export function ContentSettingsFields({
 }
 
 /**
- * Les catégories du contenu (cases à cocher, dans l'ordre de la section). Une catégorie
- * supprimée entre-temps n'est plus montrée, et elle part de la liste envoyée au prochain
- * changement ([D28]).
+ * Les catégories du contenu : les choisies en pastilles, les autres trouvées en tapant
+ * (CategoryPicker).
  */
 function CategoriesSection({
   categories,
@@ -228,14 +216,6 @@ function CategoriesSection({
 }) {
   const words = labels.categories
   const list = categories.list
-  const toggle = (id: string, checked: boolean) => {
-    if (!list) return
-    const known = new Set(list.map((category) => category.id))
-    const next = new Set(chosen.filter((other) => known.has(other)))
-    if (checked) next.add(id)
-    else next.delete(id)
-    onChange([...next].sort())
-  }
   return (
     <section className="space-y-3">
       <div className="space-y-1">
@@ -265,112 +245,22 @@ function CategoriesSection({
             <Skeleton className="h-5 w-32" />
           </div>
         )
-      ) : list.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{words.none}</p>
       ) : (
-        <ul
-          aria-labelledby="reglages-categories"
-          className="grid gap-2"
-          data-category-choice
-        >
-          {list.map((category) => (
-            <li key={category.id}>
-              <Label className="font-normal">
-                <Checkbox
-                  checked={chosen.includes(category.id)}
-                  disabled={!editable}
-                  onCheckedChange={(checked) => toggle(category.id, checked)}
-                />
-                {category.name}
-              </Label>
-            </li>
-          ))}
-        </ul>
-      )}
-      {editable && list !== undefined && (
-        <AddCategory
-          section={categories.section}
-          onAdded={(category) => onChange([...chosen, category.id].sort())}
-        />
+        <>
+          <CategoryPicker
+            section={categories.section}
+            list={list}
+            chosen={chosen}
+            editable={editable}
+            labelledBy="reglages-categories"
+            onChange={onChange}
+          />
+          {list.length === 0 && (
+            <p className="text-sm text-muted-foreground">{words.none}</p>
+          )}
+        </>
       )}
     </section>
-  )
-}
-
-/**
- * Une nouvelle catégorie, créée tout de suite dans la section (comme depuis la page Catégories),
- * puis cochée. Entrée l'ajoute sans envoyer le formulaire autour (fenêtre de création).
- */
-export function AddCategory({
-  section,
-  onAdded,
-  autoFocus = false,
-}: {
-  section: CategorySection
-  onAdded: (category: Category) => void
-  // Ouvert par « Nouvelle » (éditeur des contenus) : le curseur va dans le champ.
-  autoFocus?: boolean
-}) {
-  const queryClient = useQueryClient()
-  const [name, setName] = useState("")
-  const [error, setError] = useState<string | null>(null)
-  const add = useMutation({
-    mutationFn: (value: string) => createCategory(section, value),
-    onSuccess: (category) => {
-      queryClient.setQueryData<Category[]>(
-        categoryKeys.list(section),
-        (list) => [...(list ?? []), category]
-      )
-      void queryClient.invalidateQueries({ queryKey: categoryKeys.all })
-      setName("")
-      onAdded(category)
-    },
-    onError: (failure) => setError(errorMessage(failure)),
-  })
-  const submit = () => {
-    const parsed = categoryNameSchema.safeParse({ name })
-    if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message ?? null)
-      return
-    }
-    add.mutate(parsed.data.name)
-  }
-  return (
-    <Field data-invalid={error !== null}>
-      <FieldLabel htmlFor="reglages-nouvelle-categorie">
-        {texts.categories.newName}
-      </FieldLabel>
-      <div className="flex gap-2">
-        <Input
-          id="reglages-nouvelle-categorie"
-          autoFocus={autoFocus}
-          value={name}
-          autoComplete="off"
-          placeholder={texts.categories.namePlaceholder}
-          aria-invalid={error !== null}
-          onChange={(event) => {
-            setName(event.target.value)
-            setError(null)
-          }}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") {
-              event.preventDefault()
-              submit()
-            }
-          }}
-        />
-        <Button
-          type="button"
-          variant="outline"
-          disabled={add.isPending}
-          onClick={submit}
-        >
-          {add.isPending ? <Spinner /> : <Plus />}
-          {texts.categories.add}
-        </Button>
-      </div>
-      <FieldError>{error}</FieldError>
-    </Field>
   )
 }
 

@@ -8,6 +8,11 @@ import * as publicationApi from "@/lib/contents/publication"
 import * as templatesApi from "@/lib/contents/templates"
 import * as mediaApi from "@/lib/media/api"
 import type { Media } from "@/lib/media/constants"
+import {
+  categoryInput,
+  chooseCategory,
+  chosenCategory,
+} from "@/test/categories"
 import { renderApp } from "@/test/render"
 import { texts } from "@/texts"
 
@@ -545,9 +550,7 @@ describe("Blog", () => {
       { target: { value: "Premier article" } }
     )
     await pick(labels.newContent.starter, "Interview")
-    fireEvent.click(
-      await within(dialog).findByRole("checkbox", { name: "Sommeil" })
-    )
+    await chooseCategory(dialog, "Sommeil")
     // Pas de niveau d'accès : il se règle ensuite.
     expect(
       within(dialog).queryByRole("radio", { name: /Essentiel/ })
@@ -624,6 +627,29 @@ describe("Blog", () => {
     expect(api.createContent).not.toHaveBeenCalled()
   })
 
+  it("« Nouvel article » : un nom de catégorie déjà porté ne propose pas de la créer", async () => {
+    vi.mocked(api.listContents).mockResolvedValue([])
+    await renderApp("/blog")
+    fireEvent.click(
+      await screen.findByRole("button", { name: labels.kinds.article.create })
+    )
+    const dialog = await screen.findByRole("dialog", {
+      name: labels.kinds.article.create,
+    })
+    await waitFor(() => categoryInput(dialog))
+    const input = categoryInput(dialog)
+    fireEvent.focus(input)
+    fireEvent.click(input)
+    fireEvent.change(input, { target: { value: " SOMMEIL " } })
+    fireEvent.keyDown(input, { key: "ArrowDown" })
+    expect(await screen.findByRole("option", { name: "Sommeil" })).toBeVisible()
+    expect(
+      screen.queryByRole("option", {
+        name: texts.categories.picker.create("SOMMEIL"),
+      })
+    ).toBeNull()
+  })
+
   it("« Nouvel article » : une catégorie se crée dans la fenêtre, et elle est cochée", async () => {
     vi.mocked(api.listContents).mockResolvedValue([])
     const created = {
@@ -661,19 +687,27 @@ describe("Blog", () => {
     const dialog = await screen.findByRole("dialog", {
       name: labels.kinds.article.create,
     })
-    const name = await within(dialog).findByLabelText(texts.categories.newName)
-    fireEvent.change(name, { target: { value: "Respiration" } })
-    // Entrée ajoute la catégorie, sans envoyer la fenêtre.
-    fireEvent.keyDown(name, { key: "Enter" })
+    // Un nom qu'aucune catégorie ne porte : « Créer « … » », sans envoyer la fenêtre.
+    await waitFor(() => categoryInput(dialog))
+    const input = categoryInput(dialog)
+    fireEvent.focus(input)
+    fireEvent.click(input)
+    fireEvent.change(input, { target: { value: "Respiration" } })
+    fireEvent.keyDown(input, { key: "ArrowDown" })
+    fireEvent.click(
+      await screen.findByRole("option", {
+        name: texts.categories.picker.create("Respiration"),
+      })
+    )
     await waitFor(() =>
       expect(categoriesApi.createCategory).toHaveBeenCalledWith(
         "blog",
         "Respiration"
       )
     )
-    expect(
-      await within(dialog).findByRole("checkbox", { name: "Respiration" })
-    ).toBeChecked()
+    await waitFor(() =>
+      expect(chosenCategory(dialog, "Respiration")).toBeInTheDocument()
+    )
     expect(api.createContent).not.toHaveBeenCalled()
   })
 
@@ -709,7 +743,7 @@ describe("Blog", () => {
       within(sheet).getByLabelText(texts.publication.settings.titleLabel),
       { target: { value: "Rangé enfin" } }
     )
-    fireEvent.click(within(sheet).getByRole("checkbox", { name: "Stress" }))
+    await chooseCategory(sheet, "Stress")
     fireEvent.click(save)
 
     await waitFor(() =>

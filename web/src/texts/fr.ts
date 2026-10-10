@@ -1094,6 +1094,14 @@ export const fr: Texts = {
 
   // Catégories du Blog et des Podcasts (étape 7) : ADMIN § 3, [D28], [D44].
   categories: {
+    // Le choix des catégories d'un contenu (éditeur, fenêtre de création, Réglages) : les choisies
+    // en pastilles, les autres trouvées en tapant.
+    picker: {
+      placeholder: "Ajouter une catégorie…",
+      empty: "Aucune catégorie ne correspond.",
+      create: (name: string) => `Créer « ${name} »`,
+      remove: (name: string) => `Retirer « ${name} »`,
+    },
     // Sous les onglets, dans l'onglet Categories du Blog et des Podcasts.
     description: {
       // Renommer ou ranger une catégorie change l'app tout de suite, sans « Publier ».
@@ -1190,7 +1198,6 @@ export const fr: Texts = {
     },
     name: "Nom",
     // Le champ pour en créer une au passage (fenêtre d'un nouveau contenu, réglages).
-    newName: "Nom de la nouvelle catégorie",
     add: "Ajouter",
     namePlaceholder: "Par exemple : Sommeil",
     nameRequired: "Donne un nom à la catégorie.",

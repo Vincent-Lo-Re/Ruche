@@ -2,7 +2,6 @@ import { cn } from "cn"
 import {
   type LucideIcon,
   AudioLines,
-  Check,
   ChevronRight,
   CircleAlert,
   CircleCheck,
@@ -13,12 +12,11 @@ import {
   KeyRound,
   Link2,
   Pencil,
-  Plus,
   Tags,
   TriangleAlert,
   X,
 } from "lucide-react"
-import { useState, type ReactNode } from "react"
+import type { ReactNode } from "react"
 
 import type { BlockMedia } from "@/blocks/components/context"
 import type { Draft } from "@/blocks/types"
@@ -28,10 +26,8 @@ import { MediaThumbnail } from "@/components/media/media-visuals"
 import { InfoTip } from "@/components/info-tip"
 import { LoadState } from "@/components/load-state"
 import { PanelCard } from "@/components/panel-card"
-import {
-  AddCategory,
-  type SectionCategories,
-} from "@/components/editor/content-settings-sheet"
+import { CategoryPicker } from "@/components/categories/category-picker"
+import { type SectionCategories } from "@/components/editor/content-settings-sheet"
 import { CoverAlt } from "@/components/editor/presentation"
 import { SlugField } from "@/components/editor/slug-field"
 import { Badge } from "@/components/ui/badge"
@@ -59,7 +55,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import {
   Tooltip,
   TooltipContent,
@@ -783,10 +778,8 @@ function AccessCard({
 }
 
 /**
- * Les catégories en boutons à bascule (une catégorie choisie est grisée, avec une coche), dans
- * l'ordre de la section.
- * Une catégorie supprimée entre-temps n'est plus montrée, et part de la liste au prochain
- * changement ([D28]). « Nouvelle » la crée tout de suite, puis la choisit.
+ * Les catégories du contenu : les choisies en pastilles, les autres trouvées en tapant
+ * (CategoryPicker), dans l'ordre de la section ; un nom qu'aucune ne porte se crée sur place.
  */
 function CategoriesCard({
   categories,
@@ -799,7 +792,6 @@ function CategoriesCard({
   editable: boolean
   onChange: (categoryIds: string[]) => void
 }) {
-  const [adding, setAdding] = useState(false)
   const list = categories.list
   return (
     <PanelCard id="article-categories" icon={Tags} title={categoryWords.label}>
@@ -815,56 +807,14 @@ function CategoriesCard({
           rowClassName="h-7 w-40"
         />
       ) : (
-        // Des boutons à bascule (ToggleGroup de shadcn), un par catégorie ; « Nouvelle » au bout.
-        <div className="flex flex-wrap items-center gap-1.5">
-          <ToggleGroup
-            multiple
-            variant="outline"
-            size="sm"
-            spacing={1.5}
-            aria-labelledby="article-categories"
-            className="flex-wrap"
-            value={chosen.filter((id) => list.some((one) => one.id === id))}
-            onValueChange={(ids: string[]) => onChange([...ids].sort())}
-            disabled={!editable}
-          >
-            {list.map((category) => (
-              <ToggleGroupItem key={category.id} value={category.id}>
-                {chosen.includes(category.id) && <Check />}
-                {category.name}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
-          {editable && !adding && (
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              aria-label={labels.categories.addLabel}
-              onClick={() => setAdding(true)}
-            >
-              <Plus />
-              {labels.categories.add}
-            </Button>
-          )}
-        </div>
-      )}
-      {list?.length === 0 && !adding && (
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          {categoryWords.none}
-        </p>
-      )}
-      {editable && adding && list !== undefined && (
-        <div className="mt-2.5">
-          <AddCategory
-            section={categories.section}
-            autoFocus
-            onAdded={(category) => {
-              onChange([...chosen, category.id].sort())
-              setAdding(false)
-            }}
-          />
-        </div>
+        <CategoryPicker
+          section={categories.section}
+          list={list}
+          chosen={chosen}
+          editable={editable}
+          labelledBy="article-categories"
+          onChange={onChange}
+        />
       )}
     </PanelCard>
   )
