@@ -13,6 +13,7 @@ import { fresh, preloadImages, ready, type Prepare } from "@/lib/preparation"
 import {
   accessLevelsRead,
   adminBrandRead,
+  appStyleRead,
   auditRead,
   categoriesRead,
   contentListRead,
@@ -128,6 +129,12 @@ export const prepareTrash: Prepare = ({ queryClient }) =>
 // La team : lue par toute l'équipe (un éditeur la voit en lecture seule, 09/10/2026).
 export const prepareTeam: Prepare = ({ queryClient }) =>
   ready(queryClient, teamRead())
+
+// La section « App » : réservée aux admins ; la charte, relue à chaque ouverture.
+export const prepareApp: Prepare = async ({ queryClient, member }) => {
+  if (member.role !== "admin") return
+  await fresh(queryClient, appStyleRead())
+}
 
 // Paramètres : réservés aux admins (les autres voient « réservé aux admins »).
 

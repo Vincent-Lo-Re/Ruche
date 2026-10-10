@@ -11,6 +11,7 @@ import {
   prepareContentList,
   prepareEditor,
   prepareMedia,
+  prepareApp,
   prepareSettings,
   prepareTeam,
   prepareTemplates,
@@ -190,6 +191,12 @@ export const routes: RouteObject[] = [
                   {
                     element: <RequireAdmin />,
                     children: [
+                      page(
+                        sections.app.path,
+                        () => import("@/pages/app-page"),
+                        (m) => <m.AppPage />,
+                        prepareApp
+                      ),
                       page(
                         sections.settings.path,
                         () => import("@/pages/settings-page"),

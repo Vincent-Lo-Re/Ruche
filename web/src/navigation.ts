@@ -7,6 +7,7 @@ import {
   MicAudioLines,
   Rss,
   SlidersVertical,
+  Smartphone,
   SquareText,
   UserGroup,
   type LucideIcon,
@@ -32,6 +33,7 @@ export const sections = {
   templates: { path: "/templates", icon: Layers },
   media: { path: "/media", icon: Images },
   trash: { path: "/trash", icon: ArchiveX },
+  app: { path: "/app", icon: Smartphone },
   team: { path: "/team", icon: UserGroup },
   settings: { path: "/settings", icon: SlidersVertical },
   account: { path: "/account", icon: CircleUser },
@@ -45,7 +47,7 @@ export const authPaths = {
 } as const
 
 // Sections réservées aux admins : cachées dans le menu d'un éditeur.
-export const adminOnlySections: readonly SectionKey[] = ["settings"]
+export const adminOnlySections: readonly SectionKey[] = ["app", "settings"]
 
 // Rangement du menu de gauche : l'accueil, puis les groupes. Le compte, l'équipe et les
 // paramètres sont dans le header (`header`).
@@ -59,6 +61,10 @@ export const menu = {
     {
       label: texts.nav.groups.tools,
       items: ["templates", "media", "trash"],
+    },
+    {
+      label: texts.nav.groups.app,
+      items: ["app"],
     },
   ],
 } satisfies {
