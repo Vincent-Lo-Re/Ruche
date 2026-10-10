@@ -7,3 +7,6 @@ node_modules
 # Variables d'environnement : jamais dans git (les modèles .env.example, eux, le sont)
 .env
 .env*.local
+
+# Requêtes enregistrées par le Studio local de Supabase (elles peuvent contenir des adresses)
+supabase/snippets/
