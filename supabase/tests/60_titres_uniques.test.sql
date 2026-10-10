@@ -1,11 +1,12 @@
--- Un titre par section (09/10/2026, migration …_titres_uniques.sql) : deux articles, deux épisodes
--- ou deux pages ne portent pas le même titre ; majuscules et espaces ne comptent pas, les accents
--- si ; un titre vide, un modèle de bloc et la corbeille ne comptent pas. Un contenu restauré ou
--- une version dont le titre a été repris revient renommé (« (2) »).
+-- Un titre par section (09/10/2026, migration …_titres_uniques.sql) : deux articles, deux épisodes,
+-- deux pages ou deux modèles de bloc (10/10/2026, …_noms_des_modeles.sql) ne portent pas le même
+-- titre ; majuscules et espaces ne comptent pas, les accents si ; un titre vide et la corbeille ne
+-- comptent pas. Un contenu restauré ou une version dont le titre a été repris revient renommé
+-- (« (2) »).
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(24);
+select plan(26);
 
 select pg_temp.create_people();
 select pg_temp.empty_media_library();
@@ -44,9 +45,16 @@ select throws_ok(
   'P0001', 'titre_pris', 'mais pas une seconde page'
 );
 select lives_ok(
-  $$select pg_temp.create_content('t1', 'template', content_title => 'Bandeau', sort => 'style')$$
-  || $$; select pg_temp.create_content('t2', 'template', content_title => 'Bandeau', sort => 'style')$$,
-  'deux modèles de bloc du même titre'
+  $$select pg_temp.create_content('t1', 'template', content_title => 'Bandeau', sort => 'style')$$,
+  'un modèle « Bandeau »'
+);
+select throws_ok(
+  $$select pg_temp.create_content('t2', 'template', content_title => 'bandeau', sort => 'shared')$$,
+  'P0001', 'titre_pris', 'un second modèle du même nom, même d''une autre sorte, est refusé (10/10/2026)'
+);
+select lives_ok(
+  $$select pg_temp.create_content('bandeau', 'article', content_title => 'Bandeau')$$,
+  'un article peut porter le nom d''un modèle'
 );
 select lives_ok(
   $$select pg_temp.create_content('v1', 'article'); select pg_temp.create_content('v2', 'article')$$,
@@ -77,9 +85,10 @@ select is_empty(
   format($$select * from public.content_title_taken('article', 'Mon article', %L)$$, pg_temp.cid('a')),
   'sans le contenu lui-même'
 );
-select is_empty(
-  $$select * from public.content_title_taken('template', 'Bandeau')$$,
-  'un modèle n''est jamais concerné'
+select results_eq(
+  $$select taken_id from public.content_title_taken('template', 'BANDEAU')$$,
+  format($$values (%L::uuid)$$, pg_temp.cid('t1')),
+  'content_title_taken : les modèles aussi'
 );
 select pg_temp.as_anon();
 select throws_ok(
