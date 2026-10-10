@@ -2351,7 +2351,7 @@ export const en = {
       title: "Brand",
       description: [
         "Fill in your brand details: its name, initials*, a contact email**, and your website.",
-        "* Shown in place of the monogram until you upload one.",
+        "* Shown in place of the icon until you upload one.",
         "** Shown on the sign-in screen for anyone who needs help.",
       ],
       name: "Brand name",
@@ -2376,13 +2376,13 @@ export const en = {
         // La section des logos : une carte, deux groupes de deux cases (fond clair, fond sombre).
         title: "Logos",
         description: [
-          "Upload your logotype* and monogram** for light and dark backgrounds (SVG, PNG, or WebP, up to 1 MB each).",
-          "* Without a logotype, your brand name is shown as text.",
-          "** Without a monogram, your initials are shown.",
+          "Upload your logo* and icon** for light and dark backgrounds (SVG, PNG, or WebP, up to 1 MB each).",
+          "* Without a logo, your brand name is shown as text.",
+          "** Without an icon, your initials are shown.",
         ],
         logotype: {
           title: "Logo",
-          use: "menu and sign-in",
+          use: "header and sign-in",
         },
         monogram: {
           title: "Icon",
@@ -2449,9 +2449,9 @@ export const en = {
         loginScreen: {
           title: "Sign-in screen",
           description: [
-            "Customize the first screen your team sees: its background image* and the monogram animation**.",
+            "Customize the first screen your team sees: its background image* and the icon animation**.",
             "* JPEG, PNG, or WebP, resized and compressed automatically, shown on large screens. Click the preview to choose it, or drag it there.",
-            "** Until you upload a monogram, your initials animate instead.",
+            "** Until you upload an icon, your initials animate instead.",
           ],
           preview: "Sign-in screen preview",
         },
@@ -2481,7 +2481,7 @@ export const en = {
           group: "Icon animations",
           // Une animation grisée : ce que le monogramme pour fond sombre ne permet pas.
           blocked: {
-            text: "“Trace”, “Cascade”, and “Glint” need an uploaded monogram: they don't work on your initials.",
+            text: "“Trace”, “Cascade”, and “Glint” need an uploaded icon: they don't work on your initials.",
             svg: "“Trace”, “Cascade”, and “Glint” only work with a simple SVG icon (up to four solid colors, no gradients or images).",
             accent:
               "“Glint” only works with an icon that has an accent color (a bright color, not just black, white, or gray).",

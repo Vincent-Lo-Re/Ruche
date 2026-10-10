@@ -2430,7 +2430,7 @@ export const fr: Texts = {
         ],
         logotype: {
           title: "Logotype",
-          use: "menu et connexion",
+          use: "header et connexion",
         },
         monogram: {
           title: "Monogramme",
