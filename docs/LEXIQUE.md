@@ -111,7 +111,6 @@
 | Lecture (mode) | Preview (le duo Edit / Preview ; le téléphone de l'éditeur se dit alors « phone ») | Le contenu comme dans l'app, sans rien modifier. | Aperçu (déjà pris) / Read mode |
 | aperçu | preview | Le téléphone de l'éditeur, ou la vignette d'un fichier. | — |
 | Concentration | Focus mode | Cache les deux colonnes de l'éditeur. | mode zen / Zen mode |
-| Écran entier / Ajuster | Full screen / Fit | Tout l'écran du téléphone, ou tenir dans la fenêtre. | — |
 | Grand texte | Large text | Aperçu avec le texte agrandi du téléphone. | — / Big text |
 | prendre, reprendre la main | take over (quelqu'un écrit) / start editing (personne n'écrit) | Devenir la seule personne qui écrit un brouillon. | verrou (à l'écran) / lock, claim |
 | lecture seule | read-only | Un brouillon qu'un autre membre écrit. | — / view only |

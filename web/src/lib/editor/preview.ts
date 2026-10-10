@@ -18,17 +18,12 @@ type PreviewTheme = (typeof previewThemes)[number]
 export const previewReaders = ["subscriber", "visitor"] as const
 type PreviewReader = (typeof previewReaders)[number]
 
-// En Lecture : l'écran à la hauteur de la fenêtre (à sa vraie largeur), ou l'écran entier, réduit.
-export const previewFits = ["adjust", "full"] as const
-type PreviewFit = (typeof previewFits)[number]
-
 export type PreviewSettings = {
   device: Device
   mode: PreviewMode
   theme: PreviewTheme
   largeText: boolean
   reader: PreviewReader
-  fit: PreviewFit
 }
 
 // À l'ouverture de l'éditeur depuis une liste : l'iPhone, en Édition, en clair, comme un abonné.
@@ -38,7 +33,6 @@ export const defaultPreview: PreviewSettings = {
   theme: "light",
   largeText: false,
   reader: "subscriber",
-  fit: "adjust",
 }
 
 // Les réglages gardés dans l'adresse de l'éditeur, d'un écran à l'autre (QCM du 04/10/2026) :
@@ -58,7 +52,6 @@ const searchChoices = {
   device: choice("device", devices, defaultPreview.device),
   theme: choice("theme", previewThemes, defaultPreview.theme),
   reader: choice("reader", previewReaders, defaultPreview.reader),
-  fit: choice("fit", previewFits, defaultPreview.fit),
 }
 const largeTextWord = { name: "text", value: "large" }
 
@@ -73,7 +66,6 @@ export function previewFromSearch(
     theme: readChoice(params, searchChoices.theme),
     largeText: params.get(largeTextWord.name) === largeTextWord.value,
     reader: readChoice(params, searchChoices.reader),
-    fit: readChoice(params, searchChoices.fit),
   }
 }
 
@@ -90,7 +82,8 @@ export function withPreview(
   writeChoice(params, searchChoices.device, preview.device)
   writeChoice(params, searchChoices.theme, preview.theme)
   writeChoice(params, searchChoices.reader, preview.reader)
-  writeChoice(params, searchChoices.fit, preview.fit)
+  // L'ancien choix « Ajuster / Écran entier » (retiré le 10/10/2026) ne reste pas dans l'adresse.
+  params.delete("fit")
   if (preview.largeText) params.set(largeTextWord.name, largeTextWord.value)
   else params.delete(largeTextWord.name)
   return params
@@ -100,22 +93,12 @@ export function withPreview(
 const MIN_SCALE = 0.4
 
 /**
- * « Écran entier » : seulement en Lecture (en Édition, réduire l'écran fausserait le
- * glisser-déposer et le curseur, docs/ADMINISTRATION.md, § 4).
- */
-export function showsFullScreen(preview: PreviewSettings): boolean {
-  return preview.mode === "read" && preview.fit === "full"
-}
-
-/**
- * La réduction de l'écran entier pour tenir dans la hauteur disponible : 1 si la place suffit,
+ * Le téléphone est toujours montré en entier, en Édition comme en Lecture (10/10/2026,
+ * docs/ADMINISTRATION.md, § 4) : sa réduction pour tenir dans la hauteur disponible, 1 si la place suffit,
  * arrondie au centième inférieur, jamais sous 0,4. deviceHeight : la hauteur du téléphone entier,
  * lue dans les variables de preview.css (deviceHeightOf).
  */
-export function fullScreenScale(
-  deviceHeight: number,
-  available: number
-): number {
+export function phoneScale(deviceHeight: number, available: number): number {
   const scale = Math.floor((available / deviceHeight) * 100) / 100
   return Math.min(1, Math.max(MIN_SCALE, scale))
 }

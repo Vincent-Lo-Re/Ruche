@@ -490,7 +490,9 @@ function blockTop(page: Page, index: number): Promise<number> {
     const block = document.querySelectorAll("[data-block-id]")[${index}]
     const screen = block.closest(".blocks-screen-scroll")
     const margin = parseFloat(getComputedStyle(block).scrollMarginTop)
-    const top = block.getBoundingClientRect().top - screen.getBoundingClientRect().top
+    // Le téléphone est réduit (zoom) : l'écart vu à l'écran, ramené à ses vraies mesures.
+    const top = (block.getBoundingClientRect().top - screen.getBoundingClientRect().top) /
+      block.currentCSSZoom
     return Math.round(top - margin)
   })()`)
 }

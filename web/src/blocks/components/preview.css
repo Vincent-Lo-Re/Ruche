@@ -275,13 +275,17 @@
    des derniers iPhone et Android (texts.editor.preview.device) ; l'écran tient dans la hauteur de
    la fenêtre et l'article défile dedans, à sa vraie largeur. Le cadre est toujours sombre, comme
    un vrai téléphone, quel que soit le thème. */
+/* Le téléphone toujours en entier, en Édition comme en Lecture (10/10/2026) : il garde sa vraie
+   hauteur et se réduit tout entier pour tenir dans la fenêtre (zoom tiré de sa hauteur,
+   --blocks-device-scale). Les hauteurs « plein écran » des blocs se calculent sur
+   --blocks-screen-height, la vraie hauteur de l'écran de l'appareil. */
 .blocks-device {
   --blocks-device-frame: #1c1c1e;
   --blocks-device-island: #000000;
   display: flex;
   flex-direction: column;
-  min-height: 0;
-  flex-shrink: 1;
+  flex-shrink: 0;
+  zoom: var(--blocks-device-scale, 1);
   padding: var(--blocks-device-padding);
   border-radius: var(--blocks-device-radius);
   background: var(--blocks-device-frame);
@@ -293,7 +297,7 @@
 
 /* Les mesures de chaque téléphone, une seule fois, sur la grille de l'aperçu (qui contient le
    téléphone, ses barres et les messages au-dessus de lui). La hauteur de l'écran et le cadre
-   donnent aussi la réduction de l'écran entier (deviceHeightOf de lib/editor/preview.ts). */
+   donnent aussi la réduction du téléphone (deviceHeightOf de lib/editor/preview.ts). */
 .blocks-preview-layout[data-device="ios"] {
   --blocks-phone-width: 402px;
   --blocks-screen-height: 874px;
@@ -314,8 +318,8 @@
 
 /* L'aperçu des contenus en grille : les messages au-dessus du téléphone (à sa largeur), puis la barre de
    mise en forme, le téléphone et la barre de l'aperçu. Les deux barres commencent à la hauteur du
-   contenu de l'écran : le cadre, la barre d'état, puis la marge de la page (réduits avec
-   l'Écran entier). */
+   contenu de l'écran : le cadre, la barre d'état, puis la marge de la page (réduits avec le
+   téléphone). */
 .blocks-preview-layout {
   --blocks-content-top: calc(
     var(--blocks-device-padding) + var(--blocks-status-height) +
@@ -352,18 +356,6 @@
   grid-area: tools;
 }
 
-/* Écran entier (Lecture seulement) : le téléphone garde sa vraie hauteur et se réduit tout
-   entier (zoom tiré de la hauteur de la fenêtre, --blocks-device-scale) ; en Édition, l'écran
-   reste à sa vraie largeur (le glisser-déposer et le curseur en dépendent). */
-.blocks-device[data-fit="full"] {
-  zoom: var(--blocks-device-scale, 1);
-  flex-shrink: 0;
-}
-
-.blocks-device[data-fit="full"] .blocks-screen {
-  flex-shrink: 0;
-}
-
 /* Grand texte : comme le réglage du téléphone, le texte grandit et la page garde sa largeur. */
 .blocks-device[data-large-text] {
   --blocks-text-scale: 1.3;
@@ -373,10 +365,9 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  /* La hauteur de l'écran, sauf si la fenêtre est plus basse : il rétrécit alors avec le cadre. */
-  flex: 0 1 var(--blocks-screen-height);
+  /* La vraie hauteur de l'écran : c'est tout le téléphone qui se réduit (zoom). */
+  flex: 0 0 var(--blocks-screen-height);
   width: var(--blocks-phone-width);
-  min-height: 0;
   overflow: hidden;
   border-radius: var(--blocks-screen-radius);
   background: var(--blocks-color-background);

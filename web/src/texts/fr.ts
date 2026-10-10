@@ -1757,14 +1757,9 @@ export const fr: Texts = {
         dark: "Sombre",
       },
       largeText: "Grand texte",
-      fit: {
-        label: "Taille de l'écran",
-        adjust:
-          "Ajuster : l'écran tient dans la hauteur de la fenêtre, sans changer de largeur",
-        full: "Écran entier : tout l'écran du téléphone, réduit s'il le faut",
-        scale: (percent: number) => `${percent} %`,
-        scaleLabel: (percent: number) => `Écran entier affiché à ${percent} %`,
-      },
+      // Le téléphone réduit pour tenir dans la fenêtre.
+      scale: (percent: number) => `${percent} %`,
+      scaleLabel: (percent: number) => `Téléphone affiché à ${percent} %`,
       reader: {
         label: "Lecteur",
         subscriber: "Lire comme un abonné à la bonne formule",

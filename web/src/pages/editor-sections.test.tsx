@@ -1004,8 +1004,8 @@ describe("éditeur d'un article (Blog)", () => {
     expect(left).not.toHaveClass("hidden")
   })
 
-  it("l'écran entier n'existe qu'en Lecture, réduit d'après la hauteur disponible", async () => {
-    // jsdom n'a pas ResizeObserver : la hauteur mesurée est 0, l'écran descend à 40 %.
+  it("le téléphone est toujours en entier, réduit d'après la hauteur disponible, en Édition comme en Lecture", async () => {
+    // jsdom n'a pas ResizeObserver : la hauteur mesurée est 0, le téléphone descend à 40 %.
     vi.stubGlobal(
       "ResizeObserver",
       class {
@@ -1023,29 +1023,15 @@ describe("éditeur d'un article (Blog)", () => {
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
     const tools = screen.getByRole("toolbar", { name: preview.tools })
-    expect(
-      within(tools).queryByRole("button", { name: preview.fit.full })
-    ).toBeNull()
+    // « 40 % » à l'écran, la phrase entière pour les lecteurs d'écran, dès l'Édition.
+    expect(within(tools).getByText(preview.scale(40))).toBeVisible()
+    expect(within(tools).getByText(preview.scaleLabel(40))).toBeInTheDocument()
 
+    // En Lecture aussi, sans choix de taille.
     fireEvent.click(
       within(tools).getByRole("button", { name: preview.mode.read })
     )
-    fireEvent.click(
-      within(tools).getByRole("button", { name: preview.fit.full })
-    )
-    const phone = screen.getByRole("region", { name: preview.screen.ios })
-    expect(phone).toHaveAttribute("data-fit", "full")
-    // « 40 % » à l'écran, la phrase entière pour les lecteurs d'écran.
-    expect(within(tools).getByText(preview.fit.scale(40))).toBeVisible()
-    expect(
-      within(tools).getByText(preview.fit.scaleLabel(40))
-    ).toBeInTheDocument()
-
-    // En Édition, l'écran reprend sa vraie largeur.
-    fireEvent.click(
-      within(tools).getByRole("button", { name: preview.mode.edit })
-    )
-    expect(phone).not.toHaveAttribute("data-fit")
+    expect(within(tools).getByText(preview.scale(40))).toBeVisible()
     vi.unstubAllGlobals()
   })
 

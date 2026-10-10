@@ -7,8 +7,6 @@ import {
   Eye,
   Focus,
   Lock,
-  Maximize,
-  MoveVertical,
   Moon,
   Pencil,
   Share,
@@ -47,9 +45,7 @@ import {
   chosenValue,
   devices,
   deviceHeightOf,
-  fullScreenScale,
-  previewFits,
-  showsFullScreen,
+  phoneScale,
   previewModes,
   previewReaders,
   previewThemes,
@@ -90,23 +86,19 @@ export function FeedPreview({
   appBar?: ReactNode
   children: ReactNode
 }) {
-  // Écran entier (Lecture) : la hauteur disponible pour le téléphone, relue quand la fenêtre change.
+  // Le téléphone en entier : la hauteur disponible, relue quand la fenêtre change.
   const frame = useRef<HTMLDivElement>(null)
-  const [measured, setMeasured] = useState<number | null>(null)
-  const full = showsFullScreen(preview)
+  const [scale, setScale] = useState<number | null>(null)
   useEffect(() => {
     const element = frame.current
-    if (!full || !element) return
+    if (!element) return
     // La taille du téléphone vient de preview.css (variables de l'appareil choisi).
     const observer = new ResizeObserver(() =>
-      setMeasured(
-        fullScreenScale(deviceHeightOf(element), element.clientHeight)
-      )
+      setScale(phoneScale(deviceHeightOf(element), element.clientHeight))
     )
     observer.observe(element)
     return () => observer.disconnect()
-  }, [full, preview.device])
-  const scale = full ? measured : null
+  }, [preview.device])
   return (
     // Une grille : les messages au-dessus du téléphone, puis la barre de mise en forme, le
     // téléphone et la barre de l'aperçu, ces deux barres alignées sur le début du contenu de
@@ -149,7 +141,6 @@ export function FeedPreview({
           data-device={preview.device}
           data-blocks-theme={preview.theme}
           data-large-text={preview.largeText || undefined}
-          data-fit={scale !== null ? "full" : undefined}
         >
           <div className="blocks-screen">
             <div aria-hidden className="blocks-status">
@@ -196,10 +187,6 @@ const themeChoices: Choice<(typeof previewThemes)[number]> = {
   light: { label: labels.theme.light, icon: Sun },
   dark: { label: labels.theme.dark, icon: Moon },
 }
-const fitChoices: Choice<(typeof previewFits)[number]> = {
-  adjust: { label: labels.fit.adjust, icon: MoveVertical },
-  full: { label: labels.fit.full, icon: Maximize },
-}
 const readerChoices: Choice<(typeof previewReaders)[number]> = {
   subscriber: { label: labels.reader.subscriber, icon: UserCheck },
   visitor: { label: labels.reader.visitor, icon: UserX },
@@ -223,7 +210,7 @@ function PreviewTools({
 }: {
   preview: PreviewSettings
   onChange: (preview: PreviewSettings) => void
-  // La réduction de l'écran entier, s'il est montré.
+  // La réduction du téléphone (1 : à sa vraie taille ; null : pas encore mesurée).
   scale: number | null
   focus: FocusTool
   readers: boolean
@@ -308,25 +295,16 @@ function PreviewTools({
               />
             </>
           )}
-          <Separator className="my-1 w-5" />
-          <ToolGroup
-            label={labels.fit.label}
-            values={previewFits}
-            choices={fitChoices}
-            value={preview.fit}
-            onChange={(fit) => onChange({ ...preview, fit })}
-          />
-          {scale !== null && (
-            <span className="pb-1 text-xs text-muted-foreground tabular-nums">
-              <span aria-hidden>
-                {labels.fit.scale(Math.round(scale * 100))}
-              </span>
-              <span className="sr-only">
-                {labels.fit.scaleLabel(Math.round(scale * 100))}
-              </span>
-            </span>
-          )}
         </>
+      )}
+      {/* Réduit pour tenir dans la fenêtre : on ne le voit pas à sa vraie taille. */}
+      {scale !== null && scale < 1 && (
+        <span className="pb-1 text-xs text-muted-foreground tabular-nums">
+          <span aria-hidden>{labels.scale(Math.round(scale * 100))}</span>
+          <span className="sr-only">
+            {labels.scaleLabel(Math.round(scale * 100))}
+          </span>
+        </span>
       )}
     </div>
   )
