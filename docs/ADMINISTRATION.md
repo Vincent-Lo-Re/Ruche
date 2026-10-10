@@ -16,6 +16,12 @@ Les sections 1 à 9 sont **décidées**. On coche chaque ligne quand elle est en
 - [x] **Accueil** (« Tableau de bord ») : on y arrive après la connexion. Depuis le 06/10/2026, il n'a plus que son titre, avec son icône, et « Bienvenue » dessous (avant : tes brouillons récents, les publications programmées et les programmations échouées).
 - [x] **Blog** : les articles et leurs catégories.
 - [x] **Podcasts** : les épisodes (le son fait partie de l'épisode) et leurs catégories.
+- [ ] **App : l'allure de l'app mobile** (décidé le 10/10/2026, **à construire avec l'app mobile**). Le header, la barre de navigation et la présentation des listes de l'app ne sont pas des modèles de bloc : un modèle s'insère dans un contenu, autant de fois qu'on veut, alors que ces éléments sont uniques et valent pour toute l'app. Ce ne sont pas non plus des pages de blocs libres : quelques choix guidés, dessinés par l'app elle-même (cohérente, lisible en grand texte, rapide). Une seule section « App » dans le menu (ou un onglet de Paramètres, à trancher alors), en trois parties, chacune avec son aperçu en direct dans le téléphone de l'admin :
+  - **Barre du haut** : le logo ou le nom de la marque, les boutons montrés (recherche, favoris, partage).
+  - **Barre de navigation** : les onglets (Accueil, Blog, Podcasts, une page…), leur ordre, leur icône et leur nom ; 5 au plus, comme le veulent iOS et Android.
+  - **Listes du Blog et des Podcasts** : une présentation choisie parmi quelques-unes (grande image, vignette à gauche, grille), et ce qui s'affiche (catégorie, temps de lecture ou durée).
+
+  Construite avant l'app, elle proposerait des réglages que l'app ne saurait pas suivre : on la fait au début de l'app mobile, avec ses écrans.
 - [ ] **Méthodes, refaites en écrans** (décidé le 06/10/2026, sur QCM et sur la maquette `docs/maquettes/methode-ecrans.html`). Les essais précédents (une méthode faite de chapitres et de leçons à blocs, puis les exercices, puis une seule page qui déroule tout) sont **retirés** : on repart au propre, en retirant tout l'ancien système de l'admin puis de la base, avant de construire le nouveau. Aucune méthode n'existait en ligne.
   - **La structure** : une méthode a une **Entrée** (facultative), un ou plusieurs **chapitres**, et une **Sortie** (facultative), qu'on ajoute au besoin (« Ajouter une Entrée », « Ajouter une Sortie »). Un chapitre contient des **leçons** ; une leçon contient des **exercices**.
   - **Simple ou à écrans** : l'Entrée, la Sortie et chaque chapitre, leçon ou exercice ont une sorte, choisie à la création et **qui ne change plus** :
@@ -262,6 +268,8 @@ Le 09/10/2026, après avoir construit les langues de l'app (#16, #17), les terme
 - **Renommer les niveaux d'une méthode** (04/10/2026) : « Chapitre », « Leçon » et « Exercice » pourront être changés à la main. D'ici là, ces mots restent dans `texts.ts`.
 - **Blocs à répondre dans un exercice** (questions à choix, réponses à écrire, minuteur…).
 - **Méthodes en écrans** (06/10/2026) : ce que le lecteur voit de sa place dans la méthode (titre, position), avec la charte graphique de l'app ; un menu de navigation dans l'app ; la vidéo ; les points de départ d'une Entrée et d'une Sortie.
+
+- **Section « App »** (10/10/2026) : voir § 1, « App : l'allure de l'app mobile » ; à construire au début de l'app mobile.
 
 ## 11. Ordre de construction proposé
 
