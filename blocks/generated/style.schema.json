@@ -1,33 +1,113 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/Vincent-Lo-Re/Ruche/blob/main/blocks/generated/published.schema.json",
-  "$comment": "Généré par web/scripts/blocks-generate.mjs (npm run blocks:generate) depuis blocks/. Ne pas modifier. Variante « published ». Variante « published » : le corps figé d'une version publiée (§ 2.4), ce que lit l'app. Blocs liés résolus en copies, fichier obligatoire dans chaque image, texte alternatif résolu.",
+  "$id": "https://github.com/Vincent-Lo-Re/Ruche/blob/main/blocks/generated/style.schema.json",
+  "$comment": "Généré par web/scripts/blocks-generate.mjs (npm run blocks:generate) depuis blocks/. Ne pas modifier. Variante « style ». Variante « style » : la charte graphique de l'app (ADMIN § 1, section « App »), un seul document. Rangée avec les blocs parce qu'elle les habille, dans l'app comme dans l'aperçu de l'admin. Les références (une couleur ou une police de la liste) et les noms en double se vérifient à part : private.style_problems dans la base, styleProblems dans l'admin.",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "v",
-    "title",
-    "blocks"
+    "darkMode",
+    "colors",
+    "roles",
+    "tints",
+    "badges",
+    "buttons",
+    "fields",
+    "fonts",
+    "fontRoles",
+    "sizes",
+    "radius",
+    "imageRadius",
+    "shadow",
+    "underlineLinks"
   ],
   "properties": {
     "v": {
       "const": 1
     },
-    "title": {
-      "type": "string",
-      "maxLength": 200
+    "darkMode": {
+      "enum": [
+        "auto",
+        "light",
+        "dark"
+      ]
     },
-    "cover": {
-      "$ref": "#/definitions/mediaRef"
-    },
-    "audio": {
-      "$ref": "#/definitions/mediaRef"
-    },
-    "blocks": {
+    "colors": {
       "type": "array",
+      "minItems": 1,
+      "maxItems": 60,
       "items": {
-        "$ref": "#/definitions/publishedTopBlock"
+        "$ref": "#/definitions/styleColor"
       }
+    },
+    "roles": {
+      "$ref": "#/definitions/styleColorRoles"
+    },
+    "tints": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 30,
+      "items": {
+        "$ref": "#/definitions/styleTint"
+      }
+    },
+    "badges": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 30,
+      "items": {
+        "$ref": "#/definitions/styleBadge"
+      }
+    },
+    "buttons": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 30,
+      "items": {
+        "$ref": "#/definitions/styleButton"
+      }
+    },
+    "fields": {
+      "enum": [
+        "outline",
+        "filled",
+        "underline"
+      ]
+    },
+    "fonts": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 12,
+      "items": {
+        "$ref": "#/definitions/styleFont"
+      }
+    },
+    "fontRoles": {
+      "$ref": "#/definitions/styleFontRoles"
+    },
+    "sizes": {
+      "$ref": "#/definitions/styleSizes"
+    },
+    "radius": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 24
+    },
+    "imageRadius": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 24
+    },
+    "shadow": {
+      "enum": [
+        "none",
+        "light",
+        "medium",
+        "strong"
+      ]
+    },
+    "underlineLinks": {
+      "type": "boolean"
     }
   },
   "definitions": {

@@ -30,6 +30,16 @@ export type PublishedTopBlock =
   PublishedTextBlock | PublishedTopImageBlock | PublishedBoxBlock
 /**
  * This interface was referenced by `BlocksVariants`'s JSON-Schema
+ * via the `definition` "styleName".
+ */
+export type StyleName = string
+/**
+ * This interface was referenced by `BlocksVariants`'s JSON-Schema
+ * via the `definition` "styleHex".
+ */
+export type StyleHex = string
+/**
+ * This interface was referenced by `BlocksVariants`'s JSON-Schema
  * via the `definition` "nullableUuid".
  */
 export type NullableUuid = string | null
@@ -83,6 +93,7 @@ export interface BlocksVariants {
   draft?: Draft
   template?: TemplateDraft
   published?: PublishedBody
+  style?: AppStyle
 }
 /**
  * This interface was referenced by `BlocksVariants`'s JSON-Schema
@@ -116,6 +127,175 @@ export interface PublishedBody {
   cover?: MediaRef
   audio?: MediaRef
   blocks: PublishedTopBlock[]
+}
+/**
+ * This interface was referenced by `BlocksVariants`'s JSON-Schema
+ * via the `definition` "style".
+ */
+export interface AppStyle {
+  v: 1
+  darkMode: "auto" | "light" | "dark"
+  /**
+   * @minItems 1
+   * @maxItems 60
+   */
+  colors: StyleColor[]
+  roles: StyleColorRoles
+  /**
+   * @minItems 1
+   * @maxItems 30
+   */
+  tints: StyleTint[]
+  /**
+   * @minItems 1
+   * @maxItems 30
+   */
+  badges: StyleBadge[]
+  /**
+   * @minItems 1
+   * @maxItems 30
+   */
+  buttons: StyleButton[]
+  fields: "outline" | "filled" | "underline"
+  /**
+   * @minItems 3
+   * @maxItems 12
+   */
+  fonts: StyleFont[]
+  fontRoles: StyleFontRoles
+  sizes: StyleSizes
+  radius: number
+  imageRadius: number
+  shadow: "none" | "light" | "medium" | "strong"
+  underlineLinks: boolean
+}
+/**
+ * This interface was referenced by `BlocksVariants`'s JSON-Schema
+ * via the `definition` "styleColor".
+ */
+export interface StyleColor {
+  id: Uuid
+  name: StyleName
+  light: StyleHex
+  dark: StyleHex
+}
+/**
+ * This interface was referenced by `BlocksVariants`'s JSON-Schema
+ * via the `definition` "styleColorRoles".
+ */
+export interface StyleColorRoles {
+  background: Uuid
+  card: Uuid
+  border: Uuid
+  text: Uuid
+  muted: Uuid
+  link: Uuid
+  primary: Uuid
+  topBar: Uuid
+  topBarText: Uuid
+  tabBar: Uuid
+  tabOn: Uuid
+  tabOff: Uuid
+  focus: Uuid
+  success: Uuid
+  warning: Uuid
+  error: Uuid
+}
+/**
+ * This interface was referenced by `BlocksVariants`'s JSON-Schema
+ * via the `definition` "styleTint".
+ */
+export interface StyleTint {
+  id: Uuid
+  name: StyleName
+  fill: Uuid
+  border: Uuid
+  title: Uuid
+  text: Uuid
+  link: Uuid
+}
+/**
+ * This interface was referenced by `BlocksVariants`'s JSON-Schema
+ * via the `definition` "styleBadge".
+ */
+export interface StyleBadge {
+  id: Uuid
+  name: StyleName
+  fill: Uuid
+  border: Uuid
+  text: Uuid
+}
+/**
+ * This interface was referenced by `BlocksVariants`'s JSON-Schema
+ * via the `definition` "styleButton".
+ */
+export interface StyleButton {
+  id: Uuid
+  name: StyleName
+  kind: "flat" | "gradient" | "outline" | "text"
+  shape: "rounded" | "pill" | "square"
+  fill: Uuid
+  end: Uuid
+  border: Uuid
+  label: Uuid
+}
+/**
+ * This interface was referenced by `BlocksVariants`'s JSON-Schema
+ * via the `definition` "styleFont".
+ */
+export interface StyleFont {
+  id: Uuid
+  name: StyleName
+  family:
+    | "system"
+    | "DM Sans"
+    | "DM Serif Display"
+    | "Fraunces"
+    | "Inter"
+    | "Libre Baskerville"
+    | "Lora"
+    | "Merriweather"
+    | "Nunito"
+    | "Playfair Display"
+    | "Poppins"
+    | "Source Serif 4"
+    | "Space Grotesk"
+    | "Work Sans"
+  weight: 400 | 500 | 600 | 700
+}
+/**
+ * This interface was referenced by `BlocksVariants`'s JSON-Schema
+ * via the `definition` "styleFontRoles".
+ */
+export interface StyleFontRoles {
+  brand: Uuid
+  title: Uuid
+  heading: Uuid
+  body: Uuid
+  quote: Uuid
+  small: Uuid
+  boxTitle: Uuid
+  button: Uuid
+  tabs: Uuid
+}
+/**
+ * This interface was referenced by `BlocksVariants`'s JSON-Schema
+ * via the `definition` "styleSizes".
+ */
+export interface StyleSizes {
+  title: StyleSize
+  heading: StyleSize
+  body: StyleSize
+  quote: StyleSize
+  small: StyleSize
+}
+/**
+ * This interface was referenced by `BlocksVariants`'s JSON-Schema
+ * via the `definition` "styleSize".
+ */
+export interface StyleSize {
+  size: number
+  lineHeight: number
 }
 /**
  * This interface was referenced by `BlocksVariants`'s JSON-Schema

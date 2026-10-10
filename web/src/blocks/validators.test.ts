@@ -6,12 +6,13 @@ import {
   validatePublished,
   validateTemplate,
 } from "@/blocks/generated/validators"
+import { validateStyle } from "@/blocks/generated/style-validator"
 
 // Les cas partagés de blocks/cases/ : les mêmes que ceux de pgTAP (30_blocs_schema), pour que
 // l'admin et la base donnent toujours le même verdict.
 type SharedCase = {
   description: string
-  variant: "draft" | "template" | "published"
+  variant: "draft" | "template" | "published" | "style"
   valid: boolean
   data: unknown
 }
@@ -40,6 +41,7 @@ describe("validateurs générés (blocks/cases)", () => {
       draft: validateDraft,
       template: validateTemplate,
       published: validatePublished,
+      style: validateStyle,
     }[variant]
     expect(validate(data)).toBe(valid)
     if (!valid) expect(validate.errors?.length).toBeGreaterThan(0)
