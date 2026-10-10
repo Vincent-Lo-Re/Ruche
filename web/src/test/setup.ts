@@ -1,24 +1,12 @@
 import "@testing-library/jest-dom/vitest"
 
 import { cleanup } from "@testing-library/react"
-import { afterEach, vi } from "vitest"
+import { afterEach } from "vitest"
 
 // Les tests lisent l'admin en français, ses textes et ses dates (lib/language.ts) : la langue
 // est posée avant qu'un test charge les textes. src/texts.test.ts vérifie les deux langues.
 localStorage.setItem("ruche-langue", "fr")
 localStorage.setItem("ruche-langue-admin", "fr")
-
-// La charte de l'app (le téléphone de l'éditeur la lit) : jamais publiée, la charte neutre. Un
-// fichier de tests la remplace par vi.mocked(getAppStyle).
-vi.mock("@/lib/app-style/api", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/lib/app-style/api")>()),
-  getAppStyle: vi.fn(async () => ({
-    draft: null,
-    revision: 0,
-    published: null,
-    publishedAt: null,
-  })),
-}))
 
 // Chaque test repart d'une page vide, en français (un test peut vider le stockage).
 afterEach(() => {

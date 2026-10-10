@@ -1,48 +1,53 @@
 import {
+  ALargeSmall,
+  BatteryFull,
   Bookmark,
   ChevronLeft,
   Eye,
   Focus,
   Lock,
+  Moon,
   Pencil,
   Share,
+  Signal,
+  Sun,
   UserCheck,
   UserX,
+  Wifi,
+  type LucideIcon,
 } from "lucide-react"
 import {
   useEffect,
   useRef,
   useState,
+  type ComponentType,
   type CSSProperties,
   type ReactNode,
+  type SVGProps,
 } from "react"
 
 import type { BlockMedia } from "@/blocks/components/context"
 import { StaticBlock } from "@/blocks/components/static-block"
-import {
-  DeviceTool,
-  LargeTextTool,
-  PreviewToolbar,
-  ThemeTool,
-  ToolGroup,
-  type ToolChoices,
-} from "@/components/editor/preview-tools"
-import { PhoneDevice } from "@/components/phone-device"
+import { AndroidLogo, AppleLogo } from "@/components/brand-icons"
 import type { Block, Draft } from "@/blocks/types"
 import { AudioPreview, CoverPreview } from "@/components/editor/presentation"
 import { Kbd } from "@/components/ui/kbd"
 import { Separator } from "@/components/ui/separator"
 import { Toggle } from "@/components/ui/toggle"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import {
+  chosenValue,
+  devices,
   deviceHeightOf,
   phoneScale,
   previewModes,
   previewReaders,
+  previewThemes,
   type PreviewSettings,
 } from "@/lib/editor/preview"
 import type { LockableKind } from "@/lib/editor/profile"
@@ -63,14 +68,8 @@ export function FeedPreview({
   appBar,
   focus,
   readers = true,
-  variables,
-  themeLocked = false,
   children,
 }: {
-  // La charte publiée de l'app, en variables CSS sur le téléphone.
-  variables?: Record<string, string>
-  // La charte garde un seul mode : pas de choix clair ou sombre.
-  themeLocked?: boolean
   preview: PreviewSettings
   onPreviewChange: (preview: PreviewSettings) => void
   // En Lecture, le choix « abonné / sans la formule » : pas pour un modèle de bloc, qui n'a pas
@@ -128,15 +127,29 @@ export function FeedPreview({
         data-backdrop
         className="blocks-preview-frame flex min-h-0 flex-col items-center"
       >
-        <PhoneDevice
-          device={preview.device}
-          theme={preview.theme}
-          largeText={preview.largeText}
-          appBar={appBar}
-          variables={variables}
+        <div
+          role="region"
+          aria-label={labels.screen[preview.device]}
+          className="blocks-device"
+          data-device={preview.device}
+          data-blocks-theme={preview.theme}
+          data-large-text={preview.largeText || undefined}
         >
-          {children}
-        </PhoneDevice>
+          <div className="blocks-screen">
+            <div aria-hidden className="blocks-status">
+              <span>{labels.time[preview.device]}</span>
+              <span className="blocks-camera" />
+              <span className="blocks-status-icons">
+                <Signal />
+                <Wifi />
+                <BatteryFull />
+              </span>
+            </div>
+            {appBar}
+            <div className="blocks-screen-scroll">{children}</div>
+            <div aria-hidden className="blocks-home" />
+          </div>
+        </div>
       </div>
       <div className="blocks-preview-tools">
         <PreviewTools
@@ -144,18 +157,29 @@ export function FeedPreview({
           onChange={onPreviewChange}
           focus={focus}
           readers={readers}
-          themeLocked={themeLocked}
         />
       </div>
     </div>
   )
 }
 
-const modeChoices: ToolChoices<(typeof previewModes)[number]> = {
+// Une icône Lucide, ou l'un des deux logos de marque (iPhone, Android).
+type Icon = LucideIcon | ComponentType<SVGProps<SVGSVGElement>>
+type Choice<T extends string> = Record<T, { label: string; icon: Icon }>
+
+const deviceChoices: Choice<(typeof devices)[number]> = {
+  ios: { label: labels.device.ios, icon: AppleLogo },
+  android: { label: labels.device.android, icon: AndroidLogo },
+}
+const modeChoices: Choice<(typeof previewModes)[number]> = {
   edit: { label: labels.mode.edit, icon: Pencil },
   read: { label: labels.mode.read, icon: Eye },
 }
-const readerChoices: ToolChoices<(typeof previewReaders)[number]> = {
+const themeChoices: Choice<(typeof previewThemes)[number]> = {
+  light: { label: labels.theme.light, icon: Sun },
+  dark: { label: labels.theme.dark, icon: Moon },
+}
+const readerChoices: Choice<(typeof previewReaders)[number]> = {
   subscriber: { label: labels.reader.subscriber, icon: UserCheck },
   visitor: { label: labels.reader.visitor, icon: UserX },
 }
@@ -174,17 +198,23 @@ function PreviewTools({
   onChange,
   focus,
   readers,
-  themeLocked,
 }: {
   preview: PreviewSettings
   onChange: (preview: PreviewSettings) => void
   focus: FocusTool
   readers: boolean
-  themeLocked: boolean
 }) {
   return (
-    <PreviewToolbar>
-      <DeviceTool
+    <div
+      role="toolbar"
+      aria-label={labels.tools}
+      aria-orientation="vertical"
+      className="flex shrink-0 flex-col items-center gap-1 self-start rounded-lg border bg-background p-1 shadow-xs"
+    >
+      <ToolGroup
+        label={labels.device.label}
+        values={devices}
+        choices={deviceChoices}
         value={preview.device}
         onChange={(device) => onChange({ ...preview, device })}
       />
@@ -214,20 +244,32 @@ function PreviewTools({
           {texts.editor.focusMode.label} <Kbd>{focus.shortcut}</Kbd>
         </TooltipContent>
       </Tooltip>
-      {!themeLocked && (
-        <>
-          <Separator className="my-1 w-5" />
-          <ThemeTool
-            value={preview.theme}
-            onChange={(theme) => onChange({ ...preview, theme })}
-          />
-        </>
-      )}
       <Separator className="my-1 w-5" />
-      <LargeTextTool
-        pressed={preview.largeText}
-        onChange={(largeText) => onChange({ ...preview, largeText })}
+      <ToolGroup
+        label={labels.theme.label}
+        values={previewThemes}
+        choices={themeChoices}
+        value={preview.theme}
+        onChange={(theme) => onChange({ ...preview, theme })}
       />
+      <Separator className="my-1 w-5" />
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <Toggle
+              size="icon"
+              aria-label={labels.largeText}
+              pressed={preview.largeText}
+              onPressedChange={(largeText) =>
+                onChange({ ...preview, largeText })
+              }
+            />
+          }
+        >
+          <ALargeSmall />
+        </TooltipTrigger>
+        <TooltipContent side="left">{labels.largeText}</TooltipContent>
+      </Tooltip>
       {preview.mode === "read" && (
         <>
           {readers && (
@@ -244,7 +286,54 @@ function PreviewTools({
           )}
         </>
       )}
-    </PreviewToolbar>
+    </div>
+  )
+}
+
+function ToolGroup<T extends string>({
+  label,
+  values,
+  choices,
+  value,
+  onChange,
+}: {
+  label: string
+  values: readonly T[]
+  choices: Choice<T>
+  value: T
+  onChange: (value: T) => void
+}) {
+  return (
+    <ToggleGroup
+      aria-label={label}
+      orientation="vertical"
+      className="flex-col"
+      value={[value]}
+      onValueChange={(next: string[]) => {
+        const chosen = chosenValue(values, next)
+        if (chosen) onChange(chosen)
+      }}
+    >
+      {values.map((candidate) => {
+        const { label: itemLabel, icon: Icon } = choices[candidate]
+        return (
+          <Tooltip key={candidate}>
+            <TooltipTrigger
+              render={
+                <ToggleGroupItem
+                  value={candidate}
+                  size="icon"
+                  aria-label={itemLabel}
+                />
+              }
+            >
+              <Icon />
+            </TooltipTrigger>
+            <TooltipContent side="left">{itemLabel}</TooltipContent>
+          </Tooltip>
+        )
+      })}
+    </ToggleGroup>
   )
 }
 

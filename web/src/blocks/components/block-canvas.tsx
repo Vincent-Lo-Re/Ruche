@@ -5,7 +5,6 @@ import {
   BlocksEditorContext,
   useBlocksEditor,
 } from "@/blocks/components/context"
-import { BoxFrame } from "@/blocks/components/box-frame"
 import { ImageBlockView } from "@/blocks/components/image-block"
 import { StaticBlock } from "@/blocks/components/static-block"
 import { TextBlockView } from "@/blocks/components/text-block"
@@ -121,7 +120,7 @@ const BoxBlockView = memo(function BoxBlockView({
 }) {
   const { editable, onAddInBox } = useBlocksEditor()
   return (
-    <BoxFrame block={block}>
+    <div className="blocks-box" data-look={block.look}>
       <div className="blocks-box-list rounded-sm">
         {block.blocks.map((child) => (
           <CanvasBlock key={child.id} block={child} />
@@ -139,6 +138,6 @@ const BoxBlockView = memo(function BoxBlockView({
           onClick={() => onAddInBox(block.id)}
         />
       )}
-    </BoxFrame>
+    </div>
   )
 })

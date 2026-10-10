@@ -5,7 +5,6 @@
  * une liste telle quelle, et la retrouver en y revenant. Sans React.
  */
 
-import type { StyleSectionGroup } from "@/lib/app-style/sections"
 import type { TemplateSort } from "@/lib/contents/templates"
 import {
   ALL_CATEGORIES,
@@ -226,60 +225,6 @@ export function settingsTabFromAddress(params: URLSearchParams): SettingsTab {
 /** Écrit l'onglet de Paramètres dans l'adresse. */
 export function writeSettingsTab(params: URLSearchParams, tab: SettingsTab) {
   writeChoice(params, settingsTabChoice, tab)
-}
-
-// --- App ----------------------------------------------------------------------------------
-
-/** Les onglets de la section « App », dans l'ordre (ADMIN § 1). */
-export const appTabs = ["identity", "style", "navigation", "layouts"] as const
-export type AppTab = (typeof appTabs)[number]
-
-const appTabChoice: Choice<AppTab> = {
-  name: "tab",
-  words: {
-    identity: "identity",
-    style: "style",
-    navigation: "navigation",
-    layouts: "layouts",
-  },
-  // La charte graphique, le seul onglet construit avant l'app mobile.
-  fallback: "style",
-}
-
-/** L'onglet de la section « App », lu dans l'adresse (la charte graphique par défaut). */
-export function appTabFromAddress(params: URLSearchParams): AppTab {
-  return readChoice(params, appTabChoice)
-}
-
-/** Écrit l'onglet de la section « App » dans l'adresse. */
-export function writeAppTab(params: URLSearchParams, tab: AppTab) {
-  writeChoice(params, appTabChoice, tab)
-}
-
-const styleGroupChoice: Choice<StyleSectionGroup> = {
-  name: "group",
-  words: {
-    colors: "colors",
-    elements: "elements",
-    text: "text",
-    shapes: "shapes",
-  },
-  fallback: "colors",
-}
-
-/** La famille de réglages ouverte dans la charte graphique (les couleurs par défaut). */
-export function styleGroupFromAddress(
-  params: URLSearchParams
-): StyleSectionGroup {
-  return readChoice(params, styleGroupChoice)
-}
-
-/** Écrit la famille de réglages de la charte graphique dans l'adresse. */
-export function writeStyleGroup(
-  params: URLSearchParams,
-  group: StyleSectionGroup
-) {
-  writeChoice(params, styleGroupChoice, group)
 }
 
 // --- Corbeille ------------------------------------------------------------------------------

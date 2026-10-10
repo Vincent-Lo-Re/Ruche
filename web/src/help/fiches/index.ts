@@ -15,7 +15,6 @@ import { fiche as utiliserLesModelesDeBloc } from "@/help/fiches/utiliser-les-mo
 import { fiche as utiliserLaCorbeille } from "@/help/fiches/utiliser-la-corbeille"
 import { fiche as inviterUnMembre } from "@/help/fiches/inviter-un-membre"
 import { fiche as changerLeNomDeLaMarque } from "@/help/fiches/changer-le-nom-de-la-marque"
-import { fiche as composerLaCharteDeLApp } from "@/help/fiches/composer-la-charte-de-l-app"
 
 // Les fiches de l'aide, rangées par thème : contenus, publication, médiathèque, modèles,
 // corbeille, équipe.
@@ -36,5 +35,4 @@ export const helpFiches: HelpFiche[] = [
   utiliserLaCorbeille,
   inviterUnMembre,
   changerLeNomDeLaMarque,
-  composerLaCharteDeLApp,
 ]

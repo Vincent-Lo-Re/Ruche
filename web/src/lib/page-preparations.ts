@@ -13,7 +13,6 @@ import { fresh, preloadImages, ready, type Prepare } from "@/lib/preparation"
 import {
   accessLevelsRead,
   adminBrandRead,
-  appStyleRead,
   auditRead,
   categoriesRead,
   contentListRead,
@@ -130,12 +129,6 @@ export const prepareTrash: Prepare = ({ queryClient }) =>
 export const prepareTeam: Prepare = ({ queryClient }) =>
   ready(queryClient, teamRead())
 
-// La section « App » : réservée aux admins ; la charte, relue à chaque ouverture.
-export const prepareApp: Prepare = async ({ queryClient, member }) => {
-  if (member.role !== "admin") return
-  await fresh(queryClient, appStyleRead())
-}
-
 // Paramètres : réservés aux admins (les autres voient « réservé aux admins »).
 
 export const prepareSettings: Prepare = async ({ queryClient, member }) => {
@@ -181,8 +174,6 @@ export function prepareEditor(kind: ContentKind): Prepare {
     const profile = contentProfile(kind, templateSort)
     await Promise.all([
       ready(queryClient, accessLevelsRead()),
-      // La charte publiée de l'app habille le téléphone.
-      fresh(queryClient, appStyleRead()),
       profile.categories &&
         ready(queryClient, categoriesRead(profile.categories)),
       profile.publication === "own" &&

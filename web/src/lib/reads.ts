@@ -2,7 +2,6 @@ import { queryOptions } from "@tanstack/react-query"
 
 import { accessLevelsKey, listAccessLevels } from "@/lib/access-levels"
 import { adminBrandKey, getAdminBrand } from "@/lib/admin-identity"
-import { appStyleKey, getAppStyle } from "@/lib/app-style/api"
 import {
   categoryKeys,
   listCategories,
@@ -63,14 +62,6 @@ export const adminBrandRead = () =>
     queryKey: adminBrandKey,
     queryFn: getAdminBrand,
     staleTime: Infinity,
-  })
-
-/** La charte de l'app (section « App ») : son brouillon, relu à chaque ouverture. */
-export const appStyleRead = () =>
-  queryOptions({
-    queryKey: appStyleKey,
-    queryFn: getAppStyle,
-    staleTime: REREAD_MS,
   })
 
 export const contentListRead = (kind: ContentKind) =>
