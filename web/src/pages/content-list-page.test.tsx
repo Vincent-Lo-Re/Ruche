@@ -238,7 +238,7 @@ describe("Blog", () => {
     ).toHaveClass("bg-panel")
   })
 
-  it("montre l'image de présentation de chaque article, sinon l'icône d'une image", async () => {
+  it("montre l'image mise en avant de chaque article, sinon l'icône d'une image", async () => {
     const PLAGE = "00000000-0000-4000-8000-0000000000f1"
     vi.mocked(api.listContents).mockResolvedValue([
       row(ARTICLE, "Bien dormir en été", { cover_id: PLAGE }),
@@ -788,7 +788,7 @@ describe("Blog", () => {
     await waitFor(() =>
       expect(publicationApi.trashContent).toHaveBeenCalledWith(articles[2].id)
     )
-    // L'image de présentation redevient peut-être protégée : tout de suite.
+    // L'image mise en avant redevient peut-être protégée : tout de suite.
     await waitFor(() => expect(mediaApi.kickFiles).toHaveBeenCalled())
     const toast = await screen.findByText(labels.trashed("Sans rangement"))
     fireEvent.click(

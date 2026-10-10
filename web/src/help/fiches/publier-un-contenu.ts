@@ -17,7 +17,7 @@ export const fiche: HelpFiche = {
   ],
   steps: [
     "Dans la colonne de droite de l'éditeur, regarde « Prêt à publier ? » : un clic sur une ligne à régler mène à son réglage.",
-    "Règle ce qui manque : le titre, l'image de présentation (article, épisode), l'audio (épisode), l'adresse de la page (page) et le niveau d'accès.",
+    "Règle ce qui manque : le titre, l'image mise en avant (article, épisode ; facultative pour une page), l'audio (épisode), l'adresse de la page (page) et le niveau d'accès.",
     "Clique sur « Publier », en bas de la colonne de droite.",
     "Vérifie le niveau d'accès dans la fenêtre « Publier dans l'app ? », puis clique sur « Publier ».",
   ],

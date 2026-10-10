@@ -645,7 +645,7 @@ function hasMissing(pub: PublicationControls): boolean {
 }
 
 /**
- * Ce qui manque pour publier ou programmer (image de présentation, audio), avec de quoi le
+ * Ce qui manque pour publier ou programmer (image mise en avant, audio), avec de quoi le
  * choisir, puis le conseil [D46] (transcription), qui n'empêche rien.
  */
 function RequirementsNotice({

@@ -7,7 +7,7 @@
 // 2. Programmer : la tâche « publications » attend pendant qu'on écrit, puis publie le dernier
 //    brouillon ([D16], [D31]) ; au bout d'une heure d'écriture, elle échoue.
 // 3. Une page réservée à une formule créée dans Paramètres : verrouillée pour un anonyme ; son
-//    image de présentation reste lisible, pas ses autres images (question 1).
+//    image mise en avant reste lisible, pas ses autres images (question 1).
 // 4. Retirer de l'app, supprimer depuis la liste, restaurer (en brouillon, [D18]), vider la
 //    corbeille.
 // 5. Les formules : un éditeur ne voit pas Paramètres ; un admin les ajoute, les range au
@@ -436,7 +436,7 @@ test("programmer : la tâche attend pendant qu'on écrit, publie le dernier brou
   expect((await readSchedule(contentId)).schedule_error).toBeNull()
 })
 
-test("page réservée à une formule : verrouillée dans l'app, image de présentation lisible, autres images protégées", async ({
+test("page réservée à une formule : verrouillée dans l'app, image mise en avant lisible, autres images protégées", async ({
   page,
   team,
 }) => {
@@ -482,7 +482,7 @@ test("page réservée à une formule : verrouillée dans l'app, image de présen
     await setSettings(page, slug, level)
     const contentId = contentIdFromUrl(page.url())
 
-    // Son image de présentation (posée dans la base : l'écran arrive à l'étape 7).
+    // Son image mise en avant (posée dans la base : l'écran arrive à l'étape 7).
     await backToPages(page)
     const cover = await readMedia(coverName)
     const inner = await readMedia(innerName)
@@ -507,7 +507,7 @@ test("page réservée à une formule : verrouillée dans l'app, image de présen
       .click()
     await expect(page.getByText(labels.published(1))).toBeVisible()
 
-    // Pour un anonyme : verrouillé, ni blocs ni son, seule l'image de présentation.
+    // Pour un anonyme : verrouillé, ni blocs ni son, seule l'image mise en avant.
     const locked = await appContent(contentId)
     expect(locked).toMatchObject({
       id: contentId,
@@ -522,7 +522,7 @@ test("page réservée à une formule : verrouillée dans l'app, image de présen
     expect(Object.keys(locked!.files)).toEqual([cover.id])
     expect(await appPage(slug)).toMatchObject({ id: contentId, locked: true })
 
-    // L'image de présentation devient publique (fonction « files ») ; l'autre reste protégée.
+    // L'image mise en avant devient publique (fonction « files ») ; l'autre reste protégée.
     await expect
       .poll(() => storedIn(cover.path), { timeout: 60_000 })
       .toEqual(["files-public"])
@@ -534,7 +534,7 @@ test("page réservée à une formule : verrouillée dans l'app, image de présen
     expect(await publicFileStatus(inner.path)).not.toBe(200)
     expect(await anonCanSignProtected(inner.path)).toBe(false)
 
-    // Retirée de l'app : plus rien pour un anonyme, l'image de présentation redevient protégée.
+    // Retirée de l'app : plus rien pour un anonyme, l'image mise en avant redevient protégée.
     await publicationAction(page, labels.actions.unpublish)
     await page
       .getByRole("alertdialog")

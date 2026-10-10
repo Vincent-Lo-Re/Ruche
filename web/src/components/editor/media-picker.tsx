@@ -38,7 +38,7 @@ import { formatDuration, formatPercent } from "@/lib/media/format"
 import { getUploadQueue, type UploadQueue } from "@/lib/media/upload-queue"
 import { texts } from "@/texts"
 
-// Ce que l'on choisit : une image (bloc Image, image de présentation) ou un audio (épisode).
+// Ce que l'on choisit : une image (bloc Image, image mise en avant) ou un audio (épisode).
 type PickerKind = "image" | "audio"
 
 const pickerLabels = {

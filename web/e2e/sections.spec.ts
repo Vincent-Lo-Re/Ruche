@@ -2,7 +2,7 @@
 // par app_feed et app_categories, avec la clé publishable, comme un anonyme.
 //
 // 1. Blog : deux catégories, rangées au clavier ; un article que « Publier » refuse tant qu'il
-//    n'a pas d'image de présentation ([D45]) ; l'image et une catégorie, puis
+//    n'a pas d'image mise en avant ([D45]) ; l'image et une catégorie, puis
 //    publier ; l'app le liste avec sa vignette (publique, question 1) ; filtres par catégorie
 //    (admin et app) ; la catégorie supprimée, l'app l'ignore ([D28]).
 // 1 bis. L'éditeur du Fil : « Ajouter un bloc » ouvre les Blocs, un Texte glissé depuis les Blocs, un
@@ -35,6 +35,7 @@ import { contentIdFromUrl, publicFileStatus } from "./support/publication.ts"
 import {
   appCategories,
   appFeed,
+  appPage,
   deleteCategoriesMarked,
 } from "./support/sections.ts"
 
@@ -407,7 +408,7 @@ test("Éditeur du Fil : main prise dans un autre onglet, la fenêtre, le cadenas
   await tab.close()
 })
 
-test("Blog : catégories rangées, article refusé sans image de présentation, publié, filtré, catégorie supprimée", async ({
+test("Blog : catégories rangées, article refusé sans image mise en avant, publié, filtré, catégorie supprimée", async ({
   page,
   team,
 }) => {
@@ -496,7 +497,7 @@ test("Blog : catégories rangées, article refusé sans image de présentation, 
     await expect(pill).toHaveAttribute("aria-pressed", "true")
     await saved(page)
 
-    // « Publier » sans image de présentation : refusé, avec l'explication ([D45]).
+    // « Publier » sans image mise en avant : refusé, avec l'explication ([D45]).
     const refused = await openPublish(page)
     await expect(refused.locator("[data-requirements]")).toContainText(
       publication.requirements.publishTitle
@@ -672,7 +673,7 @@ test("Podcasts : épisode refusé sans audio, audio de la médiathèque, durée,
     timeout: 60_000,
   })
 
-  // Un épisode, avec son image de présentation mais sans audio.
+  // Un épisode, avec son image mise en avant mais sans audio.
   await nav(page, texts.sections.podcasts.title)
   await expect(page).toHaveURL(/\/podcasts$/)
   await createBlank(page, "episode")
@@ -785,6 +786,62 @@ async function uploadInPickerAndWait(page: Page, name: string) {
   await uploadInImagePicker(page, name)
   await expect(page.locator('[data-presentation="cover"] img')).toBeVisible()
 }
+
+test("Pages : l'image mise en avant est facultative ; choisie, elle part dans l'app", async ({
+  page,
+  team,
+}) => {
+  test.setTimeout(120_000)
+  const id = uniqueId()
+  const admin = await team.createAdmin("Iris Image")
+  const slug = `a-propos-${id}`
+
+  await open(page, "/pages", admin)
+  await createBlankPage(page, `À propos ${id}`)
+  // Sa carte, sans étape dans « Prêt à publier ? » ; le téléphone commence par le titre.
+  const card = articleTab(page, "page").getByRole("region", {
+    name: editor.article.feed.title,
+  })
+  await expect(card).toBeVisible()
+  await expect(
+    articleTab(page, "page").getByRole("button", {
+      name: editor.article.ready.todo(editor.article.ready.items.cover),
+    })
+  ).toHaveCount(0)
+  await expect(page.locator('[data-presentation="cover"]')).toHaveCount(0)
+
+  // Publiée sans image.
+  await pageFree(page, slug)
+  await openPublish(page).then((dialog) =>
+    dialog
+      .getByRole("button", { name: publication.publishDialog.confirm })
+      .click()
+  )
+  await expect(page.getByText(publication.published(1))).toBeVisible()
+  expect((await appPage(slug))?.cover).toBeNull()
+
+  // Choisie dans sa carte : l'image seule, à ses proportions, et en tête du téléphone.
+  await card
+    .getByRole("button", { name: editor.article.feed.chooseLabel })
+    .click()
+  await uploadInPickerAndWait(page, `a-propos-${id}.png`)
+  await expect(card.locator("img")).toHaveAttribute(
+    "style",
+    /aspect-ratio: 640 \/ 400/
+  )
+  await saved(page)
+  await page
+    .getByRole("button", { name: publication.actions.publish, exact: true })
+    .click()
+  await page
+    .getByRole("dialog", { name: publication.publishDialog.titleAgain })
+    .getByRole("button", { name: publication.publishDialog.confirm })
+    .click()
+  await expect(page.getByText(publication.published(2))).toBeVisible()
+  await expect
+    .poll(async () => (await appPage(slug))?.cover?.mediaId ?? null)
+    .not.toBeNull()
+})
 
 test("Pages : recherche (accents, casse, adresse) et filtre par état dans la liste complète", async ({
   page,

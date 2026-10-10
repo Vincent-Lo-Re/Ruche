@@ -15,8 +15,12 @@ export type ContentProfile = {
   publication: "own" | null
   // Le titre est exigé pour publier ([D49]).
   titleRequired: boolean
-  // L'image de présentation ([D45]) : exigée pour publier, ou sans objet.
-  cover: "required" | null
+  // L'image mise en avant ([D45]) : exigée pour publier (article, épisode), facultative (page,
+  // 10/10/2026), ou sans objet (modèle de bloc).
+  cover: "required" | "optional" | null
+  // Une carte dans une liste de l'app (Blog, Podcasts) : vignette des listes de l'admin, méta en
+  // Lecture.
+  listed: boolean
   // Un audio, exigé pour publier (un épisode).
   audio: boolean
   // La section de ses catégories (Blog, Podcasts), sinon null.
@@ -32,10 +36,7 @@ export type ContentProfile = {
   rootLimit: number | undefined
 }
 
-/**
- * Celles qui ont une carte dans une liste de l'app (Blog, Podcasts) : leur image de
- * présentation est exigée ([D45]), et la colonne de droite montre cette carte.
- */
+/** Celles qui ont une carte dans une liste de l'app (Blog, Podcasts). */
 export type ListedKind = Extract<ContentKind, "article" | "episode">
 
 /**
@@ -51,7 +52,7 @@ export type LockableKind = Exclude<ContentKind, "template">
 
 /** Vrai pour une sorte qui a une carte dans une liste de l'app. */
 export function isListedKind(kind: ContentKind): kind is ListedKind {
-  return contentProfile(kind).cover === "required"
+  return contentProfile(kind).listed
 }
 
 /** Le profil d'une sorte de contenu ; templateSort : la sorte d'un modèle de bloc. */
@@ -63,6 +64,7 @@ export function contentProfile(
     publication: "own",
     titleRequired: true,
     cover: null,
+    listed: false,
     audio: false,
     categories: null,
     access: "own",
@@ -72,16 +74,17 @@ export function contentProfile(
   } satisfies ContentProfile
   switch (kind) {
     case "article":
-      return { ...base, cover: "required", categories: "blog" }
+      return { ...base, cover: "required", listed: true, categories: "blog" }
     case "episode":
       return {
         ...base,
         cover: "required",
+        listed: true,
         audio: true,
         categories: "podcasts",
       }
     case "page":
-      return { ...base, address: true }
+      return { ...base, cover: "optional", address: true }
     case "template":
       return {
         ...base,

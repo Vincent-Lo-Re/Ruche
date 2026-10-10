@@ -1,5 +1,5 @@
 // Ce qu'il faut pour publier un contenu, vu de l'admin (sans React) : le titre ([D49], tout ce
-// qui se publie), [D45] (image de présentation d'un article et d'un épisode),
+// qui se publie), [D45] (image mise en avant d'un article et d'un épisode),
 // l'audio d'un épisode, et le conseil [D46] (transcription). La base vérifie les mêmes règles
 // (publish, schedule) : l'admin ne fait qu'expliquer avant d'envoyer.
 
@@ -9,7 +9,7 @@ import type { ContentKind, ContentSettings } from "@/lib/contents/api"
 import { contentProfile } from "@/lib/editor/profile"
 
 /**
- * Ce qui manque : le titre, l'image de présentation ou l'audio, absent (missing) ou plus
+ * Ce qui manque : le titre, l'image mise en avant ou l'audio, absent (missing) ou plus
  * disponible (unavailable : supprimé, pas prêt, ou d'un autre type) ; un titre déjà porté par un
  * autre contenu de la section (taken).
  */
@@ -23,7 +23,7 @@ type Advice = { key: "transcript"; mediaId: string }
 
 export type PublishChecks = { missing: Requirement[]; advice: Advice[] }
 
-/** L'état d'un fichier choisi (image de présentation ou audio), s'il bloque la publication. */
+/** L'état d'un fichier choisi (image mise en avant ou audio), s'il bloque la publication. */
 function fileState(
   media: BlockMedia,
   kind: "image" | "audio"
@@ -83,7 +83,7 @@ export function publishChecks(
 }
 
 /**
- * Une ligne de « Prêt à publier ? » (éditeur des contenus) : le titre, l'image de présentation, l'audio,
+ * Une ligne de « Prêt à publier ? » (éditeur des contenus) : le titre, l'image mise en avant, l'audio,
  * l'adresse d'une page, le niveau d'accès.
  */
 export type ReadyItem = {
@@ -92,7 +92,7 @@ export type ReadyItem = {
 }
 
 /**
- * « Prêt à publier ? », selon ce que la sorte demande : le titre ([D49]), l'image de présentation
+ * « Prêt à publier ? », selon ce que la sorte demande : le titre ([D49]), l'image mise en avant
  * ([D45]), l'audio d'un épisode, l'adresse d'une page, et le niveau d'accès, que « Publier »
  * demande tant qu'il n'est pas choisi ([D41]). Un fichier en cours de lecture compte comme fait
  * (la base tranchera), comme pour publishChecks.

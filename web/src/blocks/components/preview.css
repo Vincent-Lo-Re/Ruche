@@ -239,7 +239,7 @@
   border: var(--blocks-border-box-width) solid var(--blocks-color-box-border);
 }
 
-/* Présentation d'un article ou d'un épisode (étape 7) : image de présentation, audio,
+/* Présentation d'un article ou d'un épisode (étape 7) : image mise en avant, audio,
    en tête du contenu comme dans l'app. */
 .blocks-cover,
 .blocks-audio {

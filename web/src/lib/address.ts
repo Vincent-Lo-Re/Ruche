@@ -143,7 +143,7 @@ export function mediaFiltersFromAddress(params: URLSearchParams): MediaFilters {
 }
 
 // « /media?file=<id> » ouvre la fiche de ce fichier (lien depuis l'éditeur : la
-// transcription d'un audio, le texte alternatif d'une image de présentation).
+// transcription d'un audio, le texte alternatif d'une image mise en avant).
 export const FILE_PARAM = "file"
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 

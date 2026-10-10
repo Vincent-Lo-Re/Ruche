@@ -68,7 +68,7 @@
 | page | page | Contenu simple de l'app, ouvert par son adresse. | — |
 | titre | title | Le nom d'un contenu, exigé pour publier. | — / headline |
 | catégorie | category | Propre au Blog ou aux Podcasts ; filtre dans l'app. | thème, étiquette / tag |
-| image de présentation | featured image | Image en tête du contenu et vignette des listes de l'app, exigée pour publier. | vignette, couverture / cover, thumbnail |
+| image mise en avant | featured image | Image en tête du contenu et vignette des listes de l'app : exigée pour publier un article ou un épisode, facultative pour une page (10/10/2026). | image de présentation (jusqu'au 10/10/2026), vignette, couverture / cover, thumbnail |
 | audio (d'un épisode) | audio | Le fichier MP3 ou M4A d'un épisode, exigé pour publier. | son, piste / sound, track |
 | adresse de la page | page URL | Ce que l'app demande pour ouvrir une page (`mentions-legales`). | slug, permalien / slug, permalink |
 | niveau d'accès | access (« Access » comme titre de champ, comme le « Post access » de Ghost ; « who can read it » dans une phrase) | Qui peut lire : Gratuit ou une formule. | visibilité, droits / visibility, permission |

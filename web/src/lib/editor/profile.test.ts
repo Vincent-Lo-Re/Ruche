@@ -18,11 +18,16 @@ describe("profil d'une sorte de contenu", () => {
     expect(contentProfile("template").publication).toBeNull()
   })
 
-  it("[D45] : image exigée pour un article et un épisode", () => {
+  it("[D45] : image mise en avant exigée pour un article et un épisode, facultative pour une page", () => {
     expect(contentProfile("article").cover).toBe("required")
     expect(contentProfile("episode").cover).toBe("required")
-    expect(contentProfile("page").cover).toBeNull()
+    expect(contentProfile("page").cover).toBe("optional")
     expect(contentProfile("template").cover).toBeNull()
+    // Seuls l'article et l'épisode ont une carte dans une liste de l'app.
+    expect(kinds.filter((kind) => contentProfile(kind).listed)).toEqual([
+      "article",
+      "episode",
+    ])
   })
 
   it("audio, catégories, adresse, niveau d'accès", () => {

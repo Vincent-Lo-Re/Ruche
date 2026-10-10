@@ -153,7 +153,7 @@ export async function runDuePublications(): Promise<number> {
 }
 
 /**
- * Pose l'image de présentation du brouillon (l'écran qui la choisit arrive à l'étape 7), comme
+ * Pose l'image mise en avant du brouillon (l'écran qui la choisit arrive à l'étape 7), comme
  * un enregistrement : nouvelle révision. À faire éditeur fermé.
  */
 export async function setDraftCover(contentId: string, mediaId: string) {

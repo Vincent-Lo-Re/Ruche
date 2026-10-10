@@ -12,7 +12,7 @@ import type { Media } from "@/lib/media/constants"
 import { renderApp, testProfile } from "@/test/render"
 import { texts } from "@/texts"
 
-// L'éditeur d'un article et d'un épisode (l'éditeur des contenus) : image de présentation, catégories,
+// L'éditeur d'un article et d'un épisode (l'éditeur des contenus) : image mise en avant, catégories,
 // audio et sa durée, [D45] (ce qui manque pour publier) et [D46] (transcription conseillée). La
 // base, Realtime et Storage sont simulés.
 
@@ -309,7 +309,7 @@ describe("éditeur d'un article (Blog)", () => {
     expect(screen.queryByLabelText(/Résumé/)).toBeNull()
   })
 
-  it("choisit l'image de présentation dans l'aperçu ; la carte de la liste n'a pas de résumé", async () => {
+  it("choisit l'image mise en avant dans l'aperçu ; la carte de la liste n'a pas de résumé", async () => {
     vi.mocked(api.getContent).mockResolvedValue(contentOf(ARTICLE, "article"))
     vi.mocked(mediaApi.listMedia).mockResolvedValue([plage])
     await renderApp(`/blog/${ARTICLE}`)
@@ -740,7 +740,7 @@ describe("éditeur d'un article (Blog)", () => {
     expect(screen.queryByText(/texte alternatif/i)).toBeNull()
   })
 
-  it("le plan : sans l'image de présentation, points à vérifier, encadré replié, survol partagé avec l'aperçu", async () => {
+  it("le plan : sans l'image mise en avant, points à vérifier, encadré replié, survol partagé avec l'aperçu", async () => {
     const BOX = "00000000-0000-4000-8000-0000000000d3"
     const IMAGE = "00000000-0000-4000-8000-0000000000d4"
     vi.mocked(api.getContent).mockResolvedValue(
@@ -774,7 +774,7 @@ describe("éditeur d'un article (Blog)", () => {
     ).toHaveAttribute("data-slot", "sidebar-menu-button")
     // Les blocs du premier niveau : la section (son image est comptée par elle).
     expect(within(plan).getByText(outline.count(1))).toBeVisible()
-    // L'image de présentation n'est pas dans le plan : elle se règle dans la colonne de droite.
+    // L'image mise en avant n'est pas dans le plan : elle se règle dans la colonne de droite.
     expect(
       within(plan).queryByText(texts.editor.article.ready.items.cover)
     ).toBeNull()
@@ -1337,7 +1337,7 @@ describe("éditeur d'un article (Blog)", () => {
     expect(confirm).not.toHaveTextContent(/adresse/)
   })
 
-  it("« Publier » explique qu'il manque l'image de présentation ([D45])", async () => {
+  it("« Publier » explique qu'il manque l'image mise en avant ([D45])", async () => {
     vi.mocked(api.getContent).mockResolvedValue(contentOf(ARTICLE, "article"))
     vi.mocked(mediaApi.listMedia).mockResolvedValue([plage])
     await renderApp(`/blog/${ARTICLE}`)
@@ -1391,7 +1391,7 @@ describe("éditeur d'un article (Blog)", () => {
     await waitFor(() =>
       expect(publicationApi.publishContent).toHaveBeenCalledWith(ARTICLE, 5)
     )
-    // L'image de présentation devient publique tout de suite.
+    // L'image mise en avant devient publique tout de suite.
     await waitFor(() => expect(mediaApi.kickFiles).toHaveBeenCalled())
   })
 
@@ -1749,7 +1749,7 @@ describe("éditeur d'un épisode (Podcasts, dans l'éditeur des contenus)", () =
     ])
     expect(
       within(episodeTab()).getByRole("region", {
-        name: article.feed.title.episode,
+        name: article.feed.title,
       })
     ).toBeVisible()
     expect(within(audioCard()).getByText(words.audio.none)).toBeVisible()
@@ -2183,7 +2183,7 @@ describe("éditeur des contenus : le builder relu sur un article complet (03/10/
       })
     )
     const card = within(articleTab()).getByRole("region", {
-      name: article.feed.title.article,
+      name: article.feed.title,
     })
     expect(card).toHaveAttribute("data-highlight")
     await waitFor(() =>

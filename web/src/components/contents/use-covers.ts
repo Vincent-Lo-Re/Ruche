@@ -7,7 +7,7 @@ import type { Media } from "@/lib/media/constants"
 import { coverIds, mediaByIdsRead, shownFiles } from "@/lib/reads"
 
 /**
- * Les images de présentation d'une liste de contenus, lues en une demande, avec leurs adresses
+ * Les images mises en avant d'une liste de contenus, lues en une demande, avec leurs adresses
  * d'aperçu (comme les vignettes de la Médiathèque). Une image à la corbeille, pas encore prête
  * ou pas encore lue n'a pas d'adresse : la vignette montre alors l'icône.
  */

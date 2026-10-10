@@ -92,7 +92,7 @@ export function prepareContentList(kind: ContentKind): Prepare {
       // « Nouvel article » : ses points de départ ([D42]).
       ready(queryClient, startersRead(kind)),
     ])
-    if (profile.cover === "required") {
+    if (profile.listed) {
       await prepareFiles(queryClient, coverIds(items ?? []), LIST_IMAGES)
     }
   }

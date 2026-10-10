@@ -253,7 +253,7 @@ export function flattenBlocks(
 
 /**
  * Les fichiers d'un brouillon, sans doublon et triés : ceux des blocs Image (blocs partagés
- * compris, linkedBlocks), l'image de présentation et l'audio.
+ * compris, linkedBlocks), l'image mise en avant et l'audio.
  */
 export function draftMediaIds(draft: Draft, linkedBlocks: Block[]): string[] {
   return [

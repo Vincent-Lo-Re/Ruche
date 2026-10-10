@@ -412,7 +412,7 @@ export function ReadView({
 }: {
   draft: Draft
   title: string
-  // L'image de présentation ; null pour une sorte sans image (une page).
+  // L'image mise en avant ; null pour une sorte sans image (une page).
   cover: BlockMedia | null
   // L'audio d'un épisode, sous le titre ; null pour une sorte sans audio.
   audio: BlockMedia | null
