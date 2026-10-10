@@ -14,6 +14,6 @@ L'app mobile de Ruche (Expo SDK 57, Expo Router, Supabase). **Elle n'est pas enc
 - Les écrans vont dans `src/app/` (Expo Router) ; le reste (composants, hooks, utilitaires) en dehors.
 - Seule la clé **publishable** de Supabase va dans l'app.
 - Avant de dire « fini » : `npx expo lint` et `npm run typecheck`.
-- Les images et les couleurs de `app.json` (icônes, écran de démarrage) sont encore celles d'Expo.
+- L'icône est un carré neutre (`#171717`) et l'écran de démarrage un fond blanc, noir en mode sombre : l'identité de l'app se réglera dans le groupe « App mobile » de l'admin.
 
 Les consignes d'Expo pour l'assistant sont dans [AGENTS.md](AGENTS.md) ; versions, commandes et façon de travailler, dans le [CLAUDE.md](../CLAUDE.md) de la racine.
