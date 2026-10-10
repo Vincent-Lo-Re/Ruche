@@ -109,7 +109,7 @@ import { restoreContent, trashContent } from "@/lib/contents/publication"
 import { createWithSettings } from "@/lib/contents/settings"
 import { contentProfile } from "@/lib/editor/profile"
 import { useCategories } from "@/hooks/use-categories"
-import { useDebouncedValue } from "@/hooks/use-debounced-value"
+import { SEARCH_DELAY_MS, useDebouncedValue } from "@/hooks/use-debounced-value"
 import { usePagination } from "@/hooks/use-pagination"
 import { errorMessage } from "@/lib/errors"
 import { kickFiles } from "@/lib/media/api"
@@ -168,7 +168,7 @@ export function ContentListPage({
     listFiltersFromAddress,
     writeListFilters
   )
-  const search = useDebouncedValue(filters.search, 150)
+  const search = useDebouncedValue(filters.search, SEARCH_DELAY_MS)
 
   const known = useMemo(
     () =>

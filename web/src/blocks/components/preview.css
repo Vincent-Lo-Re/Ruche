@@ -280,6 +280,7 @@
    --blocks-device-scale). Les hauteurs « plein écran » des blocs se calculent sur
    --blocks-screen-height, la vraie hauteur de l'écran de l'appareil. */
 .blocks-device {
+  /* Le cadre et l'îlot d'un vrai téléphone : des couleurs fixes, voulues (ni thème ni jeton). */
   --blocks-device-frame: #1c1c1e;
   --blocks-device-island: #000000;
   display: flex;

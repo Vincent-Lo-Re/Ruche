@@ -59,10 +59,7 @@ import {
   type FeedOutline,
 } from "@/components/editor/outline-panel"
 import { ArticleFooter, ArticlePanel } from "@/components/editor/article-panel"
-import {
-  BlocksLibrary,
-  LIBRARY_FIRST_ID,
-} from "@/components/editor/blocks-library"
+import { BlocksLibrary } from "@/components/editor/blocks-library"
 import { AudioPreview, CoverPreview } from "@/components/editor/presentation"
 import {
   PublicationDialogs,
@@ -118,6 +115,7 @@ import { sections, type SectionKey } from "@/navigation"
 import { texts } from "@/texts"
 import { useBrandName } from "@/hooks/use-brand-name"
 import { tabTitle } from "@/lib/admin-identity"
+import { LIBRARY_FIRST_ID } from "@/lib/editor/library-target"
 
 /** L'éditeur plein écran d'un contenu : /pages/<id>. Le menu de l'admin se cache. */
 export function EditorPage({
@@ -303,7 +301,7 @@ function ContentEditor({
 
   // --- Les blocs ---------------------------------------------------------------------------
 
-  // « Ajouter dans la section » ouvre les Blocs pour elle (openLibrary, plus bas).
+  // « Ajouter dans l'encadré » ouvre les Blocs pour lui (openLibrary, plus bas).
   const openLibraryRef = useRef<(box: string | null) => void>(() => {})
   const onAddInBox = useCallback(
     (boxId: string) => openLibraryRef.current(boxId),

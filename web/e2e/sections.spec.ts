@@ -221,7 +221,7 @@ test("Un titre par section : un second article du même titre est refusé, un é
   await expect(page).toHaveURL(/\/podcasts\/[0-9a-f-]{36}$/)
 })
 
-test("Le Fil : un article neuf arrive en tête ; rangé au clavier, l'ordre tient ; la recherche gardée au retour", async ({
+test("Blog : un article neuf arrive en tête ; rangé au clavier, l'ordre tient ; la recherche gardée au retour", async ({
   page,
   team,
 }) => {

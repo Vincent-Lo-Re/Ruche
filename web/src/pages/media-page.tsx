@@ -57,7 +57,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useAddressState } from "@/hooks/use-address-state"
-import { useDebouncedValue } from "@/hooks/use-debounced-value"
+import { SEARCH_DELAY_MS, useDebouncedValue } from "@/hooks/use-debounced-value"
 import {
   askedFileFromAddress,
   FILE_PARAM,
@@ -138,7 +138,7 @@ export function MediaPage() {
     setAddress({ ...address, kind: next })
   const setUnused = (next: boolean) => setAddress({ ...address, unused: next })
   const setSearch = (next: string) => setAddress({ ...address, search: next })
-  const debouncedSearch = useDebouncedValue(search, 250)
+  const debouncedSearch = useDebouncedValue(search, SEARCH_DELAY_MS)
   const [view, setView] = useState<View>(readView)
   // Fiche ouverte : relue dans la liste à chaque mise à jour, gardée si elle en sort.
   const [opened, setOpened] = useState<Media | null>(null)

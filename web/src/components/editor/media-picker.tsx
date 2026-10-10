@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/item"
 import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useDebouncedValue } from "@/hooks/use-debounced-value"
+import { SEARCH_DELAY_MS, useDebouncedValue } from "@/hooks/use-debounced-value"
 import { listMedia, mediaKeys, type MediaFilters } from "@/lib/media/api"
 import type { Media } from "@/lib/media/constants"
 import { formatDuration, formatPercent } from "@/lib/media/format"
@@ -115,7 +115,7 @@ function PickerBody({
 }) {
   const labels = pickerLabels[kind]
   const [search, setSearch] = useState("")
-  const debounced = useDebouncedValue(search, 250)
+  const debounced = useDebouncedValue(search, SEARCH_DELAY_MS)
   const filters: MediaFilters = { kind, search: debounced, unused: false }
   const media = useQuery({
     queryKey: mediaKeys.list(filters),

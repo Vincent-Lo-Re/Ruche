@@ -758,7 +758,7 @@ describe("éditeur d'un modèle", () => {
     expect(publicationApi.getPublication).not.toHaveBeenCalled()
   })
 
-  it("le plan d'un bloc partagé : « Dupliquer » et « Sortir de la section » grisés, pas de « Mes blocs »", async () => {
+  it("le plan d'un bloc partagé : « Dupliquer » et « Sortir de l'encadré » grisés, pas de « Mes blocs »", async () => {
     vi.mocked(api.getContent).mockResolvedValue(
       template("shared", [contactBox])
     )

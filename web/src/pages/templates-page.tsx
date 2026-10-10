@@ -68,7 +68,6 @@ import { restoreContent, trashContent } from "@/lib/contents/publication"
 import {
   createTemplate,
   detachTemplateEverywhere,
-  listTemplateUses,
   templateKeys,
   templateSorts,
   type NewTemplate,
@@ -77,7 +76,11 @@ import {
 } from "@/lib/contents/templates"
 import { errorMessage } from "@/lib/errors"
 import { kickFiles } from "@/lib/media/api"
-import { templateListRead, templateUsageRead } from "@/lib/reads"
+import {
+  templateListRead,
+  templateUsageRead,
+  templateUsesRead,
+} from "@/lib/reads"
 import { refreshAfterContentTrash } from "@/lib/refresh"
 import { editorPath, sections } from "@/navigation"
 import { ListPagination } from "@/components/list-pagination"
@@ -468,8 +471,7 @@ function TrashTemplateDialog({
   const shared = template.sort === "shared"
 
   const uses = useQuery({
-    queryKey: templateKeys.usesOf(template.id),
-    queryFn: () => listTemplateUses([template.id]),
+    ...templateUsesRead(template.id),
     enabled: shared,
     // Toujours relue à l'ouverture : un brouillon a pu l'insérer entre-temps.
     staleTime: 0,

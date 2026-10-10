@@ -22,9 +22,9 @@ import { texts } from "@/texts"
 /**
  * Le header, sur toute la largeur des pages avec le menu (ADMIN § 7, « Un header sur toute la
  * largeur ») : à gauche le logotype de la marque (sinon son nom), lien vers le Tableau de bord,
- * dans une colonne de la largeur du menu ; puis « Site web » (le site du client, réglé dans Paramètres ; sans site, pas
- * de lien), Mon compte, Équipe et Paramètres (le NavigationMenu de shadcn ; Équipe et Paramètres
- * pour les admins) ; à droite la recherche de l'aide, le thème, les palettes et, tout à droite,
+ * dans une colonne de la largeur du menu ; puis « Site web » (le site du client, réglé dans
+ * Paramètres ; sans site, pas de lien), Mon compte, La team et Paramètres (le NavigationMenu de
+ * shadcn ; Paramètres pour les admins) ; à droite la recherche de l'aide, le thème, les palettes et, tout à droite,
  * l'avatar du membre et son menu.
  */
 export function AppHeader() {

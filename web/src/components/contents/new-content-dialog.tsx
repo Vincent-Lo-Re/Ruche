@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query"
 import { TriangleAlert } from "lucide-react"
 import { useState, type FormEvent } from "react"
 
@@ -26,13 +25,8 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
-import { useDebouncedValue } from "@/hooks/use-debounced-value"
-import { useTitleCheck } from "@/hooks/use-title-check"
-import {
-  contentKeys,
-  findPageBySlug,
-  type ContentSettings,
-} from "@/lib/contents/api"
+import { useSlugCheck, useTitleCheck } from "@/hooks/use-title-check"
+import { type ContentSettings } from "@/lib/contents/api"
 import { slugFromTitle } from "@/lib/contents/slug"
 import type { SettingsChoices } from "@/lib/contents/settings"
 import { texts } from "@/texts"
@@ -98,18 +92,9 @@ export function NewContentDialog({
   // Une page : son adresse vient du titre, et une adresse déjà prise bloque la création.
   const isPage = kind === "page"
   const wantedSlug = isPage ? slugFromTitle(title) : ""
-  const checkedSlug = useDebouncedValue(wantedSlug, 300)
-  const slugCheck = useQuery({
-    queryKey: [...contentKeys.all, "adresse", checkedSlug],
-    queryFn: () => findPageBySlug(checkedSlug),
-    enabled: isPage && checkedSlug !== "",
-    staleTime: 0,
-  })
-  const slugPending =
-    isPage &&
-    wantedSlug !== "" &&
-    (wantedSlug !== checkedSlug || slugCheck.isPending)
-  const takenBy = isPage && !slugPending ? (slugCheck.data ?? null) : null
+  const slugCheck = useSlugCheck(wantedSlug)
+  const slugPending = isPage && slugCheck.pending
+  const takenBy = isPage ? slugCheck.takenBy : null
   // Un titre pris : seul son message compte (l'adresse qui en vient serait prise aussi).
   const addressMessage = !isPage
     ? null

@@ -117,6 +117,12 @@ export const contentKeys = {
   media: (ids: string[]) => ["contents", "media", ids] as const,
   publication: (id: string) => ["contents", "publication", id] as const,
   versions: (id: string) => ["contents", "versions", id] as const,
+  // Un titre ou une adresse déjà pris (vérifiés en tapant), et le verrou lu hors de l'éditeur.
+  titleTaken: (kind: ContentKind, title: string, exceptId: string | null) =>
+    ["contents", "title-taken", kind, title, exceptId] as const,
+  slugTaken: (slug: string) => ["contents", "slug-taken", slug] as const,
+  lock: (id: string, session: string) =>
+    ["contents", "detail", id, "lock", session] as const,
 }
 
 // ---------------------------------------------------------------------------------------------

@@ -73,13 +73,13 @@ type Props = {
   // « Dupliquer » (comme dans le menu « … » du plan).
   onDuplicate?: (id: string) => void
   // Nombre maximal de blocs au premier niveau (un bloc partagé : 1) : « Monter » ne fait alors
-  // pas sortir un bloc de sa section.
+  // pas sortir un bloc de son encadré.
   rootLimit?: number
   // « Fermer » (×), en tête de la glissière, et Échap.
   onClose: () => void
 }
 
-/** « Monter » ou « Descendre » : possible ou non, et son nom (il peut sortir de la section). */
+/** « Monter » ou « Descendre » : possible ou non, et son nom (il peut sortir de l'encadré). */
 function shiftAction(
   { draft, rootLimit }: Pick<Props, "draft" | "rootLimit">,
   place: BlockPlace,

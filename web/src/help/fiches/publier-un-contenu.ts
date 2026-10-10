@@ -23,7 +23,7 @@ export const fiche: HelpFiche = {
   ],
   notes: [
     "Après la publication, tu peux modifier le brouillon sans toucher à l'app : l'état passe à « Modifié », et l'app ne change qu'à la publication suivante.",
-    "Les points à vérifier dans le plan (une section vide, par exemple) n'empêchent pas de publier. La transcription d'un épisode est conseillée, pas obligatoire.",
+    "Les points à vérifier dans le plan (un encadré vide, par exemple) n'empêchent pas de publier. La transcription d'un épisode est conseillée, pas obligatoire.",
     "Pour retirer un contenu de l'app, ouvre le menu à côté de « Publier » et choisis « Retirer de l'app » : le brouillon et l'historique sont gardés, et une publication programmée est annulée.",
     "Si quelqu'un écrit le brouillon en ce moment, il faut reprendre la main pour publier.",
   ],

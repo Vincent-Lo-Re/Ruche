@@ -213,7 +213,7 @@ export function motionLoop(
   )
 }
 
-/** Le texte d'un SVG à son adresse (data: des logos de Ruche, ou fichier de l'espace « marque »). */
+/** Le texte d'un SVG à son adresse (data: d'un aperçu, ou fichier de l'espace « marque »). */
 export async function fetchSvgText(url: string): Promise<string | null> {
   if (url.startsWith("data:image/svg+xml,")) {
     return decodeURIComponent(url.slice("data:image/svg+xml,".length))

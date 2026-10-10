@@ -40,10 +40,9 @@ export function filterTrash(
 /** Le type affiché : « Fichier · Image », « Page », « Article »… */
 export function trashTypeLabel(item: TrashItem): string {
   if (item.item_type === "file") {
-    const type = texts.trash.itemTypes.file
     return isMediaKind(item.kind)
-      ? `${type} · ${texts.media.kinds[item.kind]}`
-      : type
+      ? texts.trash.fileOfKind(texts.media.kinds[item.kind])
+      : texts.trash.itemTypes.file
   }
   return texts.trash.contentKinds[item.kind]
 }

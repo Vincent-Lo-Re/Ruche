@@ -46,7 +46,7 @@ export type BlockWarning =
 
 /**
  * Ce qui manque à un bloc : une image sans fichier, un fichier qui ne s'affiche plus ; un bloc
- * partagé dont le modèle n'existe plus ; une section vide (l'app ne l'affiche pas). Ce qui se
+ * partagé dont le modèle n'existe plus ; un encadré vide (l'app ne l'affiche pas). Ce qui se
  * charge encore (ou un échec du réseau) n'est pas signalé. Le texte alternatif n'est plus
  * réclamé (02/10/2026, [D15]).
  */

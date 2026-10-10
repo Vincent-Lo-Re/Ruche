@@ -87,7 +87,7 @@ export type OutlineSelection = {
 /**
  * Le plan de l'éditeur des contenus (ADMIN § 4, « Les finitions », « Le plan retouché ») : les blocs
  * seulement (l'image mise en avant se règle dans la colonne de droite), chacun par son contenu
- * (l'icône dit le type), une vignette par image, les sections repliables, ce qui manque en icône
+ * (l'icône dit le type), une vignette par image, les encadrés repliables, ce qui manque en icône
  * (le détail dans son infobulle), un menu ⋮ par ligne, et le survol partagé avec l'aperçu.
  */
 export type FeedOutline = {
@@ -101,7 +101,7 @@ export type FeedOutline = {
   onMove?: (update: (draft: Draft) => Draft) => void
   // Le plan vide : « Ajouter un bloc » ouvre les Blocs (absent en lecture seule).
   onAdd?: () => void
-  // Une section vide : « Ajouter dans la section » ouvre les Blocs pour elle (absent en lecture
+  // Un encadré vide : « Ajouter dans l'encadré » ouvre les Blocs pour lui (absent en lecture
   // seule).
   onAddInBox?: (boxId: string) => void
   // Absent en lecture seule.
@@ -110,12 +110,12 @@ export type FeedOutline = {
     // Un bloc de premier niveau, qui n'est pas déjà un bloc partagé ; pas dans un modèle de bloc.
     onSaveToMine?: (id: string) => void
     onRemove: (id: string) => void
-    // Un bloc d'une section : il en sort, juste après elle.
+    // Un bloc d'un encadré : il en sort, juste après lui.
     onLeaveBox: (id: string) => void
     // Pourquoi un bloc ne peut pas être supprimé, sinon null.
     removeBlocked: (id: string) => string | null
     // Le premier niveau est plein (un bloc partagé n'a qu'un bloc, [D11]) : « Dupliquer » un
-    // bloc de premier niveau et « Sortir de la section » sont grisés.
+    // bloc de premier niveau et « Sortir de l'encadré » sont grisés.
     rootFull: boolean
   }
   // Nombre maximal de blocs au premier niveau (un bloc partagé) : le plan n'y range pas plus.
@@ -182,7 +182,7 @@ export function OutlinePanel({
         {/* Sans bloc, « Aucun bloc pour l'instant » le dit déjà. */}
         {all.length > 0 && (
           <p className="px-2 pb-2 text-xs text-muted-foreground">
-            {/* Les blocs du premier niveau : une section donne le nombre des siens. Les points à
+            {/* Les blocs du premier niveau : un encadré donne le nombre des siens. Les points à
                 vérifier sont sur leurs lignes (et dans « Prêt à publier ? »). */}
             {labels.count(draft.blocks.length)}
           </p>
@@ -237,7 +237,7 @@ function OutlineBlocks({
   selection?: OutlineSelection
   feed: FeedOutline
 }) {
-  // Les sections repliées.
+  // Les encadrés repliés.
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(new Set())
   const all = flattenBlocks(draft)
   const choosing = selection?.active ?? false
@@ -349,7 +349,7 @@ type RowShared = {
   toggleCollapsed: (id: string) => void
 }
 
-/** Une ligne du plan : le bloc (et, pour une section dépliée, ses blocs). */
+/** Une ligne du plan : le bloc (et, pour un encadré déplié, ses blocs). */
 type RowProps = { block: Block; container: ContainerId; shared: RowShared }
 
 /** Une ligne, déplaçable par sa poignée quand le plan se range (brouillon tenu). */
@@ -370,7 +370,7 @@ function SortableRow(props: RowProps) {
     roleDescription: texts.editor.dnd.roleDescription,
     disabled: {
       draggable: !shared.sortable,
-      // Pendant le déplacement d'une section, les blocs des sections ne sont plus des cibles.
+      // Pendant le déplacement d'un encadré, les blocs des encadrés ne sont plus des cibles.
       droppable:
         container !== ROOT &&
         draggingType !== null &&
@@ -431,7 +431,7 @@ function OutlineRow({
       style={rowStyle}
       className={cn("grid gap-0.5", dragging && "opacity-50")}
     >
-      {/* Le groupe du survol est la ligne seule (pas les blocs d'une section dessous) : son menu
+      {/* Le groupe du survol est la ligne seule (pas les blocs d'un encadré dessous) : son menu
           « ⋮ » n'apparaît qu'au survol de sa ligne. */}
       <div
         className={cn(
@@ -465,7 +465,7 @@ function OutlineRow({
             selectedId !== block.id &&
               feed.hoveredId === block.id &&
               "bg-sidebar-accent/60",
-            // Le chevron d'une section et le menu « ⋮ » (au survol) se posent au bout de la ligne :
+            // Le chevron d'un encadré et le menu « ⋮ » (au survol) se posent au bout de la ligne :
             // elle leur fait place, rien n'est caché dessous.
             block.type === "box" && "pr-8",
             feed.actions &&
@@ -495,7 +495,7 @@ function OutlineRow({
             }
           />
         </SidebarMenuButton>
-        {/* Déplier, replier une section : au bout de sa ligne, toujours à la même place. */}
+        {/* Déplier, replier un encadré : au bout de sa ligne, toujours à la même place. */}
         {block.type === "box" && (
           <SidebarMenuAction
             aria-expanded={!isCollapsed}
@@ -538,12 +538,12 @@ function OutlineRow({
   )
 }
 
-// Les blocs d'une section (SidebarMenuSub de shadcn) : un trait qui part du début des lignes
+// Les blocs d'un encadré (SidebarMenuSub de shadcn) : un trait qui part du début des lignes
 // (après la place des poignées).
 const boxRowsClass = (shared: RowShared) =>
   cn("mr-0 min-h-2 gap-0.5 pr-0 pl-1.5", shared.choosing ? "ml-9" : "ml-5")
 
-/** Les blocs d'une section dépliée. */
+/** Les blocs d'un encadré déplié. */
 function BoxRows({ box, shared }: { box: BoxBlock; shared: RowShared }) {
   if (shared.dnd) return <DroppableBoxRows box={box} shared={shared} />
   return (
@@ -555,7 +555,7 @@ function BoxRows({ box, shared }: { box: BoxBlock; shared: RowShared }) {
   )
 }
 
-/** Les blocs d'une section dépliée, avec sa zone de dépôt (pour une section vide). */
+/** Les blocs d'un encadré déplié, avec sa zone de dépôt (pour un encadré vide). */
 function DroppableBoxRows({
   box,
   shared,
@@ -594,7 +594,7 @@ function DroppableBoxRows({
             shared={shared}
           />
         ))}
-        {/* Une section vide : le même bouton que dans le téléphone (une ligne du plan peut
+        {/* Un encadré vide : le même bouton que dans le téléphone (une ligne du plan peut
             aussi y être glissée). */}
         {shared.feed.onAddInBox && box.blocks.length === 0 && (
           <li>
@@ -610,7 +610,7 @@ function DroppableBoxRows({
 }
 
 /**
- * Le menu ⋮ d'une ligne du plan : Dupliquer, Enregistrer comme modèle…, Sortir de la section,
+ * Le menu ⋮ d'une ligne du plan : Dupliquer, Enregistrer comme modèle…, Sortir de l'encadré,
  * Supprimer.
  */
 function RowActions({
@@ -625,7 +625,7 @@ function RowActions({
   beforeToggle = false,
 }: {
   label: string
-  // Une section : le menu s'affiche juste avant son chevron, qui ne bouge pas.
+  // Un encadré : le menu s'affiche juste avant son chevron, qui ne bouge pas.
   beforeToggle?: boolean
   onDuplicate: () => void
   // Le premier niveau est plein : la copie n'y aurait pas sa place, ni le bloc qui sort.
@@ -644,7 +644,7 @@ function RowActions({
           <SidebarMenuAction
             showOnHover
             aria-label={labels.actions(label)}
-            // Une section : juste avant son chevron, qui ne bouge pas.
+            // Un encadré : juste avant son chevron, qui ne bouge pas.
             className={cn(beforeToggle && "right-7")}
           />
         }

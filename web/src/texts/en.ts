@@ -20,6 +20,9 @@ export const en = {
 
   // Les mots de l'interface qui ne dépendent pas de la page : une seule fois ici.
   common: {
+    // Ce que les lecteurs d'écran annoncent d'un carrousel (components/ui/carousel.tsx).
+    carousel: "carousel",
+    slide: "slide",
     // La pagination des listes (lib/pagination.ts).
     pagination: {
       label: "Pages",
@@ -815,6 +818,8 @@ export const en = {
     itemTypes: {
       file: "File",
     },
+    // Un fichier et sa sorte : « File · Image ».
+    fileOfKind: (kind: string) => `File · ${kind}`,
     // Sorte d'un contenu dans la corbeille.
     contentKinds: {
       article: "Post",
@@ -1576,7 +1581,7 @@ export const en = {
       label: "Add block",
       inBox: "Add to box",
     },
-    // Rien ne se dépose dans une section du téléphone (« Ajouter dans la section » est juste
+    // Rien ne se dépose dans un encadré du téléphone (« Ajouter dans l'encadré » est juste
     // dessous) ; ce que dit aussi le plan.
     emptyBox: "This box is empty and won't appear in the app.",
     handle: (label: string) => `Move ${label}`,
@@ -1810,7 +1815,7 @@ export const en = {
       addLabel: (label: string) => `Add ${label} block`,
       // La glissière des Blocs, par-dessus le Plan (éditeur des contenus).
       close: "Close Blocks",
-      // La cible d'un ajout : « Ajouter dans la section ».
+      // La cible d'un ajout : « Ajouter dans l'encadré ».
       target: {
         box: "Adding to the box: text or images only",
         cancel: "Stop adding to the box",
@@ -2530,7 +2535,7 @@ export const en = {
         title: "Section names",
         description: [
           "Rename the Blog and Podcasts in each admin language, for the whole team*. The page reloads after saving.",
-          "* In French, write three forms by hand: the name alone (menu, page titles), with its article (le Fil, la Gazette, l'Agenda, les Épisodes), and with “de” (du Fil, de la Gazette, de l'Agenda, des Épisodes), so every sentence reads right. Leave them empty to keep the original name.",
+          "* In French, write three forms by hand: the name alone (menu, page titles), with its article (le Journal, la Gazette, l'Agenda, les Épisodes), and with “de” (du Journal, de la Gazette, de l'Agenda, des Épisodes), so every sentence reads right. Leave them empty to keep the original name.",
         ],
         // Les noms d'origine, en tête de chaque bloc.
         sections: { blog: "Blog", podcasts: "Podcasts" },

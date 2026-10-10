@@ -373,7 +373,7 @@ test("une image insérée apparaît dans « Utilisé dans » et ne peut plus all
   // Pas de légende : elle est retirée de l'admin (02/10/2026).
   await expect(image.getByRole("textbox")).toHaveCount(0)
 
-  // Une section, avec la même image dedans (« Ajouter dans la section » ouvre les Blocs).
+  // Un encadré, avec la même image dedans (« Ajouter dans l'encadré » ouvre les Blocs).
   await addBlock(page, "box")
   const box = page.locator('[data-block-type="box"]')
   await box.getByRole("button", { name: labels.add.inBox }).click()

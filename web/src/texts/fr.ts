@@ -20,6 +20,9 @@ export const fr: Texts = {
 
   // Les mots de l'interface qui ne dépendent pas de la page : une seule fois ici.
   common: {
+    // Ce que les lecteurs d'écran annoncent d'un carrousel (components/ui/carousel.tsx).
+    carousel: "carrousel",
+    slide: "diapositive",
     // La pagination des listes (lib/pagination.ts).
     pagination: {
       label: "Pages",
@@ -832,6 +835,8 @@ export const fr: Texts = {
     itemTypes: {
       file: "Fichier",
     },
+    // Un fichier et sa sorte : « Fichier · Image ».
+    fileOfKind: (kind: string) => `Fichier · ${kind}`,
     // Sorte d'un contenu dans la corbeille.
     contentKinds: {
       article: "Article",
@@ -1608,7 +1613,7 @@ export const fr: Texts = {
       label: "Ajouter un bloc",
       inBox: "Ajouter dans l'encadré",
     },
-    // Rien ne se dépose dans une section du téléphone (« Ajouter dans la section » est juste
+    // Rien ne se dépose dans un encadré du téléphone (« Ajouter dans l'encadré » est juste
     // dessous) ; ce que dit aussi le plan.
     emptyBox: "Encadré vide : il n'apparaîtra pas dans l'app.",
     handle: (label: string) => `Déplacer : ${label}`,
@@ -1842,7 +1847,7 @@ export const fr: Texts = {
       addLabel: (label: string) => `Ajouter un bloc ${label}`,
       // La glissière des Blocs, par-dessus le Plan (éditeur des contenus).
       close: "Fermer les Blocs",
-      // La cible d'un ajout : « Ajouter dans la section ».
+      // La cible d'un ajout : « Ajouter dans l'encadré ».
       target: {
         box: "Ajout dans l'encadré : texte ou image seulement",
         cancel: "Annuler l'ajout dans l'encadré",
@@ -2577,7 +2582,7 @@ export const fr: Texts = {
         title: "Noms des sections",
         description: [
           "Renomme le Blog et les Podcasts dans chaque langue de l'admin, pour toute l'équipe*. La page se recharge après l'enregistrement.",
-          "* En français, écris trois formes à la main : le nom seul (menu, titres des pages), avec son article (le Fil, la Gazette, l'Agenda, les Épisodes) et avec « de » (du Fil, de la Gazette, de l'Agenda, des Épisodes), pour que chaque phrase reste juste. Vides : le nom d'origine.",
+          "* En français, écris trois formes à la main : le nom seul (menu, titres des pages), avec son article (le Journal, la Gazette, l'Agenda, les Épisodes) et avec « de » (du Journal, de la Gazette, de l'Agenda, des Épisodes), pour que chaque phrase reste juste. Vides : le nom d'origine.",
         ],
         sections: { blog: "Blog", podcasts: "Podcasts" },
         french: "Français",
@@ -2698,7 +2703,7 @@ export const fr: Texts = {
       mediatheque: "Médiathèque",
       modeles: "Modèles de bloc",
       corbeille: "Corbeille",
-      equipe: "Équipe et compte",
+      equipe: "La team et Mon compte",
     },
   },
 

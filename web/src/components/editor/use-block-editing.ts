@@ -70,7 +70,7 @@ function presentationChooseButton(key: "cover" | "audio"): HTMLElement | null {
  * L'édition des blocs d'un brouillon dans l'éditeur des contenus : le bloc choisi, le texte qui a le curseur, le survol partagé avec le plan,
  * l'ajout, le rangement, la suppression (avec « Annuler »), les images (blocs, présentation),
  * les blocs partagés et « Enregistrer comme modèle ». emptyFocus : où va le focus quand plus
- * aucun bloc ne reste ; onAddInBox : « Ajouter dans la section » (ouvre les Blocs).
+ * aucun bloc ne reste ; onAddInBox : « Ajouter dans l'encadré » (ouvre les Blocs).
  */
 export function useBlockEditing({
   contentId,
@@ -99,7 +99,7 @@ export function useBlockEditing({
 }) {
   const queryClient = useQueryClient()
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  // Après « Ajouter dans la section », la section où les Blocs ajouteront ; valable tant qu'elle
+  // Après « Ajouter dans l'encadré », l'encadré où les Blocs ajouteront ; valable tant qu'il
   // est le bloc choisi (liveBoxTarget).
   const [boxTarget, setBoxTarget] = useState<string | null>(null)
   const targetBox = liveBoxTarget(draft, boxTarget, selectedId)
@@ -171,7 +171,7 @@ export function useBlockEditing({
   )
 
   // La barre de mise en forme n'agit que sur le texte du bloc choisi : grisée pour une image,
-  // une section ou un bloc partagé, même si un texte a eu le curseur juste avant.
+  // un encadré ou un bloc partagé, même si un texte a eu le curseur juste avant.
   const toolbarEditor =
     activeText && activeText.blockId === selectedId ? activeText.editor : null
 
@@ -231,7 +231,7 @@ export function useBlockEditing({
     .filter(({ block }) => warningOf(block) !== null)
     .map(({ block }) => block.id)
 
-  // « Sortir de la section » (plan) : le bloc se place juste après elle (pas dans un bloc
+  // « Sortir de l'encadré » (plan) : le bloc se place juste après lui (pas dans un bloc
   // partagé, qui n'a qu'un bloc au premier niveau).
   const onLeaveBox = (id: string) => {
     if (!canAddRootBlock(draft, templateSort)) return
@@ -267,7 +267,7 @@ export function useBlockEditing({
   const onRemove = (id: string) => {
     const place = findBlock(draft, id)
     if (!place) return
-    // Le focus va au bloc voisin (le suivant, sinon le précédent, sinon la section qui le
+    // Le focus va au bloc voisin (le suivant, sinon le précédent, sinon l'encadré qui le
     // contenait), ou à « Ajouter un bloc » s'il n'en reste aucun (emptyFocus).
     const siblings = blocksOf(draft, place.container)
     const neighbor =
@@ -353,7 +353,7 @@ export function useBlockEditing({
   }, [])
 
   // « Détacher » : le bloc lié devient une copie ordinaire du bloc de son modèle, à la même
-  // place (même id ; nouveaux id dans une section), enregistrée comme toute modification.
+  // place (même id ; nouveaux id dans un encadré), enregistrée comme toute modification.
   const detachRef = useRef<(blockId: string) => void>(() => {})
   useEffect(() => {
     detachRef.current = (blockId: string) => {

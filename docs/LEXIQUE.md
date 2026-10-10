@@ -28,7 +28,7 @@
 | Modèles de bloc | Block templates | Section des modèles réutilisables. | Modèles de blocs, Modèles (seul, dans un titre), gabarits / Patterns, Templates (seul) |
 | Médiathèque | Media library | Section de tous les fichiers envoyés. | Médias, bibliothèque / Media (seul), Assets, Files |
 | Corbeille | Trash | Ce qu'on supprime y reste 30 jours avant l'effacement. | Poubelle / Bin, Recycle bin |
-| La team | Team | Les membres et leurs rôles (admins seulement). Le nom de la section depuis le 09/10/2026 (avant, « Équipe ») ; « l'équipe » reste dans les phrases. | Utilisateurs / Users |
+| La team | Team | Les membres et leurs rôles (un éditeur la lit, seul un admin la gère). Le nom de la section depuis le 09/10/2026 (avant, « Équipe ») ; « l'équipe » reste dans les phrases. | Utilisateurs / Users |
 | Paramètres | Settings | Les réglages de toute l'admin (admins seulement). | Configuration / Preferences |
 | Mon compte | My account | Profil, double vérification et thème de chaque membre. | Profil (seul) / Profile (seul) |
 | Contenus (groupe du menu) | Content | Blog, Podcasts, Pages. | — / Contents |

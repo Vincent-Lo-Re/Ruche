@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { cn } from "cn"
+import { texts } from "@/texts"
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react"
@@ -54,7 +55,7 @@ function Carousel({
       <div
         className={cn("relative", className)}
         role="region"
-        aria-roledescription="carousel"
+        aria-roledescription={texts.common.carousel}
         data-slot="carousel"
         {...props}
       >
@@ -91,7 +92,7 @@ function CarouselItem({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       role="group"
-      aria-roledescription="slide"
+      aria-roledescription={texts.common.slide}
       data-slot="carousel-item"
       className={cn("min-w-0 shrink-0 grow-0 basis-full pl-4", className)}
       {...props}

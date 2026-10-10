@@ -206,7 +206,9 @@ test("un membre envoie une photo et un SVG piégé, décrit la photo, la met à 
   // Restauration depuis la page Corbeille : le fichier revient, prêt, avec son texte.
   await page.goto("/trash")
   const row = page.getByRole("row").filter({ hasText: photoName })
-  await expect(row).toContainText("Fichier · Image")
+  await expect(row).toContainText(
+    texts.trash.fileOfKind(texts.media.kinds.image)
+  )
   await expect(row).toContainText(admin.fullName)
   await row
     .getByRole("button", { name: texts.trash.restoreItem(photoName) })

@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 
 import { usePalette } from "@/components/theme/palette-context"
 import { useBrand } from "@/hooks/use-brand-name"
-import { brandFileFor } from "@/lib/admin-identity"
+import { brandFileFor, monogramSvgKey } from "@/lib/admin-identity"
 import { fetchSvgText, prepareAnimatedSvg } from "@/lib/monogram-motion"
 import { presetOf } from "@/lib/palettes"
 
@@ -16,7 +16,7 @@ export function useMonogramSvg() {
   const preset = presetOf(usePalette().palette)
   const url = brandFileFor(brand, "monogram", "dark", preset)
   const svg = useQuery({
-    queryKey: ["monogram-motion", url],
+    queryKey: monogramSvgKey(url),
     queryFn: async () => {
       const text = url ? await fetchSvgText(url) : null
       return text ? prepareAnimatedSvg(text) : null

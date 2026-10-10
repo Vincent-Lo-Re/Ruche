@@ -6,22 +6,11 @@ import {
   AuthContext,
   profileQueryKey,
   type AuthValue,
-  type Profile,
 } from "@/auth/auth-context"
 import { assuranceLevel, verifiedTotpFactor } from "@/auth/session"
 import { applyMemberLanguage, memberLanguage } from "@/lib/language"
 import { applyMemberFormat, memberFormat } from "@/lib/regional-format"
-import { supabase } from "@/lib/supabase"
-
-async function fetchProfile(userId: string): Promise<Profile | null> {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("id, email, full_name, role")
-    .eq("id", userId)
-    .maybeSingle()
-  if (error) throw error
-  return data
-}
+import { fetchProfile, onSessionChange, signOutHere } from "@/lib/auth"
 
 /** Suit la session Supabase et charge la fiche du membre connecté. */
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -31,15 +20,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     session: Session | null
   }>({ loading: true, session: null })
 
-  useEffect(() => {
-    // Rappel synchrone, sans autre appel à Supabase : la version asynchrone
-    // peut bloquer le rafraîchissement de la session.
-    const { data } = supabase.auth.onAuthStateChange((event, session) => {
-      setState({ loading: false, session })
-      if (event === "SIGNED_OUT") queryClient.clear()
-    })
-    return () => data.subscription.unsubscribe()
-  }, [queryClient])
+  useEffect(
+    () =>
+      onSessionChange((event, session) => {
+        setState({ loading: false, session })
+        if (event === "SIGNED_OUT") queryClient.clear()
+      }),
+    [queryClient]
+  )
 
   const { session } = state
   const userId = session?.user.id
@@ -64,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Une session sans fiche : le membre a été retiré de l'équipe.
   const removed = profileQuery.isSuccess && profileQuery.data === null
   useEffect(() => {
-    if (removed) void supabase.auth.signOut({ scope: "local" })
+    if (removed) void signOutHere()
   }, [removed])
 
   const value: AuthValue = {

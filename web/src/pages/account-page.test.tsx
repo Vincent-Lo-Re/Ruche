@@ -19,7 +19,6 @@ describe("Mon compte", () => {
     expect(screen.getByLabelText(texts.account.profile.name)).toHaveValue(
       testProfile.full_name
     )
-    // Dans la page : le menu de gauche montre aussi le rôle, à côté de l'avatar.
     const page = within(screen.getByRole("main"))
     // L'adresse grisée (elle se change par « Modifier ») ; le rôle en pastille en haut à droite de la page.
     expect(page.getByLabelText(texts.account.profile.email)).toHaveValue(

@@ -48,7 +48,7 @@ export type BlocksEditorValue = {
   openPicker: (blockId: string) => void
   // Blocs liés : le modèle cité, montré tel quel.
   templateFor: (templateId: string) => LinkedTemplateState
-  // « Ajouter dans la section » ouvre les Blocs pour cette section (absent : en lecture seule,
+  // « Ajouter dans l'encadré » ouvre les Blocs pour cet encadré (absent : en lecture seule,
   // la Lecture).
   onAddInBox?: (boxId: string) => void
 }

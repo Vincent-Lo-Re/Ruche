@@ -127,7 +127,7 @@ test("bloc partagé : deux pages, correction, mise à jour de l'app, détacher, 
     page.getByRole("region", { name: labels.sorts.shared.title })
   ).toBeVisible()
   await expect(page.getByText(labels.editor.sharedLimit)).toBeVisible()
-  // Une section (par les Blocs), puis un texte dedans (« Ajouter dans la section »).
+  // Un encadré (par les Blocs), puis un texte dedans (« Ajouter dans l'encadré »).
   const add = page.locator("#colonne-gauche-ajouter")
   const library = page.getByRole("region", { name: editor.columns.blocks })
   await add.click()

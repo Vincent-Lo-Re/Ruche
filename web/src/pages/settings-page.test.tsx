@@ -227,23 +227,25 @@ describe("Paramètres : les noms du Blog et des Podcasts", () => {
     const [name, le, du, en] = within(blog).getAllByRole("textbox")
 
     // Le nom seul, sans « le » ni « du » : refusé, les deux autres champs le disent.
-    fireEvent.change(name, { target: { value: "Le Fil" } })
+    fireEvent.change(name, { target: { value: "Le Journal" } })
     fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
     expect(await within(blog).findAllByText(words.incomplete)).toHaveLength(2)
     expect(identityApi.saveSectionNames).not.toHaveBeenCalled()
 
-    fireEvent.change(le, { target: { value: "le Fil" } })
-    fireEvent.change(du, { target: { value: "du Fil" } })
+    fireEvent.change(le, { target: { value: "le Journal" } })
+    fireEvent.change(du, { target: { value: "du Journal" } })
     fireEvent.change(en, { target: { value: "The Feed" } })
     // Sous chaque champ, l'exemple suit ce qui est écrit.
-    expect(within(blog).getByText(words.exampleName("Le Fil"))).toBeVisible()
-    expect(within(blog).getByText(words.exampleLe("le Fil"))).toBeVisible()
-    expect(within(blog).getByText(words.exampleDu("du Fil"))).toBeVisible()
+    expect(
+      within(blog).getByText(words.exampleName("Le Journal"))
+    ).toBeVisible()
+    expect(within(blog).getByText(words.exampleLe("le Journal"))).toBeVisible()
+    expect(within(blog).getByText(words.exampleDu("du Journal"))).toBeVisible()
     fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
     await waitFor(() =>
       expect(identityApi.saveSectionNames).toHaveBeenCalledWith({
         fr: {
-          blog: { name: "Le Fil", le: "le Fil", du: "du Fil" },
+          blog: { name: "Le Journal", le: "le Journal", du: "du Journal" },
           podcasts: null,
         },
         en: { blog: "The Feed", podcasts: null },

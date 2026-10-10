@@ -73,8 +73,7 @@ import type { RefusedSlug } from "@/lib/contents/slug"
 import { contentProfile, type PublishedKind } from "@/lib/editor/profile"
 import { READY_IDS, showReadySetting } from "@/lib/editor/ready-targets"
 import { focusSoon } from "@/lib/focus"
-import { locale } from "@/lib/regional-format"
-import { formatDuration } from "@/lib/media/format"
+import { formatCount, formatDuration } from "@/lib/media/format"
 import { texts } from "@/texts"
 
 const labels = texts.editor.article
@@ -82,9 +81,6 @@ const access = texts.publication.settings.access
 const categoryWords = texts.publication.settings.categories
 const audioWords = texts.editor.presentation.audio
 const slugWords = texts.publication.settings.slug
-
-// Nombres dans la langue de l'admin (« 1 000 », « 1,000 »).
-const integer = new Intl.NumberFormat(locale)
 
 // Valeurs de la liste du niveau d'accès (une formule a pour valeur son identifiant).
 const NOT_CHOSEN = "pas-encore-choisi"
@@ -255,7 +251,7 @@ export function ArticleFooter({
   children: ReactNode
 }) {
   const saved = savedAt ? formatShortDateTime(savedAt) : null
-  const words = labels.stats.words(integer.format(stats.words))
+  const words = labels.stats.words(formatCount(stats.words))
   const length: Measure = audio
     ? audioLength(audio, words)
     : {

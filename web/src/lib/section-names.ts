@@ -11,7 +11,7 @@ type Language = keyof typeof defaultSectionNames
 export const NAMED_SECTIONS = ["blog", "podcasts"] as const
 export type NamedSection = (typeof NAMED_SECTIONS)[number]
 
-/** Les formes d'un nom : seul (« Le Fil »), avec « le » (« le Fil »), avec « du » (« du Fil »). */
+/** Les formes d'un nom : seul (« Le Journal »), avec « le » (« le Journal »), avec « du » (« du Journal »). */
 export type SectionForms = { name: string; le: string; du: string }
 
 /** Ce que l'admin a écrit ; null : le nom d'origine. */
