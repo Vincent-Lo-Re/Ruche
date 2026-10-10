@@ -473,8 +473,10 @@ function TrashTemplateDialog({
 
   const undo = async () => {
     try {
-      await restoreContent(template.id)
-      toast.success(labels.restored(name))
+      const { renamedTo } = await restoreContent(template.id)
+      if (renamedTo !== null)
+        toast.warning(texts.trash.restoredRenamed(name, renamedTo))
+      else toast.success(labels.restored(name))
     } catch (error) {
       toast.error(errorMessage(error))
     } finally {

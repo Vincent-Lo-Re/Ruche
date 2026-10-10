@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
+import { useTitleCheck } from "@/hooks/use-title-check"
 import {
   templateSections,
   templateSorts,
@@ -85,18 +86,23 @@ export function TemplateDialog({
     defaultValues: emptyForm,
   })
   const sort = useWatch({ control: form.control, name: "sort" })
+  // Un nom par modèle, quelle que soit sa sorte : un nom pris bloque la création.
+  const name = useWatch({ control: form.control, name: "name" })
+  const nameTaken = useTitleCheck("template", name, null, open).takenBy !== null
 
   // Chaque ouverture repart d'un formulaire vide.
   useEffect(() => {
     if (open) form.reset(emptyForm)
   }, [open, form])
 
-  const submit = form.handleSubmit((values) =>
+  // Un nom pas encore vérifié part quand même : la base refuse s'il est pris.
+  const submit = form.handleSubmit((values) => {
+    if (nameTaken) return
     onSubmit({
       ...values,
       templateFor: values.sort === "starter" ? values.templateFor : null,
     })
-  )
+  })
 
   return (
     <Dialog open={open} onOpenChange={(next) => !pending && onOpenChange(next)}>
@@ -111,7 +117,7 @@ export function TemplateDialog({
               name="name"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
+                <Field data-invalid={fieldState.invalid || nameTaken}>
                   <FieldLabel htmlFor="modele-nom">{labels.name}</FieldLabel>
                   <Input
                     {...field}
@@ -119,9 +125,14 @@ export function TemplateDialog({
                     autoComplete="off"
                     maxLength={TITLE_MAX}
                     placeholder={labels.namePlaceholder}
-                    aria-invalid={fieldState.invalid}
+                    aria-invalid={fieldState.invalid || nameTaken}
                   />
-                  <FieldError errors={[fieldState.error]} />
+                  <FieldError
+                    errors={[
+                      fieldState.error ??
+                        (nameTaken ? { message: labels.nameTaken } : undefined),
+                    ]}
+                  />
                 </Field>
               )}
             />
@@ -217,7 +228,7 @@ export function TemplateDialog({
             )}
           </FieldGroup>
           <DialogFooter>
-            <Button type="submit" disabled={pending}>
+            <Button type="submit" disabled={pending || nameTaken}>
               {pending && <Spinner />}
               {submitLabel}
             </Button>

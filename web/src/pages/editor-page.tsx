@@ -86,7 +86,7 @@ import { useLockDialog } from "@/hooks/use-lock-dialog"
 import { categoryNames } from "@/lib/categories"
 import {
   contentKeys,
-  hasUniqueTitle,
+  titleTakenMessage,
   type Content,
   type ContentKind,
 } from "@/lib/contents/api"
@@ -522,13 +522,13 @@ function ContentEditor({
           if (event.key === "Enter") event.preventDefault()
         }}
       />
-      {titleTaken && hasUniqueTitle(kind) && (
+      {titleTaken && (
         <p
           id={TITLE_TAKEN_ID}
           role="alert"
           className="blocks-title-error text-sm text-destructive"
         >
-          {texts.contentList.kinds[kind].titleTaken}
+          {titleTakenMessage(kind)}
         </p>
       )}
       {profile.audio && (

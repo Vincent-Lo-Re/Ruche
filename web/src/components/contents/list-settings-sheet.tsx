@@ -17,6 +17,7 @@ import {
   contentKeys,
   hasUniqueTitle,
   lockStatus,
+  titleTakenMessage,
   type ContentKind,
   type ContentListItem,
   type ContentSettings,
@@ -141,8 +142,8 @@ export function ListSettingsSheet({
       titleError={
         titleMissing
           ? texts.publication.settings.titleRequired
-          : titleTaken && hasUniqueTitle(kind)
-            ? texts.contentList.kinds[kind].titleTaken
+          : titleTaken
+            ? titleTakenMessage(kind)
             : null
       }
       settings={settings}
