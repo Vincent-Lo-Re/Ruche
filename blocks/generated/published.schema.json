@@ -541,7 +541,7 @@
       }
     },
     "boxBlock": {
-      "$comment": "Encadré : un seul niveau, Texte et Image seulement (ni encadré, ni bloc lié).",
+      "$comment": "Encadré : un seul niveau, Texte et Image seulement (ni encadré, ni bloc lié). tint : l'identifiant d'une teinte de la charte de l'app (variante « style ») ; absente, ou disparue de la charte, la première teinte (10/10/2026).",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -562,6 +562,9 @@
             "fill",
             "border"
           ]
+        },
+        "tint": {
+          "$ref": "#/definitions/uuid"
         },
         "blocks": {
           "type": "array",
@@ -956,6 +959,9 @@
             "fill",
             "border"
           ]
+        },
+        "tint": {
+          "$ref": "#/definitions/uuid"
         },
         "blocks": {
           "type": "array",
