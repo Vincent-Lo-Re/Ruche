@@ -192,6 +192,7 @@ export function TemplateDialog({
                 name="templateFor"
                 id="modele-section"
                 label={labels.section}
+                hint={labels.sectionHint}
                 render={(field, props) => (
                   <Select
                     items={sectionItems}
