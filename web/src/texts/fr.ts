@@ -812,9 +812,9 @@ export const fr: Texts = {
           : `Les ${count} éléments sélectionnés seront supprimés définitivement. Tu ne pourras pas revenir en arrière.`,
       confirm: "Supprimer définitivement",
     },
-    // Un autre contenu de la section a pris son titre : il revient numéroté.
+    // Son titre a été repris entre-temps (un contenu de sa section, un modèle) : il revient numéroté.
     restoredRenamed: (name: string, title: string) =>
-      `« ${name} » est restauré sous le titre « ${title} » : un autre contenu de sa section porte maintenant le sien.`,
+      `« ${name} » est restauré sous le titre « ${title} » : le sien a été repris entre-temps.`,
     // Seules les pages ont une adresse.
     restoredWithoutAddress: (name: string) =>
       `La page « ${name} » est restaurée, mais sans adresse : une autre page a pris la sienne entre-temps. Choisis-en une autre avant de la publier.`,
@@ -1415,6 +1415,7 @@ export const fr: Texts = {
         "Choisis le type du modèle : il ne changera plus. Tu écriras ensuite ses blocs dans l'éditeur.",
       name: "Nom",
       namePlaceholder: "Par exemple : Contact",
+      nameTaken: "Un autre modèle porte déjà ce nom : choisis-en un autre.",
       nameRequired: "Donne un nom au modèle.",
       nameTooLong: "Le nom ne doit pas dépasser 200 caractères.",
       sort: "Type",
@@ -2052,7 +2053,7 @@ export const fr: Texts = {
       adresse_invalide:
         "L'adresse de la page ne peut contenir que des lettres minuscules sans accent, des chiffres et des tirets.",
       adresse_prise: "Une autre page a déjà cette adresse.",
-      titre_pris: "Un autre contenu de cette section porte déjà ce titre.",
+      titre_pris: "Ce titre est déjà pris : choisis-en un autre.",
       categorie_invalide: "Une des catégories n'existe plus. Recharge la page.",
       brouillon_trop_lourd:
         "Ce brouillon est trop long pour être enregistré (240 Ko au plus). Découpe-le en plusieurs contenus.",

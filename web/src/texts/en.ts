@@ -798,9 +798,9 @@ export const en = {
     // Seules les pages ont une adresse.
     restoredWithoutAddress: (name: string) =>
       `“${name}” was restored without its URL because another page now uses it. Choose a new URL before you publish it.`,
-    // Un autre contenu de la section a pris son titre : il revient numéroté.
+    // Son titre a été repris entre-temps (un contenu de sa section, un modèle) : il revient numéroté.
     restoredRenamed: (name: string, title: string) =>
-      `“${name}” was restored as “${title}” because another item in its section now has its title.`,
+      `“${name}” was restored as “${title}” because its title was taken in the meantime.`,
     restoredDraft: "Restored as a draft. Nothing is put back in the app.",
     open: "Open",
     columns: {
@@ -1385,6 +1385,8 @@ export const en = {
         "Choose a type for the template. It can't be changed later. You'll add its blocks in the editor next.",
       name: "Name",
       namePlaceholder: "e.g. Contact",
+      nameTaken:
+        "Another template already has this name. Choose a different one.",
       nameRequired: "Give the template a name.",
       nameTooLong: "The name can't be longer than 200 characters.",
       sort: "Type",
@@ -2014,7 +2016,7 @@ export const en = {
       adresse_invalide:
         "The page URL can only contain lowercase letters (no accents), numbers, and hyphens.",
       adresse_prise: "Another page already uses this URL.",
-      titre_pris: "Another item in this section already has this title.",
+      titre_pris: "This title is already taken. Choose a different one.",
       categorie_invalide:
         "One of the categories no longer exists. Reload the page.",
       brouillon_trop_lourd:

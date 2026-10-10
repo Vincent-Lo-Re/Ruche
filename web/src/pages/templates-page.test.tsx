@@ -225,6 +225,38 @@ describe("section Modèles", () => {
     )
   })
 
+  it("« Nouveau modèle » : un nom déjà porté par un autre modèle bloque la création", async () => {
+    vi.mocked(api.findContentByTitle).mockImplementation(
+      async (_kind, value) =>
+        value.toLowerCase() === "contact"
+          ? { id: "autre", title: "Contact" }
+          : null
+    )
+    await renderApp("/templates")
+    fireEvent.click(await screen.findByRole("button", { name: labels.create }))
+    const dialog = await screen.findByRole("dialog", {
+      name: texts.templates.create.title,
+    })
+    fireEvent.change(
+      within(dialog).getByLabelText(texts.templates.create.name),
+      { target: { value: "CONTACT" } }
+    )
+    expect(
+      await within(dialog).findByText(texts.templates.create.nameTaken)
+    ).toBeVisible()
+    expect(api.findContentByTitle).toHaveBeenLastCalledWith(
+      "template",
+      "CONTACT",
+      null
+    )
+    expect(
+      within(dialog).getByRole("button", {
+        name: texts.templates.create.submit,
+      })
+    ).toBeDisabled()
+    expect(templatesApi.createTemplate).not.toHaveBeenCalled()
+  })
+
   it("un point de départ a une section (Pages par défaut)", async () => {
     vi.mocked(templatesApi.createTemplate).mockResolvedValue({
       ...created,

@@ -17,7 +17,7 @@ export const fiche: HelpFiche = {
   ],
   steps: [
     "Ouvre « Modèles de bloc » et clique sur « Nouveau modèle ».",
-    "Donne-lui un nom et choisis son type : « Mise en forme », « Bloc partagé » ou « Point de départ » (avec sa section). Le type ne changera plus.",
+    "Donne-lui un nom et choisis son type : « Mise en forme », « Bloc partagé » ou « Point de départ » (avec sa section). Le type ne changera plus. Deux modèles ne peuvent pas porter le même nom, quel que soit leur type (les majuscules et les espaces ne comptent pas).",
     "Clique sur « Créer le modèle », puis écris ses blocs dans l'éditeur.",
     "Dans un contenu, ajoute une mise en forme ou un bloc partagé depuis « Mes blocs », dans les Blocs.",
     "Un point de départ se choisit en créant un contenu, dans la liste « Point de départ » de la fenêtre.",

@@ -177,11 +177,24 @@ export async function findPageBySlug(
   return found ? { id: found.id, title: found.title ?? "" } : null
 }
 
-/** Les sortes dont deux contenus ne portent pas le même titre (la base : titre_pris). */
-export function hasUniqueTitle(
-  kind: ContentKind
-): kind is "article" | "episode" | "page" {
-  return kind === "article" || kind === "episode" || kind === "page"
+/**
+ * Les sortes dont deux contenus ne portent pas le même titre (la base : titre_pris) : toutes,
+ * modèles de bloc compris (un nom par modèle, quelle que soit sa sorte).
+ */
+export function hasUniqueTitle(kind: ContentKind): boolean {
+  return (
+    kind === "article" ||
+    kind === "episode" ||
+    kind === "page" ||
+    kind === "template"
+  )
+}
+
+/** « Un autre article porte déjà ce titre » (…), selon la sorte. */
+export function titleTakenMessage(kind: ContentKind): string {
+  return kind === "template"
+    ? texts.templates.create.nameTaken
+    : texts.contentList.kinds[kind].titleTaken
 }
 
 /**
