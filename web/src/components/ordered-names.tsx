@@ -17,6 +17,7 @@ import { LoadState } from "@/components/load-state"
 import { useAccessCheck } from "@/components/team/use-access-check"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { RowActionsMenu } from "@/components/row-actions-menu"
+import { FormField } from "@/components/form-field"
 import { Button } from "@/components/ui/button"
 import { ButtonGroup } from "@/components/ui/button-group"
 import {
@@ -485,28 +486,25 @@ function AddForm<T extends Named>({
       className="flex items-start gap-2"
       onSubmit={form.handleSubmit(({ name }) => create.mutate(name))}
     >
-      <Controller
-        name="name"
+      <FormField
         control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={inputId}>{labels.name}</FieldLabel>
-            <ButtonGroup className="w-full">
-              <Input
-                {...field}
-                id={inputId}
-                autoComplete="off"
-                maxLength={MAX_NAME_LENGTH}
-                placeholder={labels.namePlaceholder}
-                aria-invalid={fieldState.invalid}
-              />
-              <Button type="submit" disabled={create.isPending}>
-                {create.isPending ? <Spinner /> : <Plus />}
-                {labels.add}
-              </Button>
-            </ButtonGroup>
-            <FieldError errors={[fieldState.error]} />
-          </Field>
+        name="name"
+        id={inputId}
+        label={labels.name}
+        render={(field, props) => (
+          <ButtonGroup className="w-full">
+            <Input
+              {...field}
+              {...props}
+              autoComplete="off"
+              maxLength={MAX_NAME_LENGTH}
+              placeholder={labels.namePlaceholder}
+            />
+            <Button type="submit" disabled={create.isPending}>
+              {create.isPending ? <Spinner /> : <Plus />}
+              {labels.add}
+            </Button>
+          </ButtonGroup>
         )}
       />
     </form>

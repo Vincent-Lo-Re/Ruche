@@ -6,6 +6,7 @@ import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
 import { useAccessCheck } from "@/components/team/use-access-check"
+import { FormField } from "@/components/form-field"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -94,43 +95,33 @@ export function InviteDialog() {
             </DialogDescription>
           </DialogHeader>
           <FieldGroup>
-            <Controller
-              name="email"
+            <FormField
               control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="invite-email">
-                    {texts.team.email}
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="invite-email"
-                    type="email"
-                    autoComplete="off"
-                    placeholder={texts.team.emailPlaceholder}
-                    aria-invalid={fieldState.invalid}
-                  />
-                  <FieldError errors={[fieldState.error]} />
-                </Field>
+              name="email"
+              id="invite-email"
+              label={texts.team.email}
+              render={(field, props) => (
+                <Input
+                  {...field}
+                  {...props}
+                  type="email"
+                  autoComplete="off"
+                  placeholder={texts.team.emailPlaceholder}
+                />
               )}
             />
-            <Controller
-              name="full_name"
+            <FormField
               control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="invite-name">
-                    {texts.team.name}
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="invite-name"
-                    autoComplete="off"
-                    placeholder={texts.team.namePlaceholder}
-                    aria-invalid={fieldState.invalid}
-                  />
-                  <FieldError errors={[fieldState.error]} />
-                </Field>
+              name="full_name"
+              id="invite-name"
+              label={texts.team.name}
+              render={(field, props) => (
+                <Input
+                  {...field}
+                  {...props}
+                  autoComplete="off"
+                  placeholder={texts.team.namePlaceholder}
+                />
               )}
             />
             <Controller

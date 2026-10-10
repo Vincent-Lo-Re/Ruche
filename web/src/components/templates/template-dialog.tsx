@@ -4,6 +4,7 @@ import { useEffect } from "react"
 import { Controller, useForm, useWatch } from "react-hook-form"
 
 import { TITLE_MAX } from "@/blocks/draft"
+import { FormField } from "@/components/form-field"
 import { Alert, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import {
@@ -186,37 +187,28 @@ export function TemplateDialog({
               )}
             />
             {sort === "starter" && (
-              <Controller
-                name="templateFor"
+              <FormField
                 control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="modele-section">
-                      {labels.section}
-                    </FieldLabel>
-                    <Select
-                      items={sectionItems}
-                      value={field.value}
-                      onValueChange={(value) => field.onChange(value)}
-                    >
-                      <SelectTrigger
-                        id="modele-section"
-                        className="w-full"
-                        aria-invalid={fieldState.invalid}
-                      >
-                        <SelectValue placeholder={labels.sectionPlaceholder} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {sectionItems.map((item) => (
-                          <SelectItem key={item.value} value={item.value}>
-                            {item.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FieldDescription>{labels.sectionHint}</FieldDescription>
-                    <FieldError errors={[fieldState.error]} />
-                  </Field>
+                name="templateFor"
+                id="modele-section"
+                label={labels.section}
+                render={(field, props) => (
+                  <Select
+                    items={sectionItems}
+                    value={field.value}
+                    onValueChange={(value) => field.onChange(value)}
+                  >
+                    <SelectTrigger {...props} className="w-full">
+                      <SelectValue placeholder={labels.sectionPlaceholder} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sectionItems.map((item) => (
+                        <SelectItem key={item.value} value={item.value}>
+                          {item.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 )}
               />
             )}
