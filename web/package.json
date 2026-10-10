@@ -14,6 +14,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:types": "node scripts/db-types.mjs",
+    "palettes:generate": "node scripts/palettes-generate.mjs",
     "blocks:generate": "node scripts/blocks-generate.mjs",
     "lint:dead": "knip",
     "lint:dup": "jscpd src"
