@@ -19,6 +19,7 @@ vi.mock("@/lib/contents/api", async (importOriginal) => {
   return {
     ...actual,
     findPageBySlug: vi.fn(async () => null),
+    findContentByTitle: vi.fn(async () => null),
     listContents: vi.fn(async () => []),
     createContent: vi.fn(),
     getContent: vi.fn(async () => null),
@@ -338,6 +339,7 @@ describe("section Modèles", () => {
     vi.mocked(publicationApi.restoreContent).mockResolvedValue({
       restored: 1,
       addressRemoved: false,
+      renamedTo: null,
     })
     await renderApp("/templates")
     fireEvent.click(
@@ -378,6 +380,7 @@ describe("section Modèles", () => {
     vi.mocked(publicationApi.restoreContent).mockResolvedValue({
       restored: 1,
       addressRemoved: false,
+      renamedTo: null,
     })
     await renderApp("/templates")
 

@@ -104,7 +104,7 @@ export function TrashPage() {
 
   const restore = useMutation({
     mutationFn: restoreTrashItem,
-    onSuccess: ({ addressRemoved }, item) => {
+    onSuccess: ({ addressRemoved, renamedTo }, item) => {
       const name = displayTitle(item.title)
       // Un contenu restauré s'ouvre depuis le message.
       const path =
@@ -114,9 +114,12 @@ export function TrashPage() {
       const action = path
         ? { label: texts.trash.open, onClick: () => void navigate(path) }
         : undefined
+      if (renamedTo !== null) {
+        toast.warning(texts.trash.restoredRenamed(name, renamedTo), { action })
+      }
       if (addressRemoved) {
         toast.warning(texts.trash.restoredWithoutAddress(name), { action })
-      } else {
+      } else if (renamedTo === null) {
         toast.success(texts.trash.restored(name), {
           description:
             // Un modèle ne se publie pas : rien à dire de l'app.

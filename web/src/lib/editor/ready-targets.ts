@@ -7,6 +7,8 @@ import { focusSoon, highlightSoon } from "@/lib/focus"
 
 // Le titre du contenu, en tête de l'aperçu : « Prêt à publier ? » et « Écrire le titre » y mènent.
 export const CONTENT_TITLE_ID = "contenu-titre"
+// La raison sous le titre, quand un autre contenu de la section le porte déjà.
+export const TITLE_TAKEN_ID = "contenu-titre-pris"
 
 // Le réglage de chaque ligne (control) et le titre de sa carte (card) dans la colonne de droite.
 export const READY_IDS = {

@@ -282,7 +282,13 @@ export async function trashContent(contentId: string): Promise<Trashed> {
   return { needsFileSync: data.needs_file_sync }
 }
 
-type Restored = { restored: number; addressRemoved: boolean }
+// addressRemoved : une page revient sans adresse ; renamedTo : son nouveau titre, si un autre
+// contenu de la section a pris le sien entre-temps (sinon null).
+type Restored = {
+  restored: number
+  addressRemoved: boolean
+  renamedTo: string | null
+}
 
 /** Restaure un contenu en brouillon, sans le republier ([D18]). */
 export async function restoreContent(contentId: string): Promise<Restored> {
@@ -293,5 +299,8 @@ export async function restoreContent(contentId: string): Promise<Restored> {
   return {
     restored: data.restored,
     addressRemoved: (data.warnings ?? []).includes("adresse_retiree"),
+    renamedTo: (data.warnings ?? []).includes("titre_renomme")
+      ? data.title
+      : null,
   }
 }

@@ -812,6 +812,9 @@ export const fr: Texts = {
           : `Les ${count} éléments sélectionnés seront supprimés définitivement. Tu ne pourras pas revenir en arrière.`,
       confirm: "Supprimer définitivement",
     },
+    // Un autre contenu de la section a pris son titre : il revient numéroté.
+    restoredRenamed: (name: string, title: string) =>
+      `« ${name} » est restauré sous le titre « ${title} » : un autre contenu de sa section porte maintenant le sien.`,
     // Seules les pages ont une adresse.
     restoredWithoutAddress: (name: string) =>
       `La page « ${name} » est restaurée, mais sans adresse : une autre page a pris la sienne entre-temps. Choisis-en une autre avant de la publier.`,
@@ -874,6 +877,7 @@ export const fr: Texts = {
         create: "Nouvelle page",
         tab: "Pages",
         createFailed: "La page n'a pas pu être créée.",
+        titleTaken: "Une autre page porte déjà ce titre : choisis-en un autre.",
         // « Nouvelle page » quand des points de départ existent pour les Pages ([D42]).
         blank: "Page vide",
         confirmTrashTitle: "Mettre cette page à la corbeille ?",
@@ -914,6 +918,8 @@ export const fr: Texts = {
         // L'onglet de la liste, à côté de « Catégories ».
         tab: "Articles",
         createFailed: "L'article n'a pas pu être créé.",
+        titleTaken:
+          "Un autre article porte déjà ce titre : choisis-en un autre.",
         blank: "Article vide",
         confirmTrashTitle: "Mettre cet article à la corbeille ?",
         confirmTrash: (title: string) =>
@@ -951,6 +957,8 @@ export const fr: Texts = {
         // L'onglet de la liste, à côté de « Catégories ».
         tab: "Épisodes",
         createFailed: "L'épisode n'a pas pu être créé.",
+        titleTaken:
+          "Un autre épisode porte déjà ce titre : choisis-en un autre.",
         blank: "Épisode vide",
         confirmTrashTitle: "Mettre cet épisode à la corbeille ?",
         confirmTrash: (title: string) =>
@@ -2044,6 +2052,7 @@ export const fr: Texts = {
       adresse_invalide:
         "L'adresse de la page ne peut contenir que des lettres minuscules sans accent, des chiffres et des tirets.",
       adresse_prise: "Une autre page a déjà cette adresse.",
+      titre_pris: "Un autre contenu de cette section porte déjà ce titre.",
       categorie_invalide: "Une des catégories n'existe plus. Recharge la page.",
       brouillon_trop_lourd:
         "Ce brouillon est trop long pour être enregistré (240 Ko au plus). Découpe-le en plusieurs contenus.",
@@ -2180,6 +2189,8 @@ export const fr: Texts = {
       scheduleTitle: "Pour programmer, il manque :",
       title: "Le titre.",
       writeTitle: "Écrire le titre",
+      titleTaken: "Un titre qu'aucun autre contenu de la section ne porte.",
+      changeTitle: "Changer le titre",
       cover: "L'image de présentation (la vignette des listes de l'app).",
       coverUnavailable:
         "Une image de présentation disponible (l'actuelle est dans la Corbeille ou pas encore prête).",
@@ -2277,6 +2288,8 @@ export const fr: Texts = {
           "Un fichier n'est plus disponible : choisis-en un autre avant de publier.",
         modele_detache:
           "Le modèle d'un bloc partagé n'existe plus : ce bloc est devenu une copie ordinaire.",
+        titre_renomme:
+          "Un autre contenu porte maintenant le titre de cette version : le brouillon prend un titre numéroté, comme « Titre (2) ».",
         adresse_prise:
           "Une autre page a pris cette adresse entre-temps : le brouillon garde son adresse actuelle.",
         formule_supprimee:

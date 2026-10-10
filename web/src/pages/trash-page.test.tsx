@@ -97,6 +97,7 @@ describe("Corbeille", () => {
   it("restaure un fichier", async () => {
     vi.mocked(api.restoreTrashItem).mockResolvedValue({
       addressRemoved: false,
+      renamedTo: null,
     })
     await renderApp("/trash")
 
@@ -239,7 +240,10 @@ describe("Corbeille : contenus", () => {
   })
 
   it("restaure un article, et « Ouvrir » dans le message mène à son éditeur", async () => {
-    vi.mocked(api.restoreTrashItem).mockResolvedValue({ addressRemoved: false })
+    vi.mocked(api.restoreTrashItem).mockResolvedValue({
+      addressRemoved: false,
+      renamedTo: null,
+    })
     const { router } = await renderApp("/trash")
     fireEvent.click(
       await screen.findByRole("button", {
@@ -256,7 +260,10 @@ describe("Corbeille : contenus", () => {
   })
 
   it("restaure une page en brouillon, et prévient quand son adresse a été reprise", async () => {
-    vi.mocked(api.restoreTrashItem).mockResolvedValue({ addressRemoved: true })
+    vi.mocked(api.restoreTrashItem).mockResolvedValue({
+      addressRemoved: true,
+      renamedTo: null,
+    })
     await renderApp("/trash")
     fireEvent.click(
       await screen.findByRole("button", {
@@ -267,6 +274,24 @@ describe("Corbeille : contenus", () => {
       await screen.findByText(texts.trash.restoredWithoutAddress(page.title!))
     ).toBeVisible()
     expect(vi.mocked(api.restoreTrashItem).mock.calls[0][0]).toEqual(page)
+  })
+
+  it("prévient quand un contenu restauré revient renommé (son titre a été repris)", async () => {
+    vi.mocked(api.restoreTrashItem).mockResolvedValue({
+      addressRemoved: false,
+      renamedTo: `${article.title} (2)`,
+    })
+    await renderApp("/trash")
+    fireEvent.click(
+      await screen.findByRole("button", {
+        name: texts.trash.restoreItem(article.title!),
+      })
+    )
+    expect(
+      await screen.findByText(
+        texts.trash.restoredRenamed(article.title!, `${article.title} (2)`)
+      )
+    ).toBeVisible()
   })
 
   it("efface la sélection, et seulement elle (têtes de lot)", async () => {

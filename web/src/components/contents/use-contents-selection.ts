@@ -124,9 +124,12 @@ function useBulkTrash<T extends Row>({
       restoreContent
     )
     if (restored.length > 0) toast.success(words.restoredMany(restored.length))
-    restored.forEach(({ addressRemoved }, index) => {
+    restored.forEach(({ addressRemoved, renamedTo }, index) => {
+      const name = nameOf(items[index])
+      if (renamedTo !== null)
+        toast.warning(texts.trash.restoredRenamed(name, renamedTo))
       if (addressRemoved)
-        toast.warning(texts.trash.restoredWithoutAddress(nameOf(items[index])))
+        toast.warning(texts.trash.restoredWithoutAddress(name))
     })
     if (error) toast.error(errorMessage(error))
     await refresh()

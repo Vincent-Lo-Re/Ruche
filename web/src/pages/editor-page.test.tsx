@@ -18,6 +18,7 @@ vi.mock("@/lib/contents/api", async (importOriginal) => {
   return {
     ...actual,
     findPageBySlug: vi.fn(async () => null),
+    findContentByTitle: vi.fn(async () => null),
     listContents: vi.fn(),
     createContent: vi.fn(),
     getContent: vi.fn(),
@@ -318,6 +319,7 @@ describe("liste des pages : publication et corbeille", () => {
     vi.mocked(publicationApi.restoreContent).mockResolvedValue({
       restored: 1,
       addressRemoved: false,
+      renamedTo: null,
     })
     await renderApp("/pages")
     fireEvent.click(

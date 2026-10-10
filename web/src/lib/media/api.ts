@@ -428,17 +428,18 @@ export async function restoreMedia(mediaId: string): Promise<Media> {
 
 /**
  * Sort un élément de la corbeille : un fichier, ou un contenu avec tout son lot, en brouillon
- * ([D18]). addressRemoved : une page revient sans adresse (une autre l'a prise entre-temps).
+ * ([D18]). addressRemoved : une page revient sans adresse (une autre l'a prise entre-temps) ;
+ * renamedTo : le nouveau titre d'un contenu dont le titre a été pris entre-temps.
  */
 export async function restoreTrashItem(
   item: TrashItem
-): Promise<{ addressRemoved: boolean }> {
+): Promise<{ addressRemoved: boolean; renamedTo: string | null }> {
   if (item.item_type === "content") {
-    const { addressRemoved } = await restoreContent(item.id)
-    return { addressRemoved }
+    const { addressRemoved, renamedTo } = await restoreContent(item.id)
+    return { addressRemoved, renamedTo }
   }
   await restoreMedia(item.id)
-  return { addressRemoved: false }
+  return { addressRemoved: false, renamedTo: null }
 }
 
 /**

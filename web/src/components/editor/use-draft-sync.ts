@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react"
 
 import { useDraftSaving } from "@/components/editor/use-draft-saving"
 import { useEditLock } from "@/hooks/use-edit-lock"
-import type { Content } from "@/lib/contents/api"
+import type { Content, ContentKind } from "@/lib/contents/api"
 
 /**
  * Le brouillon d'un éditeur et ses réglages, tenus à jour avec la base : le verrou « un seul à
@@ -13,10 +13,13 @@ import type { Content } from "@/lib/contents/api"
  */
 export function useDraftSync({
   initial,
+  kind,
   afterSave,
   writing,
 }: {
   initial: Content
+  // La sorte du contenu (vérifiée par la page) : le titre unique par section.
+  kind: ContentKind
   afterSave: () => void
   writing: boolean
 }) {
@@ -34,6 +37,7 @@ export function useDraftSync({
   const [resumeSignal, setResumeSignal] = useState(0)
   const part = useDraftSaving({
     initial,
+    kind,
     session: editorSession,
     lock: {
       phase: lock.state.phase,

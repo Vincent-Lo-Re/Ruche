@@ -679,7 +679,9 @@ function RequirementsNotice({
                 >
                   <span>
                     {item.key === "title"
-                      ? words.title
+                      ? item.state === "taken"
+                        ? words.titleTaken
+                        : words.title
                       : item.key === "cover"
                         ? item.state === "missing"
                           ? words.cover
@@ -696,7 +698,9 @@ function RequirementsNotice({
                       onClick={() => fix(item.key)}
                     >
                       {item.key === "title"
-                        ? words.writeTitle
+                        ? item.state === "taken"
+                          ? words.changeTitle
+                          : words.writeTitle
                         : item.key === "cover"
                           ? words.chooseCover
                           : words.chooseAudio}

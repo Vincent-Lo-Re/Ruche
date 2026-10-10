@@ -17,6 +17,7 @@ vi.mock("@/lib/contents/api", async (importOriginal) => {
     ...actual,
     // Une adresse libre : aucune autre page ne l'a.
     findPageBySlug: vi.fn(async () => null),
+    findContentByTitle: vi.fn(async () => null),
     getContent: vi.fn(),
     getMediaByIds: vi.fn(async () => []),
     saveDraft: vi.fn(),
@@ -700,6 +701,71 @@ describe("réglages du contenu", () => {
     expect(settings).toBeNull()
     expect(await screen.findByText(texts.editor.save.saved)).toBeVisible()
   }, 15_000)
+
+  it("un titre pris reste à l'écran avec la raison, et le brouillon s'enregistre sous l'ancien", async () => {
+    vi.mocked(api.saveDraft)
+      .mockRejectedValueOnce(new api.ContentError("titre_pris"))
+      .mockResolvedValueOnce({ rev: 5, savedAt: "2026-09-27T12:31:00Z" })
+      .mockResolvedValue({ rev: 6, savedAt: "2026-09-27T12:32:00Z" })
+    await open()
+    await ready()
+    const title = screen.getByLabelText(texts.editor.title.label)
+    fireEvent.change(title, { target: { value: "Contact" } })
+    await waitFor(() => expect(api.saveDraft).toHaveBeenCalledTimes(1), {
+      timeout: 4000,
+    })
+    expect(vi.mocked(api.saveDraft).mock.calls[0][2].title).toBe("Contact")
+
+    // Refusé : le titre reste, avec la raison ; le brouillon repart sous « Aide ».
+    expect(
+      await screen.findByText(texts.contentList.kinds.page.titleTaken)
+    ).toBeVisible()
+    expect(title).toHaveValue("Contact")
+    expect(title).toHaveAttribute("aria-invalid", "true")
+    await waitFor(() => expect(api.saveDraft).toHaveBeenCalledTimes(2), {
+      timeout: 4000,
+    })
+    expect(vi.mocked(api.saveDraft).mock.calls[1][2].title).toBe("Aide")
+
+    // Un autre titre : il part.
+    fireEvent.change(title, { target: { value: "Nous écrire" } })
+    await waitFor(() => expect(api.saveDraft).toHaveBeenCalledTimes(3), {
+      timeout: 4000,
+    })
+    const [, baseRev, saved] = vi.mocked(api.saveDraft).mock.calls[2]
+    expect(baseRev).toBe(5)
+    expect(saved.title).toBe("Nous écrire")
+    expect(
+      screen.queryByText(texts.contentList.kinds.page.titleTaken)
+    ).toBeNull()
+  }, 15_000)
+
+  it("un titre vu pris en tapant ne part pas, et « Publier » le demande", async () => {
+    vi.mocked(api.findContentByTitle).mockImplementation(
+      async (_kind, value) =>
+        value === "Contact" ? { id: "autre", title: "Contact" } : null
+    )
+    vi.mocked(api.saveDraft).mockResolvedValue({
+      rev: 5,
+      savedAt: "2026-09-27T12:31:00Z",
+    })
+    await open()
+    await ready()
+    fireEvent.change(screen.getByLabelText(texts.editor.title.label), {
+      target: { value: "Contact" },
+    })
+    expect(
+      await screen.findByText(texts.contentList.kinds.page.titleTaken)
+    ).toBeVisible()
+    await waitFor(() => expect(api.saveDraft).toHaveBeenCalled(), {
+      timeout: 4000,
+    })
+    expect(vi.mocked(api.saveDraft).mock.calls.at(-1)![2].title).toBe("Aide")
+    fireEvent.click(publishButton())
+    expect(
+      await screen.findByText(labels.requirements.titleTaken)
+    ).toBeVisible()
+  }, 10_000)
 
   it("l'adresse n'est enregistrée que si elle est valide", async () => {
     vi.mocked(api.saveDraft).mockResolvedValue({

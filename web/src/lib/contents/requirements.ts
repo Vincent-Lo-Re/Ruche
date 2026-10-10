@@ -10,11 +10,12 @@ import { contentProfile } from "@/lib/editor/profile"
 
 /**
  * Ce qui manque : le titre, l'image de présentation ou l'audio, absent (missing) ou plus
- * disponible (unavailable : supprimé, pas prêt, ou d'un autre type).
+ * disponible (unavailable : supprimé, pas prêt, ou d'un autre type) ; un titre déjà porté par un
+ * autre contenu de la section (taken).
  */
 export type Requirement = {
   key: "title" | "cover" | "audio"
-  state: "missing" | "unavailable"
+  state: "missing" | "unavailable" | "taken"
 }
 
 /** Un conseil, qui n'empêche pas de publier : l'audio n'a pas de transcription ([D46]). */
@@ -44,12 +45,14 @@ function fileState(
 
 /**
  * Ce qui manque pour publier (ou programmer) ce brouillon, et les conseils. mediaFor : ce que
- * l'éditeur sait des fichiers cités (le même que pour les blocs Image).
+ * l'éditeur sait des fichiers cités (le même que pour les blocs Image) ; titleTaken : un autre
+ * contenu de la section porte déjà ce titre (le brouillon garde alors l'ancien).
  */
 export function publishChecks(
   kind: ContentKind,
   draft: Pick<Draft, "title" | "cover" | "audio">,
-  mediaFor: (mediaId: string | null) => BlockMedia
+  mediaFor: (mediaId: string | null) => BlockMedia,
+  titleTaken = false
 ): PublishChecks {
   const profile = contentProfile(kind)
   const missing: Requirement[] = []
@@ -57,6 +60,8 @@ export function publishChecks(
   // Comme la base : des espaces ne font pas un titre, et il est demandé en premier.
   if (profile.titleRequired && draft.title.trim() === "") {
     missing.push({ key: "title", state: "missing" })
+  } else if (titleTaken) {
+    missing.push({ key: "title", state: "taken" })
   }
   if (profile.cover === "required") {
     const state = fileState(mediaFor(draft.cover?.mediaId ?? null), "image")
