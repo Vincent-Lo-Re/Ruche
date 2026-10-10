@@ -185,7 +185,7 @@ describe("Mon compte", () => {
     fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
 
     expect(
-      await screen.findByText(texts.account.profile.nameTooLong)
+      await screen.findByText(texts.account.profile.nameTooLong("100"))
     ).toBeVisible()
     expect(from).not.toHaveBeenCalled()
   })

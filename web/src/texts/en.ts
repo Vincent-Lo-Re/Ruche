@@ -281,7 +281,8 @@ export const en = {
         "Your name is how your team knows you, in the team list and the version history.",
       name: "Name",
       namePlaceholder: "First and last name",
-      nameTooLong: "The name can't be longer than 100 characters.",
+      nameTooLong: (max: string) =>
+        `The name can't be longer than ${max} characters.`,
       saved: "Name saved.",
       email: "Email address",
       role: "Role",
@@ -361,7 +362,8 @@ export const en = {
     invalidEmail: "Enter a valid email address.",
     name: "Name (optional)",
     namePlaceholder: "First and last name",
-    nameTooLong: "The name can't be longer than 100 characters.",
+    nameTooLong: (max: string) =>
+      `The name can't be longer than ${max} characters.`,
     role: "Role",
     sendInvitation: "Send invitation",
     invited: (email: string) => `Invitation sent to ${email}.`,
@@ -710,16 +712,18 @@ export const en = {
       lottieFailed: "Couldn't load the animation preview.",
       name: "Name",
       nameRequired: "Give the file a name.",
-      nameTooLong: "The name can't be longer than 255 characters.",
+      nameTooLong: (max: string) =>
+        `The name can't be longer than ${max} characters.`,
       alt: "Alt text",
       altHint:
         "Describe the image in one sentence for people who can't see it. Leave it blank if it's purely decorative.",
-      altTooLong: "Alt text can't be longer than 1,000 characters.",
+      altTooLong: (max: string) =>
+        `Alt text can't be longer than ${max} characters.`,
       transcript: "Transcript",
       transcriptHint:
         "A text version of the audio for people who can't listen to it.",
-      transcriptTooLong:
-        "The transcript can't be longer than 200,000 characters.",
+      transcriptTooLong: (max: string) =>
+        `The transcript can't be longer than ${max} characters.`,
       saved: "File details saved.",
       // La carte du nom et du texte alternatif (ou de la transcription).
       description: "Description",
@@ -1225,7 +1229,8 @@ export const en = {
     add: "Add",
     namePlaceholder: "e.g. Sleep",
     nameRequired: "Give the category a name.",
-    nameTooLong: "The name can't be longer than 100 characters.",
+    nameTooLong: (max: string) =>
+      `The name can't be longer than ${max} characters.`,
     added: (name: string) => `Category “${name}” added.`,
     renamed: "Category saved.",
     edit: "Edit",
@@ -1442,7 +1447,8 @@ export const en = {
       nameTaken:
         "Another template already has this name. Choose a different one.",
       nameRequired: "Give the template a name.",
-      nameTooLong: "The name can't be longer than 200 characters.",
+      nameTooLong: (max: string) =>
+        `The name can't be longer than ${max} characters.`,
       sort: "Type",
       section: "Section",
       sectionPlaceholder: "Choose a section",
@@ -2326,7 +2332,8 @@ export const en = {
         placeholder: "e.g. legal-notice",
         invalid:
           "Use only lowercase letters (no accents), numbers, and single hyphens, with no hyphen at the start or end.",
-        tooLong: "The URL can't be longer than 100 characters.",
+        tooLong: (max: string) =>
+          `The URL can't be longer than ${max} characters.`,
         fromTitle: "Use title",
         live: (slug: string) => `Published version: ${slug}`,
         missing: "Choose a page URL before publishing.",
@@ -2367,10 +2374,11 @@ export const en = {
       ],
       name: "Brand name",
       save: "Save",
-      nameTooLong: "The name can't be longer than 40 characters.",
+      nameTooLong: (max: string) =>
+        `The name can't be longer than ${max} characters.`,
       // Les initiales, à la place d'un monogramme pas encore envoyé (onglet, connexion).
       initials: "Initials",
-      initialsTooLong: "Initials are 1 to 3 characters.",
+      initialsTooLong: (max: string) => `Initials are 1 to ${max} characters.`,
       // L'adresse de contact, montrée sur l'écran de connexion à qui a besoin d'aide.
       email: "Contact email",
       emailPlaceholder: "contact@example.com",
@@ -2553,7 +2561,7 @@ export const en = {
         exampleDu: (du: string) => `Example: “Dans la liste ${du}”`,
         exampleEn: (name: string) => `Example: “In the ${name} list”`,
         incomplete: "Fill in all three French forms, or none.",
-        tooLong: "40 characters at most.",
+        tooLong: (max: string) => `${max} characters at most.`,
         saved: "Section names saved.",
       },
     },
@@ -2569,7 +2577,8 @@ export const en = {
       addDescription:
         "It's added at the bottom, as your top plan. Then drag it into place.",
       nameRequired: "Give the plan a name.",
-      nameTooLong: "The name can't be longer than 100 characters.",
+      nameTooLong: (max: string) =>
+        `The name can't be longer than ${max} characters.`,
       add: "Add",
       added: (name: string) => `Plan “${name}” added.`,
       rank: (position: number) => `#${position}`,

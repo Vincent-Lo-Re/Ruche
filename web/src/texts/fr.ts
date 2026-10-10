@@ -284,7 +284,8 @@ export const fr: Texts = {
         "Ton nom permet à l'équipe de te reconnaître, dans la liste de l'équipe et dans l'historique.",
       name: "Nom",
       namePlaceholder: "Prénom Nom",
-      nameTooLong: "Le nom ne doit pas dépasser 100 caractères.",
+      nameTooLong: (max: string) =>
+        `Le nom ne doit pas dépasser ${max} caractères.`,
       saved: "Nom enregistré.",
       email: "Adresse e-mail",
       role: "Rôle",
@@ -365,7 +366,8 @@ export const fr: Texts = {
     invalidEmail: "Saisis une adresse e-mail valide.",
     name: "Nom (facultatif)",
     namePlaceholder: "Prénom Nom",
-    nameTooLong: "Le nom ne doit pas dépasser 100 caractères.",
+    nameTooLong: (max: string) =>
+      `Le nom ne doit pas dépasser ${max} caractères.`,
     role: "Rôle",
     sendInvitation: "Envoyer l'invitation",
     invited: (email: string) => `Invitation envoyée à ${email}.`,
@@ -724,15 +726,17 @@ export const fr: Texts = {
       lottieFailed: "L'aperçu de l'animation n'a pas pu s'afficher.",
       name: "Nom",
       nameRequired: "Donne un nom au fichier.",
-      nameTooLong: "Le nom ne doit pas dépasser 255 caractères.",
+      nameTooLong: (max: string) =>
+        `Le nom ne doit pas dépasser ${max} caractères.`,
       alt: "Texte alternatif",
       altHint:
         "Décris l'image en une phrase pour les personnes qui ne la voient pas. Laisse vide si elle est purement décorative.",
-      altTooLong: "Le texte alternatif ne doit pas dépasser 1 000 caractères.",
+      altTooLong: (max: string) =>
+        `Le texte alternatif ne doit pas dépasser ${max} caractères.`,
       transcript: "Transcription",
       transcriptHint: "Le texte de l'audio, pour qui ne peut pas l'écouter.",
-      transcriptTooLong:
-        "La transcription ne doit pas dépasser 200 000 caractères.",
+      transcriptTooLong: (max: string) =>
+        `La transcription ne doit pas dépasser ${max} caractères.`,
       saved: "Fiche enregistrée.",
       // La carte du nom et du texte alternatif (ou de la transcription).
       description: "Description",
@@ -1248,7 +1252,8 @@ export const fr: Texts = {
     add: "Ajouter",
     namePlaceholder: "Par exemple : Sommeil",
     nameRequired: "Donne un nom à la catégorie.",
-    nameTooLong: "Le nom ne doit pas dépasser 100 caractères.",
+    nameTooLong: (max: string) =>
+      `Le nom ne doit pas dépasser ${max} caractères.`,
     added: (name: string) => `Catégorie « ${name} » ajoutée.`,
     renamed: "Catégorie enregistrée.",
     edit: "Modifier",
@@ -1471,7 +1476,8 @@ export const fr: Texts = {
       namePlaceholder: "Par exemple : Contact",
       nameTaken: "Un autre modèle porte déjà ce nom : choisis-en un autre.",
       nameRequired: "Donne un nom au modèle.",
-      nameTooLong: "Le nom ne doit pas dépasser 200 caractères.",
+      nameTooLong: (max: string) =>
+        `Le nom ne doit pas dépasser ${max} caractères.`,
       sort: "Type",
       section: "Section",
       sectionPlaceholder: "Choisis une section",
@@ -2373,7 +2379,8 @@ export const fr: Texts = {
         placeholder: "mentions-legales",
         invalid:
           "Des lettres minuscules sans accent, des chiffres et des tirets seulement (pas de tiret au début, à la fin ni deux de suite).",
-        tooLong: "L'adresse ne doit pas dépasser 100 caractères.",
+        tooLong: (max: string) =>
+          `L'adresse ne doit pas dépasser ${max} caractères.`,
         fromTitle: "Reprendre le titre",
         live: (slug: string) => `En ligne : ${slug}`,
         missing: "Choisis l'adresse de la page avant de la publier.",
@@ -2414,10 +2421,12 @@ export const fr: Texts = {
       ],
       name: "Le nom de ta marque",
       save: "Enregistrer",
-      nameTooLong: "Le nom ne doit pas dépasser 40 caractères.",
+      nameTooLong: (max: string) =>
+        `Le nom ne doit pas dépasser ${max} caractères.`,
       // Les initiales, à la place d'un monogramme pas encore envoyé (onglet, connexion).
       initials: "Initiale(s)",
-      initialsTooLong: "Les initiales font 1 à 3 caractères.",
+      initialsTooLong: (max: string) =>
+        `Les initiales font 1 à ${max} caractères.`,
       // L'adresse de contact, montrée sur l'écran de connexion à qui a besoin d'aide.
       email: "Adresse e-mail de contact",
       emailPlaceholder: "contact@exemple.fr",
@@ -2596,7 +2605,7 @@ export const fr: Texts = {
         exampleDu: (du: string) => `Exemple : « Dans la liste ${du} »`,
         exampleEn: (name: string) => `Exemple : « In the ${name} list »`,
         incomplete: "Remplis les trois formes françaises, ou aucune.",
-        tooLong: "40 caractères au plus.",
+        tooLong: (max: string) => `${max} caractères au plus.`,
         saved: "Noms des sections enregistrés.",
       },
     },
@@ -2613,7 +2622,8 @@ export const fr: Texts = {
       addDescription:
         "Elle se place en bas, comme la plus complète. Glisse-la ensuite à sa juste place.",
       nameRequired: "Donne un nom à la formule.",
-      nameTooLong: "Le nom ne doit pas dépasser 100 caractères.",
+      nameTooLong: (max: string) =>
+        `Le nom ne doit pas dépasser ${max} caractères.`,
       add: "Ajouter",
       added: (name: string) => `Formule « ${name} » ajoutée.`,
       rank: (position: number) => `n° ${position}`,

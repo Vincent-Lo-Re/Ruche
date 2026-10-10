@@ -8,7 +8,13 @@ import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { findPageBySlug } from "@/lib/contents/api"
 import type { LiveVersion } from "@/lib/contents/publication"
-import { checkSlug, slugFromTitle, type RefusedSlug } from "@/lib/contents/slug"
+import {
+  checkSlug,
+  SLUG_MAX,
+  slugFromTitle,
+  type RefusedSlug,
+} from "@/lib/contents/slug"
+import { formatCount } from "@/lib/media/format"
 import { texts } from "@/texts"
 
 const labels = texts.publication.settings.slug
@@ -105,7 +111,9 @@ export function SlugField({
       setStatus({
         kind: "error",
         message:
-          checked.reason === "too_long" ? labels.tooLong : labels.invalid,
+          checked.reason === "too_long"
+            ? labels.tooLong(formatCount(SLUG_MAX))
+            : labels.invalid,
       })
       return
     }

@@ -302,7 +302,7 @@ describe("Paramètres : le nom de la marque", () => {
     fireEvent.click(
       screen.getByRole("button", { name: texts.settings.adminIdentity.save })
     )
-    expect(await screen.findByText(identity.nameTooLong)).toBeVisible()
+    expect(await screen.findByText(identity.nameTooLong("40"))).toBeVisible()
     expect(identityApi.saveBrandDetails).not.toHaveBeenCalled()
 
     fireEvent.change(field, { target: { value: "   " } })

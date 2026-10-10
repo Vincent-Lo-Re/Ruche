@@ -1,6 +1,6 @@
 // Adresse d'une page (slug) : mêmes règles que la base (save_draft).
 
-const SLUG_MAX = 100
+export const SLUG_MAX = 100
 const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/
 
 /**
