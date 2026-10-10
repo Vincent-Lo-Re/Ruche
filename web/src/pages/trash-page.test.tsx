@@ -1,27 +1,19 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
-import * as contentsApi from "@/lib/contents/api"
 import * as api from "@/lib/media/api"
 import { fakeAuth, renderApp } from "@/test/render"
 import { texts } from "@/texts"
+import { findRole, role } from "@/test/queries"
 
 // « Ouvrir » un contenu restauré : son éditeur le lit.
-vi.mock("@/lib/contents/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof contentsApi>()
-  return { ...actual, getContent: vi.fn(async () => null) }
-})
+vi.mock("@/lib/contents/api", async (original) =>
+  (await import("@/test/mocks")).contentsApi(original)
+)
 
-vi.mock("@/lib/media/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof api>()
-  return {
-    ...actual,
-    listTrash: vi.fn(),
-    restoreTrashItem: vi.fn(),
-    emptyTrash: vi.fn(),
-    kickFiles: vi.fn(),
-  }
-})
+vi.mock("@/lib/media/api", async (original) =>
+  (await import("@/test/mocks")).mediaApi(original)
+)
 
 const photo: api.TrashItem = {
   item_type: "file",
@@ -76,21 +68,18 @@ describe("Corbeille", () => {
     await renderApp("/trash")
     await screen.findByText(photoName)
 
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.trash.filters.file })
-    )
+    fireEvent.click(role("button", texts.trash.filters.file))
     expect(screen.getByText(photoName)).toBeVisible()
   })
 
   it("le filtre est dans l'adresse (QCM du 05/10/2026)", async () => {
     const { router } = await renderApp("/trash?type=file")
     await screen.findByText(photoName)
-    expect(
-      screen.getByRole("button", { name: texts.trash.filters.file })
-    ).toHaveAttribute("aria-pressed", "true")
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.trash.filters.all })
+    expect(role("button", texts.trash.filters.file)).toHaveAttribute(
+      "aria-pressed",
+      "true"
     )
+    fireEvent.click(role("button", texts.trash.filters.all))
     await waitFor(() => expect(router.state.location.search).toBe(""))
   })
 
@@ -102,9 +91,7 @@ describe("Corbeille", () => {
     await renderApp("/trash")
 
     fireEvent.click(
-      await screen.findByRole("button", {
-        name: texts.trash.restoreItem(photoName),
-      })
+      await findRole("button", texts.trash.restoreItem(photoName))
     )
 
     expect(
@@ -118,17 +105,13 @@ describe("Corbeille", () => {
     await renderApp("/trash", fakeAuth({ role: "editor" }))
     await screen.findByText(photoName)
 
-    fireEvent.click(screen.getByRole("button", { name: texts.trash.empty }))
+    fireEvent.click(role("button", texts.trash.empty))
     const dialog = await screen.findByRole("alertdialog")
     expect(
       within(dialog).getByText(texts.trash.confirmEmpty.description(2))
     ).toBeVisible()
     expect(api.emptyTrash).not.toHaveBeenCalled()
-    fireEvent.click(
-      within(dialog).getByRole("button", {
-        name: texts.trash.confirmEmpty.confirm,
-      })
-    )
+    fireEvent.click(role("button", texts.trash.confirmEmpty.confirm, dialog))
 
     expect(await screen.findByText(texts.trash.emptied(2))).toBeVisible()
     // La liste affichée, jamais « tout ce qu'il y a » côté serveur.
@@ -146,40 +129,24 @@ describe("Corbeille", () => {
     await renderApp("/trash")
     await screen.findByText(photoName)
 
-    fireEvent.click(screen.getByRole("button", { name: texts.trash.empty }))
+    fireEvent.click(role("button", texts.trash.empty))
     const dialog = await screen.findByRole("alertdialog")
-    fireEvent.click(
-      within(dialog).getByRole("button", {
-        name: texts.trash.confirmEmpty.confirm,
-      })
-    )
+    fireEvent.click(role("button", texts.trash.confirmEmpty.confirm, dialog))
 
     await waitFor(() =>
       expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument()
     )
     expect(api.kickFiles).toHaveBeenCalled()
-    expect(
-      screen.getByRole("button", {
-        name: texts.trash.restoreItem(photoName),
-      })
-    ).toBeEnabled()
+    expect(role("button", texts.trash.restoreItem(photoName))).toBeEnabled()
   })
 
   it("efface un seul élément après confirmation", async () => {
     vi.mocked(api.emptyTrash).mockResolvedValue(1)
     await renderApp("/trash")
 
-    fireEvent.click(
-      await screen.findByRole("button", {
-        name: texts.trash.eraseItem(photoName),
-      })
-    )
+    fireEvent.click(await findRole("button", texts.trash.eraseItem(photoName)))
     const dialog = await screen.findByRole("alertdialog")
-    fireEvent.click(
-      within(dialog).getByRole("button", {
-        name: texts.common.deletePermanently,
-      })
-    )
+    fireEvent.click(role("button", texts.common.deletePermanently, dialog))
 
     await waitFor(() =>
       expect(api.emptyTrash).toHaveBeenCalledWith([
@@ -193,9 +160,7 @@ describe("Corbeille", () => {
     await renderApp("/trash")
 
     expect(await screen.findByText(texts.trash.emptyState.title)).toBeVisible()
-    expect(
-      screen.getByRole("button", { name: texts.trash.empty })
-    ).toBeDisabled()
+    expect(role("button", texts.trash.empty)).toBeDisabled()
   })
 })
 
@@ -221,9 +186,7 @@ describe("Corbeille : contenus", () => {
   it("filtre par type, avec les seuls types présents", async () => {
     await renderApp("/trash")
     await screen.findByText(page.title!)
-    const filters = screen.getByRole("group", {
-      name: texts.trash.filters.label,
-    })
+    const filters = role("group", texts.trash.filters.label)
     expect(
       within(filters)
         .getAllByRole("button")
@@ -231,9 +194,7 @@ describe("Corbeille : contenus", () => {
     ).toEqual(["Tout", "Blog", "Pages", "Médiathèque"])
     expect(screen.getAllByRole("row")).toHaveLength(4)
 
-    fireEvent.click(
-      within(filters).getByRole("button", { name: texts.trash.filters.article })
-    )
+    fireEvent.click(role("button", texts.trash.filters.article, filters))
     expect(screen.getByText(article.title!)).toBeVisible()
     expect(screen.queryByText(page.title!)).toBeNull()
     expect(screen.queryByText(photoName)).toBeNull()
@@ -246,14 +207,12 @@ describe("Corbeille : contenus", () => {
     })
     const { router } = await renderApp("/trash")
     fireEvent.click(
-      await screen.findByRole("button", {
-        name: texts.trash.restoreItem(article.title!),
-      })
+      await findRole("button", texts.trash.restoreItem(article.title!))
     )
     expect(
       await screen.findByText(texts.trash.restored(article.title!))
     ).toBeVisible()
-    fireEvent.click(screen.getByRole("button", { name: texts.common.open }))
+    fireEvent.click(role("button", texts.common.open))
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(`/blog/${article.id}`)
     )
@@ -266,9 +225,7 @@ describe("Corbeille : contenus", () => {
     })
     await renderApp("/trash")
     fireEvent.click(
-      await screen.findByRole("button", {
-        name: texts.trash.restoreItem(page.title!),
-      })
+      await findRole("button", texts.trash.restoreItem(page.title!))
     )
     expect(
       await screen.findByText(texts.trash.restoredWithoutAddress(page.title!))
@@ -283,9 +240,7 @@ describe("Corbeille : contenus", () => {
     })
     await renderApp("/trash")
     fireEvent.click(
-      await screen.findByRole("button", {
-        name: texts.trash.restoreItem(article.title!),
-      })
+      await findRole("button", texts.trash.restoreItem(article.title!))
     )
     expect(
       await screen.findByText(
@@ -298,19 +253,9 @@ describe("Corbeille : contenus", () => {
     vi.mocked(api.emptyTrash).mockResolvedValue(3)
     await renderApp("/trash")
     await screen.findByText(page.title!)
-    fireEvent.click(
-      screen.getByRole("checkbox", {
-        name: texts.selection.select(page.title!),
-      })
-    )
-    fireEvent.click(
-      screen.getByRole("checkbox", {
-        name: texts.selection.select(article.title!),
-      })
-    )
-    const erase = screen.getByRole("button", {
-      name: texts.trash.eraseSelection(2),
-    })
+    fireEvent.click(role("checkbox", texts.selection.select(page.title!)))
+    fireEvent.click(role("checkbox", texts.selection.select(article.title!)))
+    const erase = role("button", texts.trash.eraseSelection(2))
     // Le bouton « destructif » de Nova (fond rouge pâle), pas un contour au texte rouge (ADMIN § 7).
     expect(erase).toHaveClass("bg-destructive/10")
     fireEvent.click(erase)
@@ -318,11 +263,7 @@ describe("Corbeille : contenus", () => {
     expect(dialog).toHaveTextContent(
       texts.trash.confirmSelection.description(2)
     )
-    fireEvent.click(
-      within(dialog).getByRole("button", {
-        name: texts.common.deletePermanently,
-      })
-    )
+    fireEvent.click(role("button", texts.common.deletePermanently, dialog))
     await waitFor(() =>
       expect(api.emptyTrash).toHaveBeenCalledWith([
         { type: "content", id: page.id },
@@ -335,13 +276,9 @@ describe("Corbeille : contenus", () => {
     vi.mocked(api.emptyTrash).mockResolvedValue(4)
     await renderApp("/trash")
     await screen.findByText(page.title!)
-    fireEvent.click(screen.getByRole("button", { name: texts.trash.empty }))
+    fireEvent.click(role("button", texts.trash.empty))
     const dialog = await screen.findByRole("alertdialog")
-    fireEvent.click(
-      within(dialog).getByRole("button", {
-        name: texts.trash.confirmEmpty.confirm,
-      })
-    )
+    fireEvent.click(role("button", texts.trash.confirmEmpty.confirm, dialog))
     await waitFor(() =>
       expect(api.emptyTrash).toHaveBeenCalledWith([
         { type: "content", id: page.id },

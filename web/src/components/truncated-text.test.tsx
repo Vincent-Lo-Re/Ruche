@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 
 import { TruncatedText } from "@/components/truncated-text"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { role } from "@/test/queries"
 
 const TITLE = "Bien commencer sa journée, même les jours les plus chargés"
 
@@ -22,7 +23,7 @@ async function hover() {
       <TruncatedText text={TITLE} />
     </TooltipProvider>
   )
-  const heading = screen.getByRole("heading", { name: TITLE })
+  const heading = role("heading", TITLE)
   await act(async () => {
     fireEvent.pointerEnter(heading, { pointerType: "mouse" })
     fireEvent.mouseEnter(heading)

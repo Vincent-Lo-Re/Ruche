@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 import { detachedAuth, supabase } from "@/lib/supabase"
 import { fakeAuth, renderApp, testProfile } from "@/test/render"
 import { texts } from "@/texts"
+import { findRole, queryRole, role } from "@/test/queries"
 
 afterEach(() => {
   vi.restoreAllMocks()
@@ -40,10 +41,8 @@ describe("Mon compte", () => {
     await renderApp("/account", fakeAuth({ role: "editor" }))
     const labels = texts.account.language
 
-    fireEvent.click(screen.getByRole("combobox", { name: labels.label }))
-    const english = await screen.findByRole("option", {
-      name: texts.languages.en,
-    })
+    fireEvent.click(role("combobox", labels.label))
+    const english = await findRole("option", texts.languages.en)
     // Base UI ne retient un clic de souris que s'il a commencé sur l'option.
     fireEvent.pointerDown(english, { pointerType: "mouse" })
     fireEvent.click(english)
@@ -57,7 +56,7 @@ describe("Mon compte", () => {
 
     async function openDialog() {
       await renderApp("/account", fakeAuth({ role: "editor" }))
-      fireEvent.click(screen.getByRole("button", { name: labels.open }))
+      fireEvent.click(role("button", labels.open))
       return screen.findByRole("dialog")
     }
 
@@ -65,7 +64,7 @@ describe("Mon compte", () => {
       fireEvent.change(within(dialog).getByLabelText(labels.newEmail), {
         target: { value: email },
       })
-      fireEvent.click(within(dialog).getByRole("button", { name: labels.send }))
+      fireEvent.click(role("button", labels.send, dialog))
     }
 
     it("la nouvelle adresse, puis son code : le 6e chiffre confirme, le profil suit", async () => {
@@ -164,10 +163,8 @@ describe("Mon compte", () => {
     await renderApp("/account", fakeAuth({ role: "editor" }))
     const labels = texts.account.format
 
-    fireEvent.click(screen.getByRole("combobox", { name: labels.label }))
-    const swiss = await screen.findByRole("option", {
-      name: "Français (Suisse)",
-    })
+    fireEvent.click(role("combobox", labels.label))
+    const swiss = await findRole("option", "Français (Suisse)")
     fireEvent.pointerDown(swiss, { pointerType: "mouse" })
     fireEvent.click(swiss)
 
@@ -182,7 +179,7 @@ describe("Mon compte", () => {
     fireEvent.change(screen.getByLabelText(texts.account.profile.name), {
       target: { value: "a".repeat(101) },
     })
-    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
+    fireEvent.click(role("button", texts.common.save))
 
     expect(
       await screen.findByText(texts.account.profile.nameTooLong("100"))
@@ -193,11 +190,9 @@ describe("Mon compte", () => {
   it("les couleurs : une palette d'une base et d'un accent, appliquée et gardée sur ce navigateur", async () => {
     await renderApp("/account", fakeAuth({ role: "editor" }))
     const colors = texts.colors
-    const presets = screen.getByRole("group", { name: colors.presets.title })
+    const presets = role("group", colors.presets.title)
     const preset = (id: keyof typeof colors.presets.names) =>
-      within(presets).getByRole("button", {
-        name: new RegExp(colors.presets.names[id]),
-      })
+      role("button", new RegExp(colors.presets.names[id]), presets)
 
     // Le preset d'origine en tête (Nova, tout en Neutral), choisi au départ, puis les dix palettes,
     // chacune sous un nom inventé qui mêle ses deux couleurs.
@@ -205,11 +200,9 @@ describe("Mon compte", () => {
     expect(buttons).toHaveLength(11)
     expect(buttons[0]).toHaveTextContent(colors.presets.names["neutral-none"])
     // Rien à réinitialiser tant que la palette d'origine est choisie.
-    expect(
-      screen.queryByRole("button", { name: colors.presets.reset })
-    ).toBeNull()
+    expect(queryRole("button", colors.presets.reset)).toBeNull()
     // Plus de pastilles de base ni d'accent : seules les palettes se choisissent.
-    expect(screen.queryByRole("group", { name: "Couleur de base" })).toBeNull()
+    expect(queryRole("group", "Couleur de base")).toBeNull()
 
     const zincBlue = preset("zinc-blue")
     fireEvent.click(zincBlue)
@@ -231,17 +224,13 @@ describe("Mon compte", () => {
     expect(zincBlue).toHaveAttribute("aria-pressed", "false")
 
     // « Réinitialiser » revient à Neutrine, puis disparaît.
-    fireEvent.click(screen.getByRole("button", { name: colors.presets.reset }))
+    fireEvent.click(role("button", colors.presets.reset))
     expect(buttons[0]).toHaveAttribute("aria-pressed", "true")
     expect(stoneOrange).toHaveAttribute("aria-pressed", "false")
-    expect(
-      screen.queryByRole("button", { name: colors.presets.reset })
-    ).toBeNull()
+    expect(queryRole("button", colors.presets.reset)).toBeNull()
 
     // L'aperçu, à côté : une page d'accueil en réduction, aux couleurs choisies, pour voir seulement.
-    expect(
-      screen.getByRole("heading", { name: colors.preview.title })
-    ).toBeVisible()
+    expect(role("heading", colors.preview.title)).toBeVisible()
     const preview = document.querySelector("[inert]")
     expect(preview).toHaveTextContent(colors.preview.heading)
     expect(preview?.querySelector('[data-slot="sidebar-inner"]')).toHaveClass(

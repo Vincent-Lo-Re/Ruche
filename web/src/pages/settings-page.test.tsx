@@ -6,6 +6,7 @@ import * as identityApi from "@/lib/admin-identity"
 import { fakeAuth, renderApp } from "@/test/render"
 import { texts } from "@/texts"
 import { NO_CUSTOM_NAMES } from "@/lib/section-names"
+import { findRole, queryRole, role } from "@/test/queries"
 
 vi.mock("@/lib/access-levels", async (importOriginal) => {
   const actual = await importOriginal<typeof levelsApi>()
@@ -46,10 +47,8 @@ const labels = texts.settings.accessLevels
 
 /** Ouvre le menu « … » d'une ligne et choisit une action (Renommer, Supprimer). */
 async function chooseAction(name: string, action: string) {
-  fireEvent.click(
-    await screen.findByRole("button", { name: labels.actions(name) })
-  )
-  fireEvent.click(await screen.findByRole("menuitem", { name: action }))
+  fireEvent.click(await findRole("button", labels.actions(name)))
+  fireEvent.click(await findRole("menuitem", action))
 }
 const essentiel = {
   id: "00000000-0000-4000-8000-0000000000e1",
@@ -109,16 +108,12 @@ describe("Paramètres : la langue de l'admin (Avancé)", () => {
     await renderApp("/settings?tab=advanced")
     const words = texts.settings.advanced.language
 
-    expect(
-      await screen.findByRole("heading", { name: words.title })
-    ).toBeVisible()
-    const choice = await screen.findByRole("combobox", { name: words.label })
+    expect(await findRole("heading", words.title)).toBeVisible()
+    const choice = await findRole("combobox", words.label)
     expect(choice).toHaveTextContent(texts.languages.fr)
 
     fireEvent.click(choice)
-    const english = await screen.findByRole("option", {
-      name: texts.languages.en,
-    })
+    const english = await findRole("option", texts.languages.en)
     // Base UI ne retient un clic de souris que s'il a commencé sur l'option.
     fireEvent.pointerDown(english, { pointerType: "mouse" })
     fireEvent.click(english)
@@ -140,17 +135,15 @@ describe("Paramètres : le fuseau horaire de l'admin (Avancé)", () => {
     await renderApp("/settings?tab=advanced")
     const words = texts.settings.advanced.timeZone
 
-    expect(
-      await screen.findByRole("heading", { name: words.title })
-    ).toBeVisible()
-    const choice = await screen.findByRole("combobox", { name: words.label })
+    expect(await findRole("heading", words.title)).toBeVisible()
+    const choice = await findRole("combobox", words.label)
     expect(choice).toHaveTextContent(/^Paris \(UTC\+0[12]:00\)$/)
 
     fireEvent.click(choice)
     fireEvent.change(await screen.findByPlaceholderText(words.search), {
       target: { value: "Tokyo" },
     })
-    fireEvent.click(await screen.findByRole("option", { name: /Tokyo/ }))
+    fireEvent.click(await findRole("option", /Tokyo/))
 
     await waitFor(() =>
       expect(identityApi.saveAdminTimeZone).toHaveBeenCalledWith("Asia/Tokyo")
@@ -164,7 +157,7 @@ describe("Paramètres : le format régional de l'admin (Avancé)", () => {
     await renderApp("/settings?tab=advanced")
     const words = texts.settings.advanced.format
 
-    const choice = await screen.findByRole("combobox", { name: words.label })
+    const choice = await findRole("combobox", words.label)
     expect(choice).toHaveTextContent(words.sameAsLanguage)
     // L'exemple, celui de la langue de qui regarde (le français ici).
     expect(
@@ -172,9 +165,7 @@ describe("Paramètres : le format régional de l'admin (Avancé)", () => {
     ).toBeVisible()
 
     fireEvent.click(choice)
-    const british = await screen.findByRole("option", {
-      name: "Anglais (Royaume-Uni)",
-    })
+    const british = await findRole("option", "Anglais (Royaume-Uni)")
     fireEvent.pointerDown(british, { pointerType: "mouse" })
     fireEvent.click(british)
 
@@ -189,9 +180,7 @@ describe("Paramètres : les onglets", () => {
   it("trois onglets ; le premier s'ouvre au départ, l'onglet choisi va dans l'adresse", async () => {
     const { router } = await renderApp("/settings")
 
-    const tabs = await screen.findByRole("tablist", {
-      name: texts.settings.tabs.label,
-    })
+    const tabs = await findRole("tablist", texts.settings.tabs.label)
     expect(
       within(tabs)
         .getAllByRole("tab")
@@ -201,17 +190,14 @@ describe("Paramètres : les onglets", () => {
       texts.settings.tabs.plans,
       texts.settings.tabs.advanced,
     ])
-    expect(
-      within(tabs).getByRole("tab", { name: texts.settings.tabs.admin })
-    ).toHaveAttribute("aria-selected", "true")
-    // Le premier onglet : le nom de la marque.
-    expect(
-      screen.getByRole("heading", { name: texts.settings.adminIdentity.title })
-    ).toBeVisible()
-
-    fireEvent.click(
-      within(tabs).getByRole("tab", { name: texts.settings.tabs.plans })
+    expect(role("tab", texts.settings.tabs.admin, tabs)).toHaveAttribute(
+      "aria-selected",
+      "true"
     )
+    // Le premier onglet : le nom de la marque.
+    expect(role("heading", texts.settings.adminIdentity.title)).toBeVisible()
+
+    fireEvent.click(role("tab", texts.settings.tabs.plans, tabs))
     expect(await screen.findByText(labels.title)).toBeVisible()
     await waitFor(() => expect(router.state.location.search).toBe("?tab=plans"))
   })
@@ -223,12 +209,12 @@ describe("Paramètres : les noms du Blog et des Podcasts", () => {
   it("les trois formes françaises vont ensemble ; enregistre les noms écrits", async () => {
     vi.mocked(identityApi.saveSectionNames).mockResolvedValue()
     await renderApp("/settings?tab=advanced")
-    const blog = await screen.findByRole("group", { name: words.sections.blog })
+    const blog = await findRole("group", words.sections.blog)
     const [name, le, du, en] = within(blog).getAllByRole("textbox")
 
     // Le nom seul, sans « le » ni « du » : refusé, les deux autres champs le disent.
     fireEvent.change(name, { target: { value: "Le Journal" } })
-    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
+    fireEvent.click(role("button", texts.common.save))
     expect(await within(blog).findAllByText(words.incomplete)).toHaveLength(2)
     expect(identityApi.saveSectionNames).not.toHaveBeenCalled()
 
@@ -241,7 +227,7 @@ describe("Paramètres : les noms du Blog et des Podcasts", () => {
     ).toBeVisible()
     expect(within(blog).getByText(words.exampleLe("le Journal"))).toBeVisible()
     expect(within(blog).getByText(words.exampleDu("du Journal"))).toBeVisible()
-    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
+    fireEvent.click(role("button", texts.common.save))
     await waitFor(() =>
       expect(identityApi.saveSectionNames).toHaveBeenCalledWith({
         fr: {
@@ -272,7 +258,7 @@ describe("Paramètres : le nom de la marque", () => {
 
     vi.mocked(identityApi.getAdminBrand).mockResolvedValue(brand("Essaim"))
     fireEvent.change(field, { target: { value: "  Essaim " } })
-    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
+    fireEvent.click(role("button", texts.common.save))
 
     // Sans les espaces autour ; puis relu pour toute l'admin.
     await waitFor(() =>
@@ -297,12 +283,12 @@ describe("Paramètres : le nom de la marque", () => {
     expect(field).toHaveValue("Essaim")
 
     fireEvent.change(field, { target: { value: "a".repeat(41) } })
-    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
+    fireEvent.click(role("button", texts.common.save))
     expect(await screen.findByText(identity.nameTooLong("40"))).toBeVisible()
     expect(identityApi.saveBrandDetails).not.toHaveBeenCalled()
 
     fireEvent.change(field, { target: { value: "   " } })
-    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
+    fireEvent.click(role("button", texts.common.save))
     await waitFor(() =>
       expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
         name: null,
@@ -321,12 +307,12 @@ describe("Paramètres : l'adresse de contact de la marque", () => {
     await renderApp("/settings")
     const field = await screen.findByLabelText(identity.email)
     fireEvent.change(field, { target: { value: "pas-une-adresse" } })
-    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
+    fireEvent.click(role("button", texts.common.save))
     expect(await screen.findByText(identity.invalidEmail)).toBeVisible()
     expect(identityApi.saveBrandDetails).not.toHaveBeenCalled()
 
     fireEvent.change(field, { target: { value: "aide@exemple.fr" } })
-    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
+    fireEvent.click(role("button", texts.common.save))
     await waitFor(() =>
       expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
         name: null,
@@ -345,12 +331,12 @@ describe("Paramètres : le site web du client", () => {
     await renderApp("/settings")
     const field = await screen.findByLabelText(identity.website)
     fireEvent.change(field, { target: { value: "http://example.com" } })
-    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
+    fireEvent.click(role("button", texts.common.save))
     expect(await screen.findByText(identity.invalidWebsite)).toBeVisible()
     expect(identityApi.saveBrandDetails).not.toHaveBeenCalled()
 
     fireEvent.change(field, { target: { value: " https://example.com/fr " } })
-    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
+    fireEvent.click(role("button", texts.common.save))
     await waitFor(() =>
       expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
         name: null,
@@ -374,7 +360,7 @@ describe("Paramètres : les initiales de la marque", () => {
     })
     expect(field).toHaveAttribute("placeholder", "E")
     fireEvent.change(field, { target: { value: " ES " } })
-    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
+    fireEvent.click(role("button", texts.common.save))
     await waitFor(() =>
       expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
         name: "Essaim",
@@ -406,16 +392,14 @@ describe("Paramètres : le logotype et le monogramme", () => {
     await screen.findByLabelText(light)
 
     // Le fond sombre a son fichier (« Remplacer », « Retirer ») ; le fond clair n'en a pas.
-    expect(
-      within(cardOf(dark)).getByRole("img", { name: dark })
-    ).toHaveAttribute("src", logo.url)
+    expect(role("img", dark, cardOf(dark))).toHaveAttribute("src", logo.url)
     expect(within(cardOf(dark)).getByText(files.replace)).toBeVisible()
     expect(within(cardOf(light)).queryByRole("img")).toBeNull()
     expect(within(cardOf(light)).getByText(files.choose)).toBeVisible()
 
     // Dans le header (le thème : sombre ici, seul fichier envoyé), avec le nom de la marque pour
     // les lecteurs d'écran ; il mène au Tableau de bord.
-    const home = screen.getByRole("link", { name: /Essaim/ })
+    const home = role("link", /Essaim/)
     expect(home).toHaveAttribute("href", "/")
     expect(home.querySelector("img")).toHaveAttribute("src", logo.url)
 
@@ -433,9 +417,7 @@ describe("Paramètres : le logotype et le monogramme", () => {
       )
     )
     expect(identityApi.saveBrandVariants).not.toHaveBeenCalled()
-    fireEvent.click(
-      within(cardOf(dark)).getByRole("button", { name: files.remove })
-    )
+    fireEvent.click(role("button", files.remove, cardOf(dark)))
     await waitFor(() =>
       // Ses déclinaisons partent avec lui (removeBrandFile).
       expect(identityApi.removeBrandFile).toHaveBeenCalledWith(
@@ -491,18 +473,14 @@ describe("Paramètres : décliner un logo aux couleurs des palettes", () => {
       target: { files: [logo] },
     })
 
-    const dialog = await screen.findByRole("dialog", {
-      name: files.variants.title,
-    })
+    const dialog = await findRole("dialog", files.variants.title)
     // Les onze palettes, chacune avec son nom.
     expect(within(dialog).getAllByRole("listitem")).toHaveLength(11)
     expect(
       within(dialog).getByText(texts.colors.presets.names["zinc-blue"])
     ).toBeVisible()
 
-    fireEvent.click(
-      within(dialog).getByRole("button", { name: files.variants.confirm(11) })
-    )
+    fireEvent.click(role("button", files.variants.confirm(11), dialog))
     await waitFor(() =>
       expect(identityApi.saveBrandVariants).toHaveBeenCalledWith(
         "monogram",
@@ -525,7 +503,7 @@ describe("Paramètres : décliner un logo aux couleurs des palettes", () => {
 describe("Paramètres : formules d'abonnement", () => {
   it("liste les formules de la moins complète à la plus complète", async () => {
     await renderApp("/settings?tab=plans")
-    const list = await screen.findByRole("list", { name: labels.listLabel })
+    const list = await findRole("list", labels.listLabel)
     expect(
       within(list)
         .getAllByRole("listitem")
@@ -533,9 +511,10 @@ describe("Paramètres : formules d'abonnement", () => {
     ).toEqual(["Essentiel", "Premium"])
     expect(within(list).getByText(labels.rank(1))).toBeVisible()
     // Chaque formule a sa poignée, pour la souris et le clavier.
-    expect(
-      screen.getByRole("button", { name: labels.handle("Premium") })
-    ).toHaveAttribute("aria-roledescription", labels.dnd.roleDescription)
+    expect(role("button", labels.handle("Premium"))).toHaveAttribute(
+      "aria-roledescription",
+      labels.dnd.roleDescription
+    )
   })
 
   it("ajoute une formule ; un nom vide ou en double est refusé", async () => {
@@ -543,9 +522,9 @@ describe("Paramètres : formules d'abonnement", () => {
       .mockRejectedValueOnce(new levelsApi.AccessLevelError("nom_en_double"))
       .mockResolvedValue({ id: "n", name: "Intégral", rank: 3 })
     await renderApp("/settings?tab=plans")
-    await screen.findByRole("list", { name: labels.listLabel })
+    await findRole("list", labels.listLabel)
     const name = screen.getByLabelText(labels.name)
-    const add = screen.getByRole("button", { name: labels.add })
+    const add = role("button", labels.add)
 
     fireEvent.change(name, { target: { value: "   " } })
     fireEvent.click(add)
@@ -574,7 +553,7 @@ describe("Paramètres : formules d'abonnement", () => {
     await chooseAction("Premium", labels.rename)
     const input = screen.getByLabelText(labels.renameLabel("Premium"))
     fireEvent.change(input, { target: { value: "Premium+" } })
-    fireEvent.click(screen.getByRole("button", { name: texts.common.save }))
+    fireEvent.click(role("button", texts.common.save))
     await waitFor(() =>
       expect(levelsApi.renameAccessLevel).toHaveBeenCalledWith(
         premium.id,
@@ -594,10 +573,7 @@ describe("Paramètres : formules d'abonnement", () => {
     const input = screen.getByLabelText(labels.renameLabel("Premium"))
     fireEvent.keyDown(input, { key: "Escape" })
     await waitFor(
-      () =>
-        expect(
-          screen.getByRole("button", { name: labels.actions("Premium") })
-        ).toHaveFocus(),
+      () => expect(role("button", labels.actions("Premium"))).toHaveFocus(),
       { timeout: 3000 }
     )
 
@@ -607,10 +583,7 @@ describe("Paramètres : formules d'abonnement", () => {
     fireEvent.submit(again.closest("form")!)
     expect(await screen.findByText(labels.renamed)).toBeVisible()
     await waitFor(
-      () =>
-        expect(
-          screen.getByRole("button", { name: labels.actions("Premium") })
-        ).toHaveFocus(),
+      () => expect(role("button", labels.actions("Premium"))).toHaveFocus(),
       { timeout: 3000 }
     )
   })
@@ -621,24 +594,25 @@ describe("Paramètres : formules d'abonnement", () => {
     await chooseAction("Essentiel", labels.remove)
     vi.mocked(levelsApi.listAccessLevels).mockResolvedValue([premium])
     fireEvent.click(
-      within(await screen.findByRole("alertdialog")).getByRole("button", {
-        name: labels.confirmRemove.confirm,
-      })
+      role(
+        "button",
+        labels.confirmRemove.confirm,
+        await screen.findByRole("alertdialog")
+      )
     )
     await waitFor(
-      () =>
-        expect(
-          screen.getByRole("button", { name: labels.actions("Premium") })
-        ).toHaveFocus(),
+      () => expect(role("button", labels.actions("Premium"))).toHaveFocus(),
       { timeout: 3000 }
     )
 
     await chooseAction("Premium", labels.remove)
     vi.mocked(levelsApi.listAccessLevels).mockResolvedValue([])
     fireEvent.click(
-      within(await screen.findByRole("alertdialog")).getByRole("button", {
-        name: labels.confirmRemove.confirm,
-      })
+      role(
+        "button",
+        labels.confirmRemove.confirm,
+        await screen.findByRole("alertdialog")
+      )
     )
     await waitFor(
       () => expect(screen.getByLabelText(labels.name)).toHaveFocus(),
@@ -656,11 +630,7 @@ describe("Paramètres : formules d'abonnement", () => {
     expect(dialog).toHaveTextContent(
       labels.confirmRemove.description("Essentiel")
     )
-    fireEvent.click(
-      within(dialog).getByRole("button", {
-        name: labels.confirmRemove.confirm,
-      })
-    )
+    fireEvent.click(role("button", labels.confirmRemove.confirm, dialog))
     expect(
       await screen.findByText(labels.errors.formule_utilisee)
     ).toBeVisible()
@@ -684,12 +654,10 @@ describe("Paramètres : l'image de l'écran de connexion", () => {
     const input = await screen.findByLabelText(files.loginScreen.title)
     const zone = document.querySelector(`label[for="${input.id}"]`)!
     expect(zone).toHaveTextContent(files.loginImage.choose)
-    const preview = await screen.findByRole("img", {
-      name: files.loginScreen.preview,
-    })
+    const preview = await findRole("img", files.loginScreen.preview)
     expect(preview.querySelector('img[alt=""]')).toBeNull()
     expect(preview).toHaveTextContent("R")
-    expect(screen.queryByRole("button", { name: files.remove })).toBeNull()
+    expect(queryRole("button", files.remove)).toBeNull()
   })
 
   it("un clic sur l'aperçu envoie la photo, réduite ; l'image enregistrée se retire", async () => {
@@ -706,9 +674,7 @@ describe("Paramètres : l'image de l'écran de connexion", () => {
     await renderApp("/settings")
 
     // L'aperçu montre l'image choisie, sous le voile et le monogramme.
-    const preview = await screen.findByRole("img", {
-      name: files.loginScreen.preview,
-    })
+    const preview = await findRole("img", files.loginScreen.preview)
     const card = preview.closest('[data-slot="card"]') as HTMLElement
     await waitFor(() =>
       expect(preview.querySelector('img[alt=""]')).toHaveAttribute(
@@ -717,9 +683,7 @@ describe("Paramètres : l'image de l'écran de connexion", () => {
       )
     )
     // Pas de bouton à côté : l'aperçu lui-même choisit l'image.
-    expect(
-      within(card).queryByRole("button", { name: files.replace })
-    ).toBeNull()
+    expect(queryRole("button", files.replace, card)).toBeNull()
 
     const photo = new File(["x"], "photo.jpg", { type: "image/jpeg" })
     fireEvent.change(screen.getByLabelText(files.loginScreen.title), {
@@ -733,7 +697,7 @@ describe("Paramètres : l'image de l'écran de connexion", () => {
     )
     expect(identityApi.prepareLoginImage).toHaveBeenCalledWith(photo)
 
-    fireEvent.click(within(card).getByRole("button", { name: files.remove }))
+    fireEvent.click(role("button", files.remove, card))
     await waitFor(() =>
       expect(identityApi.removeLoginImage).toHaveBeenCalledWith(image.path)
     )
@@ -745,7 +709,7 @@ describe("Paramètres : le monogramme animé de l'écran de connexion", () => {
 
   it("l'interrupteur l'active ou le désactive pour toute l'équipe", async () => {
     await renderApp("/settings")
-    const toggle = await screen.findByRole("switch", { name: motion.toggle })
+    const toggle = await findRole("switch", motion.toggle)
     expect(toggle).toHaveAttribute("aria-checked", "true")
     fireEvent.click(toggle)
     await waitFor(() =>
@@ -756,10 +720,8 @@ describe("Paramètres : le monogramme animé de l'écran de connexion", () => {
 
   it("ses animations se cochent, dans l'ordre fixe, une au moins", async () => {
     await renderApp("/settings")
-    const group = await screen.findByRole("list", { name: motion.group })
-    fireEvent.click(
-      within(group).getByRole("checkbox", { name: motion.motions.shine })
-    )
+    const group = await findRole("list", motion.group)
+    fireEvent.click(role("checkbox", motion.motions.shine, group))
     await waitFor(() =>
       expect(identityApi.saveMonogramMotions).toHaveBeenCalledWith([
         "trace",
@@ -777,15 +739,16 @@ describe("Paramètres : le monogramme animé de l'écran de connexion", () => {
       "monogram-dark": { path: "m.png", url: "https://exemple.fr/m.png" },
     })
     await renderApp("/settings")
-    const group = await screen.findByRole("list", { name: motion.group })
+    const group = await findRole("list", motion.group)
     await waitFor(() =>
-      expect(
-        within(group).getByRole("checkbox", { name: motion.motions.trace })
-      ).toHaveAttribute("aria-disabled", "true")
+      expect(role("checkbox", motion.motions.trace, group)).toHaveAttribute(
+        "aria-disabled",
+        "true"
+      )
     )
-    expect(
-      within(group).getByRole("checkbox", { name: motion.motions.shine })
-    ).not.toHaveAttribute("aria-disabled")
+    expect(role("checkbox", motion.motions.shine, group)).not.toHaveAttribute(
+      "aria-disabled"
+    )
     expect(
       within(group).getAllByRole("button", { name: motion.blocked.svg })
     ).toHaveLength(3)
@@ -798,15 +761,11 @@ describe("Paramètres : le monogramme animé de l'écran de connexion", () => {
       monogramMotions: ["trace", "sway"],
     })
     await renderApp("/settings")
-    const group = await screen.findByRole("list", { name: motion.group })
-    const trace = within(group).getByRole("checkbox", {
-      name: motion.motions.trace,
-    })
+    const group = await findRole("list", motion.group)
+    const trace = role("checkbox", motion.motions.trace, group)
     expect(trace).toHaveAttribute("aria-disabled", "true")
     expect(trace).not.toBeChecked()
-    expect(
-      within(group).getByRole("checkbox", { name: motion.motions.sway })
-    ).toBeChecked()
+    expect(role("checkbox", motion.motions.sway, group)).toBeChecked()
     expect(
       within(group).getAllByRole("button", { name: motion.blocked.text })
     ).toHaveLength(3)
@@ -819,10 +778,8 @@ describe("Paramètres : le monogramme animé de l'écran de connexion", () => {
       monogramMotions: ["sway"],
     })
     await renderApp("/settings")
-    const group = await screen.findByRole("list", { name: motion.group })
-    const sway = within(group).getByRole("checkbox", {
-      name: motion.motions.sway,
-    })
+    const group = await findRole("list", motion.group)
+    const sway = role("checkbox", motion.motions.sway, group)
     expect(sway).not.toHaveAttribute("aria-disabled", "true")
     fireEvent.click(sway)
     await waitFor(() =>

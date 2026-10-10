@@ -8,33 +8,12 @@ import { rejectReasonText } from "@/lib/media/upload"
 import { getUploadQueue } from "@/lib/media/upload-queue"
 import { fakeAuth, renderApp } from "@/test/render"
 import { texts } from "@/texts"
+import { findRole, queryRole, role } from "@/test/queries"
 
 // La base, le stockage et la fonction « files » sont simulés.
-vi.mock("@/lib/media/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof api>()
-  return {
-    ...actual,
-    listMedia: vi.fn(),
-    getStorageUsed: vi.fn(),
-    getLatestAudit: vi.fn(),
-    getPreviewUrls: vi.fn(),
-    getMediaUses: vi.fn(),
-    getMediaOutdated: vi.fn(),
-    pushMediaTexts: vi.fn(),
-    updateMedia: vi.fn(),
-    trashMedia: vi.fn(),
-    restoreMedia: vi.fn(),
-    callFiles: vi.fn(),
-    kickFiles: vi.fn(),
-    createMedia: vi.fn(),
-    confirmMedia: vi.fn(),
-    discardUpload: vi.fn(),
-    getMediaVerdicts: vi.fn(),
-    getMedia: vi.fn(),
-    replaceMedia: vi.fn(),
-    replaceMediaLive: vi.fn(),
-  }
-})
+vi.mock("@/lib/media/api", async (original) =>
+  (await import("@/test/mocks")).mediaApi(original)
+)
 vi.mock("@/lib/media/transfer", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/lib/media/transfer")>()),
   sendFile: vi.fn(),
@@ -123,15 +102,12 @@ describe("Médiathèque", () => {
 
     // L'état en pastille : une coche ou une croix, l'état exact dans l'infobulle.
     expect(await screen.findByText(photo.name)).toBeVisible()
+    expect(role("img", texts.media.status.checking)).toBeVisible()
     expect(
-      screen.getByRole("img", { name: texts.media.status.checking })
-    ).toBeVisible()
-    expect(
-      screen.getByRole("img", {
-        name: texts.media.rejectedBecause(
-          texts.media.rejectReasons.lottie_invalide
-        ),
-      })
+      role(
+        "img",
+        texts.media.rejectedBecause(texts.media.rejectReasons.lottie_invalide)
+      )
     ).toBeVisible()
     expect(
       screen.getAllByRole("img", { name: texts.media.status.ready })
@@ -150,15 +126,11 @@ describe("Médiathèque", () => {
     await screen.findByText(photo.name)
 
     // « Tout » garde son texte ; les types n'ont qu'une icône, nommée pour les lecteurs d'écran.
-    const filters = screen.getByRole("group", {
-      name: texts.media.filters.label,
-    })
-    expect(
-      within(filters).getByRole("button", { name: texts.media.filters.all })
-    ).toHaveTextContent(texts.media.filters.all)
-    const audios = within(filters).getByRole("button", {
-      name: texts.media.filters.audio,
-    })
+    const filters = role("group", texts.media.filters.label)
+    expect(role("button", texts.media.filters.all, filters)).toHaveTextContent(
+      texts.media.filters.all
+    )
+    const audios = role("button", texts.media.filters.audio, filters)
     expect(audios).toHaveTextContent("")
 
     fireEvent.click(audios)
@@ -192,9 +164,7 @@ describe("Médiathèque", () => {
       })
     )
     expect(screen.getByLabelText(texts.media.search)).toHaveValue("pluie")
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.media.filters.unused })
-    )
+    fireEvent.click(role("button", texts.media.filters.unused))
     await waitFor(() =>
       expect(router.state.location.search).toBe(
         "?type=audio&q=pluie&unused=true"
@@ -215,17 +185,15 @@ describe("Médiathèque", () => {
     const unused = screen.getAllByRole("img", { name: texts.media.unused })
     expect(unused).toHaveLength(1)
     const card = (name: string) =>
-      screen.getByRole("button", { name: texts.media.open(name) }).closest("li")
+      role("button", texts.media.open(name)).closest("li")
     expect(card(voice.name)).toContainElement(unused[0])
     // « Utilisé » : un bouton, à côté de la vignette (il ouvre la liste des utilisations).
     expect(card(photo.name)).toContainElement(
-      screen.getByRole("button", { name: texts.media.uses.open(photo.name) })
+      role("button", texts.media.uses.open(photo.name))
     )
 
     vi.mocked(api.listMedia).mockResolvedValue([])
-    const toggle = screen.getByRole("button", {
-      name: texts.media.filters.unused,
-    })
+    const toggle = role("button", texts.media.filters.unused)
     expect(toggle).toHaveAttribute("aria-pressed", "false")
     fireEvent.click(toggle)
     expect(toggle).toHaveAttribute("aria-pressed", "true")
@@ -249,9 +217,7 @@ describe("Médiathèque", () => {
     await screen.findByText(photo.name)
 
     // Une icône seule : son nom s'affiche dans une infobulle au survol.
-    const listButton = screen.getByRole("button", {
-      name: texts.media.view.list,
-    })
+    const listButton = role("button", texts.media.view.list)
     expect(listButton).toHaveTextContent("")
     fireEvent.pointerEnter(listButton, { pointerType: "mouse" })
     fireEvent.mouseEnter(listButton)
@@ -260,24 +226,16 @@ describe("Médiathèque", () => {
     fireEvent.click(listButton)
 
     // État et utilisation : des icônes, nommées par leur infobulle.
-    const row = screen.getByRole("row", { name: new RegExp(voice.name) })
+    const row = role("row", new RegExp(voice.name))
+    expect(role("img", texts.media.status.ready, row)).toBeVisible()
+    expect(role("img", texts.media.unused, row)).toBeVisible()
+    const used = role("row", new RegExp(photo.name))
     expect(
-      within(row).getByRole("img", { name: texts.media.status.ready })
-    ).toBeVisible()
-    expect(
-      within(row).getByRole("img", { name: texts.media.unused })
-    ).toBeVisible()
-    const used = screen.getByRole("row", { name: new RegExp(photo.name) })
-    expect(
-      within(used).getByRole("button", {
-        name: texts.media.uses.open(photo.name),
-      })
+      role("button", texts.media.uses.open(photo.name), used)
     ).toBeVisible()
     // Ni dimensions ni durée dans la liste.
     expect(within(row).queryByText("3 min 05 s")).toBeNull()
-    expect(
-      screen.getByRole("columnheader", { name: texts.media.columns.size })
-    ).toBeVisible()
+    expect(role("columnheader", texts.media.columns.size)).toBeVisible()
     // La préférence est gardée pour la prochaine visite.
     expect(localStorage.getItem("ruche:mediatheque:affichage")).toBe("list")
   })
@@ -295,17 +253,13 @@ describe("Médiathèque", () => {
     expect(screen.queryByText("photo-49.webp")).toBeNull()
     expect(screen.getByText("1–48 sur 50")).toBeVisible()
 
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.common.pagination.page(2) })
-    )
+    fireEvent.click(role("button", texts.common.pagination.page(2)))
     expect(await screen.findByText("photo-49.webp")).toBeVisible()
     expect(screen.queryByText("photo-1.webp")).toBeNull()
     expect(router.state.location.search).toBe("?page=2")
 
-    fireEvent.click(screen.getByRole("button", { name: texts.media.view.list }))
-    expect(
-      await screen.findByRole("row", { name: /photo-50\.webp/ })
-    ).toBeVisible()
+    fireEvent.click(role("button", texts.media.view.list))
+    expect(await findRole("row", /photo-50\.webp/)).toBeVisible()
     expect(screen.queryByText("photo-1.webp")).toBeNull()
   })
 
@@ -340,9 +294,7 @@ describe("Médiathèque", () => {
     await renderApp("/media", fakeAuth({ role: "editor" }))
 
     expect(await screen.findByText(texts.media.orphans.title(1))).toBeVisible()
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.media.orphans.clean })
-    )
+    fireEvent.click(role("button", texts.media.orphans.clean))
 
     expect(
       await screen.findByText(texts.media.orphans.cleaned(1))
@@ -357,9 +309,7 @@ describe("Médiathèque", () => {
     })
     await renderApp("/media")
 
-    fireEvent.click(
-      await screen.findByRole("button", { name: texts.media.open(photo.name) })
-    )
+    fireEvent.click(await findRole("button", texts.media.open(photo.name)))
     const sheet = await screen.findByRole("dialog")
     expect(
       await within(sheet).findByText(texts.media.detail.notUsed)
@@ -372,9 +322,7 @@ describe("Médiathèque", () => {
     fireEvent.change(within(sheet).getByLabelText(texts.media.detail.alt), {
       target: { value: "  Un chat au soleil " },
     })
-    fireEvent.click(
-      within(sheet).getByRole("button", { name: texts.common.save })
-    )
+    fireEvent.click(role("button", texts.common.save, sheet))
 
     expect(await screen.findByText(texts.media.detail.saved)).toBeVisible()
     expect(api.updateMedia).toHaveBeenCalledWith(photo.id, {
@@ -385,9 +333,7 @@ describe("Médiathèque", () => {
 
   it("la fiche : des cartes avec leur icône, et l'état et l'utilisation en pastilles en bas", async () => {
     await renderApp("/media")
-    fireEvent.click(
-      await screen.findByRole("button", { name: texts.media.open(photo.name) })
-    )
+    fireEvent.click(await findRole("button", texts.media.open(photo.name)))
     const sheet = await screen.findByRole("dialog")
     const words = texts.media.detail
 
@@ -400,20 +346,16 @@ describe("Médiathèque", () => {
         within(sheet).getByRole("heading", { level: 3, name: title })
       ).toBeVisible()
     }
-    const info = within(sheet).getByRole("region", { name: words.info })
+    const info = role("region", words.info, sheet)
     // Les cartes de la fiche sont la Card de shadcn, en petit ; le bas, le SheetFooter.
     expect(info).toHaveAttribute("data-size", "sm")
     expect(within(info).getByText(texts.media.kinds.image)).toBeVisible()
     expect(within(info).getByText(words.protected)).toBeVisible()
 
     // En bas, à gauche de « Mettre à la corbeille » : des pastilles à icône, comme les vignettes.
-    expect(
-      await within(sheet).findByRole("img", { name: texts.media.unused })
-    ).toBeVisible()
-    const ready = within(sheet).getByRole("img", {
-      name: texts.media.status.ready,
-    })
-    const trash = within(sheet).getByRole("button", { name: words.trash })
+    expect(await findRole("img", texts.media.unused, sheet)).toBeVisible()
+    const ready = role("img", texts.media.status.ready, sheet)
+    const trash = role("button", words.trash, sheet)
     expect(trash.closest('[data-slot="sheet-footer"]')).not.toBeNull()
     expect(ready.parentElement).toBe(trash.parentElement)
     expect(
@@ -449,27 +391,20 @@ describe("Médiathèque", () => {
       .mockImplementation(() => {})
     await renderApp("/media")
 
-    fireEvent.click(
-      await screen.findByRole("button", {
-        name: texts.media.uses.open(photo.name),
-      })
-    )
+    fireEvent.click(await findRole("button", texts.media.uses.open(photo.name)))
     const words = texts.media.uses
-    const dialog = await screen.findByRole("dialog", { name: words.title })
+    const dialog = await findRole("dialog", words.title)
     expect(
       await within(dialog).findByText(new RegExp(texts.uses.count(2)))
     ).toBeVisible()
-    expect(
-      within(dialog).getByRole("link", { name: "Bien commencer" })
-    ).toHaveAttribute("href", "/blog/00000000-0000-4000-8000-0000000000aa")
-    expect(
-      within(dialog).getByRole("link", { name: texts.common.untitled })
-    ).toBeVisible()
+    expect(role("link", "Bien commencer", dialog)).toHaveAttribute(
+      "href",
+      "/blog/00000000-0000-4000-8000-0000000000aa"
+    )
+    expect(role("link", texts.common.untitled, dialog)).toBeVisible()
     expect(within(dialog).getByText(texts.sections.pages.title)).toBeVisible()
 
-    fireEvent.click(
-      within(dialog).getByRole("button", { name: texts.uses.export })
-    )
+    fireEvent.click(role("button", texts.uses.export, dialog))
     expect(click).toHaveBeenCalledOnce()
     const link = click.mock.contexts[0] as HTMLAnchorElement
     expect(link.download).toBe(words.fileName("photo"))
@@ -489,25 +424,17 @@ describe("Médiathèque", () => {
       },
     ])
     await renderApp("/media")
-    fireEvent.click(
-      await screen.findByRole("button", { name: texts.media.open(photo.name) })
-    )
+    fireEvent.click(await findRole("button", texts.media.open(photo.name)))
     const sheet = await screen.findByRole("dialog")
     const words = texts.media.detail
 
-    const uses = within(sheet).getByRole("region", { name: words.uses })
+    const uses = role("region", words.uses, sheet)
     expect(await within(uses).findByText(words.usesCount(1))).toBeVisible()
-    expect(
-      within(uses).getByRole("link", { name: "Bien commencer" })
-    ).toBeVisible()
+    expect(role("link", "Bien commencer", uses)).toBeVisible()
     // Le même export que la fenêtre des utilisations.
-    expect(
-      within(uses).getByRole("button", { name: texts.uses.export })
-    ).toBeEnabled()
-    expect(
-      within(sheet).getByRole("img", { name: texts.media.used })
-    ).toBeVisible()
-    const info = within(sheet).getByRole("region", { name: words.info })
+    expect(role("button", texts.uses.export, uses)).toBeEnabled()
+    expect(role("img", texts.media.used, sheet)).toBeVisible()
+    const info = role("region", words.info, sheet)
     expect(within(info).getByText(words.public)).toBeVisible()
     expect(within(info).getByText(words.publicHint)).toBeVisible()
   })
@@ -546,9 +473,7 @@ describe("Médiathèque", () => {
     vi.mocked(api.pushMediaTexts).mockResolvedValue(1)
     await renderApp("/media")
 
-    fireEvent.click(
-      await screen.findByRole("button", { name: texts.media.open(photo.name) })
-    )
+    fireEvent.click(await findRole("button", texts.media.open(photo.name)))
     const sheet = await screen.findByRole("dialog")
     const outdated = texts.media.detail.outdated
     expect(await within(sheet).findByText(outdated.title(1))).toBeVisible()
@@ -566,9 +491,7 @@ describe("Médiathèque", () => {
       )
     ).toBeVisible()
 
-    fireEvent.click(
-      within(sheet).getByRole("button", { name: outdated.push(1) })
-    )
+    fireEvent.click(role("button", outdated.push(1), sheet))
     expect(await screen.findByText(outdated.pushed(1))).toBeVisible()
     expect(api.pushMediaTexts).toHaveBeenCalledWith(photo.id)
     await waitFor(() =>
@@ -578,9 +501,7 @@ describe("Médiathèque", () => {
 
   it("propose la transcription pour un audio", async () => {
     await renderApp("/media")
-    fireEvent.click(
-      await screen.findByRole("button", { name: texts.media.open(voice.name) })
-    )
+    fireEvent.click(await findRole("button", texts.media.open(voice.name)))
     const sheet = await screen.findByRole("dialog")
     expect(
       within(sheet).getByLabelText(texts.media.detail.transcript)
@@ -608,16 +529,16 @@ describe("Médiathèque", () => {
       },
     ])
     await renderApp("/media")
-    fireEvent.click(
-      await screen.findByRole("button", { name: texts.media.open(photo.name) })
-    )
+    fireEvent.click(await findRole("button", texts.media.open(photo.name)))
     const sheet = await screen.findByRole("dialog")
-    expect(
-      await within(sheet).findByRole("link", { name: "Bien dormir" })
-    ).toHaveAttribute("href", `/blog/${ARTICLE}`)
-    expect(
-      within(sheet).getByRole("link", { name: "Entretien" })
-    ).toHaveAttribute("href", `/podcasts/${EPISODE}`)
+    expect(await findRole("link", "Bien dormir", sheet)).toHaveAttribute(
+      "href",
+      `/blog/${ARTICLE}`
+    )
+    expect(role("link", "Entretien", sheet)).toHaveAttribute(
+      "href",
+      `/podcasts/${EPISODE}`
+    )
   })
 
   it("« /media?file=<id> » ouvre la fiche de ce fichier (lien de l'éditeur, [D46])", async () => {
@@ -653,12 +574,8 @@ describe("Médiathèque", () => {
     })
     await renderApp("/media")
 
-    fireEvent.click(
-      await screen.findByRole("button", { name: texts.media.open(photo.name) })
-    )
-    fireEvent.click(
-      await screen.findByRole("button", { name: texts.media.detail.trash })
-    )
+    fireEvent.click(await findRole("button", texts.media.open(photo.name)))
+    fireEvent.click(await findRole("button", texts.media.detail.trash))
 
     expect(await screen.findByText(texts.media.detail.trashed)).toBeVisible()
     expect(api.trashMedia).toHaveBeenCalledWith(photo.id)
@@ -672,25 +589,19 @@ describe("Médiathèque", () => {
     })
     await renderApp("/media")
 
-    const opener = await screen.findByRole("button", {
-      name: texts.media.open(photo.name),
-    })
+    const opener = await findRole("button", texts.media.open(photo.name))
     opener.focus()
     fireEvent.click(opener)
     // Relue après la corbeille : la photo (et son bouton) quitte la liste.
     vi.mocked(api.listMedia).mockResolvedValue([logo, animation, voice])
-    fireEvent.click(
-      await screen.findByRole("button", { name: texts.media.detail.trash })
-    )
+    fireEvent.click(await findRole("button", texts.media.detail.trash))
 
     await waitFor(() =>
-      expect(
-        screen.queryByRole("button", { name: texts.media.open(photo.name) })
-      ).toBeNull()
+      expect(queryRole("button", texts.media.open(photo.name))).toBeNull()
     )
     await waitFor(() =>
       expect(document.activeElement).toBe(
-        screen.getByRole("button", { name: texts.media.open(logo.name) })
+        role("button", texts.media.open(logo.name))
       )
     )
   })
@@ -704,12 +615,8 @@ describe("Médiathèque", () => {
     )
     await renderApp("/media")
 
-    fireEvent.click(
-      await screen.findByRole("button", { name: texts.media.open(photo.name) })
-    )
-    fireEvent.click(
-      await screen.findByRole("button", { name: texts.media.detail.trash })
-    )
+    fireEvent.click(await findRole("button", texts.media.open(photo.name)))
+    fireEvent.click(await findRole("button", texts.media.detail.trash))
 
     expect(await screen.findByText(texts.media.detail.used)).toBeVisible()
     expect(
@@ -721,40 +628,27 @@ describe("Médiathèque", () => {
 
 describe("Sélection en masse", () => {
   const selection = { ...texts.selection, ...texts.media.selection }
-  const box = (name: string) =>
-    screen.getByRole("checkbox", { name: selection.select(name) })
+  const box = (name: string) => role("checkbox", selection.select(name))
 
   it("coche en grille : un clic sur une vignette coche au lieu d'ouvrir la fiche", async () => {
     await renderApp("/media")
     await screen.findByText(photo.name)
-    expect(
-      screen.queryByRole("button", { name: selection.trash(1) })
-    ).toBeNull()
+    expect(queryRole("button", selection.trash(1))).toBeNull()
 
     fireEvent.click(box(photo.name))
-    expect(
-      screen.getByRole("button", { name: selection.trash(1) })
-    ).toBeVisible()
-    expect(
-      screen.getByRole("button", { name: selection.trash(1) })
-    ).toBeVisible()
+    expect(role("button", selection.trash(1))).toBeVisible()
+    expect(role("button", selection.trash(1))).toBeVisible()
 
     // Pendant la sélection, la vignette entière coche le fichier.
-    fireEvent.click(
-      screen.getByRole("button", { name: selection.select(logo.name) })
-    )
+    fireEvent.click(role("button", selection.select(logo.name)))
     expect(box(logo.name)).toBeChecked()
-    expect(
-      screen.getByRole("button", { name: selection.trash(2) })
-    ).toBeVisible()
+    expect(role("button", selection.trash(2))).toBeVisible()
     expect(screen.queryByRole("dialog")).toBeNull()
 
     // Tout décoché : un clic ouvre de nouveau la fiche.
     fireEvent.click(box(photo.name))
     fireEvent.click(box(logo.name))
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.media.open(photo.name) })
-    )
+    fireEvent.click(role("button", texts.media.open(photo.name)))
     expect(await screen.findByRole("dialog")).toBeVisible()
   })
 
@@ -763,29 +657,25 @@ describe("Sélection en masse", () => {
     await screen.findByText(photo.name)
 
     vi.mocked(api.listMedia).mockResolvedValue([voice])
-    fireEvent.click(screen.getByRole("button", { name: /Audios/ }))
+    fireEvent.click(role("button", /Audios/))
     await waitFor(() => expect(screen.queryByText(photo.name)).toBeNull())
 
-    fireEvent.click(screen.getByRole("button", { name: selection.selectAll }))
+    fireEvent.click(role("button", selection.selectAll))
     expect(box(voice.name)).toBeChecked()
-    expect(
-      screen.getByRole("button", { name: selection.trash(1) })
-    ).toBeVisible()
+    expect(role("button", selection.trash(1))).toBeVisible()
   })
 
   it("« Tout sélectionner » est un bouton avant Grille et Liste, sans case au-dessus des vignettes", async () => {
     await renderApp("/media")
     await screen.findByText(photo.name)
 
-    const selectAll = screen.getByRole("button", { name: selection.selectAll })
-    const grid = screen.getByRole("button", { name: texts.media.view.grid })
+    const selectAll = role("button", selection.selectAll)
+    const grid = role("button", texts.media.view.grid)
     // Juste avant le choix de la vue.
     expect(
       selectAll.compareDocumentPosition(grid) & Node.DOCUMENT_POSITION_FOLLOWING
     ).toBeTruthy()
-    expect(
-      screen.queryByRole("checkbox", { name: selection.selectAll })
-    ).toBeNull()
+    expect(queryRole("checkbox", selection.selectAll)).toBeNull()
 
     expect(selectAll).toHaveAttribute("aria-pressed", "false")
     fireEvent.click(selectAll)
@@ -823,7 +713,7 @@ describe("Sélection en masse", () => {
     fireEvent.click(box(photo.name))
     fireEvent.click(box(logo.name))
     fireEvent.click(box(voice.name))
-    fireEvent.click(screen.getByRole("button", { name: selection.trash(3) }))
+    fireEvent.click(role("button", selection.trash(3)))
 
     expect(await screen.findByText(selection.trashed(2))).toBeVisible()
     expect(vi.mocked(api.trashMedia).mock.calls.map(([id]) => id)).toEqual([
@@ -842,28 +732,22 @@ describe("Sélection en masse", () => {
         )
       )
     ).toBeVisible()
-    expect(
-      screen.getByRole("button", { name: selection.trash(1) })
-    ).toBeVisible()
+    expect(role("button", selection.trash(1))).toBeVisible()
 
     // Le message de cette mise à la corbeille (un autre test peut en avoir laissé un).
     const toastItem = screen
       .getByText(selection.trashed(2))
       .closest<HTMLElement>("[data-sonner-toast]")
-    fireEvent.click(
-      within(toastItem!).getByRole("button", { name: texts.common.undo })
-    )
+    fireEvent.click(role("button", texts.common.undo, toastItem!))
     expect(await screen.findByText(selection.restored(2))).toBeVisible()
     expect(vi.mocked(api.restoreMedia).mock.calls.map(([id]) => id)).toEqual([
       photo.id,
       voice.id,
     ])
 
-    fireEvent.click(screen.getByRole("button", { name: selection.closeKept }))
+    fireEvent.click(role("button", selection.closeKept))
     expect(screen.queryByText(selection.keptTitle(1))).toBeNull()
-    expect(document.activeElement).toBe(
-      screen.getByRole("button", { name: selection.selectAll })
-    )
+    expect(document.activeElement).toBe(role("button", selection.selectAll))
   })
 
   it("après la corbeille, le focus va sur « Tout sélectionner »", async () => {
@@ -876,18 +760,14 @@ describe("Sélection en masse", () => {
 
     fireEvent.click(box(photo.name))
     vi.mocked(api.listMedia).mockResolvedValue([logo, animation, voice])
-    fireEvent.click(screen.getByRole("button", { name: selection.trash(1) }))
+    fireEvent.click(role("button", selection.trash(1)))
 
     expect(await screen.findByText(selection.trashed(1))).toBeVisible()
     await waitFor(() =>
-      expect(document.activeElement).toBe(
-        screen.getByRole("button", { name: selection.selectAll })
-      )
+      expect(document.activeElement).toBe(role("button", selection.selectAll))
     )
     await waitFor(() => expect(screen.queryByText(photo.name)).toBeNull())
-    expect(
-      screen.queryByRole("button", { name: selection.trash(1) })
-    ).toBeNull()
+    expect(queryRole("button", selection.trash(1))).toBeNull()
   })
 })
 
@@ -924,10 +804,8 @@ describe("Remplacer un fichier", () => {
     })
     vi.mocked(api.getMedia).mockResolvedValue({ ...newPdf, status: "ready" })
     await renderApp("/media")
-    fireEvent.click(
-      await screen.findByRole("button", { name: texts.media.open(oldPdf.name) })
-    )
-    const sheet = await screen.findByRole("dialog", { name: oldPdf.name })
+    fireEvent.click(await findRole("button", texts.media.open(oldPdf.name)))
+    const sheet = await findRole("dialog", oldPdf.name)
     fireEvent.change(within(sheet).getByLabelText(words.input), {
       target: {
         files: [
@@ -953,9 +831,7 @@ describe("Remplacer un fichier", () => {
     await waitFor(() => expect(api.trashMedia).toHaveBeenCalledWith(oldPdf.id))
     expect(await screen.findByText(words.oldTrashed)).toBeInTheDocument()
     // La fiche passe au nouveau fichier.
-    expect(
-      await screen.findByRole("dialog", { name: newPdf.name })
-    ).toBeVisible()
+    expect(await findRole("dialog", newPdf.name)).toBeVisible()
   })
 
   it("ce qui est en ligne ne change que sur « Mettre à jour… » ; un brouillon qu'on écrit est gardé", async () => {
@@ -979,9 +855,7 @@ describe("Remplacer un fichier", () => {
     expect(
       within(sheet).getByText(words.keptItem("Guide", "Claire Martin"))
     ).toBeVisible()
-    fireEvent.click(
-      await within(sheet).findByRole("button", { name: words.push(1) })
-    )
+    fireEvent.click(await findRole("button", words.push(1), sheet))
     await waitFor(() =>
       expect(api.replaceMediaLive).toHaveBeenCalledWith(oldPdf.id, newPdf.id)
     )
@@ -1033,9 +907,7 @@ describe("Envoi", () => {
     await renderApp("/media")
     await screen.findByText(photo.name)
     // Zone d'annonce présente AVANT l'envoi (sinon les lecteurs d'écran ne la lisent pas).
-    const announcer = screen.getByRole("status", {
-      name: texts.media.uploads.announcerLabel,
-    })
+    const announcer = role("status", texts.media.uploads.announcerLabel)
     expect(announcer).toBeEmptyDOMElement()
 
     fireEvent.change(input(), {
@@ -1051,9 +923,7 @@ describe("Envoi", () => {
     })
 
     const reason = rejectReasonText("svg_element_interdit")
-    const panel = await screen.findByRole("region", {
-      name: texts.media.uploads.title,
-    })
+    const panel = await findRole("region", texts.media.uploads.title)
     // La ligne ne reste pas sur « vérification en cours ».
     expect(
       await within(panel).findByText(texts.media.rejectedBecause(reason))
@@ -1078,9 +948,7 @@ describe("Envoi", () => {
         )
     )
     await renderApp("/nulle-part")
-    await screen.findByRole("status", {
-      name: texts.media.uploads.announcerLabel,
-    })
+    await findRole("status", texts.media.uploads.announcerLabel)
     const leave = () => {
       const event = new Event("beforeunload", { cancelable: true })
       window.dispatchEvent(event)
@@ -1105,9 +973,7 @@ describe("Envoi", () => {
       target: { files: [new File(["bonjour"], "notes.txt")] },
     })
 
-    const panel = await screen.findByRole("region", {
-      name: texts.media.uploads.title,
-    })
+    const panel = await findRole("region", texts.media.uploads.title)
     expect(
       await within(panel).findByText(texts.media.prepareErrors.type_refuse)
     ).toBeVisible()
@@ -1130,9 +996,7 @@ describe("Envoi", () => {
       target: { files: [pdfFile()] },
     })
 
-    const panel = await screen.findByRole("region", {
-      name: texts.media.uploads.title,
-    })
+    const panel = await findRole("region", texts.media.uploads.title)
     expect(
       await within(panel).findByText(texts.media.uploads.stages.done)
     ).toBeVisible()
@@ -1170,9 +1034,7 @@ describe("Envoi", () => {
     fireEvent.change(input(), {
       target: { files: [pdfFile(), new File(["bonjour"], "notes.txt")] },
     })
-    const uploads = await screen.findByRole("region", {
-      name: texts.media.uploads.title,
-    })
+    const uploads = await findRole("region", texts.media.uploads.title)
     await within(uploads).findByText(texts.media.uploads.stages.done)
     await within(uploads).findByText(texts.media.prepareErrors.type_refuse)
     expect(
@@ -1181,19 +1043,11 @@ describe("Envoi", () => {
 
     await act(() => router.navigate("/trash"))
 
-    const elsewhere = await screen.findByRole("region", {
-      name: texts.media.uploads.title,
-    })
+    const elsewhere = await findRole("region", texts.media.uploads.title)
     expect(within(elsewhere).getByText("guide.pdf")).toBeVisible()
     expect(within(elsewhere).getByText("notes.txt")).toBeVisible()
 
-    fireEvent.click(
-      within(elsewhere).getByRole("button", {
-        name: texts.media.uploads.close,
-      })
-    )
-    expect(
-      screen.queryByRole("region", { name: texts.media.uploads.title })
-    ).toBeNull()
+    fireEvent.click(role("button", texts.media.uploads.close, elsewhere))
+    expect(queryRole("region", texts.media.uploads.title)).toBeNull()
   })
 })

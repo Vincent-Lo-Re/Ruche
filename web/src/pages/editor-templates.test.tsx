@@ -9,61 +9,27 @@ import * as templatesApi from "@/lib/contents/templates"
 import * as mediaApi from "@/lib/media/api"
 import { renderApp, testProfile } from "@/test/render"
 import { texts } from "@/texts"
+import { findRole, queryRole, role } from "@/test/queries"
 
 // Modèles de blocs dans l'éditeur (étape 6) : bloc lié montré tel qu'il est dans son modèle,
 // « Détacher », insertion d'un modèle, « Enregistrer comme modèle », éditeur d'un modèle.
 // La base et Realtime sont simulés.
 
-vi.mock("@/lib/contents/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof api>()
-  return {
-    ...actual,
-    listContents: vi.fn(async () => []),
-    createContent: vi.fn(),
-    getContent: vi.fn(),
-    getMediaByIds: vi.fn(async () => []),
-    saveDraft: vi.fn(),
-    lockTake: vi.fn(),
-    lockStatus: vi.fn(),
-    lockHeartbeat: vi.fn(async () => true),
-    lockRelease: vi.fn(async () => true),
-    lockReleaseOnExit: vi.fn(),
-    subscribeLock: vi.fn(() => () => {}),
-  }
-})
+vi.mock("@/lib/contents/api", async (original) =>
+  (await import("@/test/mocks")).contentsApi(original)
+)
 
-vi.mock("@/lib/contents/publication", async (importOriginal) => {
-  const actual = await importOriginal<typeof publicationApi>()
-  return {
-    ...actual,
-    getPublication: vi.fn(),
-    listVersions: vi.fn(async () => []),
-    publishContent: vi.fn(),
-    trashContent: vi.fn(),
-    restoreContent: vi.fn(),
-  }
-})
+vi.mock("@/lib/contents/publication", async (original) =>
+  (await import("@/test/mocks")).publicationApi(original)
+)
 
-vi.mock("@/lib/contents/templates", async (importOriginal) => {
-  const actual = await importOriginal<typeof templatesApi>()
-  return {
-    ...actual,
-    listTemplates: vi.fn(async () => []),
-    listTemplateUses: vi.fn(async () => []),
-    getTemplatesByIds: vi.fn(async () => []),
-    listStarters: vi.fn(async () => []),
-    getTemplateOutdated: vi.fn(async () => []),
-    createTemplate: vi.fn(),
-    createTemplateFrom: vi.fn(),
-    pushTemplate: vi.fn(),
-    detachTemplateEverywhere: vi.fn(),
-  }
-})
+vi.mock("@/lib/contents/templates", async (original) =>
+  (await import("@/test/mocks")).templatesApi(original)
+)
 
-vi.mock("@/lib/media/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof mediaApi>()
-  return { ...actual, kickFiles: vi.fn(async () => {}) }
-})
+vi.mock("@/lib/media/api", async (original) =>
+  (await import("@/test/mocks")).mediaApi(original)
+)
 
 vi.mock("@/lib/access-levels", async (importOriginal) => {
   const actual = await importOriginal<typeof levelsApi>()
@@ -212,35 +178,23 @@ describe("bloc lié dans un contenu", () => {
     expect(templatesApi.getTemplatesByIds).toHaveBeenCalledWith([TEMPLATE_ID])
     // Le plan le nomme d'après son modèle.
     expect(
-      within(
-        screen.getByRole("navigation", { name: texts.editor.outline.title })
-      ).getByRole("button", {
-        name: texts.editor.outline.select(
-          texts.editor.blockLabel.linked("Contact")
-        ),
-      })
+      role(
+        "button",
+        texts.editor.outline.select(texts.editor.blockLabel.linked("Contact")),
+        role("navigation", texts.editor.outline.title)
+      )
     ).toHaveTextContent("Contact")
     // Choisi : « Modifier le modèle » et « Détacher » dans la barre de ses réglages, pas
     // « Enregistrer comme modèle » (c'est déjà un modèle).
     fireEvent.pointerDown(view)
-    const bar = await screen.findByRole("toolbar", {
-      name: texts.editor.settings.actions,
-    })
+    const bar = await findRole("toolbar", texts.editor.settings.actions)
     expect(
-      within(bar).getByRole("link", {
-        name: texts.templates.linked.editLabel("Contact"),
-      })
+      role("link", texts.templates.linked.editLabel("Contact"), bar)
     ).toHaveAttribute("href", `/templates/${TEMPLATE_ID}`)
     expect(
-      within(bar).getByRole("button", {
-        name: texts.templates.linked.detachLabel("Contact"),
-      })
+      role("button", texts.templates.linked.detachLabel("Contact"), bar)
     ).toBeVisible()
-    expect(
-      within(bar).queryByRole("button", {
-        name: texts.templates.saveAs.action,
-      })
-    ).toBeNull()
+    expect(queryRole("button", texts.templates.saveAs.action, bar)).toBeNull()
   })
 
   it("« Détacher » en fait une copie ordinaire : même id, nouveaux id à l'intérieur", async () => {
@@ -259,13 +213,11 @@ describe("bloc lié dans un contenu", () => {
       document.querySelector(`[data-block-id="${LINKED_ID}"]`)!
     )
     fireEvent.click(
-      within(
-        await screen.findByRole("toolbar", {
-          name: texts.editor.settings.actions,
-        })
-      ).getByRole("button", {
-        name: texts.templates.linked.detachLabel("Contact"),
-      })
+      role(
+        "button",
+        texts.templates.linked.detachLabel("Contact"),
+        await findRole("toolbar", texts.editor.settings.actions)
+      )
     )
     expect(
       await screen.findByText(texts.templates.linked.detached("Contact"))
@@ -297,9 +249,7 @@ describe("bloc lié dans un contenu", () => {
       await screen.findByText(texts.templates.linked.missing)
     ).toBeInTheDocument()
     expect(
-      screen.queryByRole("button", {
-        name: texts.templates.linked.detachLabel("Contact"),
-      })
+      queryRole("button", texts.templates.linked.detachLabel("Contact"))
     ).toBeNull()
   })
 
@@ -334,11 +284,7 @@ describe("bloc lié dans un contenu", () => {
     await renderApp(`/pages/${PAGE_ID}`)
     await editable()
     await screen.findByText(texts.publication.status.live)
-    expect(
-      screen.getByRole("button", {
-        name: texts.publication.actions.publish,
-      })
-    ).toBeEnabled()
+    expect(role("button", texts.publication.actions.publish)).toBeEnabled()
   })
 })
 
@@ -360,17 +306,15 @@ describe("insérer un modèle depuis « Mes blocs »", () => {
   /** Les Blocs (« Ajouter un bloc »), puis « Mes blocs ». */
   async function openMine() {
     fireEvent.click(document.getElementById("colonne-gauche-ajouter")!)
-    const library = screen.getByRole("region", {
-      name: texts.editor.columns.blocks,
-    })
+    const library = role("region", texts.editor.columns.blocks)
     fireEvent.click(
-      await within(library).findByRole("button", {
-        name: new RegExp(texts.editor.library.mine.title),
-      })
+      await findRole(
+        "button",
+        new RegExp(texts.editor.library.mine.title),
+        library
+      )
     )
-    return within(library).findByRole("region", {
-      name: texts.editor.library.mine.title,
-    })
+    return findRole("region", texts.editor.library.mine.title, library)
   }
 
   it("une mise en forme s'insère en copie (nouveaux id), un bloc partagé en bloc lié", async () => {
@@ -383,17 +327,17 @@ describe("insérer un modèle depuis « Mes blocs »", () => {
     const mine = await openMine()
     // Un point de départ ne s'insère pas ; un bloc partagé vide non plus.
     expect(within(mine).queryByText("Interview")).toBeNull()
-    const empty = await within(mine).findByRole("button", {
-      name: texts.editor.library.mine.insertLabel("Vide"),
-    })
+    const empty = await findRole(
+      "button",
+      texts.editor.library.mine.insertLabel("Vide"),
+      mine
+    )
     expect(empty).toBeDisabled()
     expect(empty).toHaveAccessibleDescription(
       texts.templates.insert.emptyTemplate
     )
     fireEvent.click(
-      within(mine).getByRole("button", {
-        name: texts.editor.library.mine.insertLabel("À retenir"),
-      })
+      role("button", texts.editor.library.mine.insertLabel("À retenir"), mine)
     )
     await waitFor(() => expect(api.saveDraft).toHaveBeenCalled(), {
       timeout: 4000,
@@ -407,9 +351,7 @@ describe("insérer un modèle depuis « Mes blocs »", () => {
 
     // Le bloc partagé : ajouté après le bloc choisi (la copie, qui vient d'arriver).
     fireEvent.click(
-      within(mine).getByRole("button", {
-        name: texts.editor.library.mine.insertLabel("Contact"),
-      })
+      role("button", texts.editor.library.mine.insertLabel("Contact"), mine)
     )
     await waitFor(() => expect(lastSaved().blocks).toHaveLength(2), {
       timeout: 4000,
@@ -448,42 +390,28 @@ describe("« Enregistrer comme modèle »", () => {
     const saveAs = texts.templates.saveAs
 
     // Le plan est ouvert d'office (éditeur des contenus).
-    const outline = screen.getByRole("navigation", {
-      name: texts.editor.outline.title,
-    })
-    fireEvent.click(
-      within(outline).getByRole("button", { name: saveAs.select })
-    )
-    const save = within(outline).getByRole("button", {
-      name: saveAs.withCount(0),
-    })
+    const outline = role("navigation", texts.editor.outline.title)
+    fireEvent.click(role("button", saveAs.select, outline))
+    const save = role("button", saveAs.withCount(0), outline)
     expect(save).toBeDisabled()
     // Au clavier aussi : ce sont des cases à cocher. Les blocs d'un encadré n'en ont pas.
     fireEvent.click(
-      within(outline).getByRole("checkbox", {
-        name: saveAs.selectBlock("Texte « Deux »"),
-      })
+      role("checkbox", saveAs.selectBlock("Texte « Deux »"), outline)
     )
     fireEvent.click(
-      within(outline).getByRole("checkbox", {
-        name: saveAs.selectBlock("Texte « Un »"),
-      })
+      role("checkbox", saveAs.selectBlock("Texte « Un »"), outline)
     )
     expect(within(outline).getAllByRole("checkbox")).toHaveLength(3)
-    fireEvent.click(
-      within(outline).getByRole("button", { name: saveAs.withCount(2) })
-    )
+    fireEvent.click(role("button", saveAs.withCount(2), outline))
 
-    const dialog = await screen.findByRole("dialog", { name: saveAs.title })
+    const dialog = await findRole("dialog", saveAs.title)
     // Plusieurs blocs : pas de bloc identique partout (un seul bloc, [D11]).
     expect(
-      within(dialog).getByRole("radio", {
-        name: new RegExp(texts.templates.sorts.shared.title),
-      })
+      role("radio", new RegExp(texts.templates.sorts.shared.title), dialog)
     ).toHaveAttribute("aria-disabled", "true")
     expect(within(dialog).getByText(saveAs.sharedOne)).toBeInTheDocument()
     // Sans nom : refusé avant l'envoi.
-    fireEvent.click(within(dialog).getByRole("button", { name: saveAs.submit }))
+    fireEvent.click(role("button", saveAs.submit, dialog))
     expect(
       await within(dialog).findByText(texts.templates.create.nameRequired)
     ).toBeInTheDocument()
@@ -493,7 +421,7 @@ describe("« Enregistrer comme modèle »", () => {
         target: { value: "Deux textes" },
       }
     )
-    fireEvent.click(within(dialog).getByRole("button", { name: saveAs.submit }))
+    fireEvent.click(role("button", saveAs.submit, dialog))
 
     await waitFor(() =>
       expect(templatesApi.createTemplateFrom).toHaveBeenCalledWith(
@@ -503,11 +431,7 @@ describe("« Enregistrer comme modèle »", () => {
       )
     )
     const toast = await screen.findByText(saveAs.saved("Deux textes"))
-    fireEvent.click(
-      within(toast.closest("li")!).getByRole("button", {
-        name: texts.common.open,
-      })
-    )
+    fireEvent.click(role("button", texts.common.open, toast.closest("li")!))
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(`/templates/${STYLE_ID}`)
     )
@@ -532,14 +456,8 @@ describe("« Enregistrer comme modèle »", () => {
     fireEvent.pointerDown(
       document.querySelector(`[data-block-id="${LINKED_ID}"]`)!
     )
-    fireEvent.click(
-      await screen.findByRole("button", {
-        name: texts.templates.saveAs.action,
-      })
-    )
-    const dialog = await screen.findByRole("dialog", {
-      name: texts.templates.saveAs.title,
-    })
+    fireEvent.click(await findRole("button", texts.templates.saveAs.action))
+    const dialog = await findRole("dialog", texts.templates.saveAs.title)
     fireEvent.change(
       within(dialog).getByLabelText(texts.templates.create.name),
       {
@@ -547,15 +465,9 @@ describe("« Enregistrer comme modèle »", () => {
       }
     )
     fireEvent.click(
-      within(dialog).getByRole("radio", {
-        name: new RegExp(texts.templates.sorts.shared.title),
-      })
+      role("radio", new RegExp(texts.templates.sorts.shared.title), dialog)
     )
-    fireEvent.click(
-      within(dialog).getByRole("button", {
-        name: texts.templates.saveAs.submit,
-      })
-    )
+    fireEvent.click(role("button", texts.templates.saveAs.submit, dialog))
     await waitFor(() =>
       expect(templatesApi.createTemplateFrom).toHaveBeenCalledWith(
         PAGE_ID,
@@ -635,25 +547,19 @@ describe("éditeur d'un modèle", () => {
     await editable()
 
     // « ← Modèles de bloc » en bas à gauche ; pas de barre du haut.
-    const left = screen.getByRole("complementary", { name: columns.left })
+    const left = role("complementary", columns.left)
     expect(
-      within(left).getByRole("link", {
-        name: texts.editor.back(texts.sections.templates.title),
-      })
+      role("link", texts.editor.back(texts.sections.templates.title), left)
     ).toHaveAttribute("href", "/templates")
     expect(screen.queryByRole("banner")).toBeNull()
 
     // À droite : la sorte, pas de publication (ni « Prêt à publier ? », ni niveau d'accès).
-    const right = screen.getByRole("complementary", {
-      name: columns.right.template,
-    })
-    expect(
-      within(right).getByRole("region", { name: sorts.shared.title })
-    ).toHaveTextContent(sorts.shared.description)
+    const right = role("complementary", columns.right.template)
+    expect(role("region", sorts.shared.title, right)).toHaveTextContent(
+      sorts.shared.description
+    )
     expect(right.querySelector('[data-template-sort="shared"]')).not.toBeNull()
-    expect(
-      screen.queryByRole("button", { name: texts.publication.actions.publish })
-    ).toBeNull()
+    expect(queryRole("button", texts.publication.actions.publish)).toBeNull()
     expect(
       within(right).queryByText(texts.editor.article.ready.title)
     ).toBeNull()
@@ -662,10 +568,12 @@ describe("éditeur d'un modèle", () => {
     ).toBeNull()
 
     // « Utilisé dans 2 brouillons » : un lien vers chacun, la corbeille dite.
-    const uses = await within(right).findByRole("region", {
-      name: texts.templates.editor.usedIn(2),
-    })
-    expect(within(uses).getByRole("link", { name: "Accueil" })).toHaveAttribute(
+    const uses = await findRole(
+      "region",
+      texts.templates.editor.usedIn(2),
+      right
+    )
+    expect(role("link", "Accueil", uses)).toHaveAttribute(
       "href",
       `/pages/${PAGE_ID}`
     )
@@ -676,9 +584,7 @@ describe("éditeur d'un modèle", () => {
     // Un seul bloc : « Ajouter un bloc » est grisé, et la règle est dite, une icône info orange
     // devant.
     await waitFor(() =>
-      expect(
-        within(left).getByRole("button", { name: texts.editor.add.label })
-      ).toBeDisabled()
+      expect(role("button", texts.editor.add.label, left)).toBeDisabled()
     )
     const rule = within(left).getByText(texts.templates.editor.sharedLimit)
     expect(rule).toBeVisible()
@@ -692,9 +598,7 @@ describe("éditeur d'un modèle", () => {
     fireEvent.pointerDown(
       document.querySelector(`[data-block-id="${contactBox.id}"]`)!
     )
-    const bar = await screen.findByRole("toolbar", {
-      name: texts.editor.settings.actions,
-    })
+    const bar = await findRole("toolbar", texts.editor.settings.actions)
     for (const name of [
       texts.editor.settings.remove,
       texts.editor.outline.duplicate,
@@ -705,11 +609,7 @@ describe("éditeur d'un modèle", () => {
       )
     }
     // Ni « Enregistrer comme modèle » ni « Mes blocs » dans un modèle.
-    expect(
-      within(bar).queryByRole("button", {
-        name: texts.templates.saveAs.action,
-      })
-    ).toBeNull()
+    expect(queryRole("button", texts.templates.saveAs.action, bar)).toBeNull()
     expect(
       screen.getByText(texts.templates.editor.keepBlock)
     ).toBeInTheDocument()
@@ -721,9 +621,10 @@ describe("éditeur d'un modèle", () => {
     fireEvent.click(
       within(boxRow).getAllByRole("button", { name: /^Actions/ })[0]
     )
-    const remove = within(await screen.findByRole("menu")).getByRole(
+    const remove = role(
       "menuitem",
-      { name: texts.editor.outline.remove }
+      texts.editor.outline.remove,
+      await screen.findByRole("menu")
     )
     expect(remove).toHaveAttribute("aria-disabled", "true")
     expect(remove).toHaveAccessibleDescription(texts.templates.editor.keepBlock)
@@ -731,13 +632,12 @@ describe("éditeur d'un modèle", () => {
     await waitFor(() => expect(screen.queryByRole("menu")).toBeNull())
 
     fireEvent.click(
-      await within(uses).findByRole("button", {
-        name: texts.templates.editor.outdated.push(1),
-      })
+      await findRole("button", texts.templates.editor.outdated.push(1), uses)
     )
-    const confirm = await screen.findByRole("alertdialog", {
-      name: texts.templates.editor.outdated.title(1),
-    })
+    const confirm = await findRole(
+      "alertdialog",
+      texts.templates.editor.outdated.title(1)
+    )
     expect(confirm).toHaveTextContent("Accueil")
     expect(confirm).toHaveTextContent("version n° 3, publiée le 27 sept. 2026")
     // Un seul contenu : la phrase est au singulier.
@@ -746,9 +646,7 @@ describe("éditeur d'un modèle", () => {
     )
     expect(templatesApi.pushTemplate).not.toHaveBeenCalled()
     fireEvent.click(
-      within(confirm).getByRole("button", {
-        name: texts.templates.editor.outdated.confirm,
-      })
+      role("button", texts.templates.editor.outdated.confirm, confirm)
     )
     await waitFor(() =>
       expect(templatesApi.pushTemplate).toHaveBeenCalledWith(TEMPLATE_ID)
@@ -766,31 +664,21 @@ describe("éditeur d'un modèle", () => {
     )
     await renderApp(`/templates/${TEMPLATE_ID}`)
     await editable()
-    const plan = screen.getByRole("navigation", {
-      name: texts.editor.outline.title,
-    })
+    const plan = role("navigation", texts.editor.outline.title)
     // Pas de « Choisir des blocs » : on n'enregistre pas un modèle depuis un modèle.
-    expect(
-      within(plan).queryByRole("button", {
-        name: texts.templates.saveAs.select,
-      })
-    ).toBeNull()
+    expect(queryRole("button", texts.templates.saveAs.select, plan)).toBeNull()
     // Les sections sont dépliées d'office.
     const inner = (contactBox.blocks[0] as TextBlock).id
     const innerRow = document
       .querySelector(`[data-outline-id="${inner}"]`)!
       .closest("li")!
-    fireEvent.click(within(innerRow).getByRole("button", { name: /^Actions/ }))
+    fireEvent.click(role("button", /^Actions/, innerRow))
     const menu = await screen.findByRole("menu")
     expect(
-      within(menu).getByRole("menuitem", {
-        name: texts.editor.outline.leaveBox,
-      })
+      role("menuitem", texts.editor.outline.leaveBox, menu)
     ).toHaveAttribute("aria-disabled", "true")
     expect(
-      within(menu).queryByRole("menuitem", {
-        name: texts.templates.saveAs.action,
-      })
+      queryRole("menuitem", texts.templates.saveAs.action, menu)
     ).toBeNull()
     fireEvent.keyDown(menu, { key: "Escape" })
     await waitFor(() => expect(screen.queryByRole("menu")).toBeNull())
@@ -803,9 +691,11 @@ describe("éditeur d'un modèle", () => {
       within(boxRow).getAllByRole("button", { name: /^Actions/ })[0]
     )
     expect(
-      within(await screen.findByRole("menu")).getByRole("menuitem", {
-        name: texts.editor.outline.duplicate,
-      })
+      role(
+        "menuitem",
+        texts.editor.outline.duplicate,
+        await screen.findByRole("menu")
+      )
     ).toHaveAttribute("aria-disabled", "true")
   })
 
@@ -814,30 +704,28 @@ describe("éditeur d'un modèle", () => {
     vi.mocked(templatesApi.listTemplateUses).mockResolvedValue([])
     await renderApp(`/templates/${TEMPLATE_ID}`)
     await editable()
-    const left = screen.getByRole("complementary", { name: columns.left })
+    const left = role("complementary", columns.left)
     expect(
       within(left).getByText(texts.templates.editor.sharedLimit)
     ).toBeVisible()
     // Utilisé nulle part : la carte dit comment s'en servir.
     expect(
-      await screen.findByRole("region", {
-        name: texts.templates.editor.usedIn(0),
-      })
+      await findRole("region", texts.templates.editor.usedIn(0))
     ).toHaveTextContent(texts.templates.editor.usesNone)
     const add = document.getElementById("colonne-gauche-ajouter")!
     expect(add).toBeEnabled()
     fireEvent.click(add)
-    const library = screen.getByRole("region", { name: columns.blocks })
+    const library = role("region", columns.blocks)
     expect(
-      within(library).getByRole("button", {
-        name: texts.editor.library.addLabel(texts.editor.blocks.text),
-      })
+      role(
+        "button",
+        texts.editor.library.addLabel(texts.editor.blocks.text),
+        library
+      )
     ).toBeEnabled()
     // Dans un modèle, pas de bloc enregistré à insérer (pas de bloc lié dans un modèle).
     expect(
-      within(library).queryByRole("button", {
-        name: new RegExp(texts.editor.library.mine.title),
-      })
+      queryRole("button", new RegExp(texts.editor.library.mine.title), library)
     ).toBeNull()
     expect(templatesApi.listTemplates).not.toHaveBeenCalled()
   })
@@ -848,7 +736,7 @@ describe("éditeur d'un modèle", () => {
     )
     await renderApp(`/templates/${TEMPLATE_ID}`)
     await editable()
-    const card = screen.getByRole("region", { name: sorts.starter.title })
+    const card = role("region", sorts.starter.title)
     expect(card).toHaveTextContent(
       texts.templates.editor.starterFor(texts.templates.sections.page)
     )
@@ -856,17 +744,11 @@ describe("éditeur d'un modèle", () => {
     expect(templatesApi.listTemplateUses).not.toHaveBeenCalled()
 
     const preview = texts.editor.preview
-    const tools = screen.getByRole("toolbar", { name: preview.tools })
-    fireEvent.click(
-      within(tools).getByRole("button", { name: preview.mode.read })
-    )
+    const tools = role("toolbar", preview.tools)
+    fireEvent.click(role("button", preview.mode.read, tools))
+    expect(queryRole("button", preview.reader.visitor, tools)).toBeNull()
     expect(
-      within(tools).queryByRole("button", { name: preview.reader.visitor })
-    ).toBeNull()
-    expect(
-      within(
-        screen.getByRole("region", { name: preview.screen.ios })
-      ).getByText("Question")
+      within(role("region", preview.screen.ios)).getByText("Question")
     ).toBeVisible()
   })
 })

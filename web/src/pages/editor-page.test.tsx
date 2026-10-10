@@ -5,70 +5,29 @@ import type { Draft, ImageBlock, TextBlock } from "@/blocks/types"
 import * as levelsApi from "@/lib/access-levels"
 import * as api from "@/lib/contents/api"
 import * as publicationApi from "@/lib/contents/publication"
-import * as templatesApi from "@/lib/contents/templates"
 import * as mediaApi from "@/lib/media/api"
 import type { Media } from "@/lib/media/constants"
 import { createFromDialog } from "@/test/new-content"
 import { renderApp, testProfile } from "@/test/render"
 import { texts } from "@/texts"
+import { findRole, queryRole, role } from "@/test/queries"
 
 // La base et Realtime sont simulés.
-vi.mock("@/lib/contents/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof api>()
-  return {
-    ...actual,
-    findPageBySlug: vi.fn(async () => null),
-    findContentByTitle: vi.fn(async () => null),
-    listContents: vi.fn(),
-    createContent: vi.fn(),
-    getContent: vi.fn(),
-    getMediaByIds: vi.fn(async () => []),
-    saveDraft: vi.fn(),
-    lockTake: vi.fn(),
-    lockStatus: vi.fn(),
-    lockHeartbeat: vi.fn(async () => true),
-    lockRelease: vi.fn(async () => true),
-    lockReleaseOnExit: vi.fn(),
-    subscribeLock: vi.fn(() => () => {}),
-  }
-})
+vi.mock("@/lib/contents/api", async (original) =>
+  (await import("@/test/mocks")).contentsApi(original)
+)
 
-vi.mock("@/lib/contents/publication", async (importOriginal) => {
-  const actual = await importOriginal<typeof publicationApi>()
-  return {
-    ...actual,
-    getPublication: vi.fn(),
-    listVersions: vi.fn(async () => []),
-    publishContent: vi.fn(),
-    scheduleContent: vi.fn(),
-    unscheduleContent: vi.fn(),
-    unpublishContent: vi.fn(),
-    revertToVersion: vi.fn(),
-    trashContent: vi.fn(),
-    restoreContent: vi.fn(),
-  }
-})
+vi.mock("@/lib/contents/publication", async (original) =>
+  (await import("@/test/mocks")).publicationApi(original)
+)
 
-vi.mock("@/lib/contents/templates", async (importOriginal) => {
-  const actual = await importOriginal<typeof templatesApi>()
-  return {
-    ...actual,
-    listTemplates: vi.fn(async () => []),
-    listTemplateUses: vi.fn(async () => []),
-    getTemplatesByIds: vi.fn(async () => []),
-    listStarters: vi.fn(async () => []),
-    getTemplateOutdated: vi.fn(async () => []),
-    createTemplate: vi.fn(),
-    createTemplateFrom: vi.fn(),
-    pushTemplate: vi.fn(),
-    detachTemplateEverywhere: vi.fn(),
-  }
-})
+vi.mock("@/lib/contents/templates", async (original) =>
+  (await import("@/test/mocks")).templatesApi(original)
+)
 
-vi.mock("@/lib/media/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof mediaApi>()
-  return { ...actual, kickFiles: vi.fn(async () => {}) }
-})
+vi.mock("@/lib/media/api", async (original) =>
+  (await import("@/test/mocks")).mediaApi(original)
+)
 
 vi.mock("@/lib/access-levels", async (importOriginal) => {
   const actual = await importOriginal<typeof levelsApi>()
@@ -237,7 +196,7 @@ describe("liste des pages", () => {
     vi.mocked(api.createContent).mockResolvedValue(content)
     const { router } = await renderApp("/pages")
 
-    const link = await screen.findByRole("link", { name: "Mentions légales" })
+    const link = await findRole("link", "Mentions légales")
     expect(link).toHaveAttribute("href", `/pages/${PAGE_ID}`)
     // La date seulement : ni qui a modifié, ni qui écrit en ce moment.
     expect(screen.getByText("27 sept. 2026 à 14h30")).toBeInTheDocument()
@@ -252,12 +211,11 @@ describe("liste des pages", () => {
       null
     )
     // Plein écran : le menu de l'admin est caché, « ← Pages » ramène à la liste.
-    expect(
-      await screen.findByRole("link", { name: texts.editor.back("Pages") })
-    ).toHaveAttribute("href", "/pages")
-    expect(
-      screen.queryByRole("navigation", { name: texts.nav.label })
-    ).toBeNull()
+    expect(await findRole("link", texts.editor.back("Pages"))).toHaveAttribute(
+      "href",
+      "/pages"
+    )
+    expect(queryRole("navigation", texts.nav.label)).toBeNull()
   })
 })
 
@@ -301,7 +259,7 @@ describe("liste des pages : publication et corbeille", () => {
     ])
     await renderApp("/pages")
     const cells = async (title: string) =>
-      (await screen.findByRole("link", { name: title })).closest("tr")!
+      (await findRole("link", title)).closest("tr")!
     const labels = texts.publication.status
     expect(await cells("Brouillon seul")).toHaveTextContent(labels.draft)
     expect(await cells("En ligne")).toHaveTextContent(labels.live)
@@ -323,19 +281,13 @@ describe("liste des pages : publication et corbeille", () => {
     })
     await renderApp("/pages")
     fireEvent.click(
-      await screen.findByRole("button", {
-        name: texts.contentList.actions("Mentions légales"),
-      })
+      await findRole("button", texts.contentList.actions("Mentions légales"))
     )
-    fireEvent.click(
-      await screen.findByRole("menuitem", { name: texts.contentList.trash })
-    )
+    fireEvent.click(await findRole("menuitem", texts.contentList.trash))
     const dialog = await screen.findByRole("alertdialog")
     expect(publicationApi.trashContent).not.toHaveBeenCalled()
     fireEvent.click(
-      within(dialog).getByRole("button", {
-        name: texts.contentList.confirmTrash.confirm,
-      })
+      role("button", texts.contentList.confirmTrash.confirm, dialog)
     )
     await waitFor(() =>
       expect(publicationApi.trashContent).toHaveBeenCalledWith(PAGE_ID)
@@ -345,11 +297,7 @@ describe("liste des pages : publication et corbeille", () => {
     const toast = await screen.findByText(
       texts.contentList.trashed("Mentions légales")
     )
-    fireEvent.click(
-      within(toast.closest("li")!).getByRole("button", {
-        name: texts.common.undo,
-      })
-    )
+    fireEvent.click(role("button", texts.common.undo, toast.closest("li")!))
     await waitFor(() =>
       expect(publicationApi.restoreContent).toHaveBeenCalledWith(PAGE_ID)
     )
@@ -364,17 +312,15 @@ describe("liste des pages : publication et corbeille", () => {
     })
     await renderApp("/pages")
     fireEvent.click(
-      await screen.findByRole("button", {
-        name: texts.contentList.actions("Mentions légales"),
-      })
+      await findRole("button", texts.contentList.actions("Mentions légales"))
     )
+    fireEvent.click(await findRole("menuitem", texts.contentList.trash))
     fireEvent.click(
-      await screen.findByRole("menuitem", { name: texts.contentList.trash })
-    )
-    fireEvent.click(
-      within(await screen.findByRole("alertdialog")).getByRole("button", {
-        name: texts.contentList.confirmTrash.confirm,
-      })
+      role(
+        "button",
+        texts.contentList.confirmTrash.confirm,
+        await screen.findByRole("alertdialog")
+      )
     )
     await waitFor(() =>
       expect(publicationApi.trashContent).toHaveBeenCalledWith(PAGE_ID)
@@ -391,17 +337,15 @@ describe("liste des pages : publication et corbeille", () => {
     )
     await renderApp("/pages")
     fireEvent.click(
-      await screen.findByRole("button", {
-        name: texts.contentList.actions("Mentions légales"),
-      })
+      await findRole("button", texts.contentList.actions("Mentions légales"))
     )
+    fireEvent.click(await findRole("menuitem", texts.contentList.trash))
     fireEvent.click(
-      await screen.findByRole("menuitem", { name: texts.contentList.trash })
-    )
-    fireEvent.click(
-      within(await screen.findByRole("alertdialog")).getByRole("button", {
-        name: texts.contentList.confirmTrash.confirm,
-      })
+      role(
+        "button",
+        texts.contentList.confirmTrash.confirm,
+        await screen.findByRole("alertdialog")
+      )
     )
     expect(
       await screen.findByText(texts.editor.errors.verrou_tenu)
@@ -426,9 +370,9 @@ describe("éditeur", () => {
       expect.any(String)
     )
     // Éditeur des contenus : le plan est ouvert d'office, avec la première ligne de chaque texte.
-    expect(
-      screen.getByRole("navigation", { name: texts.editor.outline.title })
-    ).toHaveTextContent("Bonjour")
+    expect(role("navigation", texts.editor.outline.title)).toHaveTextContent(
+      "Bonjour"
+    )
 
     fireEvent.change(title, { target: { value: "Mentions légales 2026" } })
     await waitFor(() => expect(api.saveDraft).toHaveBeenCalledTimes(1), {
@@ -448,7 +392,7 @@ describe("éditeur", () => {
     await renderApp(`/pages/${PAGE_ID}`)
 
     expect(
-      await screen.findByRole("button", { name: texts.editor.lock.button })
+      await findRole("button", texts.editor.lock.button)
     ).toBeInTheDocument()
     expect(screen.getByLabelText(texts.editor.title.label)).toHaveAttribute(
       "readonly"
@@ -488,7 +432,7 @@ describe("éditeur", () => {
       .mockRejectedValueOnce(new api.ContentError(null, { retryable: true }))
       .mockResolvedValue(withDraft({ title: "Titre de Claire" }, 5))
     await renderApp(`/pages/${PAGE_ID}`)
-    await screen.findByRole("button", { name: texts.editor.lock.button })
+    await findRole("button", texts.editor.lock.button)
 
     act(() => emitLock(lockChange(CLAIRE, 5)))
     await waitFor(() => expect(api.getContent).toHaveBeenCalledTimes(2))
@@ -510,7 +454,7 @@ describe("éditeur", () => {
       .mockResolvedValueOnce(content)
       .mockImplementation(() => new Promise((resolve) => reads.push(resolve)))
     await renderApp(`/pages/${PAGE_ID}`)
-    await screen.findByRole("button", { name: texts.editor.lock.button })
+    await findRole("button", texts.editor.lock.button)
 
     act(() => emitLock(lockChange(CLAIRE, 5)))
     await waitFor(() => expect(reads).toHaveLength(1))
@@ -530,7 +474,7 @@ describe("éditeur", () => {
       .mockResolvedValueOnce(withDraft({ title: "Révision 5" }, 5))
       .mockResolvedValue(withDraft({ title: "Révision 6" }, 6))
     await renderApp(`/pages/${PAGE_ID}`)
-    await screen.findByRole("button", { name: texts.editor.lock.button })
+    await findRole("button", texts.editor.lock.button)
 
     act(() => emitLock(lockChange(CLAIRE, 6)))
     await waitFor(() =>
@@ -546,9 +490,7 @@ describe("éditeur", () => {
     vi.mocked(api.lockTake).mockResolvedValue(otherTab)
     vi.mocked(api.lockStatus).mockResolvedValue(otherTab)
     await renderApp(`/pages/${PAGE_ID}`)
-    fireEvent.click(
-      await screen.findByRole("button", { name: texts.editor.lock.button })
-    )
+    fireEvent.click(await findRole("button", texts.editor.lock.button))
     const dialog = await screen.findByRole("alertdialog")
     expect(
       within(dialog).getByText(texts.editor.lock.dialog.title.readOnlySelf)
@@ -575,10 +517,10 @@ describe("éditeur d'une page (éditeur des contenus)", () => {
 
   /** La carte « Adresse de la page » et son champ. */
   function addressCard() {
-    return screen.getByRole("region", { name: slug.label })
+    return role("region", slug.label)
   }
   function addressField() {
-    return within(addressCard()).getByRole("textbox", { name: slug.label })
+    return role("textbox", slug.label, addressCard())
   }
 
   async function editable() {
@@ -594,28 +536,24 @@ describe("éditeur d'une page (éditeur des contenus)", () => {
     await renderApp(`/pages/${PAGE_ID}`)
     await editable()
     expect(screen.queryByRole("banner")).toBeNull()
-    const back = within(
-      screen.getByRole("complementary", { name: columns.left })
-    ).getByRole("link", {
-      name: texts.editor.back(texts.sections.pages.title),
-    })
+    const back = role(
+      "link",
+      texts.editor.back(texts.sections.pages.title),
+      role("complementary", columns.left)
+    )
     expect(back).toHaveAttribute("href", "/pages")
     // La sortie en haut à gauche, dans l'en-tête du plan ; « Ajouter un bloc » reste en bas.
     expect(back.parentElement).toHaveTextContent(texts.editor.outline.title)
     expect(back.parentElement).not.toHaveTextContent(texts.editor.add.label)
     // Les Blocs ouverts couvrent le plan : la sortie reste au même endroit, dans leur en-tête.
     fireEvent.click(
-      within(
-        screen.getByRole("complementary", { name: columns.left })
-      ).getAllByRole("button", { name: texts.editor.add.label })[0]
+      within(role("complementary", columns.left)).getAllByRole("button", {
+        name: texts.editor.add.label,
+      })[0]
     )
-    const blocks = await screen.findByRole("region", {
-      name: texts.editor.columns.blocks,
-    })
+    const blocks = await findRole("region", texts.editor.columns.blocks)
     expect(
-      within(blocks).getByRole("link", {
-        name: texts.editor.back(texts.sections.pages.title),
-      })
+      role("link", texts.editor.back(texts.sections.pages.title), blocks)
     ).toHaveAttribute("href", "/pages")
     // Une seule flèche à la fois.
     expect(
@@ -623,7 +561,7 @@ describe("éditeur d'une page (éditeur des contenus)", () => {
         name: texts.editor.back(texts.sections.pages.title),
       })
     ).toHaveLength(1)
-    const panel = screen.getByRole("region", { name: columns.content.page })
+    const panel = role("region", columns.content.page)
     const todo = within(panel)
       .getAllByRole("button")
       .map((button) => button.getAttribute("aria-label"))
@@ -636,11 +574,7 @@ describe("éditeur d'une page (éditeur des contenus)", () => {
       within(panel).queryByText(texts.publication.settings.categories.label)
     ).toBeNull()
     // L'image mise en avant, facultative : sa carte, sans étape dans « Prêt à publier ? ».
-    expect(
-      within(panel).getByRole("region", {
-        name: texts.editor.article.feed.title,
-      })
-    ).toBeVisible()
+    expect(role("region", texts.editor.article.feed.title, panel)).toBeVisible()
     // Pas encore choisie : le téléphone commence par le titre.
     expect(document.querySelector('[data-presentation="cover"]')).toBeNull()
     // Pas de barre du haut : l'adresse est dans la colonne de droite.
@@ -648,7 +582,7 @@ describe("éditeur d'une page (éditeur des contenus)", () => {
     // « Publier » est dans le bas de la colonne de droite, que les messages laissent voir
     // (data-feed-footer, index.css).
     expect(document.querySelector("[data-feed-footer]")).toContainElement(
-      screen.getByRole("button", { name: texts.publication.actions.publish })
+      role("button", texts.publication.actions.publish)
     )
   })
 
@@ -675,11 +609,7 @@ describe("éditeur d'une page (éditeur des contenus)", () => {
       slug: "contact",
     })
     // « Prêt à publier ? » : l'adresse est faite.
-    expect(
-      screen.getByRole("button", {
-        name: ready.done(ready.items.address),
-      })
-    ).toBeVisible()
+    expect(role("button", ready.done(ready.items.address))).toBeVisible()
   })
 
   it("une adresse déjà prise est refusée en tapant, avec le nom de la page ; « Reprendre le titre » propose l'adresse du titre", async () => {
@@ -699,9 +629,7 @@ describe("éditeur d'une page (éditeur des contenus)", () => {
     ).toBeVisible()
     expect(addressField()).toHaveAttribute("aria-invalid", "true")
 
-    fireEvent.click(
-      within(addressCard()).getByRole("button", { name: slug.fromTitle })
-    )
+    fireEvent.click(role("button", slug.fromTitle, addressCard()))
     expect(addressField()).toHaveValue("mentions-legales")
     await waitFor(() => expect(api.saveDraft).toHaveBeenCalled(), {
       timeout: 4000,
@@ -715,9 +643,7 @@ describe("éditeur d'une page (éditeur des contenus)", () => {
     Element.prototype.scrollIntoView = vi.fn()
     await renderApp(`/pages/${PAGE_ID}`)
     await editable()
-    fireEvent.click(
-      screen.getByRole("button", { name: ready.todo(ready.items.address) })
-    )
+    fireEvent.click(role("button", ready.todo(ready.items.address)))
     await waitFor(() => expect(addressField()).toHaveFocus())
     expect(addressCard()).toHaveAttribute("data-highlight")
   })
@@ -727,12 +653,9 @@ describe("éditeur d'une page (éditeur des contenus)", () => {
     await editable()
     const preview = texts.editor.preview
     fireEvent.click(
-      within(screen.getByRole("toolbar", { name: preview.tools })).getByRole(
-        "button",
-        { name: preview.mode.read }
-      )
+      role("button", preview.mode.read, role("toolbar", preview.tools))
     )
-    const phone = screen.getByRole("region", { name: preview.screen.ios })
+    const phone = role("region", preview.screen.ios)
     expect(
       within(phone).getByRole("heading", { level: 1, name: "Mentions légales" })
     ).toBeVisible()
@@ -761,7 +684,7 @@ describe("éditeur : images", () => {
       await screen.findByText(texts.editor.image.loadFailed)
     ).toBeInTheDocument()
     expect(screen.queryByText(texts.editor.image.missing)).toBeNull()
-    fireEvent.click(screen.getByRole("button", { name: texts.common.retry }))
+    fireEvent.click(role("button", texts.common.retry))
     expect(
       await screen.findByText(texts.editor.image.notReady)
     ).toBeInTheDocument()
@@ -830,12 +753,10 @@ describe("éditeur : clavier", () => {
     // Le second bloc est choisi dans le plan : ses réglages glissent par-dessus la colonne de
     // droite, avec la barre d'actions en bas.
     fireEvent.click(
-      await screen.findByRole("button", {
-        name: texts.editor.outline.select("Texte « Deux »"),
-      })
+      await findRole("button", texts.editor.outline.select("Texte « Deux »"))
     )
-    const bar = await screen.findByRole("toolbar", { name: labels.actions })
-    const moveUp = within(bar).getByRole("button", { name: labels.moveUp })
+    const bar = await findRole("toolbar", labels.actions)
+    const moveUp = role("button", labels.moveUp, bar)
     act(() => moveUp.focus())
     fireEvent.click(moveUp)
 
@@ -848,7 +769,7 @@ describe("éditeur : clavier", () => {
     ).toBeInTheDocument()
 
     // Supprimer : le focus va à la ligne du bloc suivant, dans le plan.
-    fireEvent.click(within(bar).getByRole("button", { name: labels.remove }))
+    fireEvent.click(role("button", labels.remove, bar))
     await waitFor(() =>
       expect(document.activeElement).toBe(
         document.querySelector(`[data-outline-id="${ONE}"]`)
@@ -856,15 +777,9 @@ describe("éditeur : clavier", () => {
     )
 
     // Plus aucun bloc : le focus va à « Ajouter un bloc », en bas de la colonne de gauche.
+    fireEvent.click(role("button", texts.editor.outline.select("Texte « Un »")))
     fireEvent.click(
-      screen.getByRole("button", {
-        name: texts.editor.outline.select("Texte « Un »"),
-      })
-    )
-    fireEvent.click(
-      within(
-        await screen.findByRole("toolbar", { name: labels.actions })
-      ).getByRole("button", { name: labels.remove })
+      role("button", labels.remove, await findRole("toolbar", labels.actions))
     )
     await waitFor(() =>
       expect(document.activeElement).toBe(

@@ -23,7 +23,7 @@ import {
   Suspense,
   useState,
 } from "react"
-import { Controller, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
 import { AudioPlayer } from "@/components/media/audio-player"
@@ -41,17 +41,12 @@ import {
 import { ReplaceFile } from "@/components/media/replace-file"
 import { PanelCard } from "@/components/panel-card"
 import { useAccessCheck } from "@/components/team/use-access-check"
+import { FormField } from "@/components/form-field"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field"
+import { FieldError, FieldGroup } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import {
   Item,
@@ -332,70 +327,36 @@ function MediaDetailsForm({ media }: { media: Media }) {
       onSubmit={form.handleSubmit((values) => save.mutate(values))}
     >
       <FieldGroup>
-        <Controller
-          name="name"
+        <FormField
           control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="media-name">
-                {texts.media.detail.name}
-              </FieldLabel>
-              <Input
-                {...field}
-                id="media-name"
-                autoComplete="off"
-                aria-invalid={fieldState.invalid}
-              />
-              <FieldError errors={[fieldState.error]} />
-            </Field>
+          name="name"
+          id="media-name"
+          label={texts.media.detail.name}
+          render={(field, props) => (
+            <Input {...field} {...props} autoComplete="off" />
           )}
         />
         {hasAlt && (
-          <Controller
-            name="alt"
+          <FormField
             control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="media-alt">
-                  {texts.media.detail.alt}
-                </FieldLabel>
-                <Textarea
-                  {...field}
-                  id="media-alt"
-                  rows={2}
-                  aria-invalid={fieldState.invalid}
-                  aria-describedby="media-alt-hint"
-                />
-                <FieldDescription id="media-alt-hint">
-                  {texts.media.detail.altHint}
-                </FieldDescription>
-                <FieldError errors={[fieldState.error]} />
-              </Field>
+            name="alt"
+            id="media-alt"
+            label={texts.media.detail.alt}
+            hint={texts.media.detail.altHint}
+            render={(field, props) => (
+              <Textarea {...field} {...props} rows={2} />
             )}
           />
         )}
         {hasTranscript && (
-          <Controller
-            name="transcript"
+          <FormField
             control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="media-transcript">
-                  {texts.media.detail.transcript}
-                </FieldLabel>
-                <Textarea
-                  {...field}
-                  id="media-transcript"
-                  rows={6}
-                  className="max-h-80"
-                  aria-invalid={fieldState.invalid}
-                  aria-describedby="media-transcript-hint"
-                />
-                <FieldDescription id="media-transcript-hint">
-                  {texts.media.detail.transcriptHint}
-                </FieldDescription>
-                <FieldError errors={[fieldState.error]} />
-              </Field>
+            name="transcript"
+            id="media-transcript"
+            label={texts.media.detail.transcript}
+            hint={texts.media.detail.transcriptHint}
+            render={(field, props) => (
+              <Textarea {...field} {...props} rows={6} className="max-h-80" />
             )}
           />
         )}

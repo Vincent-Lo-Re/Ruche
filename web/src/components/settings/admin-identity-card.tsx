@@ -1,11 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useQuery } from "@tanstack/react-query"
-import { Controller, useForm, useWatch } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 
 import { LoadState } from "@/components/load-state"
 import { SaveFooter } from "@/components/settings/save-footer"
+import { FormField } from "@/components/form-field"
 import { Card, CardContent } from "@/components/ui/card"
-import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useBrandMutation } from "@/hooks/use-brand-name"
 import { brandInitial, saveBrandDetails } from "@/lib/admin-identity"
@@ -86,78 +86,58 @@ function BrandDetailsForm({
     <form onSubmit={onSubmit} noValidate>
       <Card className="@container pb-0">
         <CardContent className="grid gap-4 @lg:grid-cols-2">
-          <Controller
+          <FormField
+            control={form.control}
             name="name"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="admin-name">{labels.name}</FieldLabel>
-                <Input
-                  {...field}
-                  id="admin-name"
-                  placeholder={texts.app.name}
-                  aria-invalid={fieldState.invalid}
-                />
-                <FieldError errors={[fieldState.error]} />
-              </Field>
+            id="admin-name"
+            label={labels.name}
+            render={(field, props) => (
+              <Input {...field} {...props} placeholder={texts.app.name} />
             )}
           />
-          <Controller
+          <FormField
+            control={form.control}
             name="initials"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="admin-initials">
-                  {labels.initials}
-                </FieldLabel>
-                <Input
-                  {...field}
-                  id="admin-initials"
-                  maxLength={3}
-                  // Vides : la première lettre du nom.
-                  placeholder={brandInitial(nameValue || texts.app.name)}
-                  aria-invalid={fieldState.invalid}
-                />
-                <FieldError errors={[fieldState.error]} />
-              </Field>
+            id="admin-initials"
+            label={labels.initials}
+            render={(field, props) => (
+              <Input
+                {...field}
+                {...props}
+                maxLength={3}
+                // Vides : la première lettre du nom.
+                placeholder={brandInitial(nameValue || texts.app.name)}
+              />
             )}
           />
-          <Controller
+          <FormField
+            control={form.control}
             name="contactEmail"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="admin-email">{labels.email}</FieldLabel>
-                <Input
-                  {...field}
-                  id="admin-email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder={labels.emailPlaceholder}
-                  aria-invalid={fieldState.invalid}
-                />
-                <FieldError errors={[fieldState.error]} />
-              </Field>
+            id="admin-email"
+            label={labels.email}
+            render={(field, props) => (
+              <Input
+                {...field}
+                {...props}
+                type="email"
+                autoComplete="email"
+                placeholder={labels.emailPlaceholder}
+              />
             )}
           />
-          <Controller
-            name="websiteUrl"
+          <FormField
             control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="admin-website">
-                  {labels.website}
-                </FieldLabel>
-                <Input
-                  {...field}
-                  id="admin-website"
-                  type="url"
-                  autoComplete="url"
-                  placeholder={labels.websitePlaceholder}
-                  aria-invalid={fieldState.invalid}
-                />
-                <FieldError errors={[fieldState.error]} />
-              </Field>
+            name="websiteUrl"
+            id="admin-website"
+            label={labels.website}
+            render={(field, props) => (
+              <Input
+                {...field}
+                {...props}
+                type="url"
+                autoComplete="url"
+                placeholder={labels.websitePlaceholder}
+              />
             )}
           />
         </CardContent>

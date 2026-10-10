@@ -18,6 +18,7 @@ import { TransferError } from "@/lib/media/transfer"
 import type { UploadContext } from "@/lib/media/upload"
 import { UploadQueue } from "@/lib/media/upload-queue"
 import { texts } from "@/texts"
+import { queryRole, role } from "@/test/queries"
 
 // Le statut relu dans la base (vérification des SVG et des Lottie) est simulé.
 vi.mock("@/lib/media/api", async (importOriginal) => ({
@@ -89,7 +90,7 @@ function file(name = "guide.pdf") {
 }
 
 function uploadWindow() {
-  return screen.queryByRole("region", { name: texts.media.uploads.title })
+  return queryRole("region", texts.media.uploads.title)
 }
 
 function wait(ms: number) {
@@ -113,9 +114,7 @@ describe("fenêtre des envois", () => {
     })
     act(() => runs[0].context.update({ stage: "sending", progress: 0.5 }))
 
-    const region = screen.getByRole("region", {
-      name: texts.media.uploads.title,
-    })
+    const region = role("region", texts.media.uploads.title)
     expect(
       within(region).getByText(texts.media.uploads.summary.active(2))
     ).toBeVisible()
@@ -124,14 +123,8 @@ describe("fenêtre des envois", () => {
         `${texts.media.uploads.stages.sending} ${formatPercent(0.5)}`
       )
     ).toBeVisible()
-    expect(
-      within(region).getByRole("progressbar", { name: "guide.pdf" })
-    ).toBeVisible()
-    expect(
-      within(region).queryByRole("button", {
-        name: texts.media.uploads.close,
-      })
-    ).toBeNull()
+    expect(role("progressbar", "guide.pdf", region)).toBeVisible()
+    expect(queryRole("button", texts.media.uploads.close, region)).toBeNull()
   })
 
   it("se ferme toute seule quand tout est prêt", async () => {
@@ -182,15 +175,13 @@ describe("fenêtre des envois", () => {
 
   it("reste ouverte après un échec, et « Fermer » rend le focus où il était", async () => {
     const { queue, runs } = setup()
-    const before = screen.getByRole("button", { name: "Avant" })
+    const before = role("button", "Avant")
     act(() => {
       queue.add([file("notes.txt")])
     })
     await act(async () => runs[0].reject(new PrepareError("type_refuse")))
 
-    const region = screen.getByRole("region", {
-      name: texts.media.uploads.title,
-    })
+    const region = role("region", texts.media.uploads.title)
     expect(
       within(region).getByText(texts.media.uploads.summary.failed(1))
     ).toBeVisible()
@@ -202,9 +193,7 @@ describe("fenêtre des envois", () => {
 
     // Arrivée dans la fenêtre depuis « Avant » (au clavier), puis « Fermer ».
     act(() => before.focus())
-    const close = within(region).getByRole("button", {
-      name: texts.media.uploads.close,
-    })
+    const close = role("button", texts.media.uploads.close, region)
     act(() => close.focus())
     fireEvent.click(close)
 
@@ -220,17 +209,11 @@ describe("fenêtre des envois", () => {
     })
     await act(async () => runs[0].reject(new TransferError("envoi_interrompu")))
 
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: texts.media.uploads.retry("guide.pdf"),
-      })
-    )
+    fireEvent.click(role("button", texts.media.uploads.retry("guide.pdf")))
 
     expect(runs).toHaveLength(2)
     expect(
-      screen.getByRole("button", {
-        name: texts.media.uploads.cancel("guide.pdf"),
-      })
+      role("button", texts.media.uploads.cancel("guide.pdf"))
     ).toHaveFocus()
   })
 
@@ -241,16 +224,10 @@ describe("fenêtre des envois", () => {
     })
     await act(async () => runs[0].reject(new PrepareError("type_refuse")))
 
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: texts.media.uploads.dismiss("notes.txt"),
-      })
-    )
+    fireEvent.click(role("button", texts.media.uploads.dismiss("notes.txt")))
 
     expect(screen.queryByText("notes.txt")).toBeNull()
-    expect(
-      screen.getByRole("button", { name: texts.media.uploads.collapse })
-    ).toHaveFocus()
+    expect(role("button", texts.media.uploads.collapse)).toHaveFocus()
   })
 
   it("ne se ferme pas tant que le focus est dedans", async () => {
@@ -258,15 +235,13 @@ describe("fenêtre des envois", () => {
     act(() => {
       queue.add([file()])
     })
-    act(() =>
-      screen.getByRole("button", { name: texts.media.uploads.collapse }).focus()
-    )
+    act(() => role("button", texts.media.uploads.collapse).focus())
     await act(async () => runs[0].resolve(media()))
 
     await wait(500)
     expect(uploadWindow()).not.toBeNull()
 
-    act(() => screen.getByRole("button", { name: "Avant" }).focus())
+    act(() => role("button", "Avant").focus())
     await waitFor(() => expect(uploadWindow()).toBeNull())
   })
 
@@ -276,19 +251,16 @@ describe("fenêtre des envois", () => {
       queue.add([file()])
     })
 
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.media.uploads.collapse })
-    )
-    const expand = screen.getByRole("button", {
-      name: texts.media.uploads.expand,
-    })
+    fireEvent.click(role("button", texts.media.uploads.collapse))
+    const expand = role("button", texts.media.uploads.expand)
     expect(expand).toHaveAttribute("aria-expanded", "false")
     expect(screen.queryByRole("listitem")).toBeNull()
 
     fireEvent.click(expand)
-    expect(
-      screen.getByRole("button", { name: texts.media.uploads.collapse })
-    ).toHaveAttribute("aria-expanded", "true")
+    expect(role("button", texts.media.uploads.collapse)).toHaveAttribute(
+      "aria-expanded",
+      "true"
+    )
     expect(screen.getByRole("listitem")).toBeVisible()
   })
 

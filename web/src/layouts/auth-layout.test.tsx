@@ -6,6 +6,7 @@ import * as identityApi from "@/lib/admin-identity"
 import { fakeAuth, renderApp } from "@/test/render"
 import { texts } from "@/texts"
 import { NO_CUSTOM_NAMES } from "@/lib/section-names"
+import { findRole } from "@/test/queries"
 
 vi.mock("@/lib/admin-identity", async (importOriginal) => {
   const actual = await importOriginal<typeof identityApi>()
@@ -49,9 +50,7 @@ describe("pages de connexion (modèle login-04)", () => {
     )
     await renderApp("/sign-in", fakeAuth("signed-out"))
 
-    expect(
-      await screen.findByRole("heading", { name: texts.signIn.title })
-    ).toBeVisible()
+    expect(await findRole("heading", texts.signIn.title)).toBeVisible()
     await waitFor(() =>
       expect(document.querySelector('img[alt=""]')).toHaveAttribute("src", url)
     )
@@ -86,7 +85,7 @@ describe("pages de connexion (modèle login-04)", () => {
     savePendingSignIn("anne@exemple.test")
     await renderApp("/sign-in", fakeAuth("signed-out"))
 
-    const link = await screen.findByRole("link", { name: "aide@exemple.fr" })
+    const link = await findRole("link", "aide@exemple.fr")
     expect(link).toHaveAttribute("href", "mailto:aide@exemple.fr")
     clearPendingSignIn()
   })

@@ -8,6 +8,7 @@ import type { Media } from "@/lib/media/constants"
 import type { UploadRunner } from "@/lib/media/upload"
 import { UploadQueue } from "@/lib/media/upload-queue"
 import { texts } from "@/texts"
+import { role } from "@/test/queries"
 
 const labels = texts.editor.picker
 
@@ -84,7 +85,7 @@ describe("choix d'une image : envoyer une image", () => {
     expect(
       await screen.findByText(labels.uploadingProgress("vitrail.jpg", "40 %"))
     ).toBeVisible()
-    expect(screen.getByRole("button", { name: labels.upload })).toBeDisabled()
+    expect(role("button", labels.upload)).toBeDisabled()
 
     const ready = media({})
     finish(ready)
@@ -118,7 +119,7 @@ describe("choix d'une image : envoyer une image", () => {
         text.startsWith(labels.uploadFailed("vitrail.jpg", ""))
       )
     ).toBeVisible()
-    expect(screen.getByRole("button", { name: labels.upload })).toBeEnabled()
+    expect(role("button", labels.upload)).toBeEnabled()
     expect(onChoose).not.toHaveBeenCalled()
   })
 })

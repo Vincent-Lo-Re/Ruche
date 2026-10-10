@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest"
 
 import { MediaUnavailable } from "@/blocks/components/media-state"
 import { texts } from "@/texts"
+import { role } from "@/test/queries"
 
 const words = { ...texts.editor.presentation.audio }
 
@@ -30,7 +31,7 @@ describe("MediaUnavailable", () => {
   it("dit pourquoi le fichier manque et propose d'en choisir un autre", () => {
     const onChoose = show({ state: "missing" })
     expect(screen.getByText(words.missing)).toBeVisible()
-    fireEvent.click(screen.getByRole("button", { name: words.choose }))
+    fireEvent.click(role("button", words.choose))
     expect(onChoose).toHaveBeenCalled()
   })
 
@@ -39,7 +40,7 @@ describe("MediaUnavailable", () => {
     show({ state: "error", retry })
     // Un audio, pas « L'image n'a pas pu être chargée ».
     expect(screen.getByText(words.loadFailed)).toBeVisible()
-    fireEvent.click(screen.getByRole("button", { name: texts.common.retry }))
+    fireEvent.click(role("button", texts.common.retry))
     expect(retry).toHaveBeenCalled()
   })
 

@@ -3,14 +3,13 @@ import { describe, expect, it } from "vitest"
 
 import { fakeAuth, renderApp } from "@/test/render"
 import { texts } from "@/texts"
+import { findRole, queryRole, role } from "@/test/queries"
 
 describe("menu", () => {
   it("les icônes Lucide ont un trait d'un pixel, qui ne change pas avec leur taille", async () => {
     await renderApp("/account", fakeAuth({ role: "editor" }))
 
-    const blog = await screen.findByRole("link", {
-      name: texts.sections.blog.title,
-    })
+    const blog = await findRole("link", texts.sections.blog.title)
     const icon = blog.querySelector("svg")
     expect(icon).toHaveAttribute("stroke-width", "1")
     expect(icon?.querySelector("[vector-effect]")).toHaveAttribute(
@@ -29,17 +28,17 @@ describe("menu", () => {
     expect(footer).not.toBeNull()
     expect(within(footer!).queryByRole("button")).toBeNull()
     expect(
-      within(
-        screen.getByRole("navigation", { name: texts.nav.label })
-      ).queryByRole("link", { name: texts.sections.team.title })
+      queryRole(
+        "link",
+        texts.sections.team.title,
+        role("navigation", texts.nav.label)
+      )
     ).toBeNull()
   })
 
   it("toujours ouvert : ni bouton ni raccourci pour le replier", async () => {
     await renderApp("/account", fakeAuth({ role: "editor" }))
-    const link = await screen.findByRole("link", {
-      name: texts.sections.blog.title,
-    })
+    const link = await findRole("link", texts.sections.blog.title)
 
     // Le header est au-dessus du menu et du contenu, pas dans le contenu.
     expect(

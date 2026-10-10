@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from "vitest"
 
 import { fakeAuth, renderApp } from "@/test/render"
 import { texts } from "@/texts"
+import { queryRole, role } from "@/test/queries"
 
 afterEach(() => {
   localStorage.clear()
@@ -11,8 +12,7 @@ afterEach(() => {
 
 describe("menu de l'avatar", () => {
   // L'avatar seul, tout à droite du header : le bouton se lit par ce qu'il fait.
-  const trigger = () =>
-    screen.getByRole("button", { name: texts.accountMenu.open })
+  const trigger = () => role("button", texts.accountMenu.open)
   const openMenu = async () => {
     fireEvent.click(trigger())
     return screen.findByRole("menu")
@@ -39,9 +39,7 @@ describe("menu de l'avatar", () => {
     const { router } = await renderApp("/", fakeAuth({ role: "editor" }))
 
     const menu = await openMenu()
-    fireEvent.click(
-      within(menu).getByRole("menuitem", { name: texts.sections.account.title })
-    )
+    fireEvent.click(role("menuitem", texts.sections.account.title, menu))
     await waitFor(() => expect(router.state.location.pathname).toBe("/account"))
   })
 
@@ -49,12 +47,8 @@ describe("menu de l'avatar", () => {
     const { router } = await renderApp("/", fakeAuth({ role: "editor" }))
 
     const menu = await openMenu()
-    expect(
-      within(menu).queryByRole("menuitem", { name: texts.theme.title })
-    ).toBeNull()
-    fireEvent.click(
-      within(menu).getByRole("menuitem", { name: texts.common.signOut })
-    )
+    expect(queryRole("menuitem", texts.theme.title, menu)).toBeNull()
+    fireEvent.click(role("menuitem", texts.common.signOut, menu))
     await waitFor(() =>
       expect(router.state.location.pathname).toBe("/sign-out")
     )

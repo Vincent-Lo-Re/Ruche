@@ -7,6 +7,7 @@ import { routes } from "@/routes"
 
 import { fakeAuth, renderApp } from "@/test/render"
 import { texts } from "@/texts"
+import { queryRole, role } from "@/test/queries"
 
 // Par défaut : un admin connecté, double vérification faite.
 const renderAt = (path: string) => renderApp(path)
@@ -20,7 +21,7 @@ describe("menu", () => {
   it("range les sections par groupes, avec l'équipe et le compte en bas", async () => {
     await renderAt("/")
 
-    const main = screen.getByRole("navigation", { name: texts.nav.label })
+    const main = role("navigation", texts.nav.label)
     expect(within(main).getByText(texts.nav.groups.contents)).toBeVisible()
     expect(within(main).getByText(texts.nav.groups.tools)).toBeVisible()
     expect(within(main).getByText(texts.nav.groups.app)).toBeVisible()
@@ -45,7 +46,7 @@ describe("menu", () => {
 
     // Le compte, l'équipe et les paramètres sont dans le header (sans site web réglé, pas de
     // lien « Site web » : app-header.test.tsx).
-    const header = screen.getByRole("navigation", { name: texts.header.label })
+    const header = role("navigation", texts.header.label)
     expect(
       within(header)
         .getAllByRole("link")
@@ -56,23 +57,15 @@ describe("menu", () => {
   it("mène aux adresses en français", async () => {
     await renderAt("/")
 
-    expect(screen.getByRole("link", { name: "Médiathèque" })).toHaveAttribute(
-      "href",
-      "/media"
-    )
+    expect(role("link", "Médiathèque")).toHaveAttribute("href", "/media")
   })
 
   it("ouvre la section demandée et marque son lien comme actif", async () => {
     await renderAt("/blog")
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Blog")
-    expect(screen.getByRole("link", { name: "Blog" })).toHaveAttribute(
-      "aria-current",
-      "page"
-    )
-    expect(
-      screen.getByRole("link", { name: "Tableau de bord" })
-    ).not.toHaveAttribute("aria-current")
+    expect(role("link", "Blog")).toHaveAttribute("aria-current", "page")
+    expect(role("link", "Tableau de bord")).not.toHaveAttribute("aria-current")
   })
 })
 
@@ -90,7 +83,7 @@ describe("thème", () => {
   it("passe en sombre et garde le choix", async () => {
     await renderAt("/account")
 
-    fireEvent.click(screen.getByRole("button", { name: texts.theme.dark }))
+    fireEvent.click(role("button", texts.theme.dark))
 
     expect(document.documentElement).toHaveClass("dark")
     expect(localStorage.getItem("ruche-theme")).toBe("dark")
@@ -107,9 +100,7 @@ describe("accès", () => {
       texts.signIn.title
     )
     // Les pages de connexion n'ont pas le menu.
-    expect(
-      screen.queryByRole("navigation", { name: texts.nav.label })
-    ).not.toBeInTheDocument()
+    expect(queryRole("navigation", texts.nav.label)).not.toBeInTheDocument()
   })
 
   it("demande le code de l'app après le code reçu par e-mail", async () => {
@@ -143,13 +134,13 @@ describe("rôles", () => {
   it("cache Paramètres dans le header d'un éditeur, qui garde Mon compte et La team", async () => {
     await renderApp("/", fakeAuth({ role: "editor" }))
 
-    const header = screen.getByRole("navigation", { name: texts.header.label })
+    const header = role("navigation", texts.header.label)
     expect(
       within(header)
         .getAllByRole("link")
         .map((link) => link.textContent)
     ).toEqual(["Mon compte", "La team"])
-    expect(screen.queryByRole("link", { name: "Paramètres" })).toBeNull()
+    expect(queryRole("link", "Paramètres")).toBeNull()
   })
 
   it("affiche « Réservé aux admins » à un éditeur sur /settings", async () => {
@@ -221,8 +212,9 @@ describe("pages chargées à part et préparées (ADMIN § 7)", () => {
       texts.sections.appShapes.title
     )
     expect(screen.getByText(texts.appPages.soon.title)).toBeVisible()
-    expect(
-      screen.getByRole("link", { name: texts.sections.appShapes.title })
-    ).toHaveAttribute("aria-current", "page")
+    expect(role("link", texts.sections.appShapes.title)).toHaveAttribute(
+      "aria-current",
+      "page"
+    )
   })
 })

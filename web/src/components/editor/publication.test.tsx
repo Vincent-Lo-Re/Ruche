@@ -9,6 +9,7 @@ import { formatDateTime } from "@/lib/dates"
 import * as mediaApi from "@/lib/media/api"
 import { renderApp, testProfile } from "@/test/render"
 import { texts } from "@/texts"
+import { findRole, role } from "@/test/queries"
 
 // La base et Realtime sont simulés : la barre de publication de l'éditeur (étape 5).
 vi.mock("@/lib/contents/api", async (importOriginal) => {
@@ -30,29 +31,18 @@ vi.mock("@/lib/contents/api", async (importOriginal) => {
   }
 })
 
-vi.mock("@/lib/contents/publication", async (importOriginal) => {
-  const actual = await importOriginal<typeof publicationApi>()
-  return {
-    ...actual,
-    getPublication: vi.fn(),
-    listVersions: vi.fn(async () => []),
-    publishContent: vi.fn(),
-    scheduleContent: vi.fn(),
-    unscheduleContent: vi.fn(),
-    unpublishContent: vi.fn(),
-    revertToVersion: vi.fn(),
-  }
-})
+vi.mock("@/lib/contents/publication", async (original) =>
+  (await import("@/test/mocks")).publicationApi(original)
+)
 
 vi.mock("@/lib/access-levels", async (importOriginal) => {
   const actual = await importOriginal<typeof levelsApi>()
   return { ...actual, listAccessLevels: vi.fn() }
 })
 
-vi.mock("@/lib/media/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof mediaApi>()
-  return { ...actual, kickFiles: vi.fn(async () => {}) }
-})
+vi.mock("@/lib/media/api", async (original) =>
+  (await import("@/test/mocks")).mediaApi(original)
+)
 
 const PAGE_ID = "00000000-0000-4000-8000-0000000000aa"
 const PREMIUM = "00000000-0000-4000-8000-0000000000f1"
@@ -133,25 +123,21 @@ async function ready() {
 }
 
 function publishButton() {
-  return screen.getByRole("button", { name: labels.actions.publish })
+  return role("button", labels.actions.publish)
 }
 
 /** La carte « Adresse de la page », dans la colonne de droite (éditeur des contenus), et son champ. */
 function addressCard() {
-  return screen.getByRole("region", { name: labels.settings.slug.label })
+  return role("region", labels.settings.slug.label)
 }
 function addressField() {
-  return within(addressCard()).getByRole("textbox", {
-    name: labels.settings.slug.label,
-  })
+  return role("textbox", labels.settings.slug.label, addressCard())
 }
 
 /** Choisit le niveau d'accès dans sa carte (Base UI ne retient un clic que s'il commence sur l'option). */
 async function pickLevel(name: RegExp) {
   fireEvent.click(
-    within(
-      screen.getByRole("region", { name: labels.settings.access.label })
-    ).getByRole("combobox")
+    within(role("region", labels.settings.access.label)).getByRole("combobox")
   )
   const option = await screen.findByRole("option", { name })
   fireEvent.pointerDown(option, { pointerType: "mouse" })
@@ -223,13 +209,9 @@ describe("barre de publication", () => {
     await waitFor(() => expect(publishButton()).toBeEnabled())
 
     fireEvent.click(publishButton())
-    const dialog = await screen.findByRole("dialog", {
-      name: labels.publishDialog.title,
-    })
+    const dialog = await findRole("dialog", labels.publishDialog.title)
     expect(within(dialog).getByText(labels.levelRequired)).toBeVisible()
-    const confirm = within(dialog).getByRole("button", {
-      name: labels.publishDialog.confirm,
-    })
+    const confirm = role("button", labels.publishDialog.confirm, dialog)
     // Aucun niveau coché par défaut : on ne peut pas publier.
     expect(
       within(dialog)
@@ -239,9 +221,7 @@ describe("barre de publication", () => {
     expect(confirm).toBeDisabled()
 
     fireEvent.click(
-      within(dialog).getByRole("radio", {
-        name: new RegExp(labels.settings.access.free),
-      })
+      role("radio", new RegExp(labels.settings.access.free), dialog)
     )
     expect(confirm).toBeEnabled()
     fireEvent.click(confirm)
@@ -271,26 +251,16 @@ describe("barre de publication", () => {
     await ready()
     await waitFor(() => expect(publishButton()).toBeEnabled())
     fireEvent.click(publishButton())
-    const dialog = await screen.findByRole("dialog", {
-      name: labels.publishDialog.title,
-    })
+    const dialog = await findRole("dialog", labels.publishDialog.title)
     expect(
       await within(dialog).findByText(labels.settings.access.loadFailed)
     ).toBeVisible()
     expect(within(dialog).queryAllByRole("radio")).toHaveLength(0)
-    const confirm = within(dialog).getByRole("button", {
-      name: labels.publishDialog.confirm,
-    })
+    const confirm = role("button", labels.publishDialog.confirm, dialog)
     expect(confirm).toBeDisabled()
 
-    fireEvent.click(
-      within(dialog).getByRole("button", {
-        name: texts.common.retry,
-      })
-    )
-    expect(
-      await within(dialog).findByRole("radio", { name: /Premium/ })
-    ).toBeVisible()
+    fireEvent.click(role("button", texts.common.retry, dialog))
+    expect(await findRole("radio", /Premium/, dialog)).toBeVisible()
     expect(confirm).toBeDisabled()
   })
 
@@ -302,27 +272,17 @@ describe("barre de publication", () => {
     await ready()
     await waitFor(() => expect(publishButton()).toBeEnabled())
     fireEvent.click(publishButton())
-    const dialog = await screen.findByRole("dialog", {
-      name: labels.publishDialog.title,
-    })
+    const dialog = await findRole("dialog", labels.publishDialog.title)
     expect(
       await within(dialog).findByText(labels.settings.access.loadFailed)
     ).toBeVisible()
     expect(
       within(dialog).queryByText(labels.settings.access.deleted)
     ).toBeNull()
-    expect(
-      within(dialog).getByRole("button", { name: labels.publishDialog.confirm })
-    ).toBeDisabled()
-    fireEvent.click(
-      within(dialog).getByRole("button", {
-        name: texts.common.retry,
-      })
-    )
+    expect(role("button", labels.publishDialog.confirm, dialog)).toBeDisabled()
+    fireEvent.click(role("button", texts.common.retry, dialog))
     expect(await within(dialog).findByText("Premium")).toBeVisible()
-    expect(
-      within(dialog).getByRole("button", { name: labels.publishDialog.confirm })
-    ).toBeEnabled()
+    expect(role("button", labels.publishDialog.confirm, dialog)).toBeEnabled()
   })
 
   it("une page sans adresse : « Publier » allume la carte de l'adresse au lieu de publier", async () => {
@@ -331,9 +291,10 @@ describe("barre de publication", () => {
     await ready()
     await waitFor(() => expect(publishButton()).toBeEnabled())
     expect(
-      screen.getByRole("button", {
-        name: texts.editor.article.ready.todo(labels.settings.slug.label),
-      })
+      role(
+        "button",
+        texts.editor.article.ready.todo(labels.settings.slug.label)
+      )
     ).toBeVisible()
 
     fireEvent.click(publishButton())
@@ -356,16 +317,10 @@ describe("barre de publication", () => {
 
     fireEvent.click(publishButton())
     const dialog = await screen.findByRole("dialog")
-    fireEvent.click(
-      within(dialog).getByRole("button", {
-        name: labels.publishDialog.confirm,
-      })
-    )
+    fireEvent.click(role("button", labels.publishDialog.confirm, dialog))
     const held = await screen.findByRole("alertdialog")
     expect(held).toHaveTextContent(labels.lockHeld.description("Claire Martin"))
-    fireEvent.click(
-      within(held).getByRole("button", { name: labels.lockHeld.take })
-    )
+    fireEvent.click(role("button", labels.lockHeld.take, held))
     await waitFor(() =>
       expect(api.lockTake).toHaveBeenLastCalledWith(
         PAGE_ID,
@@ -391,9 +346,10 @@ describe("barre de publication", () => {
     ).closest("[data-schedule-banner]") as HTMLElement
     expect(banner).toHaveTextContent(labels.banner.waitingMineHint)
     expect(banner).not.toHaveTextContent(labels.banner.waitingHint)
-    expect(
-      within(banner).getByRole("link", { name: labels.banner.leave })
-    ).toHaveAttribute("href", "/pages")
+    expect(role("link", labels.banner.leave, banner)).toHaveAttribute(
+      "href",
+      "/pages"
+    )
   })
 
   it("programmation en attente : quelqu'un d'autre écrit (lecture seule)", async () => {
@@ -453,9 +409,7 @@ describe("barre de publication", () => {
     )
     expect(banner).toHaveTextContent(labels.banner.failedBy("Claire Martin"))
     fireEvent.click(
-      within(banner as HTMLElement).getByRole("button", {
-        name: labels.actions.dismissFailure,
-      })
+      role("button", labels.actions.dismissFailure, banner as HTMLElement)
     )
     await waitFor(() =>
       expect(publicationApi.unscheduleContent).toHaveBeenCalledWith(PAGE_ID)
@@ -471,16 +425,10 @@ describe("retirer de l'app", () => {
     )
     await ready()
     await screen.findByText(labels.status.live)
-    fireEvent.click(screen.getByRole("button", { name: labels.actions.more }))
-    fireEvent.click(
-      await screen.findByRole("menuitem", { name: labels.actions.unpublish })
-    )
+    fireEvent.click(role("button", labels.actions.more))
+    fireEvent.click(await findRole("menuitem", labels.actions.unpublish))
     const dialog = await screen.findByRole("alertdialog")
-    fireEvent.click(
-      within(dialog).getByRole("button", {
-        name: labels.unpublishDialog.confirm,
-      })
-    )
+    fireEvent.click(role("button", labels.unpublishDialog.confirm, dialog))
     await waitFor(() =>
       expect(publicationApi.unpublishContent).toHaveBeenCalledWith(PAGE_ID)
     )
@@ -508,11 +456,9 @@ describe("programmer (heure de Paris)", () => {
     await ready()
     await waitFor(() => expect(publishButton()).toBeEnabled())
     // Le menu « Autres actions de publication ».
-    fireEvent.click(screen.getByRole("button", { name: labels.actions.more }))
-    fireEvent.click(
-      await screen.findByRole("menuitem", { name: labels.actions.schedule })
-    )
-    return screen.findByRole("dialog", { name: labels.scheduleDialog.title })
+    fireEvent.click(role("button", labels.actions.more))
+    fireEvent.click(await findRole("menuitem", labels.actions.schedule))
+    return findRole("dialog", labels.scheduleDialog.title)
   }
 
   function fill(dialog: HTMLElement, date: string, time: string) {
@@ -538,11 +484,7 @@ describe("programmer (heure de Paris)", () => {
       { exact: false }
     )
     expect(summary).toHaveTextContent(labels.scheduleDialog.ambiguous)
-    fireEvent.click(
-      within(dialog).getByRole("button", {
-        name: labels.scheduleDialog.confirm,
-      })
-    )
+    fireEvent.click(role("button", labels.scheduleDialog.confirm, dialog))
     await waitFor(() =>
       expect(publicationApi.scheduleContent).toHaveBeenCalledWith(
         PAGE_ID,
@@ -568,11 +510,7 @@ describe("programmer (heure de Paris)", () => {
     })
     expect(api.saveDraft).not.toHaveBeenCalled()
     fill(dialog, "03/10/2099", "08h00")
-    fireEvent.click(
-      within(dialog).getByRole("button", {
-        name: labels.scheduleDialog.confirm,
-      })
-    )
+    fireEvent.click(role("button", labels.scheduleDialog.confirm, dialog))
     await waitFor(() =>
       expect(publicationApi.scheduleContent).toHaveBeenCalled()
     )
@@ -587,9 +525,7 @@ describe("programmer (heure de Paris)", () => {
 
   it("refuse une heure qui n'existe pas (passage à l'heure d'été) et un moment passé", async () => {
     const dialog = await openScheduleDialog()
-    const confirm = within(dialog).getByRole("button", {
-      name: labels.scheduleDialog.confirm,
-    })
+    const confirm = role("button", labels.scheduleDialog.confirm, dialog)
 
     fill(dialog, "29/03/2099", "02h30")
     expect(

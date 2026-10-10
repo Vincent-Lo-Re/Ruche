@@ -3,7 +3,7 @@ import type { Factor } from "@supabase/supabase-js"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { ShieldCheck } from "lucide-react"
 import { useState, type ReactNode } from "react"
-import { Controller, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
 import { profileQueryKey, useAuth, type Profile } from "@/auth/auth-context"
@@ -16,6 +16,7 @@ import { useBrand } from "@/hooks/use-brand-name"
 import { PaletteChoice } from "@/components/theme/palette-choice"
 import { PalettePreview } from "@/components/theme/palette-preview"
 import { ThemeChoice } from "@/components/theme-choice"
+import { FormField } from "@/components/form-field"
 import { Button } from "@/components/ui/button"
 import { ButtonGroup } from "@/components/ui/button-group"
 import {
@@ -29,7 +30,6 @@ import {
 import {
   Field,
   FieldDescription,
-  FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
@@ -216,33 +216,28 @@ function ProfileCard({ profile }: { profile: Profile }) {
           <Card>
             <CardContent>
               <FieldGroup>
-                <Controller
-                  name="full_name"
+                <FormField
                   control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="account-name">
-                        {labels.name}
-                      </FieldLabel>
-                      <ButtonGroup className="w-full">
-                        <Input
-                          {...field}
-                          id="account-name"
-                          autoComplete="name"
-                          placeholder={labels.namePlaceholder}
-                          aria-invalid={fieldState.invalid}
-                        />
-                        <Button
-                          type="submit"
-                          variant="outline"
-                          disabled={save.isPending || !form.formState.isDirty}
-                        >
-                          {save.isPending && <Spinner />}
-                          {texts.common.save}
-                        </Button>
-                      </ButtonGroup>
-                      <FieldError errors={[fieldState.error]} />
-                    </Field>
+                  name="full_name"
+                  id="account-name"
+                  label={labels.name}
+                  render={(field, props) => (
+                    <ButtonGroup className="w-full">
+                      <Input
+                        {...field}
+                        {...props}
+                        autoComplete="name"
+                        placeholder={labels.namePlaceholder}
+                      />
+                      <Button
+                        type="submit"
+                        variant="outline"
+                        disabled={save.isPending || !form.formState.isDirty}
+                      >
+                        {save.isPending && <Spinner />}
+                        {texts.common.save}
+                      </Button>
+                    </ButtonGroup>
                   )}
                 />
               </FieldGroup>

@@ -15,47 +15,22 @@ import {
 } from "@/test/categories"
 import { renderApp } from "@/test/render"
 import { texts } from "@/texts"
+import { findRole, queryRole, role } from "@/test/queries"
 
 // Listes du Blog, des Podcasts et des Pages (étape 7) : colonnes, recherche, filtres, création
 // (vide ou point de départ, [D42]) et corbeille. La base est simulée.
 
-vi.mock("@/lib/contents/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof api>()
-  return {
-    ...actual,
-    findPageBySlug: vi.fn(async () => null),
-    findContentByTitle: vi.fn(async () => null),
-    listContents: vi.fn(),
-    reorderContents: vi.fn(async () => {}),
-    getMediaByIds: vi.fn(async () => []),
-    createContent: vi.fn(),
-    getContent: vi.fn(async () => null),
-    lockTake: vi.fn(),
-    lockStatus: vi.fn(),
-    saveDraft: vi.fn(async () => ({
-      rev: 2,
-      savedAt: "2026-09-28T08:01:00Z",
-    })),
-    lockRelease: vi.fn(async () => true),
-    lockReleaseOnExit: vi.fn(),
-    subscribeLock: vi.fn(() => () => {}),
-  }
-})
+vi.mock("@/lib/contents/api", async (original) =>
+  (await import("@/test/mocks")).contentsApi(original)
+)
 
-vi.mock("@/lib/contents/publication", async (importOriginal) => {
-  const actual = await importOriginal<typeof publicationApi>()
-  return {
-    ...actual,
-    getPublication: vi.fn(async () => null),
-    trashContent: vi.fn(),
-    restoreContent: vi.fn(),
-  }
-})
+vi.mock("@/lib/contents/publication", async (original) =>
+  (await import("@/test/mocks")).publicationApi(original)
+)
 
-vi.mock("@/lib/contents/templates", async (importOriginal) => {
-  const actual = await importOriginal<typeof templatesApi>()
-  return { ...actual, listStarters: vi.fn(async () => []) }
-})
+vi.mock("@/lib/contents/templates", async (original) =>
+  (await import("@/test/mocks")).templatesApi(original)
+)
 
 vi.mock("@/lib/categories", async (importOriginal) => {
   const actual = await importOriginal<typeof categoriesApi>()
@@ -76,16 +51,9 @@ vi.mock("@/lib/access-levels", async (importOriginal) => {
   }
 })
 
-vi.mock("@/lib/media/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof mediaApi>()
-  return {
-    ...actual,
-    kickFiles: vi.fn(async () => {}),
-    getPreviewUrls: vi.fn(async (keys: string[]) =>
-      Object.fromEntries(keys.map((key) => [key, `blob:${key}`]))
-    ),
-  }
-})
+vi.mock("@/lib/media/api", async (original) =>
+  (await import("@/test/mocks")).mediaApi(original)
+)
 
 const labels = texts.contentList
 const SOMMEIL = "00000000-0000-4000-8000-00000000c001"
@@ -191,8 +159,8 @@ function shownTitles(): string[] {
 
 /** Choisit une option d'un filtre (liste déroulante). */
 async function pick(filter: string, option: string) {
-  fireEvent.click(screen.getByRole("combobox", { name: filter }))
-  const choice = await screen.findByRole("option", { name: option })
+  fireEvent.click(role("combobox", filter))
+  const choice = await findRole("option", option)
   // Base UI ne retient un clic de souris que s'il a commencé sur l'option.
   fireEvent.pointerDown(choice, { pointerType: "mouse" })
   fireEvent.click(choice)
@@ -208,7 +176,7 @@ describe("Blog", () => {
     vi.mocked(api.listContents).mockResolvedValue(articles)
     await renderApp("/blog")
 
-    const link = await screen.findByRole("link", { name: "Bien dormir en été" })
+    const link = await findRole("link", "Bien dormir en été")
     expect(link).toHaveAttribute("href", `/blog/${ARTICLE}`)
     expect(api.listContents).toHaveBeenCalledWith("article")
     expect(categoriesApi.listCategories).toHaveBeenCalledWith("blog")
@@ -229,12 +197,11 @@ describe("Blog", () => {
     expect(within(last).getByText(labels.noCategory)).toBeVisible()
     expect(screen.getByText(labels.count(3, 3))).toBeVisible()
     // Deux onglets : les articles (ouvert) et les catégories.
-    expect(
-      screen.getByRole("tab", { name: labels.kinds.article.tab })
-    ).toHaveAttribute("aria-selected", "true")
-    expect(
-      screen.getByRole("tab", { name: texts.categories.tab })
-    ).toBeVisible()
+    expect(role("tab", labels.kinds.article.tab)).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
+    expect(role("tab", texts.categories.tab)).toBeVisible()
     // La liste est dans une carte blanche, sur le panneau gris de la page (ADMIN § 7).
     expect(
       screen.getByRole("table").closest('[data-slot="list-card"]')
@@ -262,9 +229,9 @@ describe("Blog", () => {
     ])
     await renderApp("/blog")
 
-    const withCover = (
-      await screen.findByRole("link", { name: "Bien dormir en été" })
-    ).closest("tr")!
+    const withCover = (await findRole("link", "Bien dormir en été")).closest(
+      "tr"
+    )!
     await waitFor(() =>
       expect(withCover.querySelector("img")).toHaveAttribute(
         "src",
@@ -282,16 +249,15 @@ describe("Blog", () => {
   it("cherche et filtre par état et par catégorie", async () => {
     vi.mocked(api.listContents).mockResolvedValue(articles)
     await renderApp("/blog")
-    await screen.findByRole("link", { name: "Bien dormir en été" })
+    await findRole("link", "Bien dormir en été")
 
-    fireEvent.change(
-      screen.getByRole("searchbox", { name: labels.kinds.article.search }),
-      { target: { value: "TRAVAIL" } }
-    )
+    fireEvent.change(role("searchbox", labels.kinds.article.search), {
+      target: { value: "TRAVAIL" },
+    })
     await waitFor(() => expect(shownTitles()).toEqual(["Le stress au travail"]))
     expect(screen.getByText(labels.count(1, 3))).toBeVisible()
 
-    fireEvent.click(screen.getByRole("button", { name: labels.filters.reset }))
+    fireEvent.click(role("button", labels.filters.reset))
     await waitFor(() => expect(shownTitles()).toHaveLength(3))
 
     await pick(labels.filters.state, labels.filters.states.live)
@@ -328,54 +294,37 @@ describe("Blog", () => {
     vi.mocked(api.listContents).mockResolvedValue(many)
     const { router } = await renderApp("/blog")
     await waitFor(() => expect(shownTitles()).toHaveLength(25))
-    const pages = screen.getByRole("navigation", {
-      name: texts.common.pagination.label,
-    })
+    const pages = role("navigation", texts.common.pagination.label)
     expect(screen.getByText("1–25 sur 30")).toBeVisible()
     expect(
-      within(pages).getByRole("button", {
-        name: texts.common.pagination.previous,
-      })
+      role("button", texts.common.pagination.previous, pages)
     ).toBeDisabled()
 
-    fireEvent.click(
-      within(pages).getByRole("button", {
-        name: texts.common.pagination.page(2),
-      })
-    )
+    fireEvent.click(role("button", texts.common.pagination.page(2), pages))
     await waitFor(() => expect(shownTitles()).toHaveLength(5))
     expect(shownTitles()[0]).toBe("Article 26")
     expect(router.state.location.search).toBe("?page=2")
     expect(router.state.historyAction).toBe("REPLACE")
 
     // « Mettre en tête » : de la page 2 au début de toute la liste.
-    fireEvent.click(
-      screen.getByRole("button", { name: labels.actions("Article 28") })
-    )
-    fireEvent.click(
-      await screen.findByRole("menuitem", { name: labels.order.moveTop })
-    )
+    fireEvent.click(role("button", labels.actions("Article 28")))
+    fireEvent.click(await findRole("menuitem", labels.order.moveTop))
     await waitFor(() => expect(api.reorderContents).toHaveBeenCalled())
     const ids = vi.mocked(api.reorderContents).mock.calls[0][1]
     expect(ids).toHaveLength(30)
     expect(ids[0]).toBe(many[27].id)
 
     // Une recherche : la première page, et la page quitte l'adresse.
-    fireEvent.change(
-      screen.getByRole("searchbox", { name: labels.kinds.article.search }),
-      { target: { value: "Article 1" } }
-    )
+    fireEvent.change(role("searchbox", labels.kinds.article.search), {
+      target: { value: "Article 1" },
+    })
     await waitFor(() =>
       expect(
         new URLSearchParams(router.state.location.search).get("page")
       ).toBeNull()
     )
     await waitFor(() =>
-      expect(
-        screen.queryByRole("navigation", {
-          name: texts.common.pagination.label,
-        })
-      ).toBeNull()
+      expect(queryRole("navigation", texts.common.pagination.label)).toBeNull()
     )
   })
 
@@ -383,19 +332,19 @@ describe("Blog", () => {
     vi.mocked(api.listContents).mockResolvedValue(articles)
     const { router } = await renderApp("/blog?q=travail&status=draft")
     await waitFor(() => expect(shownTitles()).toEqual(["Le stress au travail"]))
-    expect(
-      screen.getByRole("searchbox", { name: labels.kinds.article.search })
-    ).toHaveValue("travail")
-    expect(
-      screen.getByRole("combobox", { name: labels.filters.state })
-    ).toHaveTextContent(labels.filters.states.draft)
+    expect(role("searchbox", labels.kinds.article.search)).toHaveValue(
+      "travail"
+    )
+    expect(role("combobox", labels.filters.state)).toHaveTextContent(
+      labels.filters.states.draft
+    )
 
     await pick(labels.filters.category, "Stress")
     expect(router.state.historyAction).toBe("REPLACE")
     expect(
       new URLSearchParams(router.state.location.search).get("category")
     ).toBe(STRESS)
-    fireEvent.click(screen.getByRole("button", { name: labels.filters.reset }))
+    fireEvent.click(role("button", labels.filters.reset))
     await waitFor(() => expect(router.state.location.search).toBe(""))
   })
 
@@ -405,7 +354,7 @@ describe("Blog", () => {
     vi.mocked(api.lockTake).mockResolvedValue(lockRow({ mine: true }))
     vi.mocked(api.lockStatus).mockResolvedValue(lockRow({ mine: true }))
     await renderApp("/blog?status=live")
-    const link = await screen.findByRole("link", { name: "Bien dormir en été" })
+    const link = await findRole("link", "Bien dormir en été")
     // C'est le contenu qui défile, dans son panneau (le header et le menu restent en place).
     pageScroll().scrollTop = 420
     fireEvent.scroll(pageScroll())
@@ -417,11 +366,7 @@ describe("Blog", () => {
     ).toBeInTheDocument()
     expect(window.scrollY).toBe(0)
 
-    fireEvent.click(
-      screen.getByRole("link", {
-        name: texts.editor.back(texts.sections.blog.title),
-      })
-    )
+    fireEvent.click(role("link", texts.editor.back(texts.sections.blog.title)))
     await waitFor(() => expect(shownTitles()).toEqual(["Bien dormir en été"]))
     // Le filtre est gardé, la place retrouvée, et la ligne s'allume.
     expect(pageScroll().scrollTop).toBe(420)
@@ -435,12 +380,10 @@ describe("Blog", () => {
   it("une liste ouverte depuis le menu commence en haut", async () => {
     vi.mocked(api.listContents).mockResolvedValue(articles)
     await renderApp("/blog")
-    await screen.findByRole("link", { name: "Bien dormir en été" })
+    await findRole("link", "Bien dormir en été")
     pageScroll().scrollTop = 300
     fireEvent.scroll(pageScroll())
-    fireEvent.click(
-      screen.getByRole("link", { name: texts.sections.podcasts.title })
-    )
+    fireEvent.click(role("link", texts.sections.podcasts.title))
     await waitFor(() => expect(pageScroll().scrollTop).toBe(0))
   })
 
@@ -449,16 +392,12 @@ describe("Blog", () => {
     // Un brouillon qui n'arrive pas.
     vi.mocked(api.getContent).mockReturnValue(new Promise(() => {}))
     const { router } = await renderApp("/blog")
-    fireEvent.click(
-      await screen.findByRole("link", { name: "Bien dormir en été" })
-    )
+    fireEvent.click(await findRole("link", "Bien dormir en été"))
 
     // La liste reste nette ; la barre du haut n'apparaît qu'après un instant.
+    expect(queryRole("progressbar", texts.nav.pageLoading)).toBeNull()
     expect(
-      screen.queryByRole("progressbar", { name: texts.nav.pageLoading })
-    ).toBeNull()
-    expect(
-      await screen.findByRole("progressbar", { name: texts.nav.pageLoading })
+      await findRole("progressbar", texts.nav.pageLoading)
     ).toBeInTheDocument()
     expect(router.state.location.pathname).toBe("/blog")
     expect(shownTitles()).toHaveLength(3)
@@ -478,17 +417,11 @@ describe("Blog", () => {
       waiting.querySelector(".blocks-device .blocks-screen")
     ).not.toBeNull()
     expect(document.querySelectorAll("aside")).toHaveLength(2)
+    expect(queryRole("navigation", texts.nav.label)).toBeNull()
     expect(
-      screen.queryByRole("navigation", { name: texts.nav.label })
-    ).toBeNull()
-    expect(
-      screen.getByRole("link", {
-        name: texts.editor.back(texts.sections.blog.title),
-      })
+      role("link", texts.editor.back(texts.sections.blog.title))
     ).toHaveAttribute("href", "/blog")
-    expect(
-      screen.queryByRole("progressbar", { name: texts.nav.pageLoading })
-    ).toBeNull()
+    expect(queryRole("progressbar", texts.nav.pageLoading)).toBeNull()
   })
 
   it("un article survolé est lu à l'avance ; ouvert, l'éditeur arrive avec son brouillon, sans lignes grises", async () => {
@@ -497,7 +430,7 @@ describe("Blog", () => {
     vi.mocked(api.lockTake).mockResolvedValue(lockRow({ mine: true }))
     vi.mocked(api.lockStatus).mockResolvedValue(lockRow({ mine: true }))
     await renderApp("/blog")
-    const link = await screen.findByRole("link", { name: "Bien dormir en été" })
+    const link = await findRole("link", "Bien dormir en été")
 
     // Survolé un instant (pas seulement traversé) : son brouillon est lu.
     fireEvent.pointerOver(link)
@@ -523,20 +456,18 @@ describe("Blog", () => {
     vi.mocked(api.listContents).mockResolvedValue(articles)
     const { router } = await renderApp("/blog?q=dormir")
     await waitFor(() => expect(shownTitles()).toEqual(["Bien dormir en été"]))
-    const menu = screen.getByRole("navigation", { name: texts.nav.label })
+    const menu = role("navigation", texts.nav.label)
     const content = screen
       .getByRole("heading", { level: 1 })
       .closest("[data-page-fade]")
 
-    fireEvent.click(
-      within(menu).getByRole("link", { name: texts.sections.podcasts.title })
-    )
+    fireEvent.click(role("link", texts.sections.podcasts.title, menu))
     await screen.findByRole("heading", {
       level: 1,
       name: texts.sections.podcasts.title,
     })
     // Le menu est le même ; le contenu est nouveau, et apparaît en fondu (index.css).
-    expect(screen.getByRole("navigation", { name: texts.nav.label })).toBe(menu)
+    expect(role("navigation", texts.nav.label)).toBe(menu)
     const next = screen
       .getByRole("heading", { level: 1 })
       .closest("[data-page-fade]")
@@ -557,9 +488,7 @@ describe("Blog", () => {
     const page = () => document.querySelector("[data-page-fade]")
     const list = page()
 
-    fireEvent.click(
-      await screen.findByRole("link", { name: "Bien dormir en été" })
-    )
+    fireEvent.click(await findRole("link", "Bien dormir en été"))
     await screen.findByLabelText(texts.editor.title.label)
     const editor = page()
     expect(editor).not.toBe(list)
@@ -567,16 +496,10 @@ describe("Blog", () => {
       screen.getByLabelText(texts.editor.title.label)
     )
     // Le menu reste caché dans l'éditeur.
-    expect(
-      screen.queryByRole("navigation", { name: texts.nav.label })
-    ).toBeNull()
+    expect(queryRole("navigation", texts.nav.label)).toBeNull()
 
-    fireEvent.click(
-      screen.getByRole("link", {
-        name: texts.editor.back(texts.sections.blog.title),
-      })
-    )
-    await screen.findByRole("navigation", { name: texts.nav.label })
+    fireEvent.click(role("link", texts.editor.back(texts.sections.blog.title)))
+    await findRole("navigation", texts.nav.label)
     expect(page()).not.toBe(editor)
   })
 
@@ -592,17 +515,11 @@ describe("Blog", () => {
     expect(
       await screen.findByText(labels.kinds.article.emptyTitle)
     ).toBeVisible()
-    fireEvent.click(
-      screen.getByRole("button", { name: labels.kinds.article.create })
-    )
-    const dialog = await screen.findByRole("dialog", {
-      name: labels.kinds.article.create,
-    })
+    fireEvent.click(role("button", labels.kinds.article.create))
+    const dialog = await findRole("dialog", labels.kinds.article.create)
 
     // Le titre est obligatoire.
-    fireEvent.click(
-      within(dialog).getByRole("button", { name: labels.kinds.article.submit })
-    )
+    fireEvent.click(role("button", labels.kinds.article.submit, dialog))
     expect(
       await within(dialog).findByText(texts.publication.settings.titleRequired)
     ).toBeVisible()
@@ -615,12 +532,8 @@ describe("Blog", () => {
     await pick(labels.newContent.starter, "Interview")
     await chooseCategory(dialog, "Sommeil")
     // Pas de niveau d'accès : il se règle ensuite.
-    expect(
-      within(dialog).queryByRole("radio", { name: /Essentiel/ })
-    ).toBeNull()
-    fireEvent.click(
-      within(dialog).getByRole("button", { name: labels.kinds.article.submit })
-    )
+    expect(queryRole("radio", /Essentiel/, dialog)).toBeNull()
+    fireEvent.click(role("button", labels.kinds.article.submit, dialog))
 
     await waitFor(() =>
       expect(api.createContent).toHaveBeenCalledWith(
@@ -654,18 +567,12 @@ describe("Blog", () => {
           : null
     )
     await renderApp("/blog")
-    fireEvent.click(
-      await screen.findByRole("button", { name: labels.kinds.article.create })
-    )
-    const dialog = await screen.findByRole("dialog", {
-      name: labels.kinds.article.create,
-    })
+    fireEvent.click(await findRole("button", labels.kinds.article.create))
+    const dialog = await findRole("dialog", labels.kinds.article.create)
     const field = within(dialog).getByLabelText(
       texts.publication.settings.titleLabel
     )
-    const submit = within(dialog).getByRole("button", {
-      name: labels.kinds.article.submit,
-    })
+    const submit = role("button", labels.kinds.article.submit, dialog)
 
     fireEvent.change(field, { target: { value: "MON ARTICLE" } })
     expect(
@@ -693,23 +600,17 @@ describe("Blog", () => {
   it("« Nouvel article » : un nom de catégorie déjà porté ne propose pas de la créer", async () => {
     vi.mocked(api.listContents).mockResolvedValue([])
     await renderApp("/blog")
-    fireEvent.click(
-      await screen.findByRole("button", { name: labels.kinds.article.create })
-    )
-    const dialog = await screen.findByRole("dialog", {
-      name: labels.kinds.article.create,
-    })
+    fireEvent.click(await findRole("button", labels.kinds.article.create))
+    const dialog = await findRole("dialog", labels.kinds.article.create)
     await waitFor(() => categoryInput(dialog))
     const input = categoryInput(dialog)
     fireEvent.focus(input)
     fireEvent.click(input)
     fireEvent.change(input, { target: { value: " SOMMEIL " } })
     fireEvent.keyDown(input, { key: "ArrowDown" })
-    expect(await screen.findByRole("option", { name: "Sommeil" })).toBeVisible()
+    expect(await findRole("option", "Sommeil")).toBeVisible()
     expect(
-      screen.queryByRole("option", {
-        name: texts.categories.picker.create("SOMMEIL"),
-      })
+      queryRole("option", texts.categories.picker.create("SOMMEIL"))
     ).toBeNull()
   })
 
@@ -744,12 +645,8 @@ describe("Blog", () => {
       return created
     })
     await renderApp("/blog")
-    fireEvent.click(
-      await screen.findByRole("button", { name: labels.kinds.article.create })
-    )
-    const dialog = await screen.findByRole("dialog", {
-      name: labels.kinds.article.create,
-    })
+    fireEvent.click(await findRole("button", labels.kinds.article.create))
+    const dialog = await findRole("dialog", labels.kinds.article.create)
     // Un nom qu'aucune catégorie ne porte : « Créer « … » », sans envoyer la fenêtre.
     await waitFor(() => categoryInput(dialog))
     const input = categoryInput(dialog)
@@ -758,9 +655,7 @@ describe("Blog", () => {
     fireEvent.change(input, { target: { value: "Respiration" } })
     fireEvent.keyDown(input, { key: "ArrowDown" })
     fireEvent.click(
-      await screen.findByRole("option", {
-        name: texts.categories.picker.create("Respiration"),
-      })
+      await findRole("option", texts.categories.picker.create("Respiration"))
     )
     await waitFor(() =>
       expect(categoriesApi.createCategory).toHaveBeenCalledWith(
@@ -787,20 +682,10 @@ describe("Blog", () => {
     })
     await renderApp("/blog")
 
-    fireEvent.click(
-      await screen.findByRole("button", {
-        name: labels.actions("Sans rangement"),
-      })
-    )
-    fireEvent.click(
-      await screen.findByRole("menuitem", { name: labels.settings.action })
-    )
-    const sheet = await screen.findByRole("dialog", {
-      name: texts.publication.settings.title,
-    })
-    const save = within(sheet).getByRole("button", {
-      name: texts.common.save,
-    })
+    fireEvent.click(await findRole("button", labels.actions("Sans rangement")))
+    fireEvent.click(await findRole("menuitem", labels.settings.action))
+    const sheet = await findRole("dialog", texts.publication.settings.title)
+    const save = role("button", texts.common.save, sheet)
     await waitFor(() => expect(save).toBeEnabled())
     fireEvent.change(
       within(sheet).getByLabelText(texts.publication.settings.titleLabel),
@@ -838,23 +723,13 @@ describe("Blog", () => {
     )
     await renderApp("/blog")
 
-    fireEvent.click(
-      await screen.findByRole("button", {
-        name: labels.actions("Sans rangement"),
-      })
-    )
-    fireEvent.click(
-      await screen.findByRole("menuitem", { name: labels.settings.action })
-    )
-    const sheet = await screen.findByRole("dialog", {
-      name: texts.publication.settings.title,
-    })
+    fireEvent.click(await findRole("button", labels.actions("Sans rangement")))
+    fireEvent.click(await findRole("menuitem", labels.settings.action))
+    const sheet = await findRole("dialog", texts.publication.settings.title)
     expect(
       await within(sheet).findByText(labels.settings.heldBy("Claire Martin"))
     ).toBeVisible()
-    expect(
-      within(sheet).getByRole("button", { name: texts.common.save })
-    ).toBeDisabled()
+    expect(role("button", texts.common.save, sheet)).toBeDisabled()
     expect(
       within(sheet).getByLabelText(texts.publication.settings.titleLabel)
     ).toHaveAttribute("readonly")
@@ -871,28 +746,18 @@ describe("Blog", () => {
       renamedTo: null,
     })
     await renderApp("/blog")
-    fireEvent.click(
-      await screen.findByRole("button", {
-        name: labels.actions("Sans rangement"),
-      })
-    )
-    fireEvent.click(await screen.findByRole("menuitem", { name: labels.trash }))
+    fireEvent.click(await findRole("button", labels.actions("Sans rangement")))
+    fireEvent.click(await findRole("menuitem", labels.trash))
     const dialog = await screen.findByRole("alertdialog")
     expect(dialog).toHaveTextContent(labels.kinds.article.confirmTrashTitle)
-    fireEvent.click(
-      within(dialog).getByRole("button", { name: labels.confirmTrash.confirm })
-    )
+    fireEvent.click(role("button", labels.confirmTrash.confirm, dialog))
     await waitFor(() =>
       expect(publicationApi.trashContent).toHaveBeenCalledWith(articles[2].id)
     )
     // L'image mise en avant redevient peut-être protégée : tout de suite.
     await waitFor(() => expect(mediaApi.kickFiles).toHaveBeenCalled())
     const toast = await screen.findByText(labels.trashed("Sans rangement"))
-    fireEvent.click(
-      within(toast.closest("li")!).getByRole("button", {
-        name: texts.common.undo,
-      })
-    )
+    fireEvent.click(role("button", texts.common.undo, toast.closest("li")!))
     expect(
       await screen.findByText(labels.kinds.article.restored("Sans rangement"))
     ).toBeVisible()
@@ -917,28 +782,16 @@ describe("Blog", () => {
 
     // Une case par article, puis « Tout sélectionner ».
     fireEvent.click(
-      await screen.findByRole("checkbox", {
-        name: texts.selection.select("Sans rangement"),
-      })
+      await findRole("checkbox", texts.selection.select("Sans rangement"))
     )
-    expect(
-      screen.getByRole("button", { name: texts.selection.trash(1) })
-    ).toBeVisible()
-    fireEvent.click(
-      screen.getByRole("checkbox", { name: texts.selection.selectAll })
-    )
-    expect(
-      screen.getByRole("button", { name: texts.selection.trash(3) })
-    ).toBeVisible()
+    expect(role("button", texts.selection.trash(1))).toBeVisible()
+    fireEvent.click(role("checkbox", texts.selection.selectAll))
+    expect(role("button", texts.selection.trash(3))).toBeVisible()
 
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.selection.trash(3) })
-    )
+    fireEvent.click(role("button", texts.selection.trash(3)))
     const dialog = await screen.findByRole("alertdialog")
     expect(dialog).toHaveTextContent(article.confirmTrashManyTitle(3))
-    fireEvent.click(
-      within(dialog).getByRole("button", { name: labels.confirmTrash.confirm })
-    )
+    fireEvent.click(role("button", labels.confirmTrash.confirm, dialog))
 
     // Deux partent ; celui que Claire écrit est gardé, coché, et listé.
     expect(await screen.findByText(article.trashedMany(2))).toBeVisible()
@@ -949,15 +802,14 @@ describe("Blog", () => {
         texts.selection.keptItem("Le stress au travail", writing)
       )
     ).toBeVisible()
-    expect(
-      screen.getByRole("button", { name: texts.selection.trash(1) })
-    ).toBeVisible()
+    expect(role("button", texts.selection.trash(1))).toBeVisible()
 
     // « Annuler » : les deux reviennent en brouillon.
     fireEvent.click(
-      within(screen.getByText(article.trashedMany(2)).closest("li")!).getByRole(
+      role(
         "button",
-        { name: texts.common.undo }
+        texts.common.undo,
+        screen.getByText(article.trashedMany(2)).closest("li")!
       )
     )
     expect(await screen.findByText(article.restoredMany(2))).toBeVisible()
@@ -972,14 +824,13 @@ describe("Podcasts", () => {
       row("00000000-0000-4000-8000-0000000000e1", "Entretien avec Claire"),
     ])
     await renderApp("/podcasts")
-    expect(
-      await screen.findByRole("link", { name: "Entretien avec Claire" })
-    ).toHaveAttribute("href", "/podcasts/00000000-0000-4000-8000-0000000000e1")
+    expect(await findRole("link", "Entretien avec Claire")).toHaveAttribute(
+      "href",
+      "/podcasts/00000000-0000-4000-8000-0000000000e1"
+    )
     expect(api.listContents).toHaveBeenCalledWith("episode")
     expect(categoriesApi.listCategories).toHaveBeenCalledWith("podcasts")
-    expect(
-      screen.getByRole("button", { name: labels.kinds.episode.create })
-    ).toBeVisible()
+    expect(role("button", labels.kinds.episode.create)).toBeVisible()
   })
 })
 
@@ -997,18 +848,12 @@ describe("Pages", () => {
     })
     vi.mocked(api.lockTake).mockResolvedValue(lockRow({ mine: true }))
     await renderApp("/pages")
-    fireEvent.click(
-      await screen.findByRole("button", { name: labels.kinds.page.create })
-    )
-    const dialog = await screen.findByRole("dialog", {
-      name: labels.kinds.page.create,
-    })
+    fireEvent.click(await findRole("button", labels.kinds.page.create))
+    const dialog = await findRole("dialog", labels.kinds.page.create)
     const title = within(dialog).getByLabelText(
       texts.publication.settings.titleLabel
     )
-    const submit = within(dialog).getByRole("button", {
-      name: labels.kinds.page.submit,
-    })
+    const submit = role("button", labels.kinds.page.submit, dialog)
     // Pas de champ d'adresse : elle se lit sous le titre.
     expect(
       within(dialog).queryByLabelText(texts.publication.settings.slug.label)
@@ -1046,18 +891,15 @@ describe("Pages", () => {
       row("00000000-0000-4000-8000-0000000000b2", "Aide"),
     ])
     await renderApp("/pages")
-    await screen.findByRole("link", { name: "Mentions légales" })
+    await findRole("link", "Mentions légales")
     expect(screen.queryByText("mentions-legales")).toBeNull()
-    expect(
-      screen.queryByRole("combobox", { name: labels.filters.category })
-    ).toBeNull()
+    expect(queryRole("combobox", labels.filters.category)).toBeNull()
     expect(categoriesApi.listCategories).not.toHaveBeenCalled()
 
     // La recherche trouve aussi l'adresse.
-    fireEvent.change(
-      screen.getByRole("searchbox", { name: labels.kinds.page.search }),
-      { target: { value: "legales" } }
-    )
+    fireEvent.change(role("searchbox", labels.kinds.page.search), {
+      target: { value: "legales" },
+    })
     await waitFor(() => expect(shownTitles()).toEqual(["Mentions légales"]))
   })
 })
