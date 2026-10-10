@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from "react-router"
 
-import { AccountMenu } from "@/components/account-menu"
+import { Separator } from "@/components/ui/separator"
 import {
   Sidebar,
   SidebarContent,
@@ -13,6 +13,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { isInSection, menu, sections, type SectionKey } from "@/navigation"
+import { useBrandName } from "@/hooks/use-brand-name"
 import { texts } from "@/texts"
 
 /** Le menu de gauche, toujours ouvert (docs/ADMINISTRATION.md § 7). */
@@ -38,12 +39,24 @@ export function AppSidebar() {
         </nav>
       </SidebarContent>
 
-      {/* L'avatar du membre : son menu a « Se déconnecter » (le compte, l'équipe, les
-          paramètres et le thème sont dans le header). */}
+      {/* En bas, sous un trait, le copyright au nom de la marque (l'avatar du membre est dans
+          le header). */}
       <SidebarFooter>
-        <AccountMenu />
+        <Separator className="bg-sidebar-border" />
+        <Copyright />
       </SidebarFooter>
     </Sidebar>
+  )
+}
+
+function Copyright() {
+  const brand = useBrandName()
+  // Vide le temps de lire le nom de la marque.
+  if (!brand) return null
+  return (
+    <p className="px-2 py-1 text-center text-xs text-sidebar-foreground/60">
+      {texts.nav.copyright(new Date().getFullYear(), brand)}
+    </p>
   )
 }
 

@@ -8,4 +8,6 @@ interface ImportMetaEnv {
   readonly VITE_PREPARATION_CHECK?: string
   // La langue de départ, tant que le membre n'a rien choisi : "en" (sinon), "fr" (parcours Playwright).
   readonly VITE_DEFAULT_LANGUAGE?: string
+  // La version de package.json, posée par vite.config.ts (pas dans .env).
+  readonly VITE_APP_VERSION: string
 }

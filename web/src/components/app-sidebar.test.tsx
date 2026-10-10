@@ -19,16 +19,15 @@ describe("menu", () => {
     )
   })
 
-  it("l'avatar est seul en bas du menu, sans trait (le compte, l'équipe et les paramètres sont dans le header)", async () => {
+  it("en bas du menu, le copyright au nom de la marque ; l'avatar est dans le header", async () => {
     await renderApp("/account", fakeAuth({ role: "admin" }))
 
-    const avatar = await screen.findByRole("button", {
-      name: new RegExp(`${texts.accountMenu.open}$`),
-    })
-    const footer = avatar.closest<HTMLElement>('[data-sidebar="footer"]')
+    const copyright = await screen.findByText(
+      texts.nav.copyright(new Date().getFullYear(), texts.app.name)
+    )
+    const footer = copyright.closest<HTMLElement>('[data-sidebar="footer"]')
     expect(footer).not.toBeNull()
-    expect(within(footer!).queryByRole("navigation")).toBeNull()
-    expect(within(footer!).queryByRole("separator")).toBeNull()
+    expect(within(footer!).queryByRole("button")).toBeNull()
     expect(
       within(
         screen.getByRole("navigation", { name: texts.nav.label })

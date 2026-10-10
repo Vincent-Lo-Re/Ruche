@@ -1,11 +1,11 @@
-// Le menu de gauche, toujours ouvert : le membre en bas (avatar, nom, rôle), qui ouvre le menu du
-// compte.
+// Le menu de gauche, toujours ouvert, avec le copyright en bas ; le membre est tout à droite du
+// header : son avatar seul ouvre le menu du compte.
 
 // Les parcours tournent en français (VITE_DEFAULT_LANGUAGE de playwright.config.ts).
 import { fr as texts } from "../src/texts/fr.ts"
 import { accountMenuButton, expect, signIn, test } from "./support/fixtures.ts"
 
-test("le membre en bas du menu : nom et rôle, son menu ; le menu ne se replie pas", async ({
+test("l'avatar seul dans le header, son menu ; le menu ne se replie pas", async ({
   page,
   team,
 }) => {
@@ -13,14 +13,15 @@ test("le membre en bas du menu : nom et rôle, son menu ; le menu ne se replie p
   await page.goto("/")
   await signIn(page, admin)
 
-  // Le nom et, dessous, le rôle ; l'e-mail est dans le menu.
+  // Ni nom ni rôle à côté de l'avatar : ils sont dans son menu, avec l'e-mail.
   const member = accountMenuButton(page)
-  await expect(member).toContainText("Alice Admin")
-  await expect(member).toContainText(texts.roles.admin)
-  await expect(member).not.toContainText(admin.email)
-  await member.getByText("Alice Admin").click()
+  await expect(member).not.toContainText("Alice Admin")
+  await expect(member).not.toContainText(texts.roles.admin)
+  await member.click()
   const menu = page.getByRole("menu")
+  await expect(menu).toContainText("Alice Admin")
   await expect(menu).toContainText(admin.email)
+  await expect(menu).toContainText(texts.roles.admin)
   await page.keyboard.press("Escape")
   await expect(menu).toHaveCount(0)
 

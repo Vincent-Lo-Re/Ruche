@@ -287,6 +287,12 @@
   padding-bottom: calc(--spacing(8) + var(--upload-window-space));
 }
 
+/* Le bas du pied des pages avec le menu (version, contact) : sa marge, plus la place de la
+   fenêtre des envois. */
+@utility pb-footer {
+  padding-bottom: calc(--spacing(4) + var(--upload-window-space));
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

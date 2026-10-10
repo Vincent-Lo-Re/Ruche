@@ -1,5 +1,6 @@
 import { Outlet, useLocation } from "react-router"
 
+import { AppFooter } from "@/components/app-footer"
 import { AppHeader } from "@/components/app-header"
 import { AppSidebar } from "@/components/app-sidebar"
 import { UploadAnnouncer } from "@/components/media/upload-announcer"
@@ -26,10 +27,12 @@ export function AppLayout() {
         {/* min-w-0 : la zone de droite ne s'élargit pas selon son contenu (sinon la page défile
             sur le côté au lieu de laisser rétrécir, par exemple, la recherche de la médiathèque). */}
         <SidebarInset className="min-w-0">
-          {/* En bas, de la place pour la fenêtre des envois quand elle est ouverte (index.css). */}
-          <div key={pathname} data-page-fade className="flex-1 p-8 pb-page">
+          <div key={pathname} data-page-fade className="flex-1 p-8 pb-4">
             <Outlet />
           </div>
+          {/* En bas à droite, la version et le contact ; dessous, de la place pour la fenêtre
+              des envois quand elle est ouverte (index.css). */}
+          <AppFooter />
           {/* Envois de la médiathèque : suivis dans toute l'admin. */}
           <UploadAnnouncer />
           <UploadWindow />

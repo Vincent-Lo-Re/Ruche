@@ -10,32 +10,29 @@ afterEach(() => {
 })
 
 describe("menu de l'avatar", () => {
-  // Le bouton se lit par ce qu'il montre (nom, e-mail), puis par ce qu'il fait.
+  // L'avatar seul, tout à droite du header : le bouton se lit par ce qu'il fait.
   const trigger = () =>
-    screen.getByRole("button", {
-      name: new RegExp(`${texts.accountMenu.open}$`),
-    })
+    screen.getByRole("button", { name: texts.accountMenu.open })
   const openMenu = async () => {
     fireEvent.click(trigger())
     return screen.findByRole("menu")
   }
 
-  it("montre l'initiale du prénom, le nom et, dessous, le rôle ; un clic sur le nom ouvre le menu", async () => {
+  it("l'avatar seul, en dernier dans le header ; son menu montre le nom, l'e-mail et le rôle", async () => {
     // Anne Admin (fakeAuth) : « A ».
     await renderApp("/", fakeAuth({ role: "editor" }))
 
-    expect(trigger()).toHaveAccessibleName(
-      `Anne Admin ${texts.roles.editor} ${texts.accountMenu.open}`
-    )
-    expect(within(trigger()).getByText("A")).toBeVisible()
-    const name = within(trigger()).getByText("Anne Admin")
-    expect(name.nextElementSibling).toHaveTextContent(texts.roles.editor)
-    expect(within(trigger()).queryByText("anne@exemple.test")).toBeNull()
+    const header = screen
+      .getByRole("navigation", { name: texts.header.label })
+      .closest("header")!
+    expect(within(header).getAllByRole("button").at(-1)).toBe(trigger())
+    expect(trigger()).toHaveTextContent(`A${texts.accountMenu.open}`)
+    expect(screen.queryByText(texts.roles.editor)).toBeNull()
 
-    fireEvent.click(name)
-    const menu = await screen.findByRole("menu")
+    const menu = await openMenu()
     expect(within(menu).getByText("Anne Admin")).toBeVisible()
     expect(within(menu).getByText("anne@exemple.test")).toBeVisible()
+    expect(within(menu).getByText(texts.roles.editor)).toBeVisible()
   })
 
   it("« Mon compte » ouvre la page du compte ; le thème reste dans le header", async () => {
