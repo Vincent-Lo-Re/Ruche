@@ -9,7 +9,7 @@
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(136);
+select plan(137);
 
 select pg_temp.create_people();
 select pg_temp.empty_media_library();
@@ -349,8 +349,13 @@ select lives_ok(
 select lives_ok(
   $$insert into ids select 'depart_recette', (public.template_create_from(pg_temp.cid('source'),
     array['00000000-0000-4000-8000-000000000c01', '00000000-0000-4000-8000-000000000c05']::uuid[],
-    'Recette', 'starter', 'article')).id$$,
+    'Recette du jour', 'starter', 'article')).id$$,
   'un point de départ des articles'
+);
+select throws_ok(
+  $$select public.template_create_from(pg_temp.cid('source'),
+    array['00000000-0000-4000-8000-000000000c01']::uuid[], ' À RETENIR ', 'shared')$$,
+  'P0001', 'titre_pris', 'un nom déjà porté par un autre modèle, de n''importe quelle sorte, est refusé'
 );
 select is(
   (select template_for from public.contents where id = pg_temp.cid('depart_recette')), 'article',
