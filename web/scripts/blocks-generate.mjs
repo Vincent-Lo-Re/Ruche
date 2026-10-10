@@ -6,11 +6,10 @@
 //   - blocks/blocks.tokens.json : les mesures communes à l'aperçu de l'admin et à l'app ;
 //   - blocks/cases/*.json : les cas de test partagés ({ description, variant, valid, data }).
 // Produit :
-//   - blocks/generated/<variante>.schema.json (draft, template, published, style) : chaque variante,
+//   - blocks/generated/<variante>.schema.json (draft, template, published) : chaque variante,
 //     telle que la reçoivent Ajv et pg_jsonschema, et blocks/generated/schema.sha256 ;
 //   - web/src/blocks/generated/blocks.ts : les types TypeScript ;
-//   - web/src/blocks/generated/validators.js (+ .d.ts) et style-validator.js (la charte, à part :
-//     l'éditeur ne la charge pas) : les validateurs Ajv « standalone »,
+//   - web/src/blocks/generated/validators.js (+ .d.ts) : les validateurs Ajv « standalone »,
 //     en ESM, AUTONOMES (les aides d'Ajv sont incluses par esbuild : ni ajv, ni require, ni
 //     new Function à l'exécution, donc utilisables tels quels par l'app sous Hermes) ;
 //   - web/src/blocks/generated/tokens.css : variables CSS ;
@@ -40,7 +39,7 @@ const webRoot = fileURLToPath(new URL("../", import.meta.url))
 
 const BANNER =
   "Généré par web/scripts/blocks-generate.mjs (npm run blocks:generate) depuis blocks/. Ne pas modifier."
-const VARIANTS = ["draft", "template", "published", "style"]
+const VARIANTS = ["draft", "template", "published"]
 const BASE_ID =
   "https://github.com/Vincent-Lo-Re/Ruche/blob/main/blocks/generated/"
 const MIGRATIONS = repo("supabase/migrations")
@@ -139,8 +138,6 @@ const rawValidators = standaloneCode(ajv, {
   validatePublished: "published",
   validatePublishedBlock: `${BASE_ID}published.schema.json#/definitions/publishedTopBlock`,
 })
-// La charte de l'app à part : seule la page App la vérifie, l'éditeur ne la charge pas.
-const rawStyleValidator = standaloneCode(ajv, { validateStyle: "style" })
 
 const outDir = fileURLToPath(
   new URL("../src/blocks/generated/", import.meta.url)
@@ -148,41 +145,38 @@ const outDir = fileURLToPath(
 rmSync(outDir, { recursive: true, force: true })
 mkdirSync(outDir, { recursive: true })
 
-// Un module ESM autonome, vérifié : ni require, ni new Function, ni eval.
-const bundle = async (raw, file) => {
-  const bundled = await build({
-    stdin: {
-      contents: raw,
-      resolveDir: webRoot,
-      sourcefile: `${file}.raw.mjs`,
-      loader: "js",
-    },
-    bundle: true,
-    format: "esm",
-    platform: "neutral",
-    target: "es2020",
-    write: false,
-    legalComments: "none",
-    banner: { js: `// ${BANNER}` },
-  })
-  const code = bundled.outputFiles[0].text
-  // Les aides d'Ajv gardent leur propre code source dans une chaîne (« ucs2length.code =
-  // 'require(…)' »), qui ne s'exécute jamais : on l'écarte avant de chercher un vrai appel.
-  const executable = code.replace(/\.code = '[^']*'/g, "")
-  for (const pattern of [
-    /\brequire\s*\(/,
-    /Dynamic require/,
-    /new Function/,
-    /\beval\s*\(/,
-  ]) {
-    if (pattern.test(executable)) {
-      fail(`${file}.js contient ${pattern} : il ne serait pas autonome.`)
-    }
+const bundled = await build({
+  stdin: {
+    contents: rawValidators,
+    resolveDir: webRoot,
+    sourcefile: "validators.raw.mjs",
+    loader: "js",
+  },
+  bundle: true,
+  format: "esm",
+  platform: "neutral",
+  target: "es2020",
+  write: false,
+  legalComments: "none",
+  banner: { js: `// ${BANNER}` },
+})
+const validatorsJs = bundled.outputFiles[0].text
+// Les aides d'Ajv gardent leur propre code source dans une chaîne (« ucs2length.code =
+// 'require(…)' »), qui ne s'exécute jamais : on l'écarte avant de chercher un vrai appel.
+const executable = validatorsJs.replace(/\.code = '[^']*'/g, "")
+for (const pattern of [
+  /\brequire\s*\(/,
+  /Dynamic require/,
+  /new Function/,
+  /\beval\s*\(/,
+]) {
+  if (pattern.test(executable)) {
+    fail(
+      `le validateur produit contient ${pattern} : il ne serait pas autonome.`
+    )
   }
-  writeFileSync(`${outDir}${file}.js`, code)
 }
-await bundle(rawValidators, "validators")
-await bundle(rawStyleValidator, "style-validator")
+writeFileSync(`${outDir}validators.js`, validatorsJs)
 writeFileSync(
   `${outDir}validators.d.ts`,
   `// ${BANNER}
@@ -219,16 +213,6 @@ export declare const validateBlock: BlocksValidator<TopBlock>
 export declare const validatePublished: BlocksValidator<PublishedBody>
 /** Un bloc de premier niveau d'une version publiée : l'app valide chaque bloc reçu. */
 export declare const validatePublishedBlock: BlocksValidator<PublishedTopBlock>
-`
-)
-writeFileSync(
-  `${outDir}style-validator.d.ts`,
-  `// ${BANNER}
-import type { AppStyle } from "./blocks"
-import type { BlocksValidator } from "./validators"
-
-/** La charte graphique de l'app (variante « style ») ; les références se vérifient à part. */
-export declare const validateStyle: BlocksValidator<AppStyle>
 `
 )
 
@@ -329,14 +313,10 @@ const cases = readdirSync(casesDir)
 const validators = await import(
   `${pathToFileURL(`${outDir}validators.js`).href}?t=${Date.now()}`
 )
-const styleValidator = await import(
-  `${pathToFileURL(`${outDir}style-validator.js`).href}?t=${Date.now()}`
-)
 const byVariant = {
   draft: validators.validateDraft,
   template: validators.validateTemplate,
   published: validators.validatePublished,
-  style: styleValidator.validateStyle,
 }
 const mismatches = cases.filter((c) => byVariant[c.variant](c.data) !== c.valid)
 if (mismatches.length > 0) {

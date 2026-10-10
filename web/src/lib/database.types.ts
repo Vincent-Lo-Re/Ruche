@@ -157,34 +157,6 @@ export type Database = {
         }
         Relationships: []
       }
-      app_style: {
-        Row: {
-          draft: Json | null
-          draft_rev: number
-          id: boolean
-          published: Json | null
-          published_at: string | null
-          updated_at: string | null
-        }
-        ComputedFields: never
-        Insert: {
-          draft?: Json | null
-          draft_rev?: number
-          id?: boolean
-          published?: Json | null
-          published_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          draft?: Json | null
-          draft_rev?: number
-          id?: boolean
-          published?: Json | null
-          published_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       categories: {
         Row: {
           created_at: string
@@ -805,7 +777,6 @@ export type Database = {
         }[]
       }
       app_page: { Args: { slug: string }; Returns: Json }
-      app_style: { Args: Record<PropertyKey, never>; Returns: Json }
       categories_reorder: {
         Args: { ids: string[]; section: string }
         Returns: {
@@ -1193,12 +1164,6 @@ export type Database = {
         }[]
       }
       schedule: { Args: { at: string; content_id: string }; Returns: string }
-      style_discard: { Args: { expected_rev: number }; Returns: number }
-      style_publish: { Args: { expected_rev: number }; Returns: number }
-      style_save: {
-        Args: { expected_rev: number; new_draft: Json }
-        Returns: number
-      }
       team_members: {
         Args: Record<PropertyKey, never>
         Returns: {
