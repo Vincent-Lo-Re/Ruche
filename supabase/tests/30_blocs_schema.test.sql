@@ -114,8 +114,9 @@ select ok(private.blocks_schema('inconnue') is null, 'variante inconnue : null')
 select ok(
   extensions.jsonschema_is_valid(private.blocks_schema('draft'))
     and extensions.jsonschema_is_valid(private.blocks_schema('template'))
-    and extensions.jsonschema_is_valid(private.blocks_schema('published')),
-  'les trois variantes sont des schémas valides pour pg_jsonschema'
+    and extensions.jsonschema_is_valid(private.blocks_schema('published'))
+    and extensions.jsonschema_is_valid(private.blocks_schema('style')),
+  'les quatre variantes sont des schémas valides pour pg_jsonschema'
 );
 select ok(
   private.blocks_schema_hash() ~ '^[0-9a-f]{64}$',
@@ -126,10 +127,11 @@ select is(
   encode(sha256(convert_to(
     'draft' || E'\n' || private.blocks_schema('draft')::text || E'\n'
       || 'template' || E'\n' || private.blocks_schema('template')::text || E'\n'
-      || 'published' || E'\n' || private.blocks_schema('published')::text || E'\n',
+      || 'published' || E'\n' || private.blocks_schema('published')::text || E'\n'
+      || 'style' || E'\n' || private.blocks_schema('style')::text || E'\n',
     'UTF8'
   )), 'hex'),
-  'empreinte : calculée sur le texte exact des trois variantes'
+  'empreinte : calculée sur le texte exact des quatre variantes'
 );
 select volatility_is('private', 'blocks_schema', array['text'], 'immutable', 'blocks_schema est immutable');
 select volatility_is('private', 'blocks_schema_hash', array[]::text[], 'immutable', 'blocks_schema_hash est immutable');

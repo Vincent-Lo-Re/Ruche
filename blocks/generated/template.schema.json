@@ -1033,6 +1033,380 @@
         }
       }
     },
+    "styleName": {
+      "$comment": "Nom donné par le client (couleur, teinte, pastille, bouton, police) : 1 à 40 caractères, sans espace autour.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40,
+      "pattern": "^\\S(.*\\S)?$"
+    },
+    "styleHex": {
+      "$comment": "Une couleur « #rrggbb », en minuscules.",
+      "type": "string",
+      "pattern": "^#[0-9a-f]{6}$"
+    },
+    "styleColor": {
+      "title": "StyleColor",
+      "$comment": "Une couleur de la palette : sa valeur en mode clair et en mode sombre.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "light",
+        "dark"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/uuid"
+        },
+        "name": {
+          "$ref": "#/definitions/styleName"
+        },
+        "light": {
+          "$ref": "#/definitions/styleHex"
+        },
+        "dark": {
+          "$ref": "#/definitions/styleHex"
+        }
+      }
+    },
+    "styleColorRoles": {
+      "title": "StyleColorRoles",
+      "$comment": "Où va chaque couleur : l'identifiant d'une couleur de la palette pour chaque usage de l'app. Un usage ajouté plus tard sera facultatif, pour qu'une charte déjà enregistrée reste valable.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "background",
+        "card",
+        "border",
+        "text",
+        "muted",
+        "link",
+        "primary",
+        "topBar",
+        "topBarText",
+        "tabBar",
+        "tabOn",
+        "tabOff",
+        "focus",
+        "success",
+        "warning",
+        "error"
+      ],
+      "properties": {
+        "background": {
+          "$ref": "#/definitions/uuid"
+        },
+        "card": {
+          "$ref": "#/definitions/uuid"
+        },
+        "border": {
+          "$ref": "#/definitions/uuid"
+        },
+        "text": {
+          "$ref": "#/definitions/uuid"
+        },
+        "muted": {
+          "$ref": "#/definitions/uuid"
+        },
+        "link": {
+          "$ref": "#/definitions/uuid"
+        },
+        "primary": {
+          "$ref": "#/definitions/uuid"
+        },
+        "topBar": {
+          "$ref": "#/definitions/uuid"
+        },
+        "topBarText": {
+          "$ref": "#/definitions/uuid"
+        },
+        "tabBar": {
+          "$ref": "#/definitions/uuid"
+        },
+        "tabOn": {
+          "$ref": "#/definitions/uuid"
+        },
+        "tabOff": {
+          "$ref": "#/definitions/uuid"
+        },
+        "focus": {
+          "$ref": "#/definitions/uuid"
+        },
+        "success": {
+          "$ref": "#/definitions/uuid"
+        },
+        "warning": {
+          "$ref": "#/definitions/uuid"
+        },
+        "error": {
+          "$ref": "#/definitions/uuid"
+        }
+      }
+    },
+    "styleTint": {
+      "title": "StyleTint",
+      "$comment": "Une teinte d'encadré : chaque partie est une couleur de la palette.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "fill",
+        "border",
+        "title",
+        "text",
+        "link"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/uuid"
+        },
+        "name": {
+          "$ref": "#/definitions/styleName"
+        },
+        "fill": {
+          "$ref": "#/definitions/uuid"
+        },
+        "border": {
+          "$ref": "#/definitions/uuid"
+        },
+        "title": {
+          "$ref": "#/definitions/uuid"
+        },
+        "text": {
+          "$ref": "#/definitions/uuid"
+        },
+        "link": {
+          "$ref": "#/definitions/uuid"
+        }
+      }
+    },
+    "styleBadge": {
+      "title": "StyleBadge",
+      "$comment": "Une pastille (catégorie, « Abonnés »…) : la première sert aux catégories.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "fill",
+        "border",
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/uuid"
+        },
+        "name": {
+          "$ref": "#/definitions/styleName"
+        },
+        "fill": {
+          "$ref": "#/definitions/uuid"
+        },
+        "border": {
+          "$ref": "#/definitions/uuid"
+        },
+        "text": {
+          "$ref": "#/definitions/uuid"
+        }
+      }
+    },
+    "styleButton": {
+      "title": "StyleButton",
+      "$comment": "Un bouton : aplat (fill), dégradé (de fill à end), bordure (border) ou texte seul ; label est la couleur du texte. Toutes les couleurs restent, même celles que le style n'emploie pas : changer de style ne perd rien. rounded : l'arrondi de la charte. Le premier sert aux boutons de l'app.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "kind",
+        "shape",
+        "fill",
+        "end",
+        "border",
+        "label"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/uuid"
+        },
+        "name": {
+          "$ref": "#/definitions/styleName"
+        },
+        "kind": {
+          "enum": [
+            "flat",
+            "gradient",
+            "outline",
+            "text"
+          ]
+        },
+        "shape": {
+          "enum": [
+            "rounded",
+            "pill",
+            "square"
+          ]
+        },
+        "fill": {
+          "$ref": "#/definitions/uuid"
+        },
+        "end": {
+          "$ref": "#/definitions/uuid"
+        },
+        "border": {
+          "$ref": "#/definitions/uuid"
+        },
+        "label": {
+          "$ref": "#/definitions/uuid"
+        }
+      }
+    },
+    "styleFont": {
+      "title": "StyleFont",
+      "$comment": "Une police : system (celle du téléphone) ou une police libre de Google Fonts, copiée dans le stockage de l'installation. On ne fait qu'ajouter des familles ; les épaisseurs de chacune sont dans l'admin.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "family",
+        "weight"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/uuid"
+        },
+        "name": {
+          "$ref": "#/definitions/styleName"
+        },
+        "family": {
+          "enum": [
+            "system",
+            "DM Sans",
+            "DM Serif Display",
+            "Fraunces",
+            "Inter",
+            "Libre Baskerville",
+            "Lora",
+            "Merriweather",
+            "Nunito",
+            "Playfair Display",
+            "Poppins",
+            "Source Serif 4",
+            "Space Grotesk",
+            "Work Sans"
+          ]
+        },
+        "weight": {
+          "enum": [
+            400,
+            500,
+            600,
+            700
+          ]
+        }
+      }
+    },
+    "styleFontRoles": {
+      "title": "StyleFontRoles",
+      "$comment": "Où va chaque police : l'identifiant d'une police de la liste pour chaque usage.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "brand",
+        "title",
+        "heading",
+        "body",
+        "quote",
+        "small",
+        "boxTitle",
+        "button",
+        "tabs"
+      ],
+      "properties": {
+        "brand": {
+          "$ref": "#/definitions/uuid"
+        },
+        "title": {
+          "$ref": "#/definitions/uuid"
+        },
+        "heading": {
+          "$ref": "#/definitions/uuid"
+        },
+        "body": {
+          "$ref": "#/definitions/uuid"
+        },
+        "quote": {
+          "$ref": "#/definitions/uuid"
+        },
+        "small": {
+          "$ref": "#/definitions/uuid"
+        },
+        "boxTitle": {
+          "$ref": "#/definitions/uuid"
+        },
+        "button": {
+          "$ref": "#/definitions/uuid"
+        },
+        "tabs": {
+          "$ref": "#/definitions/uuid"
+        }
+      }
+    },
+    "styleSize": {
+      "title": "StyleSize",
+      "$comment": "Une taille de texte en points, pour un texte de taille normale (le « grand texte » du téléphone l'agrandit), et son interligne.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "size",
+        "lineHeight"
+      ],
+      "properties": {
+        "size": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 48
+        },
+        "lineHeight": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 2
+        }
+      }
+    },
+    "styleSizes": {
+      "title": "StyleSizes",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "heading",
+        "body",
+        "quote",
+        "small"
+      ],
+      "properties": {
+        "title": {
+          "$ref": "#/definitions/styleSize"
+        },
+        "heading": {
+          "$ref": "#/definitions/styleSize"
+        },
+        "body": {
+          "$ref": "#/definitions/styleSize"
+        },
+        "quote": {
+          "$ref": "#/definitions/styleSize"
+        },
+        "small": {
+          "$ref": "#/definitions/styleSize"
+        }
+      }
+    },
     "draft": {
       "title": "Draft",
       "$comment": "Variante « draft » : le brouillon d'un contenu (article, épisode, méthode, chapitre, leçon, page).",
@@ -1126,6 +1500,118 @@
           "items": {
             "$ref": "#/definitions/publishedTopBlock"
           }
+        }
+      }
+    },
+    "style": {
+      "title": "AppStyle",
+      "$comment": "Variante « style » : la charte graphique de l'app (ADMIN § 1, section « App »), un seul document. Rangée avec les blocs parce qu'elle les habille, dans l'app comme dans l'aperçu de l'admin. Les références (une couleur ou une police de la liste) et les noms en double se vérifient à part : private.style_problems dans la base, styleProblems dans l'admin.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "v",
+        "darkMode",
+        "colors",
+        "roles",
+        "tints",
+        "badges",
+        "buttons",
+        "fields",
+        "fonts",
+        "fontRoles",
+        "sizes",
+        "radius",
+        "imageRadius",
+        "shadow",
+        "underlineLinks"
+      ],
+      "properties": {
+        "v": {
+          "const": 1
+        },
+        "darkMode": {
+          "enum": [
+            "auto",
+            "light",
+            "dark"
+          ]
+        },
+        "colors": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 60,
+          "items": {
+            "$ref": "#/definitions/styleColor"
+          }
+        },
+        "roles": {
+          "$ref": "#/definitions/styleColorRoles"
+        },
+        "tints": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 30,
+          "items": {
+            "$ref": "#/definitions/styleTint"
+          }
+        },
+        "badges": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 30,
+          "items": {
+            "$ref": "#/definitions/styleBadge"
+          }
+        },
+        "buttons": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 30,
+          "items": {
+            "$ref": "#/definitions/styleButton"
+          }
+        },
+        "fields": {
+          "enum": [
+            "outline",
+            "filled",
+            "underline"
+          ]
+        },
+        "fonts": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 12,
+          "items": {
+            "$ref": "#/definitions/styleFont"
+          }
+        },
+        "fontRoles": {
+          "$ref": "#/definitions/styleFontRoles"
+        },
+        "sizes": {
+          "$ref": "#/definitions/styleSizes"
+        },
+        "radius": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 24
+        },
+        "imageRadius": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 24
+        },
+        "shadow": {
+          "enum": [
+            "none",
+            "light",
+            "medium",
+            "strong"
+          ]
+        },
+        "underlineLinks": {
+          "type": "boolean"
         }
       }
     }
