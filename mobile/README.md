@@ -1,56 +1,19 @@
-# Welcome to your Expo app 👋
+# Ruche : l'app mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+L'app mobile de Ruche (Expo SDK 57, Expo Router, Supabase). **Elle n'est pas encore commencée** : on ne l'attaque qu'une fois l'administration terminée (docs/BONNES-PRATIQUES.md, § 8). Pour l'instant, `src/` n'a qu'un écran vide qui affiche le nom de l'app, et le client Supabase (`src/lib/supabase.ts`).
 
-## Get started
+## Démarrer
 
-1. Install dependencies
+1. Copier `.env.example` en `.env` (il pointe vers le Supabase local, démarré à la racine par `npm run db:start`).
+2. Installer les dépendances : `npm ci`.
+3. Lancer le serveur de dev : `npx expo start`.
 
-   ```bash
-   npm install
-   ```
+## Règles
 
-2. Start the app
+- Ajouter une dépendance **uniquement** avec `npx expo install <paquet>`, jamais `npm install <paquet>` : c'est Expo qui fixe les versions.
+- Les écrans vont dans `src/app/` (Expo Router) ; le reste (composants, hooks, utilitaires) en dehors.
+- Seule la clé **publishable** de Supabase va dans l'app.
+- Avant de dire « fini » : `npx expo lint` et `npm run typecheck`.
+- Les images et les couleurs de `app.json` (icônes, écran de démarrage) sont encore celles d'Expo.
 
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-### Other setup steps
-
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Les consignes d'Expo pour l'assistant sont dans [AGENTS.md](AGENTS.md) ; versions, commandes et façon de travailler, dans le [CLAUDE.md](../CLAUDE.md) de la racine.
