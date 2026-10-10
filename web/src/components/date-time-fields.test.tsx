@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest"
 
 import { DayField, TimeField } from "@/components/date-time-fields"
 import { texts } from "@/texts"
+import { role } from "@/test/queries"
 
 function Fields({ day = "", time = "" }: { day?: string; time?: string }) {
   const [dayValue, setDay] = useState(day)
@@ -38,13 +39,13 @@ describe("champs Jour et Heure", () => {
 
   it("choisit le jour dans le calendrier, en français", async () => {
     render(<Fields day="05/03/2099" />)
-    const pick = screen.getByRole("button", { name: texts.dates.pickDay })
+    const pick = role("button", texts.dates.pickDay)
     // Le bouton du calendrier est dans le champ du jour (InputGroup de shadcn).
     expect(pick.closest('[data-slot="input-group"]')).not.toBeNull()
     fireEvent.click(pick)
     // Le mois du jour saisi, en français.
     expect(await screen.findByText(/mars 2099/i)).toBeVisible()
-    fireEvent.click(screen.getByRole("button", { name: /20 mars 2099/i }))
+    fireEvent.click(role("button", /20 mars 2099/i))
     expect(screen.getByLabelText("Jour")).toHaveValue("20/03/2099")
   })
 })

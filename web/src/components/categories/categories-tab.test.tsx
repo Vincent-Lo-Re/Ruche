@@ -7,6 +7,7 @@ import * as settingsApi from "@/lib/contents/settings"
 import * as templatesApi from "@/lib/contents/templates"
 import { renderApp } from "@/test/render"
 import { texts } from "@/texts"
+import { findRole, queryRole, role } from "@/test/queries"
 
 // L'onglet « Catégories » du Blog et des Podcasts : liste comme celle des contenus, fenêtre pour
 // créer ou modifier, suppression définitive ([D28]), une à une ou cochées. Le rangement au clavier
@@ -47,10 +48,8 @@ const stress = { id: "c2", name: "Stress", position: 1, created_at, uses: 0 }
 
 /** Ouvre le menu « … » d'une ligne et choisit une action. */
 async function chooseAction(name: string, action: string) {
-  fireEvent.click(
-    await screen.findByRole("button", { name: labels.actions(name) })
-  )
-  fireEvent.click(await screen.findByRole("menuitem", { name: action }))
+  fireEvent.click(await findRole("button", labels.actions(name)))
+  fireEvent.click(await findRole("menuitem", action))
 }
 
 beforeEach(() => {
@@ -62,7 +61,7 @@ afterEach(() => vi.clearAllMocks())
 describe("Blog : l'onglet Catégories", () => {
   it("un onglet de la page Blog, dans l'adresse, avec ses colonnes et le bouton « Nouvelle catégorie »", async () => {
     const { router } = await renderApp("/blog")
-    fireEvent.click(await screen.findByRole("tab", { name: labels.tab }))
+    fireEvent.click(await findRole("tab", labels.tab))
 
     const table = await screen.findByRole("table")
     expect(router.state.location.search).toBe("?tab=categories")
@@ -72,20 +71,12 @@ describe("Blog : l'onglet Catégories", () => {
       rows.map((row) => within(row).getAllByRole("cell")[2].textContent)
     ).toEqual(["Sommeil", "Stress"])
     // « État » : un lien (le nombre dans l'infobulle), ou un lien coupé.
-    expect(
-      within(rows[0]).getByRole("button", {
-        name: labels.uses.open("Sommeil"),
-      })
-    ).toBeVisible()
-    expect(
-      within(rows[1]).getByRole("img", { name: labels.usesCount(0) })
-    ).toBeVisible()
+    expect(role("button", labels.uses.open("Sommeil"), rows[0])).toBeVisible()
+    expect(role("img", labels.usesCount(0), rows[1])).toBeVisible()
     expect(within(rows[0]).getByText("27 sept. 2026 à 14h30")).toBeVisible()
-    expect(screen.getByRole("button", { name: labels.create })).toBeVisible()
+    expect(role("button", labels.create)).toBeVisible()
     expect(
-      screen.queryByRole("button", {
-        name: texts.contentList.kinds.article.create,
-      })
+      queryRole("button", texts.contentList.kinds.article.create)
     ).toBeNull()
     expect(screen.getByText(labels.description.blog)).toBeVisible()
   })
@@ -107,14 +98,10 @@ describe("Blog : l'onglet Catégories", () => {
     })
     await renderApp("/blog?tab=categories")
 
-    fireEvent.click(await screen.findByRole("button", { name: labels.create }))
-    const dialog = await screen.findByRole("dialog", {
-      name: labels.dialog.createTitle,
-    })
+    fireEvent.click(await findRole("button", labels.create))
+    const dialog = await findRole("dialog", labels.dialog.createTitle)
     // Un nom vide est refusé sans rien envoyer.
-    fireEvent.click(
-      within(dialog).getByRole("button", { name: texts.common.save })
-    )
+    fireEvent.click(role("button", texts.common.save, dialog))
     expect(await within(dialog).findByText(labels.nameRequired)).toBeVisible()
     expect(categoriesApi.createCategory).not.toHaveBeenCalled()
 
@@ -125,16 +112,12 @@ describe("Blog : l'onglet Catégories", () => {
     expect(
       await within(dialog).findByText(labels.errors.nom_en_double)
     ).toBeVisible()
-    expect(
-      within(dialog).getByRole("button", { name: texts.common.save })
-    ).toBeDisabled()
+    expect(role("button", texts.common.save, dialog)).toBeDisabled()
 
     fireEvent.change(within(dialog).getByLabelText(labels.name), {
       target: { value: "Respiration" },
     })
-    fireEvent.click(
-      within(dialog).getByRole("button", { name: texts.common.save })
-    )
+    fireEvent.click(role("button", texts.common.save, dialog))
 
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
     expect(categoriesApi.createCategory).toHaveBeenCalledWith(
@@ -142,23 +125,15 @@ describe("Blog : l'onglet Catégories", () => {
       "Respiration"
     )
     expect(await screen.findByText(labels.added("Respiration"))).toBeVisible()
-    expect(
-      await screen.findByRole("button", { name: "Respiration" })
-    ).toBeVisible()
+    expect(await findRole("button", "Respiration")).toBeVisible()
   })
 
   it("« Modifier » : garder son propre nom est permis, prendre celui d'une autre non", async () => {
     await renderApp("/blog?tab=categories")
-    fireEvent.click(
-      await screen.findByRole("button", { name: labels.actions("Sommeil") })
-    )
-    fireEvent.click(await screen.findByRole("menuitem", { name: labels.edit }))
-    const dialog = await screen.findByRole("dialog", {
-      name: labels.dialog.editTitle,
-    })
-    const save = within(dialog).getByRole("button", {
-      name: texts.common.save,
-    })
+    fireEvent.click(await findRole("button", labels.actions("Sommeil")))
+    fireEvent.click(await findRole("menuitem", labels.edit))
+    const dialog = await findRole("dialog", labels.dialog.editTitle)
+    const save = role("button", texts.common.save, dialog)
     expect(save).toBeEnabled()
     fireEvent.change(within(dialog).getByLabelText(labels.name), {
       target: { value: "stress" },
@@ -177,15 +152,11 @@ describe("Blog : l'onglet Catégories", () => {
     await renderApp("/blog?tab=categories")
 
     await chooseAction("Sommeil", labels.edit)
-    const dialog = await screen.findByRole("dialog", {
-      name: labels.dialog.editTitle,
-    })
+    const dialog = await findRole("dialog", labels.dialog.editTitle)
     const name = within(dialog).getByLabelText(labels.name)
     expect(name).toHaveValue("Sommeil")
     fireEvent.change(name, { target: { value: "Bien dormir" } })
-    fireEvent.click(
-      within(dialog).getByRole("button", { name: texts.common.save })
-    )
+    fireEvent.click(role("button", texts.common.save, dialog))
 
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
     expect(categoriesApi.renameCategory).toHaveBeenCalledWith(
@@ -200,15 +171,9 @@ describe("Blog : l'onglet Catégories", () => {
     await renderApp("/blog?tab=categories")
 
     await chooseAction("Sommeil", labels.remove)
-    const confirm = await screen.findByRole("alertdialog", {
-      name: labels.confirmRemove.title,
-    })
+    const confirm = await findRole("alertdialog", labels.confirmRemove.title)
     expect(confirm).toHaveTextContent(labels.confirmRemove.uses(3))
-    fireEvent.click(
-      within(confirm).getByRole("button", {
-        name: labels.confirmRemove.confirm,
-      })
-    )
+    fireEvent.click(role("button", labels.confirmRemove.confirm, confirm))
 
     await waitFor(() =>
       expect(categoriesApi.deleteCategory).toHaveBeenCalledWith("c1")
@@ -221,22 +186,15 @@ describe("Blog : l'onglet Catégories", () => {
     await renderApp("/blog?tab=categories")
 
     fireEvent.click(
-      await screen.findByRole("checkbox", {
-        name: texts.selection.select("Sommeil"),
-      })
+      await findRole("checkbox", texts.selection.select("Sommeil"))
     )
-    fireEvent.click(
-      screen.getByRole("checkbox", { name: texts.selection.select("Stress") })
+    fireEvent.click(role("checkbox", texts.selection.select("Stress")))
+    fireEvent.click(role("button", labels.removeMany(2)))
+    const confirm = await findRole(
+      "alertdialog",
+      labels.confirmRemoveMany.title(2)
     )
-    fireEvent.click(screen.getByRole("button", { name: labels.removeMany(2) }))
-    const confirm = await screen.findByRole("alertdialog", {
-      name: labels.confirmRemoveMany.title(2),
-    })
-    fireEvent.click(
-      within(confirm).getByRole("button", {
-        name: labels.confirmRemove.confirm,
-      })
-    )
+    fireEvent.click(role("button", labels.confirmRemove.confirm, confirm))
 
     await waitFor(() =>
       expect(categoriesApi.deleteCategory).toHaveBeenCalledTimes(2)
@@ -271,21 +229,16 @@ describe("Blog : l'onglet Catégories", () => {
     ])
     await renderApp("/blog?tab=categories")
 
-    fireEvent.click(
-      await screen.findByRole("button", { name: labels.uses.open("Sommeil") })
-    )
-    const dialog = await screen.findByRole("dialog", {
-      name: labels.uses.title,
-    })
+    fireEvent.click(await findRole("button", labels.uses.open("Sommeil")))
+    const dialog = await findRole("dialog", labels.uses.title)
     expect(categoriesApi.getCategoryUses).toHaveBeenCalledWith("c1")
-    expect(
-      await within(dialog).findByRole("link", { name: "Bien dormir" })
-    ).toHaveAttribute("href", "/blog/a1")
-    const trashed = within(dialog).getByRole("row", { name: /Ancien article/ })
+    expect(await findRole("link", "Bien dormir", dialog)).toHaveAttribute(
+      "href",
+      "/blog/a1"
+    )
+    const trashed = role("row", /Ancien article/, dialog)
     expect(within(trashed).getByText(labels.uses.states.trash)).toBeVisible()
-    expect(
-      within(dialog).getByRole("button", { name: texts.uses.export })
-    ).toBeEnabled()
+    expect(role("button", texts.uses.export, dialog)).toBeEnabled()
   })
 
   it("« Retirer » suit l'état de chaque contenu : republié, brouillon seulement, ou indisponible", async () => {
@@ -321,46 +274,27 @@ describe("Blog : l'onglet Catégories", () => {
       .mockResolvedValueOnce({ result: "draftOnly", publishError: null })
     await renderApp("/blog?tab=categories")
 
-    fireEvent.click(
-      await screen.findByRole("button", { name: labels.uses.open("Sommeil") })
-    )
-    const dialog = await screen.findByRole("dialog", {
-      name: labels.uses.title,
-    })
-    const row = (title: string) =>
-      within(dialog).getByRole("row", { name: new RegExp(title) })
-    await within(dialog).findByRole("link", { name: "En ligne" })
+    fireEvent.click(await findRole("button", labels.uses.open("Sommeil")))
+    const dialog = await findRole("dialog", labels.uses.title)
+    const row = (title: string) => role("row", new RegExp(title), dialog)
+    await findRole("link", "En ligne", dialog)
     // L'état, avec ce que fera « Retirer » pour les lecteurs d'écran.
     expect(row("Programmé")).toHaveTextContent(labels.uses.states.scheduled)
     expect(row("Écrit")).toHaveTextContent(labels.uses.tips.writing("Marie"))
     expect(
-      within(row("Programmé")).getByRole("button", {
-        name: labels.uses.removeFrom("Programmé"),
-      })
+      role("button", labels.uses.removeFrom("Programmé"), row("Programmé"))
     ).toBeDisabled()
     expect(
-      within(row("Écrit")).getByRole("checkbox", {
-        name: texts.selection.select("Écrit"),
-      })
+      role("checkbox", texts.selection.select("Écrit"), row("Écrit"))
     ).toHaveAttribute("aria-disabled", "true")
 
     // Tout cocher ne coche que ce qu'on peut retirer.
-    fireEvent.click(
-      within(dialog).getByRole("checkbox", { name: texts.selection.selectAll })
-    )
-    fireEvent.click(
-      within(dialog).getByRole("button", { name: labels.uses.removeMany(2) })
-    )
-    const confirm = await screen.findByRole("alertdialog", {
-      name: labels.uses.confirm.title(2),
-    })
+    fireEvent.click(role("checkbox", texts.selection.selectAll, dialog))
+    fireEvent.click(role("button", labels.uses.removeMany(2), dialog))
+    const confirm = await findRole("alertdialog", labels.uses.confirm.title(2))
     expect(confirm).toHaveTextContent(labels.uses.confirm.republish(1))
     expect(confirm).toHaveTextContent(labels.uses.confirm.draftOnly(1))
-    fireEvent.click(
-      within(confirm).getByRole("button", {
-        name: labels.uses.confirm.confirm,
-      })
-    )
+    fireEvent.click(role("button", labels.uses.confirm.confirm, confirm))
 
     await waitFor(() =>
       expect(settingsApi.removeCategory).toHaveBeenCalledTimes(2)
@@ -381,32 +315,25 @@ describe("Blog : l'onglet Catégories", () => {
   it("le filtre par état : utilisées ou non", async () => {
     await renderApp("/blog?tab=categories")
 
-    fireEvent.click(
-      await screen.findByRole("combobox", { name: labels.filters.label })
-    )
-    const unused = await screen.findByRole("option", {
-      name: labels.filters.unused,
-    })
+    fireEvent.click(await findRole("combobox", labels.filters.label))
+    const unused = await findRole("option", labels.filters.unused)
     fireEvent.pointerDown(unused, { pointerType: "mouse" })
     fireEvent.click(unused)
 
-    expect(await screen.findByRole("button", { name: "Stress" })).toBeVisible()
-    expect(screen.queryByRole("button", { name: "Sommeil" })).toBeNull()
+    expect(await findRole("button", "Stress")).toBeVisible()
+    expect(queryRole("button", "Sommeil")).toBeNull()
     expect(screen.getByText(labels.count(1, 2))).toBeVisible()
   })
 
   it("une recherche filtre les catégories et interdit de ranger", async () => {
     await renderApp("/blog?tab=categories")
 
-    fireEvent.change(
-      await screen.findByRole("searchbox", { name: labels.search }),
-      {
-        target: { value: "som" },
-      }
-    )
+    fireEvent.change(await findRole("searchbox", labels.search), {
+      target: { value: "som" },
+    })
 
     expect(await screen.findByText(labels.orderFiltering)).toBeVisible()
-    expect(screen.getByRole("button", { name: "Sommeil" })).toBeVisible()
-    expect(screen.queryByRole("button", { name: "Stress" })).toBeNull()
+    expect(role("button", "Sommeil")).toBeVisible()
+    expect(queryRole("button", "Stress")).toBeNull()
   })
 })

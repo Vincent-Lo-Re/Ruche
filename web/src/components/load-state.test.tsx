@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest"
 
 import { LoadState } from "@/components/load-state"
 import { texts } from "@/texts"
+import { role } from "@/test/queries"
 
 describe("LoadState", () => {
   it("un échec : l'Alert de shadcn, avec la raison et « Réessayer »", () => {
@@ -17,7 +18,7 @@ describe("LoadState", () => {
     expect(alert).toHaveAttribute("data-slot", "alert")
     expect(alert).toHaveTextContent("Les fichiers n'ont pas pu être chargés.")
     expect(alert).toHaveTextContent("Réseau coupé.")
-    fireEvent.click(screen.getByRole("button", { name: texts.common.retry }))
+    fireEvent.click(role("button", texts.common.retry))
     expect(refetch).toHaveBeenCalled()
   })
 

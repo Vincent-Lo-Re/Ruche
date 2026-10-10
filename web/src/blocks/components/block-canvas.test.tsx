@@ -10,6 +10,7 @@ import {
 import type { Draft } from "@/blocks/types"
 import type { Media } from "@/lib/media/constants"
 import { texts } from "@/texts"
+import { queryRole, role } from "@/test/queries"
 
 const id = (n: number) =>
   `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`
@@ -58,7 +59,7 @@ describe("le téléphone en Édition", () => {
     await waitFor(() =>
       expect(document.querySelector(".ProseMirror")).not.toBeNull()
     )
-    expect(screen.queryByRole("button", { name: /Déplacer/ })).toBeNull()
+    expect(queryRole("button", /Déplacer/)).toBeNull()
     fireEvent.pointerDown(document.querySelector(".ProseMirror")!)
     expect(selectBlock).toHaveBeenCalledWith(id(1))
     expect(
@@ -70,9 +71,7 @@ describe("le téléphone en Édition", () => {
     const onAddInBox = vi.fn()
     renderCanvas({ onAddInBox })
     expect(screen.getByText(texts.editor.emptyBox)).toBeVisible()
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.editor.add.inBox })
-    )
+    fireEvent.click(role("button", texts.editor.add.inBox))
     expect(onAddInBox).toHaveBeenCalledWith(id(2))
   })
 })
@@ -121,7 +120,7 @@ describe("aperçu tel quel (Lecture, bloc d'un modèle)", () => {
         />
       </BlocksEditorContext>
     )
-    const logo = screen.getByRole("img", { name: "Logo" })
+    const logo = role("img", "Logo")
     expect(logo).toHaveAttribute("data-natural")
     expect(logo.style.maxWidth).toBe("120px")
   })

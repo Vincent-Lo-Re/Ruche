@@ -7,6 +7,7 @@ import { teamQueryKey, type Member } from "@/lib/team"
 import { supabase } from "@/lib/supabase"
 import { fakeAuth, renderApp, testProfile } from "@/test/render"
 import { texts } from "@/texts"
+import { findRole, queryRole, role } from "@/test/queries"
 
 afterEach(() => vi.restoreAllMocks())
 
@@ -99,9 +100,7 @@ describe("La team", () => {
     // Invitée la veille : le lien (10 minutes) a expiré.
     const nina = (await screen.findByText(invited.email)).closest("tr")!
     expect(within(nina).getByText(texts.team.status.expired)).toBeVisible()
-    fireEvent.click(
-      within(nina).getByRole("button", { name: texts.team.actions.resend })
-    )
+    fireEvent.click(role("button", texts.team.actions.resend, nina))
 
     expect(await screen.findByText(texts.team.done.resent)).toBeVisible()
     expect(invoke).toHaveBeenCalledWith("equipe", {
@@ -115,9 +114,7 @@ describe("La team", () => {
 
     const nina = (await screen.findByText(invited.email)).closest("tr")!
     expect(
-      within(nina).getByRole("button", {
-        name: texts.team.actions.open(invited.email),
-      })
+      role("button", texts.team.actions.open(invited.email), nina)
     ).toBeVisible()
     const anne = screen.getByText(me.email).closest("tr")!
     expect(within(anne).queryByRole("button")).toBeNull()
@@ -130,7 +127,7 @@ describe("La team", () => {
     const nina = (await screen.findByText(invited.email)).closest("tr")!
     expect(within(nina).getByText(texts.team.status.expired)).toBeVisible()
     expect(within(nina).queryByRole("button")).toBeNull()
-    expect(screen.queryByRole("button", { name: texts.team.invite })).toBeNull()
+    expect(queryRole("button", texts.team.invite)).toBeNull()
     expect(screen.queryByText(texts.team.singleAdmin)).toBeNull()
   })
 
@@ -164,9 +161,7 @@ describe("La team", () => {
     expect(
       await screen.findByText(texts.team.loadFailed, { exact: false })
     ).toBeVisible()
-    expect(
-      screen.getByRole("button", { name: texts.common.retry })
-    ).toBeVisible()
+    expect(role("button", texts.common.retry)).toBeVisible()
   })
 
   it("relit sa fiche quand la fonction répond « réservé aux admins »", async () => {
@@ -175,9 +170,7 @@ describe("La team", () => {
     const invalidate = vi.spyOn(queryClient, "invalidateQueries")
 
     const nina = (await screen.findByText(invited.email)).closest("tr")!
-    fireEvent.click(
-      within(nina).getByRole("button", { name: texts.team.actions.resend })
-    )
+    fireEvent.click(role("button", texts.team.actions.resend, nina))
 
     expect(
       await screen.findByText(texts.team.errors.reserve_aux_admins)
@@ -191,15 +184,11 @@ describe("La team", () => {
     const invoke = mockTeam()
     await renderApp("/team")
 
-    fireEvent.click(
-      await screen.findByRole("button", { name: texts.team.invite })
-    )
+    fireEvent.click(await findRole("button", texts.team.invite))
     fireEvent.change(await screen.findByLabelText(texts.team.email), {
       target: { value: "pas-une-adresse" },
     })
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.team.sendInvitation })
-    )
+    fireEvent.click(role("button", texts.team.sendInvitation))
 
     expect(await screen.findByText(texts.team.invalidEmail)).toBeVisible()
     expect(invoke).toHaveBeenCalledTimes(1) // la liste seulement
@@ -209,15 +198,11 @@ describe("La team", () => {
     const invoke = mockTeam(teamFailure("deja_membre", 409))
     await renderApp("/team")
 
-    fireEvent.click(
-      await screen.findByRole("button", { name: texts.team.invite })
-    )
+    fireEvent.click(await findRole("button", texts.team.invite))
     fireEvent.change(await screen.findByLabelText(texts.team.email), {
       target: { value: "Nina@Exemple.test" },
     })
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.team.sendInvitation })
-    )
+    fireEvent.click(role("button", texts.team.sendInvitation))
 
     expect(await screen.findByText(texts.team.errors.deja_membre)).toBeVisible()
     expect(invoke).toHaveBeenCalledWith("equipe", {

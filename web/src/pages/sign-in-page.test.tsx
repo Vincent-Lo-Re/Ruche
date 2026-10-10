@@ -6,6 +6,7 @@ import { savePendingSignIn } from "@/auth/pending-sign-in"
 import { supabase } from "@/lib/supabase"
 import { fakeAuth, renderApp } from "@/test/render"
 import { texts } from "@/texts"
+import { role } from "@/test/queries"
 
 afterEach(() => {
   vi.restoreAllMocks()
@@ -17,7 +18,7 @@ async function askCode(email: string) {
   fireEvent.change(screen.getByLabelText(texts.signIn.email), {
     target: { value: email },
   })
-  fireEvent.click(screen.getByRole("button", { name: texts.signIn.sendCode }))
+  fireEvent.click(role("button", texts.signIn.sendCode))
 }
 
 const noSession = { user: null, session: null, messageId: null }
@@ -27,7 +28,7 @@ describe("connexion", () => {
     const signIn = vi.spyOn(supabase.auth, "signInWithOtp")
     await renderApp("/sign-in", fakeAuth("signed-out"))
     const field = screen.getByLabelText(texts.signIn.email)
-    const button = screen.getByRole("button", { name: texts.signIn.sendCode })
+    const button = role("button", texts.signIn.sendCode)
     expect(button).toBeDisabled()
 
     fireEvent.change(field, { target: { value: "pas-une-adresse" } })
@@ -102,9 +103,7 @@ describe("connexion", () => {
     expect(signIn).not.toHaveBeenCalled()
 
     // « Changer d'adresse » oublie la demande en cours.
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.signIn.otherEmail })
-    )
+    fireEvent.click(role("button", texts.signIn.otherEmail))
     expect(screen.getByLabelText(texts.signIn.email)).toBeVisible()
     expect(sessionStorage.length).toBe(0)
   })
@@ -150,7 +149,7 @@ describe("connexion", () => {
     const code = await screen.findByLabelText(texts.signIn.code)
     // Pas de clic : le 6e chiffre lance la connexion ; le bouton attend, grisé, avec ses points.
     fireEvent.change(code, { target: { value: "123456" } })
-    const button = screen.getByRole("button", { name: texts.common.loading })
+    const button = role("button", texts.common.loading)
     expect(button).toBeDisabled()
 
     // La vérification dure au moins une seconde (CODE_CHECK_MIN_MS).
@@ -159,9 +158,7 @@ describe("connexion", () => {
     ).toBeVisible()
     // Refusé : les cases se vident, et le bouton revient, inactif jusqu'au prochain code.
     expect(code).toHaveValue("")
-    expect(
-      screen.getByRole("button", { name: texts.signIn.submitCode })
-    ).toBeDisabled()
+    expect(role("button", texts.signIn.submitCode)).toBeDisabled()
     expect(verify).toHaveBeenCalledTimes(1)
     expect(verify).toHaveBeenCalledWith({
       email: "anne@exemple.test",
@@ -179,7 +176,7 @@ describe("connexion", () => {
     await askCode("anne@exemple.test")
 
     const code = await screen.findByLabelText(texts.signIn.code)
-    const button = screen.getByRole("button", { name: texts.signIn.submitCode })
+    const button = role("button", texts.signIn.submitCode)
     expect(button).toBeDisabled()
     fireEvent.change(code, { target: { value: "123" } })
     expect(button).toBeDisabled()
@@ -199,9 +196,7 @@ describe("invitation", () => {
     )
 
     expect(verify).not.toHaveBeenCalled()
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.invitation.accept })
-    )
+    fireEvent.click(role("button", texts.invitation.accept))
 
     await waitFor(() =>
       expect(verify).toHaveBeenCalledWith({
@@ -227,9 +222,7 @@ describe("invitation", () => {
       fakeAuth("signed-out")
     )
 
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.invitation.accept })
-    )
+    fireEvent.click(role("button", texts.invitation.accept))
 
     expect(await screen.findByText(texts.invitation.expired)).toBeVisible()
   })

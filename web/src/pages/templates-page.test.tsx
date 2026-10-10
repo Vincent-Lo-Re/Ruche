@@ -10,6 +10,7 @@ import * as mediaApi from "@/lib/media/api"
 import { createFromDialog } from "@/test/new-content"
 import { renderApp } from "@/test/render"
 import { texts } from "@/texts"
+import { findRole, queryRole, role } from "@/test/queries"
 
 // La section Modèles (étape 6) et « Nouvelle page » avec les points de départ ([D42]). La base
 // est simulée.
@@ -150,11 +151,11 @@ describe("section Modèles", () => {
     expect(
       await screen.findByRole("tab", { name: labels.tabs.all, selected: true })
     ).toBeInTheDocument()
-    const row = screen.getByRole("link", { name: "Contact" }).closest("tr")!
+    const row = role("link", "Contact").closest("tr")!
     expect(row).toHaveTextContent(sorts.shared.title)
     expect(row).toHaveTextContent("27 sept. 2026 à 14h30")
     expect(row).not.toHaveTextContent("Anne Admin")
-    expect(screen.getByRole("link", { name: "Contact" })).toHaveAttribute(
+    expect(role("link", "Contact")).toHaveAttribute(
       "href",
       `/templates/${CONTACT}`
     )
@@ -163,16 +164,14 @@ describe("section Modèles", () => {
     ).toHaveLength(2)
 
     // Un onglet par sorte : ses modèles seulement, sans la colonne Type.
-    fireEvent.click(screen.getByRole("tab", { name: sorts.starter.tab }))
+    fireEvent.click(role("tab", sorts.starter.tab))
     const panel = await screen.findByRole("tabpanel")
     expect(
       within(panel).getByText(sorts.starter.description, { exact: false })
     ).toBeVisible()
-    expect(within(panel).getByRole("link", { name: "Interview" })).toBeVisible()
-    expect(within(panel).queryByRole("link", { name: "Contact" })).toBeNull()
-    expect(
-      within(panel).queryByRole("columnheader", { name: labels.columns.type })
-    ).toBeNull()
+    expect(role("link", "Interview", panel)).toBeVisible()
+    expect(queryRole("link", "Contact", panel)).toBeNull()
+    expect(queryRole("columnheader", labels.columns.type, panel)).toBeNull()
   })
 
   it("l'onglet est dans l'adresse (QCM du 05/10/2026)", async () => {
@@ -184,7 +183,7 @@ describe("section Modèles", () => {
         selected: true,
       })
     ).toBeInTheDocument()
-    fireEvent.click(screen.getByRole("tab", { name: sorts.shared.tab }))
+    fireEvent.click(role("tab", sorts.shared.tab))
     await waitFor(() =>
       expect(router.state.location.search).toBe("?tab=shared")
     )
@@ -193,10 +192,8 @@ describe("section Modèles", () => {
   it("« Nouveau modèle » : nom et sorte, puis l'éditeur du modèle s'ouvre", async () => {
     vi.mocked(templatesApi.createTemplate).mockResolvedValue(created)
     const { router } = await renderApp("/templates")
-    fireEvent.click(await screen.findByRole("button", { name: labels.create }))
-    const dialog = await screen.findByRole("dialog", {
-      name: texts.templates.create.title,
-    })
+    fireEvent.click(await findRole("button", labels.create))
+    const dialog = await findRole("dialog", texts.templates.create.title)
     fireEvent.change(
       within(dialog).getByLabelText(texts.templates.create.name),
       {
@@ -204,15 +201,9 @@ describe("section Modèles", () => {
       }
     )
     fireEvent.click(
-      within(dialog).getByRole("radio", {
-        name: new RegExp(texts.templates.sorts.shared.title),
-      })
+      role("radio", new RegExp(texts.templates.sorts.shared.title), dialog)
     )
-    fireEvent.click(
-      within(dialog).getByRole("button", {
-        name: texts.templates.create.submit,
-      })
-    )
+    fireEvent.click(role("button", texts.templates.create.submit, dialog))
     await waitFor(() =>
       expect(templatesApi.createTemplate).toHaveBeenCalledWith({
         name: "Contact",
@@ -233,10 +224,8 @@ describe("section Modèles", () => {
           : null
     )
     await renderApp("/templates")
-    fireEvent.click(await screen.findByRole("button", { name: labels.create }))
-    const dialog = await screen.findByRole("dialog", {
-      name: texts.templates.create.title,
-    })
+    fireEvent.click(await findRole("button", labels.create))
+    const dialog = await findRole("dialog", texts.templates.create.title)
     fireEvent.change(
       within(dialog).getByLabelText(texts.templates.create.name),
       { target: { value: "CONTACT" } }
@@ -249,11 +238,7 @@ describe("section Modèles", () => {
       "CONTACT",
       null
     )
-    expect(
-      within(dialog).getByRole("button", {
-        name: texts.templates.create.submit,
-      })
-    ).toBeDisabled()
+    expect(role("button", texts.templates.create.submit, dialog)).toBeDisabled()
     expect(templatesApi.createTemplate).not.toHaveBeenCalled()
   })
 
@@ -264,10 +249,8 @@ describe("section Modèles", () => {
       template_for: "page",
     })
     await renderApp("/templates")
-    fireEvent.click(await screen.findByRole("button", { name: labels.create }))
-    const dialog = await screen.findByRole("dialog", {
-      name: texts.templates.create.title,
-    })
+    fireEvent.click(await findRole("button", labels.create))
+    const dialog = await findRole("dialog", texts.templates.create.title)
     expect(
       within(dialog).queryByLabelText(texts.templates.create.section)
     ).toBeNull()
@@ -278,18 +261,12 @@ describe("section Modèles", () => {
       }
     )
     fireEvent.click(
-      within(dialog).getByRole("radio", {
-        name: new RegExp(texts.templates.sorts.starter.title),
-      })
+      role("radio", new RegExp(texts.templates.sorts.starter.title), dialog)
     )
     expect(
       await within(dialog).findByText(texts.templates.create.sectionHint)
     ).toBeInTheDocument()
-    fireEvent.click(
-      within(dialog).getByRole("button", {
-        name: texts.templates.create.submit,
-      })
-    )
+    fireEvent.click(role("button", texts.templates.create.submit, dialog))
     await waitFor(() =>
       expect(templatesApi.createTemplate).toHaveBeenCalledWith({
         name: "Interview",
@@ -319,17 +296,14 @@ describe("section Modèles", () => {
       needsFileSync: false,
     })
     await renderApp("/templates")
-    fireEvent.click(
-      await screen.findByRole("button", { name: labels.actions("Contact") })
-    )
-    fireEvent.click(await screen.findByRole("menuitem", { name: labels.trash }))
+    fireEvent.click(await findRole("button", labels.actions("Contact")))
+    fireEvent.click(await findRole("menuitem", labels.trash))
 
-    const dialog = await screen.findByRole("alertdialog", {
-      name: labels.used.title,
-    })
-    expect(
-      within(dialog).getByRole("link", { name: "Accueil" })
-    ).toHaveAttribute("href", `/pages/${PAGE_ID}`)
+    const dialog = await findRole("alertdialog", labels.used.title)
+    expect(role("link", "Accueil", dialog)).toHaveAttribute(
+      "href",
+      `/pages/${PAGE_ID}`
+    )
     // Dans la corbeille : pas de lien, mais nommé.
     // Une ligne par brouillon (l'Item de shadcn) : le nom, puis la sorte et la corbeille.
     expect(
@@ -337,14 +311,8 @@ describe("section Modèles", () => {
         .getByText(/Ancienne/)
         .closest("[data-template-use]")
     ).toHaveTextContent(labels.used.inTrash)
-    expect(
-      within(dialog).queryByRole("button", {
-        name: labels.confirmTrash.confirm,
-      })
-    ).toBeNull()
-    fireEvent.click(
-      within(dialog).getByRole("button", { name: labels.used.detachAll })
-    )
+    expect(queryRole("button", labels.confirmTrash.confirm, dialog)).toBeNull()
+    fireEvent.click(role("button", labels.used.detachAll, dialog))
     await waitFor(() =>
       expect(templatesApi.detachTemplateEverywhere).toHaveBeenCalledWith(
         CONTACT
@@ -352,12 +320,8 @@ describe("section Modèles", () => {
     )
     expect(await screen.findByText(labels.used.detached(2))).toBeInTheDocument()
 
-    const confirm = await screen.findByRole("alertdialog", {
-      name: labels.confirmTrash.title,
-    })
-    fireEvent.click(
-      within(confirm).getByRole("button", { name: labels.confirmTrash.confirm })
-    )
+    const confirm = await findRole("alertdialog", labels.confirmTrash.title)
+    fireEvent.click(role("button", labels.confirmTrash.confirm, confirm))
     await waitFor(() =>
       expect(publicationApi.trashContent).toHaveBeenCalledWith(CONTACT)
     )
@@ -374,30 +338,20 @@ describe("section Modèles", () => {
       renamedTo: null,
     })
     await renderApp("/templates")
-    fireEvent.click(
-      await screen.findByRole("button", { name: labels.actions("À retenir") })
-    )
-    fireEvent.click(await screen.findByRole("menuitem", { name: labels.trash }))
-    const dialog = await screen.findByRole("alertdialog", {
-      name: labels.confirmTrash.title,
-    })
+    fireEvent.click(await findRole("button", labels.actions("À retenir")))
+    fireEvent.click(await findRole("menuitem", labels.trash))
+    const dialog = await findRole("alertdialog", labels.confirmTrash.title)
     expect(dialog).toHaveTextContent(
       labels.confirmTrash.description("À retenir")
     )
-    fireEvent.click(
-      within(dialog).getByRole("button", { name: labels.confirmTrash.confirm })
-    )
+    fireEvent.click(role("button", labels.confirmTrash.confirm, dialog))
     await waitFor(() =>
       expect(publicationApi.trashContent).toHaveBeenCalledWith(RETENIR)
     )
     // Seul un bloc identique partout a besoin de la liste de ses brouillons.
     expect(templatesApi.listTemplateUses).not.toHaveBeenCalledWith([RETENIR])
     const toast = await screen.findByText(labels.trashed("À retenir"))
-    fireEvent.click(
-      within(toast.closest("li")!).getByRole("button", {
-        name: texts.common.undo,
-      })
-    )
+    fireEvent.click(role("button", texts.common.undo, toast.closest("li")!))
     await waitFor(() =>
       expect(publicationApi.restoreContent).toHaveBeenCalledWith(RETENIR)
     )
@@ -418,34 +372,25 @@ describe("section Modèles", () => {
     })
     await renderApp("/templates")
 
-    fireEvent.click(
-      await screen.findByRole("checkbox", { name: texts.selection.selectAll })
-    )
-    expect(
-      screen.getByRole("button", { name: texts.selection.trash(3) })
-    ).toBeVisible()
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.selection.trash(3) })
-    )
+    fireEvent.click(await findRole("checkbox", texts.selection.selectAll))
+    expect(role("button", texts.selection.trash(3))).toBeVisible()
+    fireEvent.click(role("button", texts.selection.trash(3)))
     const dialog = await screen.findByRole("alertdialog")
     expect(dialog).toHaveTextContent(labels.confirmTrashManyTitle(3))
-    fireEvent.click(
-      within(dialog).getByRole("button", { name: labels.confirmTrash.confirm })
-    )
+    fireEvent.click(role("button", labels.confirmTrash.confirm, dialog))
 
     expect(await screen.findByText(labels.trashedMany(2))).toBeVisible()
     expect(screen.getByText(labels.keptTitle(1))).toBeVisible()
     expect(
       screen.getByText(texts.selection.keptItem("Contact", used))
     ).toBeVisible()
-    expect(
-      screen.getByRole("checkbox", { name: texts.selection.select("Contact") })
-    ).toBeChecked()
+    expect(role("checkbox", texts.selection.select("Contact"))).toBeChecked()
 
     fireEvent.click(
-      within(screen.getByText(labels.trashedMany(2)).closest("li")!).getByRole(
+      role(
         "button",
-        { name: texts.common.undo }
+        texts.common.undo,
+        screen.getByText(labels.trashedMany(2)).closest("li")!
       )
     )
     expect(await screen.findByText(labels.restoredMany(2))).toBeVisible()
@@ -474,41 +419,32 @@ describe("Modèles de bloc : où ils servent", () => {
     const { router } = await renderApp("/templates")
 
     // « Interview » (point de départ) ne sert nulle part : un lien coupé.
-    const interview = (
-      await screen.findByRole("link", { name: "Interview" })
-    ).closest("tr")!
-    expect(
-      await within(interview).findByRole("img", { name: labels.usesCount(0) })
-    ).toBeVisible()
+    const interview = (await findRole("link", "Interview")).closest("tr")!
+    expect(await findRole("img", labels.usesCount(0), interview)).toBeVisible()
 
     // « À retenir » (mise en forme) a été copiée : la fenêtre le dit, avec l'export.
-    fireEvent.click(
-      await screen.findByRole("button", { name: labels.uses.open("À retenir") })
-    )
-    const dialog = await screen.findByRole("dialog", {
-      name: labels.uses.title,
-    })
+    fireEvent.click(await findRole("button", labels.uses.open("À retenir")))
+    const dialog = await findRole("dialog", labels.uses.title)
     expect(templatesApi.getTemplateUses).toHaveBeenCalledWith(
       expect.objectContaining({ id: RETENIR, sort: "style" })
     )
-    expect(
-      await within(dialog).findByRole("link", { name: "Bien dormir" })
-    ).toHaveAttribute("href", "/blog/a1")
+    expect(await findRole("link", "Bien dormir", dialog)).toHaveAttribute(
+      "href",
+      "/blog/a1"
+    )
     expect(within(dialog).getByText(texts.uses.copied)).toBeVisible()
-    expect(
-      within(dialog).getByRole("button", { name: texts.uses.export })
-    ).toBeEnabled()
+    expect(role("button", texts.uses.export, dialog)).toBeEnabled()
     fireEvent.keyDown(dialog, { key: "Escape" })
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
 
     // L'onglet « Non utilisés » : seulement « Interview », et dans l'adresse.
-    fireEvent.click(screen.getByRole("tab", { name: labels.tabs.unused }))
+    fireEvent.click(role("tab", labels.tabs.unused))
     expect(router.state.location.search).toBe("?tab=unused")
     const panel = await screen.findByRole("tabpanel")
     expect(within(panel).getByText(labels.unusedDescription)).toBeVisible()
-    expect(within(panel).getByRole("link", { name: "Interview" })).toBeVisible()
-    expect(within(panel).queryByRole("link", { name: "Contact" })).toBeNull()
-    expect(within(panel).queryByRole("link", { name: "À retenir" })).toBeNull()
+    expect(role("link", "Interview", panel)).toBeVisible()
+    expect(queryRole("link", "Contact", panel)).toBeNull()
+    expect(queryRole("link", "À retenir", panel)).toBeNull()
   })
 })
 

@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { AudioPlayer } from "@/components/media/audio-player"
 import { formatClock } from "@/lib/media/format"
 import { texts } from "@/texts"
+import { role } from "@/test/queries"
 
 const labels = texts.audioPlayer
 
@@ -30,15 +31,9 @@ describe("AudioPlayer", () => {
     render(<AudioPlayer src="/son.mp3" name="episode.mp3" durationHint={185} />)
     expect(screen.getByText(`0:00 / ${formatClock(185)}`)).toBeVisible()
 
-    fireEvent.click(
-      screen.getByRole("button", { name: labels.play("episode.mp3") })
-    )
-    fireEvent.click(
-      screen.getByRole("button", { name: labels.pause("episode.mp3") })
-    )
-    expect(
-      screen.getByRole("button", { name: labels.play("episode.mp3") })
-    ).toBeVisible()
+    fireEvent.click(role("button", labels.play("episode.mp3")))
+    fireEvent.click(role("button", labels.pause("episode.mp3")))
+    expect(role("button", labels.play("episode.mp3"))).toBeVisible()
   })
 
   it("avance avec le temps de lecture, et la position est lue en clair", () => {
@@ -58,8 +53,8 @@ describe("AudioPlayer", () => {
 
   it("coupe et remet le son", () => {
     render(<AudioPlayer src="/son.mp3" name="episode.mp3" durationHint={10} />)
-    fireEvent.click(screen.getByRole("button", { name: labels.mute }))
-    expect(screen.getByRole("button", { name: labels.unmute })).toHaveAttribute(
+    fireEvent.click(role("button", labels.mute))
+    expect(role("button", labels.unmute)).toHaveAttribute(
       "aria-pressed",
       "true"
     )

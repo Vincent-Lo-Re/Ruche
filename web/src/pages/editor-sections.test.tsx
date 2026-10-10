@@ -16,6 +16,7 @@ import {
 } from "@/test/categories"
 import { renderApp, testProfile } from "@/test/render"
 import { texts } from "@/texts"
+import { findRole, queryRole, role } from "@/test/queries"
 
 // L'éditeur d'un article et d'un épisode (l'éditeur des contenus) : image mise en avant, catégories,
 // audio et sa durée, [D45] (ce qui manque pour publier) et [D46] (transcription conseillée). La
@@ -239,12 +240,12 @@ const outline = texts.editor.outline
 
 /** L'Article (ou l'Épisode), dans la colonne de droite (éditeur des contenus). */
 function articleTab(kind: "article" | "episode" = "article") {
-  return screen.getByRole("region", { name: columns.content[kind] })
+  return role("region", columns.content[kind])
 }
 
 /** Les Blocs, en glissière par-dessus le Plan (éditeur des contenus). */
 function blocksPanel() {
-  return screen.getByRole("region", { name: columns.blocks })
+  return role("region", columns.blocks)
 }
 
 /** Ouvre les Blocs par « Ajouter un bloc », en bas de la colonne de gauche. */
@@ -255,7 +256,7 @@ function openBlocks() {
 /** Choisit une option d'une liste (Base UI ne retient un clic que s'il commence sur l'option). */
 async function pick(list: HTMLElement, option: string) {
   fireEvent.click(list)
-  const choice = await screen.findByRole("option", { name: option })
+  const choice = await findRole("option", option)
   fireEvent.pointerDown(choice, { pointerType: "mouse" })
   fireEvent.click(choice)
   await waitFor(() => expect(screen.queryByRole("listbox")).toBeNull())
@@ -267,16 +268,12 @@ describe("éditeur d'un article (Blog)", () => {
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
     expect(
-      screen.getByRole("link", {
-        name: texts.editor.back(texts.sections.blog.title),
-      })
+      role("link", texts.editor.back(texts.sections.blog.title))
     ).toHaveAttribute("href", "/blog")
     // Colonne de gauche ouverte d'office, sur le plan, sans onglets ; les Blocs sont fermés.
-    expect(
-      screen.getByRole("navigation", { name: outline.title })
-    ).toBeVisible()
+    expect(role("navigation", outline.title)).toBeVisible()
     expect(screen.queryByRole("tablist")).toBeNull()
-    expect(screen.queryByRole("region", { name: columns.blocks })).toBeNull()
+    expect(queryRole("region", columns.blocks)).toBeNull()
     // Tout ce qui concerne l'article est à droite : pas de « Réglages » en haut. Sans bloc, le
     // téléphone et le plan n'ont qu'un bouton « Ajouter un bloc », comme le bas de la colonne de
     // gauche (avec le retour, au-dessus).
@@ -284,25 +281,24 @@ describe("éditeur d'un article (Blog)", () => {
     expect(
       screen.getAllByRole("button", { name: texts.editor.add.label })
     ).toHaveLength(3)
-    const left = screen.getByRole("complementary", { name: columns.left })
+    const left = role("complementary", columns.left)
     expect(
-      within(left).getByRole("link", {
-        name: texts.editor.back(texts.sections.blog.title),
-      })
+      role("link", texts.editor.back(texts.sections.blog.title), left)
     ).toBeVisible()
+    expect(role("heading", article.ready.title, articleTab())).toBeVisible()
     expect(
-      within(articleTab()).getByRole("heading", { name: article.ready.title })
-    ).toBeVisible()
-    expect(
-      within(articleTab()).getByRole("button", {
-        name: article.ready.todo(article.ready.items.cover),
-      })
+      role(
+        "button",
+        article.ready.todo(article.ready.items.cover),
+        articleTab()
+      )
     ).toBeVisible()
     // Les composants shadcn tels quels (ADMIN § 7) : « Prêt à publier ? » est une Card, « Publier »
     // et son menu un ButtonGroup.
-    expect(
-      within(articleTab()).getByRole("region", { name: article.ready.title })
-    ).toHaveAttribute("data-slot", "card")
+    expect(role("region", article.ready.title, articleTab())).toHaveAttribute(
+      "data-slot",
+      "card"
+    )
     expect(
       screen
         .getByRole("button", { name: texts.publication.actions.more })
@@ -324,9 +320,7 @@ describe("éditeur d'un article (Blog)", () => {
     const preview = document.querySelector<HTMLElement>(
       '[data-presentation="cover"]'
     )!
-    fireEvent.click(
-      within(preview).getByRole("button", { name: words.cover.choose })
-    )
+    fireEvent.click(role("button", words.cover.choose, preview))
     const dialog = await screen.findByRole("dialog")
     expect(mediaApi.listMedia).toHaveBeenCalledWith({
       kind: "image",
@@ -334,9 +328,7 @@ describe("éditeur d'un article (Blog)", () => {
       unused: false,
     })
     fireEvent.click(
-      await within(dialog).findByRole("button", {
-        name: texts.editor.picker.choose("plage.png"),
-      })
+      await findRole("button", texts.editor.picker.choose("plage.png"), dialog)
     )
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
     expect(
@@ -345,9 +337,11 @@ describe("éditeur d'un article (Blog)", () => {
       )
     ).toBeVisible()
     expect(
-      within(articleTab()).getByRole("button", {
-        name: article.ready.done(article.ready.items.cover),
-      })
+      role(
+        "button",
+        article.ready.done(article.ready.items.cover),
+        articleTab()
+      )
     ).toBeVisible()
 
     // La carte montre l'image et le titre, sans résumé.
@@ -366,27 +360,13 @@ describe("éditeur d'un article (Blog)", () => {
     )
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    fireEvent.click(
-      await within(articleTab()).findByRole("button", {
-        name: words.cover.remove,
-      })
-    )
+    fireEvent.click(await findRole("button", words.cover.remove, articleTab()))
     // « Retirer l'image » a disparu : le focus passe à la vignette, pour en choisir une.
-    expect(
-      within(articleTab()).getByRole("button", {
-        name: article.feed.chooseLabel,
-      })
-    ).toHaveFocus()
+    expect(role("button", article.feed.chooseLabel, articleTab())).toHaveFocus()
     const toast = await screen.findByText(words.cover.removed)
-    fireEvent.click(
-      within(toast.closest("li")!).getByRole("button", {
-        name: texts.common.undo,
-      })
-    )
+    fireEvent.click(role("button", texts.common.undo, toast.closest("li")!))
     expect(
-      await within(articleTab()).findByRole("button", {
-        name: article.feed.replaceLabel,
-      })
+      await findRole("button", article.feed.replaceLabel, articleTab())
     ).toBeVisible()
   })
 
@@ -402,24 +382,18 @@ describe("éditeur d'un article (Blog)", () => {
     const preview = document.querySelector<HTMLElement>(
       '[data-presentation="cover"]'
     )!
-    const choose = within(preview).getByRole("button", {
-      name: words.cover.choose,
-    })
+    const choose = role("button", words.cover.choose, preview)
     choose.focus()
     fireEvent.click(choose)
     const dialog = await screen.findByRole("dialog")
     fireEvent.click(
-      await within(dialog).findByRole("button", {
-        name: texts.editor.picker.choose("plage.png"),
-      })
+      await findRole("button", texts.editor.picker.choose("plage.png"), dialog)
     )
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
     await waitFor(() => expect(preview.querySelector("img")).not.toBeNull())
     await waitFor(() =>
       expect(
-        within(articleTab()).getByRole("button", {
-          name: article.feed.replaceLabel,
-        })
+        role("button", article.feed.replaceLabel, articleTab())
       ).toHaveFocus()
     )
   })
@@ -441,14 +415,10 @@ describe("éditeur d'un article (Blog)", () => {
     )
     await renderApp(`/blog/${ARTICLE}`)
     const title = await editable()
-    const right = screen.getByRole("complementary", {
-      name: columns.right.article,
-    })
+    const right = role("complementary", columns.right.article)
     // Pas d'onglets : en tête, le titre de l'article.
     expect(within(right).queryByRole("tablist")).toBeNull()
-    expect(
-      within(right).getByRole("heading", { name: "Bien dormir" })
-    ).toBeVisible()
+    expect(role("heading", "Bien dormir", right)).toBeVisible()
     const choose = () =>
       fireEvent.pointerDown(
         document.querySelector<HTMLElement>(`[data-block-id="${BLOCK}"]`)!
@@ -460,49 +430,31 @@ describe("éditeur d'un article (Blog)", () => {
     )
     // L'Article reste dessous, hors du clavier ; « Publier » reste visible en bas.
     expect(articleTab()).toHaveAttribute("inert")
+    expect(role("heading", "Image", panel())).toBeVisible()
     expect(
-      within(panel()).getByRole("heading", { name: "Image" })
-    ).toBeVisible()
-    expect(
-      within(right).getByRole("button", {
-        name: texts.publication.actions.publish,
-      })
+      role("button", texts.publication.actions.publish, right)
     ).toBeVisible()
 
     // × : plus de bloc choisi, le focus au titre de la colonne.
-    fireEvent.click(
-      within(panel()).getByRole("button", { name: texts.common.close })
-    )
-    expect(
-      screen.queryByRole("button", { name: texts.common.close })
-    ).toBeNull()
+    fireEvent.click(role("button", texts.common.close, panel()))
+    expect(queryRole("button", texts.common.close)).toBeNull()
     expect(articleTab()).not.toHaveAttribute("inert")
     await waitFor(() =>
-      expect(
-        within(right).getByRole("heading", { name: "Bien dormir" })
-      ).toHaveFocus()
+      expect(role("heading", "Bien dormir", right)).toHaveFocus()
     )
 
     // Échap, depuis la glissière.
     choose()
-    const close = await within(panel()).findByRole("button", {
-      name: texts.common.close,
-    })
+    const close = await findRole("button", texts.common.close, panel())
     fireEvent.keyDown(close, { key: "Escape" })
-    expect(
-      screen.queryByRole("button", { name: texts.common.close })
-    ).toBeNull()
+    expect(queryRole("button", texts.common.close)).toBeNull()
 
     // Le titre (dans l'aperçu) revient aussi à l'Article.
     choose()
-    await within(panel()).findByRole("button", {
-      name: texts.common.close,
-    })
+    await findRole("button", texts.common.close, panel())
     fireEvent.focus(title)
     await waitFor(() =>
-      expect(
-        screen.queryByRole("button", { name: texts.common.close })
-      ).toBeNull()
+      expect(queryRole("button", texts.common.close)).toBeNull()
     )
   })
 
@@ -527,16 +479,12 @@ describe("éditeur d'un article (Blog)", () => {
       document.querySelector<HTMLElement>(`[data-block-id="${BLOCK}"]`)!
     )
     openBlocks()
-    await within(panel()).findByRole("button", {
-      name: texts.common.close,
-    })
+    await findRole("button", texts.common.close, panel())
     expect(blocksPanel()).toBeVisible()
     // Le fond autour du téléphone : le Plan, plus de bloc choisi.
     fireEvent.click(document.querySelector("main")!)
-    expect(screen.queryByRole("region", { name: columns.blocks })).toBeNull()
-    expect(
-      screen.queryByRole("button", { name: texts.common.close })
-    ).toBeNull()
+    expect(queryRole("region", columns.blocks)).toBeNull()
+    expect(queryRole("button", texts.common.close)).toBeNull()
   })
 
   it("l'aperçu : la Lecture montre l'article comme dans l'app, sans ses blocs pour une personne sans la formule", async () => {
@@ -578,15 +526,14 @@ describe("éditeur d'un article (Blog)", () => {
     )
     const { router } = await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    const tools = screen.getByRole("toolbar", { name: preview.tools })
-    expect(
-      screen.getByRole("toolbar", { name: texts.editor.toolbar.label })
-    ).toHaveAttribute("aria-orientation", "vertical")
-
-    fireEvent.click(
-      within(tools).getByRole("button", { name: preview.mode.read })
+    const tools = role("toolbar", preview.tools)
+    expect(role("toolbar", texts.editor.toolbar.label)).toHaveAttribute(
+      "aria-orientation",
+      "vertical"
     )
-    const phone = screen.getByRole("region", { name: preview.screen.ios })
+
+    fireEvent.click(role("button", preview.mode.read, tools))
+    const phone = role("region", preview.screen.ios)
     expect(
       within(phone).getByRole("heading", { level: 1, name: "Bien dormir" })
     ).toBeVisible()
@@ -599,25 +546,17 @@ describe("éditeur d'un article (Blog)", () => {
     ).toBeVisible()
 
     // Comme une personne sans la formule : l'app ne reçoit pas les blocs.
-    fireEvent.click(
-      within(tools).getByRole("button", { name: preview.reader.visitor })
-    )
+    fireEvent.click(role("button", preview.reader.visitor, tools))
     expect(
       await within(phone).findByText(preview.locked.text.article("Essentiel"))
     ).toBeVisible()
     expect(within(phone).queryByText("Respire lentement.")).toBeNull()
 
     // Sombre, Android, Grand texte : le téléphone change, l'article reste le même.
-    fireEvent.click(
-      within(tools).getByRole("button", { name: preview.theme.dark })
-    )
-    fireEvent.click(
-      within(tools).getByRole("button", { name: preview.device.android })
-    )
-    fireEvent.click(
-      within(tools).getByRole("button", { name: preview.largeText })
-    )
-    const android = screen.getByRole("region", { name: preview.screen.android })
+    fireEvent.click(role("button", preview.theme.dark, tools))
+    fireEvent.click(role("button", preview.device.android, tools))
+    fireEvent.click(role("button", preview.largeText, tools))
+    const android = role("region", preview.screen.android)
     expect(android).toHaveAttribute("data-blocks-theme", "dark")
     expect(android).toHaveAttribute("data-large-text")
 
@@ -632,16 +571,11 @@ describe("éditeur d'un article (Blog)", () => {
     )
 
     // Un bloc choisi dans le plan : on reste en Lecture, le téléphone défile jusqu'à lui.
-    fireEvent.click(
-      within(tools).getByRole("button", { name: preview.reader.subscriber })
-    )
+    fireEvent.click(role("button", preview.reader.subscriber, tools))
     const scroll = vi.mocked(Element.prototype.scrollIntoView)
     scroll.mockClear()
     fireEvent.click(
-      within(screen.getByRole("navigation", { name: outline.title })).getByRole(
-        "button",
-        { name: /^Aller à Texte/ }
-      )
+      role("button", /^Aller à Texte/, role("navigation", outline.title))
     )
     expect(scroll).toHaveBeenCalledWith({ block: "start", behavior: "smooth" })
     expect(scroll.mock.contexts[0]).toBe(
@@ -650,13 +584,9 @@ describe("éditeur d'un article (Blog)", () => {
     expect(screen.queryByLabelText(texts.editor.title.label)).toBeNull()
 
     // « Édition » : on écrit de nouveau, l'adresse garde le reste.
-    fireEvent.click(
-      within(tools).getByRole("button", { name: preview.mode.edit })
-    )
+    fireEvent.click(role("button", preview.mode.edit, tools))
     expect(await screen.findByLabelText(texts.editor.title.label)).toBeVisible()
-    expect(
-      within(tools).queryByRole("button", { name: preview.reader.visitor })
-    ).toBeNull()
+    expect(queryRole("button", preview.reader.visitor, tools)).toBeNull()
     expect(search()).toBe("device=android&text=large&theme=dark")
   })
 
@@ -700,7 +630,7 @@ describe("éditeur d'un article (Blog)", () => {
     )
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    const plan = screen.getByRole("navigation", { name: outline.title })
+    const plan = role("navigation", outline.title)
     // Le contenu plutôt que le type : « Texte « … » » reste le nom lu par les lecteurs d'écran.
     expect(within(plan).getByText("Les bons réflexes")).toBeVisible()
     // Ses autres intertitres n'apparaissent pas dans le plan.
@@ -708,9 +638,7 @@ describe("éditeur d'un article (Blog)", () => {
     expect(await within(plan).findByText("plage.png")).toBeVisible()
     // Le bloc partagé : son nom, sans pastille « Partagé » (« Bloc choisi » le dit, 03/10/2026).
     expect(
-      within(plan).getByRole("button", {
-        name: outline.select(texts.editor.blockLabel.linked(null)),
-      })
+      role("button", outline.select(texts.editor.blockLabel.linked(null)), plan)
     ).toBeVisible()
     expect(within(plan).queryByText("Partagé")).toBeNull()
     // Le modèle n'existe plus : écrit en clair.
@@ -737,7 +665,7 @@ describe("éditeur d'un article (Blog)", () => {
     )
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    const plan = screen.getByRole("navigation", { name: outline.title })
+    const plan = role("navigation", outline.title)
     expect(await within(plan).findByText("plage.png")).toBeVisible()
     expect(within(plan).queryByText(outline.warnings.noFile)).toBeNull()
     const image = document.querySelector('[data-block-type="image"]')!
@@ -770,12 +698,10 @@ describe("éditeur d'un article (Blog)", () => {
     )
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    const plan = screen.getByRole("navigation", { name: outline.title })
+    const plan = role("navigation", outline.title)
     // Les lignes du plan sont celles du menu (SidebarMenuButton de shadcn, QCM du 06/10/2026).
     expect(
-      within(plan).getByRole("button", {
-        name: outline.select(texts.editor.blockLabel.image),
-      })
+      role("button", outline.select(texts.editor.blockLabel.image), plan)
     ).toHaveAttribute("data-slot", "sidebar-menu-button")
     // Les blocs du premier niveau : la section (son image est comptée par elle).
     expect(within(plan).getByText(outline.count(1))).toBeVisible()
@@ -786,30 +712,24 @@ describe("éditeur d'un article (Blog)", () => {
     // Ce qui manque : une icône devant le libellé (le détail dans l'infobulle), qui décrit la
     // ligne ; le haut du plan ne compte que les blocs.
     expect(
-      within(plan).getByRole("button", {
-        name: outline.select(texts.editor.blockLabel.image),
-      })
+      role("button", outline.select(texts.editor.blockLabel.image), plan)
     ).toHaveAccessibleDescription(outline.warnings.noFile)
     expect(within(plan).queryByText(/point à vérifier/)).toBeNull()
     expect(within(plan).getByText(outline.box.fill)).toBeVisible()
 
     // L'encadré se replie : son image ne se voit plus dans le plan.
     const boxLabel = texts.editor.blockLabel.box(outline.box.fill, 1)
-    const imageRow = within(plan).getByRole("button", {
-      name: outline.select(texts.editor.blockLabel.image),
-    })
-    fireEvent.click(
-      within(plan).getByRole("button", { name: outline.collapse(boxLabel) })
+    const imageRow = role(
+      "button",
+      outline.select(texts.editor.blockLabel.image),
+      plan
     )
+    fireEvent.click(role("button", outline.collapse(boxLabel), plan))
     expect(imageRow).not.toBeInTheDocument()
-    fireEvent.click(
-      within(plan).getByRole("button", { name: outline.expand(boxLabel) })
-    )
+    fireEvent.click(role("button", outline.expand(boxLabel), plan))
 
     // Survoler une ligne du plan montre le bloc dans l'aperçu, et inversement.
-    const boxRow = within(plan).getByRole("button", {
-      name: outline.select(boxLabel),
-    })
+    const boxRow = role("button", outline.select(boxLabel), plan)
     const boxInPhone = document.querySelector(`[data-block-id="${BOX}"]`)!
     fireEvent.pointerEnter(boxRow.parentElement!)
     await waitFor(() => expect(boxInPhone).toHaveAttribute("data-hovered"))
@@ -818,20 +738,14 @@ describe("éditeur d'un article (Blog)", () => {
     fireEvent.pointerOver(document.querySelector(`[data-block-id="${IMAGE}"]`)!)
     await waitFor(() =>
       expect(
-        within(plan).getByRole("button", {
-          name: outline.select(texts.editor.blockLabel.image),
-        })
+        role("button", outline.select(texts.editor.blockLabel.image), plan)
       ).toHaveClass("bg-sidebar-accent/60")
     )
 
     // « … » : Enregistrer dans Mes blocs pour un bloc de premier niveau seulement.
-    fireEvent.click(
-      within(plan).getByRole("button", { name: outline.actions(boxLabel) })
-    )
+    fireEvent.click(role("button", outline.actions(boxLabel), plan))
     expect(
-      await screen.findByRole("menuitem", {
-        name: texts.templates.saveAs.action,
-      })
+      await findRole("menuitem", texts.templates.saveAs.action)
     ).toBeVisible()
     fireEvent.keyDown(document.activeElement!, { key: "Escape" })
     await waitFor(() => expect(screen.queryByRole("menu")).toBeNull())
@@ -856,11 +770,9 @@ describe("éditeur d'un article (Blog)", () => {
     )
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    const plan = screen.getByRole("navigation", { name: outline.title })
+    const plan = role("navigation", outline.title)
     fireEvent.click(
-      within(plan).getByRole("button", {
-        name: outline.select(texts.editor.blockLabel.image),
-      })
+      role("button", outline.select(texts.editor.blockLabel.image), plan)
     )
     await waitFor(() =>
       expect(scroll).toHaveBeenCalledWith({
@@ -888,15 +800,15 @@ describe("éditeur d'un article (Blog)", () => {
     )
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    const plan = screen.getByRole("navigation", { name: outline.title })
+    const plan = role("navigation", outline.title)
     fireEvent.click(
-      within(plan).getByRole("button", {
-        name: outline.select(texts.editor.blockLabel.box(outline.box.fill, 0)),
-      })
+      role(
+        "button",
+        outline.select(texts.editor.blockLabel.box(outline.box.fill, 0)),
+        plan
+      )
     )
-    const bar = await screen.findByRole("toolbar", {
-      name: texts.editor.settings.actions,
-    })
+    const bar = await findRole("toolbar", texts.editor.settings.actions)
     const names = within(bar)
       .getAllByRole("button")
       .map((button) => button.getAttribute("aria-label"))
@@ -943,23 +855,17 @@ describe("éditeur d'un article (Blog)", () => {
     )
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    const plan = screen.getByRole("navigation", { name: outline.title })
+    const plan = role("navigation", outline.title)
     const section = texts.editor.blockLabel.box(outline.box.border, 1)
-    fireEvent.click(
-      within(plan).getByRole("button", { name: outline.select(section) })
-    )
+    fireEvent.click(role("button", outline.select(section), plan))
     expect(
       await screen.findByText(texts.editor.settings.title(section))
     ).toBeVisible()
-    const bar = screen.getByRole("toolbar", {
-      name: texts.editor.settings.actions,
-    })
+    const bar = role("toolbar", texts.editor.settings.actions)
     expect(
-      within(bar).getByRole("button", { name: texts.templates.saveAs.action })
+      role("button", texts.templates.saveAs.action, bar)
     ).toBeInTheDocument()
-    fireEvent.click(
-      within(bar).getByRole("button", { name: outline.duplicate })
-    )
+    fireEvent.click(role("button", outline.duplicate, bar))
     await waitFor(() =>
       expect(within(plan).getByText(outline.count(2))).toBeVisible()
     )
@@ -981,7 +887,7 @@ describe("éditeur d'un article (Blog)", () => {
     )
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    const plan = screen.getByRole("navigation", { name: outline.title })
+    const plan = role("navigation", outline.title)
     const name = texts.editor.blockLabel.image
     // Une seule poignée pour ce bloc : celle du plan (le téléphone n'en a pas).
     const handles = screen.getAllByRole("button", {
@@ -995,10 +901,11 @@ describe("éditeur d'un article (Blog)", () => {
     vi.mocked(api.getContent).mockResolvedValue(contentOf(ARTICLE, "article"))
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    const left = screen.getByRole("complementary", { name: columns.left })
-    const button = screen.getByRole("button", {
-      name: new RegExp(`^${texts.editor.focusMode.label}`),
-    })
+    const left = role("complementary", columns.left)
+    const button = role(
+      "button",
+      new RegExp(`^${texts.editor.focusMode.label}`)
+    )
     expect(button).toHaveAttribute("aria-pressed", "false")
     // jsdom n'est pas un Mac : Ctrl + .
     fireEvent.keyDown(window, { key: ".", ctrlKey: true })
@@ -1013,13 +920,9 @@ describe("éditeur d'un article (Blog)", () => {
     vi.mocked(api.getContent).mockResolvedValue(contentOf(ARTICLE, "article"))
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    const tools = screen.getByRole("toolbar", { name: preview.tools })
-    fireEvent.click(
-      within(tools).getByRole("button", { name: preview.mode.read })
-    )
-    const toolbar = screen.getByRole("toolbar", {
-      name: texts.editor.toolbar.label,
-    })
+    const tools = role("toolbar", preview.tools)
+    fireEvent.click(role("button", preview.mode.read, tools))
+    const toolbar = role("toolbar", texts.editor.toolbar.label)
     expect(toolbar).toBeVisible()
     expect(toolbar.parentElement).not.toHaveClass("invisible")
     for (const button of within(toolbar).getAllByRole("button")) {
@@ -1045,7 +948,7 @@ describe("éditeur d'un article (Blog)", () => {
     vi.mocked(api.getContent).mockResolvedValue(contentOf(ARTICLE, "article"))
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    const tools = screen.getByRole("toolbar", { name: preview.tools })
+    const tools = role("toolbar", preview.tools)
     const layout = document.querySelector<HTMLElement>("[data-device]")!
     // Réduit dès l'Édition, sans pourcentage affiché (il soulèverait plus de questions).
     expect(layout.style.getPropertyValue("--blocks-device-scale")).toBe("0.4")
@@ -1056,9 +959,7 @@ describe("éditeur d'un article (Blog)", () => {
     )
 
     // En Lecture aussi, sans choix de taille.
-    fireEvent.click(
-      within(tools).getByRole("button", { name: preview.mode.read })
-    )
+    fireEvent.click(role("button", preview.mode.read, tools))
     expect(layout.style.getPropertyValue("--blocks-device-scale")).toBe("0.4")
     vi.unstubAllGlobals()
   })
@@ -1069,16 +970,12 @@ describe("éditeur d'un article (Blog)", () => {
     await editable()
     // Celui du téléphone (le plan vide a le même).
     fireEvent.click(
-      within(
-        screen.getByRole("region", { name: preview.screen.ios })
-      ).getByRole("button", { name: texts.editor.add.label })
+      role("button", texts.editor.add.label, role("region", preview.screen.ios))
     )
     expect(blocksPanel()).toBeVisible()
     await waitFor(() =>
       expect(
-        screen.getByRole("button", {
-          name: texts.editor.library.addLabel(texts.editor.blocks.text),
-        })
+        role("button", texts.editor.library.addLabel(texts.editor.blocks.text))
       ).toHaveFocus()
     )
     // Pas de bandeau : le bloc s'ajoutera à la fin.
@@ -1086,12 +983,8 @@ describe("éditeur d'un article (Blog)", () => {
     expect(screen.queryByRole("dialog")).toBeNull()
     // Le Plan, dessous, est hors du clavier ; × referme les Blocs, le focus va à « Ajouter un
     // bloc » en bas de la colonne.
-    fireEvent.click(
-      within(blocksPanel()).getByRole("button", {
-        name: texts.editor.library.close,
-      })
-    )
-    expect(screen.queryByRole("region", { name: columns.blocks })).toBeNull()
+    fireEvent.click(role("button", texts.editor.library.close, blocksPanel()))
+    expect(queryRole("region", columns.blocks)).toBeNull()
     await waitFor(() =>
       expect(document.getElementById("colonne-gauche-ajouter")).toHaveFocus()
     )
@@ -1112,9 +1005,7 @@ describe("éditeur d'un article (Blog)", () => {
       screen.getAllByRole("button", { name: texts.editor.add.inBox })
     ).toHaveLength(2)
     fireEvent.click(
-      within(
-        screen.getByRole("region", { name: preview.screen.ios })
-      ).getByRole("button", { name: texts.editor.add.inBox })
+      role("button", texts.editor.add.inBox, role("region", preview.screen.ios))
     )
     const library = blocksPanel()
     expect(
@@ -1123,20 +1014,22 @@ describe("éditeur d'un article (Blog)", () => {
     // La section est le bloc choisi : ses réglages sont à droite.
     expect(panel()).toHaveAccessibleName(texts.editor.settings.label)
     expect(
-      within(library).getByRole("button", {
-        name: texts.editor.library.addLabel(texts.editor.blocks.box),
-      })
+      role(
+        "button",
+        texts.editor.library.addLabel(texts.editor.blocks.box),
+        library
+      )
     ).toBeDisabled()
     expect(
-      within(library).getByRole("button", {
-        name: new RegExp(texts.editor.library.mine.title),
-      })
+      role("button", new RegExp(texts.editor.library.mine.title), library)
     ).toBeDisabled()
 
     fireEvent.click(
-      within(library).getByRole("button", {
-        name: texts.editor.library.addLabel(texts.editor.blocks.text),
-      })
+      role(
+        "button",
+        texts.editor.library.addLabel(texts.editor.blocks.text),
+        library
+      )
     )
     await waitFor(() => expect(api.saveDraft).toHaveBeenCalled(), {
       timeout: 4000,
@@ -1200,9 +1093,7 @@ describe("éditeur d'un article (Blog)", () => {
       category_ids: [SOMMEIL, STRESS].sort(),
     })
     expect(
-      within(tab).getByRole("button", {
-        name: article.ready.done(article.ready.items.access),
-      })
+      role("button", article.ready.done(article.ready.items.access), tab)
     ).toBeVisible()
   }, 10_000)
 
@@ -1265,35 +1156,39 @@ describe("éditeur d'un article (Blog)", () => {
     openBlocks()
     const library = blocksPanel()
     fireEvent.click(
-      within(library).getByRole("button", {
-        name: texts.editor.library.addLabel(texts.editor.blocks.text),
-      })
+      role(
+        "button",
+        texts.editor.library.addLabel(texts.editor.blocks.text),
+        library
+      )
     )
     // Le nouveau bloc est choisi : ses réglages glissent à droite.
-    expect(
-      await screen.findByRole("button", { name: texts.common.close })
-    ).toBeVisible()
+    expect(await findRole("button", texts.common.close)).toBeVisible()
     fireEvent.click(
-      await within(library).findByRole("button", {
-        name: new RegExp(texts.editor.library.mine.title),
-      })
+      await findRole(
+        "button",
+        new RegExp(texts.editor.library.mine.title),
+        library
+      )
     )
-    const mine = await within(library).findByRole("region", {
-      name: texts.editor.library.mine.title,
-    })
+    const mine = await findRole(
+      "region",
+      texts.editor.library.mine.title,
+      library
+    )
     expect(
       within(mine).getByLabelText(texts.editor.library.mine.searchLabel)
     ).toHaveFocus()
     // « Gérer dans Modèles de bloc » s'ouvre dans un nouvel onglet : l'éditeur reste ouvert.
     expect(
-      within(mine).getByRole("link", {
-        name: new RegExp(texts.editor.library.mine.manage),
-      })
+      role("link", new RegExp(texts.editor.library.mine.manage), mine)
     ).toHaveAttribute("target", "_blank")
     fireEvent.click(
-      await within(mine).findByRole("button", {
-        name: texts.editor.library.mine.insertLabel("À retenir"),
-      })
+      await findRole(
+        "button",
+        texts.editor.library.mine.insertLabel("À retenir"),
+        mine
+      )
     )
     expect(
       await screen.findByText(texts.editor.library.mine.added("À retenir"))
@@ -1333,15 +1228,11 @@ describe("éditeur d'un article (Blog)", () => {
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
     // L'historique s'ouvre depuis le menu de « Publier ».
+    fireEvent.click(role("button", texts.publication.actions.more))
     fireEvent.click(
-      screen.getByRole("button", { name: texts.publication.actions.more })
+      await findRole("menuitem", texts.publication.actions.history)
     )
-    fireEvent.click(
-      await screen.findByRole("menuitem", {
-        name: texts.publication.actions.history,
-      })
-    )
-    const list = await screen.findByRole("list", { name: history.title })
+    const list = await findRole("list", history.title)
     const [second, first] = within(list).getAllByRole("listitem")
     expect(
       await within(first).findByText(
@@ -1351,9 +1242,7 @@ describe("éditeur d'un article (Blog)", () => {
     expect(within(second).getByText(history.noCategory)).toBeVisible()
 
     // La confirmation dit ce qui sera remplacé pour un article : pas d'adresse.
-    fireEvent.click(
-      within(first).getByRole("button", { name: history.revertItem(1) })
-    )
+    fireEvent.click(role("button", history.revertItem(1), first))
     const confirm = await screen.findByRole("alertdialog")
     expect(confirm).toHaveTextContent(history.confirm.description("article"))
     expect(confirm).not.toHaveTextContent(/adresse/)
@@ -1365,31 +1254,19 @@ describe("éditeur d'un article (Blog)", () => {
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
 
-    fireEvent.click(
-      await screen.findByRole("button", {
-        name: texts.publication.actions.publish,
-      })
-    )
+    fireEvent.click(await findRole("button", texts.publication.actions.publish))
     const dialog = await screen.findByRole("dialog")
     expect(dialog).toHaveTextContent(requirements.publishTitle)
     expect(dialog).toHaveTextContent(requirements.cover)
     expect(
-      within(dialog).getByRole("button", {
-        name: texts.publication.publishDialog.confirm,
-      })
+      role("button", texts.publication.publishDialog.confirm, dialog)
     ).toBeDisabled()
 
     // « Choisir l'image » ouvre le choix, et la fenêtre de publication se ferme.
+    fireEvent.click(role("button", requirements.chooseCover, dialog))
+    const picker = await findRole("dialog", texts.editor.picker.title)
     fireEvent.click(
-      within(dialog).getByRole("button", { name: requirements.chooseCover })
-    )
-    const picker = await screen.findByRole("dialog", {
-      name: texts.editor.picker.title,
-    })
-    fireEvent.click(
-      await within(picker).findByRole("button", {
-        name: texts.editor.picker.choose("plage.png"),
-      })
+      await findRole("button", texts.editor.picker.choose("plage.png"), picker)
     )
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
 
@@ -1400,15 +1277,11 @@ describe("éditeur d'un article (Blog)", () => {
       publishedAt: "2026-09-27T12:32:00Z",
       needsFileSync: true,
     })
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.publication.actions.publish })
-    )
+    fireEvent.click(role("button", texts.publication.actions.publish))
     const again = await screen.findByRole("dialog")
     expect(again).not.toHaveTextContent(requirements.publishTitle)
     fireEvent.click(
-      within(again).getByRole("button", {
-        name: texts.publication.publishDialog.confirm,
-      })
+      role("button", texts.publication.publishDialog.confirm, again)
     )
     await waitFor(() =>
       expect(publicationApi.publishContent).toHaveBeenCalledWith(ARTICLE, 5)
@@ -1423,9 +1296,11 @@ describe("éditeur d'un article (Blog)", () => {
     )
     await renderApp(`/blog/${ARTICLE}`)
     const title = await editable()
-    const todo = within(articleTab()).getByRole("button", {
-      name: article.ready.todo(article.ready.items.title),
-    })
+    const todo = role(
+      "button",
+      article.ready.todo(article.ready.items.title),
+      articleTab()
+    )
     // Le niveau est déjà choisi : seuls le titre et l'image manquent.
     expect(within(articleTab()).getByText("1 / 3")).toBeVisible()
     fireEvent.click(todo)
@@ -1433,22 +1308,20 @@ describe("éditeur d'un article (Blog)", () => {
     // Le champ du titre s'allume : c'est là qu'il faut agir.
     expect(title).toHaveAttribute("data-highlight")
 
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.publication.actions.publish })
-    )
+    fireEvent.click(role("button", texts.publication.actions.publish))
     const dialog = await screen.findByRole("dialog")
     expect(dialog).toHaveTextContent(requirements.title)
-    fireEvent.click(
-      within(dialog).getByRole("button", { name: requirements.writeTitle })
-    )
+    fireEvent.click(role("button", requirements.writeTitle, dialog))
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
     await waitFor(() => expect(title).toHaveFocus())
 
     fireEvent.change(title, { target: { value: "Bien dormir" } })
     expect(
-      within(articleTab()).getByRole("button", {
-        name: article.ready.done(article.ready.items.title),
-      })
+      role(
+        "button",
+        article.ready.done(article.ready.items.title),
+        articleTab()
+      )
     ).toBeVisible()
   })
 
@@ -1461,14 +1334,10 @@ describe("éditeur d'un article (Blog)", () => {
     )
     await renderApp(`/blog/${ARTICLE}`)
     const title = await editable()
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.publication.actions.publish })
-    )
+    fireEvent.click(role("button", texts.publication.actions.publish))
     const dialog = await screen.findByRole("dialog")
     fireEvent.click(
-      within(dialog).getByRole("button", {
-        name: texts.publication.publishDialog.confirm,
-      })
+      role("button", texts.publication.publishDialog.confirm, dialog)
     )
     await waitFor(() => expect(title).toHaveFocus())
   })
@@ -1484,25 +1353,17 @@ describe("éditeur d'un article (Blog)", () => {
     )
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    fireEvent.click(
-      await screen.findByRole("button", {
-        name: texts.publication.actions.publish,
-      })
-    )
+    fireEvent.click(await findRole("button", texts.publication.actions.publish))
     const dialog = await screen.findByRole("dialog")
     fireEvent.click(
-      within(dialog).getByRole("button", {
-        name: texts.publication.publishDialog.confirm,
-      })
+      role("button", texts.publication.publishDialog.confirm, dialog)
     )
     expect(
       await screen.findByText(
         texts.editor.errors.image_de_presentation_manquante
       )
     ).toBeVisible()
-    expect(
-      await screen.findByRole("dialog", { name: texts.editor.picker.title })
-    ).toBeVisible()
+    expect(await findRole("dialog", texts.editor.picker.title)).toBeVisible()
   })
 
   it("un article ne s'ouvre pas dans l'éditeur des Podcasts", async () => {
@@ -1527,15 +1388,11 @@ describe("éditeur des contenus : en-têtes des colonnes et lecture seule", () =
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
     expect(screen.queryByRole("banner")).toBeNull()
-    const left = screen.getByRole("complementary", { name: columns.left })
+    const left = role("complementary", columns.left)
     expect(
-      within(left).getByRole("link", {
-        name: texts.editor.back(texts.sections.blog.title),
-      })
+      role("link", texts.editor.back(texts.sections.blog.title), left)
     ).toBeInTheDocument()
-    const right = screen.getByRole("complementary", {
-      name: columns.right.article,
-    })
+    const right = role("complementary", columns.right.article)
     expect(within(right).getByText(texts.editor.save.saved)).toBeInTheDocument()
     for (const name of [
       texts.publication.actions.publish,
@@ -1545,38 +1402,26 @@ describe("éditeur des contenus : en-têtes des colonnes et lecture seule", () =
     }
     // Historique est dans le menu de « Publier », pas à côté.
     expect(
-      within(right).queryByRole("button", {
-        name: texts.publication.actions.history,
-      })
+      queryRole("button", texts.publication.actions.history, right)
     ).toBeNull()
-    fireEvent.click(
-      within(right).getByRole("button", {
-        name: texts.publication.actions.more,
-      })
-    )
+    fireEvent.click(role("button", texts.publication.actions.more, right))
     expect(
-      await screen.findByRole("menuitem", {
-        name: texts.publication.actions.history,
-      })
+      await findRole("menuitem", texts.publication.actions.history)
     ).toBeVisible()
     // Concentration est dans la barre de l'aperçu, sous Édition et Lecture.
+    expect(queryRole("button", texts.editor.focusMode.label, right)).toBeNull()
     expect(
-      within(right).queryByRole("button", {
-        name: texts.editor.focusMode.label,
-      })
-    ).toBeNull()
-    expect(
-      within(
-        screen.getByRole("toolbar", { name: texts.editor.preview.tools })
-      ).getByRole("button", { name: texts.editor.focusMode.label })
+      role(
+        "button",
+        texts.editor.focusMode.label,
+        role("toolbar", texts.editor.preview.tools)
+      )
     ).toBeInTheDocument()
     expect(
       await within(right).findByText(texts.publication.status.draft)
     ).toBeInTheDocument()
     // Pas de cadenas quand on écrit.
-    expect(
-      within(right).queryByRole("button", { name: texts.editor.lock.button })
-    ).toBeNull()
+    expect(queryRole("button", texts.editor.lock.button, right)).toBeNull()
   })
 
   it("une programmation : « Programmé » à côté de « Publier », et son bandeau au-dessus du téléphone", async () => {
@@ -1594,9 +1439,7 @@ describe("éditeur des contenus : en-têtes des colonnes et lecture seule", () =
     })
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    const right = screen.getByRole("complementary", {
-      name: columns.right.article,
-    })
+    const right = role("complementary", columns.right.article)
     // Une pastille courte à côté de « Publier », la phrase entière pour les lecteurs d'écran (et
     // dans l'infobulle).
     const badge = await within(right).findByText(
@@ -1617,26 +1460,22 @@ describe("éditeur des contenus : en-têtes des colonnes et lecture seule", () =
     )
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    const right = screen.getByRole("complementary", {
-      name: columns.right.article,
-    })
-    const unknown = await within(right).findByRole("button", {
-      name: texts.publication.status.unknownHint,
-    })
+    const right = role("complementary", columns.right.article)
+    const unknown = await findRole(
+      "button",
+      texts.publication.status.unknownHint,
+      right
+    )
     expect(within(right).queryByText(texts.publication.short.draft)).toBeNull()
     expect(
-      within(right).getByRole("button", {
-        name: texts.publication.actions.publish,
-      })
+      role("button", texts.publication.actions.publish, right)
     ).toBeDisabled()
     fireEvent.click(unknown)
     expect(
       await within(right).findByText(texts.publication.short.draft)
     ).toBeInTheDocument()
     expect(
-      within(right).getByRole("button", {
-        name: texts.publication.actions.publish,
-      })
+      role("button", texts.publication.actions.publish, right)
     ).toBeEnabled()
   })
 
@@ -1645,9 +1484,7 @@ describe("éditeur des contenus : en-têtes des colonnes et lecture seule", () =
     vi.mocked(api.lockTake).mockResolvedValueOnce(claire)
     vi.mocked(api.lockStatus).mockResolvedValue(claire)
     await renderApp(`/blog/${ARTICLE}`)
-    const lock = await screen.findByRole("button", {
-      name: texts.editor.lock.button,
-    })
+    const lock = await findRole("button", texts.editor.lock.button)
     expect(screen.queryByRole("alertdialog")).toBeNull()
 
     fireEvent.click(lock)
@@ -1663,9 +1500,7 @@ describe("éditeur des contenus : en-têtes des colonnes et lecture seule", () =
     expect(buttons.at(-1)).toHaveTextContent(dialog.stay)
 
     vi.mocked(api.lockStatus).mockResolvedValue(mine)
-    fireEvent.click(
-      within(window).getByRole("button", { name: dialog.take.readOnly })
-    )
+    fireEvent.click(role("button", dialog.take.readOnly, window))
     await waitFor(() =>
       expect(api.lockTake).toHaveBeenLastCalledWith(
         ARTICLE,
@@ -1674,9 +1509,7 @@ describe("éditeur des contenus : en-têtes des colonnes et lecture seule", () =
       )
     )
     await editable()
-    expect(
-      screen.queryByRole("button", { name: texts.editor.lock.button })
-    ).toBeNull()
+    expect(queryRole("button", texts.editor.lock.button)).toBeNull()
   })
 
   it("perdre la main ouvre la fenêtre une fois ; Échap y laisse le cadenas, qui la rouvre", async () => {
@@ -1703,14 +1536,12 @@ describe("éditeur des contenus : en-têtes des colonnes et lecture seule", () =
     expect(
       await within(window).findByText(dialog.title.lost("Claire Martin"))
     ).toBeInTheDocument()
-    expect(
-      within(window).getByRole("button", { name: dialog.take.lost })
-    ).toBeInTheDocument()
+    expect(role("button", dialog.take.lost, window)).toBeInTheDocument()
 
     fireEvent.keyDown(window, { key: "Escape" })
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
     // Elle ne se rouvre pas d'elle-même ; le cadenas la rouvre.
-    const lock = screen.getByRole("button", { name: texts.editor.lock.button })
+    const lock = role("button", texts.editor.lock.button)
     fireEvent.click(lock)
     expect(await screen.findByRole("alertdialog")).toBeInTheDocument()
   })
@@ -1719,44 +1550,29 @@ describe("éditeur des contenus : en-têtes des colonnes et lecture seule", () =
     vi.mocked(api.getContent).mockResolvedValue(contentOf(ARTICLE, "article"))
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    expect(
-      screen.queryByRole("button", { name: texts.editor.focusMode.exit })
-    ).toBeNull()
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.editor.focusMode.label })
-    )
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.editor.focusMode.exit })
-    )
-    expect(
-      screen.getByRole("complementary", { name: columns.left })
-    ).not.toHaveClass("hidden")
+    expect(queryRole("button", texts.editor.focusMode.exit)).toBeNull()
+    fireEvent.click(role("button", texts.editor.focusMode.label))
+    fireEvent.click(role("button", texts.editor.focusMode.exit))
+    expect(role("complementary", columns.left)).not.toHaveClass("hidden")
   })
 })
 
 describe("éditeur d'un épisode (Podcasts, dans l'éditeur des contenus)", () => {
   const episodeTab = () => articleTab("episode")
-  const audioCard = () =>
-    within(episodeTab()).getByRole("region", { name: words.audio.label })
+  const audioCard = () => role("region", words.audio.label, episodeTab())
 
   it("s'ouvre à /podcasts/<id> avec le plan à gauche et l'Épisode à droite, sa carte Audio", async () => {
     vi.mocked(api.getContent).mockResolvedValue(contentOf(EPISODE, "episode"))
     await renderApp(`/podcasts/${EPISODE}`)
     await editable()
-    const left = screen.getByRole("complementary", { name: columns.left })
+    const left = role("complementary", columns.left)
     expect(
-      within(left).getByRole("link", {
-        name: texts.editor.back(texts.sections.podcasts.title),
-      })
+      role("link", texts.editor.back(texts.sections.podcasts.title), left)
     ).toHaveAttribute("href", "/podcasts")
-    expect(
-      screen.getByRole("navigation", { name: outline.title })
-    ).toBeVisible()
+    expect(role("navigation", outline.title)).toBeVisible()
     // Pas de barre du haut : tout est dans la colonne de droite.
     expect(document.querySelector("header")).toBeNull()
-    const right = screen.getByRole("complementary", {
-      name: columns.right.episode,
-    })
+    const right = role("complementary", columns.right.episode)
     expect(
       within(right).getByRole("heading", { level: 2, name: "Entretien" })
     ).toBeVisible()
@@ -1769,11 +1585,7 @@ describe("éditeur d'un épisode (Podcasts, dans l'éditeur des contenus)", () =
       article.ready.todo(article.ready.items.cover),
       article.ready.todo(article.ready.items.audio),
     ])
-    expect(
-      within(episodeTab()).getByRole("region", {
-        name: article.feed.title,
-      })
-    ).toBeVisible()
+    expect(role("region", article.feed.title, episodeTab())).toBeVisible()
     expect(within(audioCard()).getByText(words.audio.none)).toBeVisible()
     expect(categoriesApi.listCategories).toHaveBeenCalledWith("podcasts")
     // En bas : pas encore d'audio, à la place du temps de lecture.
@@ -1792,20 +1604,18 @@ describe("éditeur d'un épisode (Podcasts, dans l'éditeur des contenus)", () =
     await renderApp(`/podcasts/${EPISODE}`)
     await editable()
 
-    fireEvent.click(
-      within(audioCard()).getByRole("button", { name: words.audio.choose })
-    )
-    const dialog = await screen.findByRole("dialog", {
-      name: texts.editor.audioPicker.title,
-    })
+    fireEvent.click(role("button", words.audio.choose, audioCard()))
+    const dialog = await findRole("dialog", texts.editor.audioPicker.title)
     expect(mediaApi.listMedia).toHaveBeenCalledWith({
       kind: "audio",
       search: "",
       unused: false,
     })
-    const choice = await within(dialog).findByRole("button", {
-      name: texts.editor.audioPicker.choose("entretien.mp3"),
-    })
+    const choice = await findRole(
+      "button",
+      texts.editor.audioPicker.choose("entretien.mp3"),
+      dialog
+    )
     expect(choice).toHaveTextContent("3 min 05 s")
     expect(choice).toHaveTextContent(texts.editor.audioPicker.noTranscript)
     fireEvent.click(choice)
@@ -1817,9 +1627,7 @@ describe("éditeur d'un épisode (Podcasts, dans l'éditeur des contenus)", () =
       within(audioCard()).getByText(words.audio.duration("3 min 05 s"))
     ).toBeVisible()
     await waitFor(() =>
-      expect(
-        within(audioCard()).getByRole("button", { name: words.audio.replace })
-      ).toHaveFocus()
+      expect(role("button", words.audio.replace, audioCard())).toHaveFocus()
     )
     // En bas de la colonne, la durée de l'audio.
     expect(screen.getByText(/^3 min 05 s · \d+ mots?$/)).toBeVisible()
@@ -1828,9 +1636,11 @@ describe("éditeur d'un épisode (Podcasts, dans l'éditeur des contenus)", () =
       '[data-presentation="audio"]'
     )!
     expect(
-      await within(phoneAudio).findByRole("button", {
-        name: texts.audioPlayer.play("entretien.mp3"),
-      })
+      await findRole(
+        "button",
+        texts.audioPlayer.play("entretien.mp3"),
+        phoneAudio
+      )
     ).toBeVisible()
     expect(phoneAudio.querySelector('[data-warning="transcript"]')).toBeNull()
     await waitFor(() => expect(api.saveDraft).toHaveBeenCalled(), {
@@ -1848,14 +1658,14 @@ describe("éditeur d'un épisode (Podcasts, dans l'éditeur des contenus)", () =
     await renderApp(`/podcasts/${EPISODE}`)
     await editable()
     fireEvent.click(
-      within(episodeTab()).getByRole("button", {
-        name: article.ready.todo(article.ready.items.audio),
-      })
+      role(
+        "button",
+        article.ready.todo(article.ready.items.audio),
+        episodeTab()
+      )
     )
     expect(
-      await screen.findByRole("dialog", {
-        name: texts.editor.audioPicker.title,
-      })
+      await findRole("dialog", texts.editor.audioPicker.title)
     ).toBeVisible()
   })
 
@@ -1868,22 +1678,12 @@ describe("éditeur d'un épisode (Podcasts, dans l'éditeur des contenus)", () =
     )
     await renderApp(`/podcasts/${EPISODE}`)
     await editable()
-    fireEvent.click(
-      await within(audioCard()).findByRole("button", {
-        name: words.audio.remove,
-      })
-    )
+    fireEvent.click(await findRole("button", words.audio.remove, audioCard()))
     await waitFor(() =>
-      expect(
-        within(audioCard()).getByRole("button", { name: words.audio.choose })
-      ).toHaveFocus()
+      expect(role("button", words.audio.choose, audioCard())).toHaveFocus()
     )
     const toast = await screen.findByText(words.audio.removed)
-    fireEvent.click(
-      within(toast.closest("li")!).getByRole("button", {
-        name: texts.common.undo,
-      })
-    )
+    fireEvent.click(role("button", texts.common.undo, toast.closest("li")!))
     expect(await within(audioCard()).findByText("entretien.mp3")).toBeVisible()
   })
 
@@ -1900,23 +1700,21 @@ describe("éditeur d'un épisode (Podcasts, dans l'éditeur des contenus)", () =
     const warnings = await screen.findAllByText(words.audio.transcriptMissing)
     expect(warnings).toHaveLength(1)
     expect(audioCard()).toContainElement(warnings[0])
-    const link = within(audioCard()).getByRole("link", {
-      name: `${words.openInLibrary} ${words.openFileHint}`,
-    })
+    const link = role(
+      "link",
+      `${words.openInLibrary} ${words.openFileHint}`,
+      audioCard()
+    )
     expect(link).toHaveAttribute("href", `/media?file=${SON}`)
     expect(link).toHaveAttribute("target", "_blank")
 
     // Conseillée, pas obligatoire : « Publier » reste possible, avec le conseil.
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.publication.actions.publish })
-    )
+    fireEvent.click(role("button", texts.publication.actions.publish))
     const dialog = await screen.findByRole("dialog")
     expect(dialog).toHaveTextContent(requirements.transcript)
     expect(dialog).not.toHaveTextContent(requirements.publishTitle)
     expect(
-      within(dialog).getByRole("button", {
-        name: texts.publication.publishDialog.confirm,
-      })
+      role("button", texts.publication.publishDialog.confirm, dialog)
     ).toBeEnabled()
   })
 
@@ -1953,13 +1751,13 @@ describe("éditeur d'un épisode (Podcasts, dans l'éditeur des contenus)", () =
       await within(audioCard()).findByText(words.audio.missing)
     ).toBeVisible()
     expect(
-      within(episodeTab()).getByRole("button", {
-        name: article.ready.todo(article.ready.items.audio),
-      })
+      role(
+        "button",
+        article.ready.todo(article.ready.items.audio),
+        episodeTab()
+      )
     ).toBeVisible()
-    expect(
-      within(audioCard()).getByRole("button", { name: words.audio.replace })
-    ).toBeVisible()
+    expect(role("button", words.audio.replace, audioCard())).toBeVisible()
   })
 
   it("en Lecture : le lecteur sous le titre et la durée de l'audio ; réservé, ni audio ni blocs", async () => {
@@ -1977,29 +1775,21 @@ describe("éditeur d'un épisode (Podcasts, dans l'éditeur des contenus)", () =
     )
     await renderApp(`/podcasts/${EPISODE}`)
     await editable()
-    const tools = screen.getByRole("toolbar", { name: preview.tools })
-    fireEvent.click(
-      within(tools).getByRole("button", { name: preview.mode.read })
-    )
-    const phone = screen.getByRole("region", { name: preview.screen.ios })
+    const tools = role("toolbar", preview.tools)
+    fireEvent.click(role("button", preview.mode.read, tools))
+    const phone = role("region", preview.screen.ios)
     expect(await within(phone).findByText("3 min 05 s")).toBeVisible()
     expect(
-      await within(phone).findByRole("button", {
-        name: texts.audioPlayer.play("entretien.mp3"),
-      })
+      await findRole("button", texts.audioPlayer.play("entretien.mp3"), phone)
     ).toBeVisible()
 
     // Comme une personne sans la formule : l'app ne reçoit pas l'audio.
-    fireEvent.click(
-      within(tools).getByRole("button", { name: preview.reader.visitor })
-    )
+    fireEvent.click(role("button", preview.reader.visitor, tools))
     expect(
       await within(phone).findByText(preview.locked.text.episode("Essentiel"))
     ).toBeVisible()
     expect(
-      within(phone).queryByRole("button", {
-        name: texts.audioPlayer.play("entretien.mp3"),
-      })
+      queryRole("button", texts.audioPlayer.play("entretien.mp3"), phone)
     ).toBeNull()
   })
 
@@ -2008,36 +1798,22 @@ describe("éditeur d'un épisode (Podcasts, dans l'éditeur des contenus)", () =
     await renderApp(`/podcasts/${EPISODE}`)
     await editable()
 
-    fireEvent.click(
-      await screen.findByRole("button", {
-        name: texts.publication.actions.publish,
-      })
-    )
+    fireEvent.click(await findRole("button", texts.publication.actions.publish))
     const dialog = await screen.findByRole("dialog")
     expect(dialog).toHaveTextContent(requirements.cover)
     expect(dialog).toHaveTextContent(requirements.audio)
-    expect(
-      within(dialog).getByRole("button", { name: requirements.chooseAudio })
-    ).toBeVisible()
-    fireEvent.click(
-      within(dialog).getByRole("button", { name: texts.common.cancel })
-    )
+    expect(role("button", requirements.chooseAudio, dialog)).toBeVisible()
+    fireEvent.click(role("button", texts.common.cancel, dialog))
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
 
+    fireEvent.click(role("button", texts.publication.actions.more))
     fireEvent.click(
-      screen.getByRole("button", { name: texts.publication.actions.more })
-    )
-    fireEvent.click(
-      await screen.findByRole("menuitem", {
-        name: texts.publication.actions.schedule,
-      })
+      await findRole("menuitem", texts.publication.actions.schedule)
     )
     const schedule = await screen.findByRole("dialog")
     expect(schedule).toHaveTextContent(requirements.scheduleTitle)
     expect(
-      within(schedule).getByRole("button", {
-        name: texts.publication.scheduleDialog.confirm,
-      })
+      role("button", texts.publication.scheduleDialog.confirm, schedule)
     ).toBeDisabled()
   })
 
@@ -2054,19 +1830,13 @@ describe("éditeur d'un épisode (Podcasts, dans l'éditeur des contenus)", () =
     await renderApp(`/podcasts/${EPISODE}`)
     await editable()
     await within(audioCard()).findByText("entretien.mp3")
-    fireEvent.click(
-      screen.getByRole("button", { name: texts.publication.actions.publish })
-    )
+    fireEvent.click(role("button", texts.publication.actions.publish))
     const dialog = await screen.findByRole("dialog")
     fireEvent.click(
-      within(dialog).getByRole("button", {
-        name: texts.publication.publishDialog.confirm,
-      })
+      role("button", texts.publication.publishDialog.confirm, dialog)
     )
     expect(
-      await screen.findByRole("dialog", {
-        name: texts.editor.audioPicker.title,
-      })
+      await findRole("dialog", texts.editor.audioPicker.title)
     ).toBeVisible()
   })
 })
@@ -2138,27 +1908,19 @@ describe("éditeur des contenus : le builder relu sur un article complet (03/10/
 
   /** Choisit une ligne du plan d'après le nom du bloc. */
   function choose(label: string) {
-    const plan = screen.getByRole("navigation", { name: outline.title })
-    fireEvent.click(
-      within(plan).getByRole("button", { name: outline.select(label) })
-    )
+    const plan = role("navigation", outline.title)
+    fireEvent.click(role("button", outline.select(label), plan))
   }
 
   it("la barre de mise en forme suit le bloc choisi : grisée pour une image ou un bloc partagé", async () => {
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    const toolbar = screen.getByRole("toolbar", {
-      name: texts.editor.toolbar.label,
-    })
-    const h3 = within(toolbar).getByRole("button", {
-      name: texts.editor.toolbar.h3,
-    })
+    const toolbar = role("toolbar", texts.editor.toolbar.label)
+    const h3 = role("button", texts.editor.toolbar.h3, toolbar)
     choose(texts.editor.blockLabel.text("Trois gestes"))
     await waitFor(() => expect(h3).toHaveAttribute("aria-pressed", "true"))
     // Sans mots sélectionnés, « Lien » n'aurait rien sur quoi se poser.
-    expect(
-      within(toolbar).getByRole("button", { name: texts.editor.toolbar.link })
-    ).toBeDisabled()
+    expect(role("button", texts.editor.toolbar.link, toolbar)).toBeDisabled()
     choose(texts.editor.blockLabel.image)
     await waitFor(() => expect(h3).toBeDisabled())
     choose(texts.editor.blockLabel.linked("Besoin d'aide ?"))
@@ -2168,15 +1930,11 @@ describe("éditeur des contenus : le builder relu sur un article complet (03/10/
   it("une section vide est signalée dans le plan et dans « Prêt à publier ? », qui y mène", async () => {
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    const plan = screen.getByRole("navigation", { name: outline.title })
+    const plan = role("navigation", outline.title)
     expect(within(plan).getByText(outline.warnings.emptyBox)).toBeVisible()
     // Les blocs du premier niveau seulement.
     expect(within(plan).getByText(outline.count(5))).toBeVisible()
-    fireEvent.click(
-      within(articleTab()).getByRole("button", {
-        name: article.ready.warnings(1),
-      })
-    )
+    fireEvent.click(role("button", article.ready.warnings(1), articleTab()))
     expect(
       await screen.findByText(
         texts.editor.settings.title(
@@ -2187,11 +1945,11 @@ describe("éditeur des contenus : le builder relu sur un article complet (03/10/
     // Sa ligne s'allume dans le plan.
     await waitFor(() =>
       expect(
-        within(plan).getByRole("button", {
-          name: outline.select(
-            texts.editor.blockLabel.box(outline.box.fill, 0)
-          ),
-        })
+        role(
+          "button",
+          outline.select(texts.editor.blockLabel.box(outline.box.fill, 0)),
+          plan
+        )
       ).toHaveAttribute("data-highlight")
     )
   })
@@ -2200,13 +1958,13 @@ describe("éditeur des contenus : le builder relu sur un article complet (03/10/
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
     fireEvent.click(
-      within(articleTab()).getByRole("button", {
-        name: article.ready.todo(article.ready.items.cover),
-      })
+      role(
+        "button",
+        article.ready.todo(article.ready.items.cover),
+        articleTab()
+      )
     )
-    const card = within(articleTab()).getByRole("region", {
-      name: article.feed.title,
-    })
+    const card = role("region", article.feed.title, articleTab())
     expect(card).toHaveAttribute("data-highlight")
     await waitFor(() =>
       expect(document.getElementById("article-image")).toHaveFocus()
@@ -2216,13 +1974,9 @@ describe("éditeur des contenus : le builder relu sur un article complet (03/10/
   it("colonne de droite : le titre en tête, et en bas la lecture, l'état et « Publier » ; l'image a son icône Info", async () => {
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    const right = screen.getByRole("complementary", {
-      name: columns.right.article,
-    })
+    const right = role("complementary", columns.right.article)
     // « Publier » et l'état sont après l'Article : dans la section du bas.
-    const publish = within(right).getByRole("button", {
-      name: texts.publication.actions.publish,
-    })
+    const publish = role("button", texts.publication.actions.publish, right)
     expect(
       articleTab().compareDocumentPosition(publish) &
         Node.DOCUMENT_POSITION_FOLLOWING
@@ -2238,9 +1992,7 @@ describe("éditeur des contenus : le builder relu sur un article complet (03/10/
 
     // La phrase de l'image est dans l'infobulle de l'icône Info.
     expect(
-      within(articleTab()).getByRole("button", {
-        name: article.feed.hint.article,
-      })
+      role("button", article.feed.hint.article, articleTab())
     ).toBeVisible()
     // Plus de résumé, donc plus de glissière.
     expect(within(articleTab()).queryByRole("meter")).toBeNull()
@@ -2249,7 +2001,7 @@ describe("éditeur des contenus : le builder relu sur un article complet (03/10/
   it("un texte se résume par sa première ligne, dans le plan comme dans « Bloc choisi »", async () => {
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    const plan = screen.getByRole("navigation", { name: outline.title })
+    const plan = role("navigation", outline.title)
     expect(within(plan).getByText("Astuce")).toBeVisible()
     expect(within(plan).queryByText(/Astuce Prépare/)).toBeNull()
     choose(texts.editor.blockLabel.text("Astuce"))
@@ -2264,14 +2016,8 @@ describe("éditeur des contenus : le builder relu sur un article complet (03/10/
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
     choose(texts.editor.blockLabel.text("Astuce"))
-    const bar = await screen.findByRole("toolbar", {
-      name: texts.editor.settings.actions,
-    })
-    fireEvent.click(
-      within(bar).getByRole("button", {
-        name: texts.editor.settings.moveUpOut,
-      })
-    )
+    const bar = await findRole("toolbar", texts.editor.settings.actions)
+    fireEvent.click(role("button", texts.editor.settings.moveUpOut, bar))
     // Sorti, juste au-dessus de la section : 3e bloc de la page sur 6.
     expect(
       await screen.findByText(
@@ -2279,14 +2025,10 @@ describe("éditeur des contenus : le builder relu sur un article complet (03/10/
       )
     ).toBeInTheDocument()
 
-    const plan = screen.getByRole("navigation", { name: outline.title })
+    const plan = role("navigation", outline.title)
     const label = texts.editor.blockLabel.text("Une question ?")
-    fireEvent.click(
-      within(plan).getByRole("button", { name: outline.actions(label) })
-    )
-    fireEvent.click(
-      await screen.findByRole("menuitem", { name: outline.leaveBox })
-    )
+    fireEvent.click(role("button", outline.actions(label), plan))
+    fireEvent.click(await findRole("menuitem", outline.leaveBox))
     expect(await screen.findByText(outline.left(label))).toBeInTheDocument()
     expect(within(plan).getByText(outline.count(7))).toBeVisible()
   })
@@ -2329,13 +2071,17 @@ describe("éditeur des contenus : le builder relu sur un article complet (03/10/
     openBlocks()
     const library = blocksPanel()
     fireEvent.click(
-      await within(library).findByRole("button", {
-        name: new RegExp(texts.editor.library.mine.title),
-      })
+      await findRole(
+        "button",
+        new RegExp(texts.editor.library.mine.title),
+        library
+      )
     )
-    const mine = await within(library).findByRole("region", {
-      name: texts.editor.library.mine.title,
-    })
+    const mine = await findRole(
+      "region",
+      texts.editor.library.mine.title,
+      library
+    )
     await waitFor(() =>
       expect(mine.querySelector('img[src="blob:plage"]')).not.toBeNull()
     )
@@ -2346,9 +2092,10 @@ describe("éditeur des contenus : le builder relu sur un article complet (03/10/
     await editable()
     choose(texts.editor.blockLabel.image)
     // Le lien dit aussi qu'il ouvre un nouvel onglet (lecteurs d'écran).
-    const link = await screen.findByRole("link", {
-      name: `${words.openInLibrary} ${words.openFileHint}`,
-    })
+    const link = await findRole(
+      "link",
+      `${words.openInLibrary} ${words.openFileHint}`
+    )
     expect(link).toHaveAttribute("href", `/media?file=${PLAGE}`)
     expect(link).toHaveAttribute("target", "_blank")
   })
@@ -2360,24 +2107,19 @@ describe("éditeur des contenus : le builder relu sur un article complet (03/10/
     await editable()
     // Le bloc du modèle s'affiche, sans barre au-dessus.
     expect(await screen.findByText("Écris-nous.")).toBeInTheDocument()
-    expect(
-      screen.queryByRole("button", { name: linked.detachLabel(name) })
-    ).toBeNull()
+    expect(queryRole("button", linked.detachLabel(name))).toBeNull()
 
     choose(texts.editor.blockLabel.linked(name))
     expect(await screen.findByText(linked.settings(name))).toBeVisible()
     expect(screen.getByText(linked.detachHint)).toBeVisible()
-    const bar = screen.getByRole("toolbar", {
-      name: texts.editor.settings.actions,
-    })
-    expect(
-      within(bar).getByRole("link", { name: linked.editLabel(name) })
-    ).toHaveAttribute("href", `/templates/${TEMPLATE}`)
+    const bar = role("toolbar", texts.editor.settings.actions)
+    expect(role("link", linked.editLabel(name), bar)).toHaveAttribute(
+      "href",
+      `/templates/${TEMPLATE}`
+    )
     // Des icônes seules, leur nom dans l'infobulle.
     expect(bar.textContent).toBe("")
-    fireEvent.click(
-      within(bar).getByRole("button", { name: linked.detachLabel(name) })
-    )
+    fireEvent.click(role("button", linked.detachLabel(name), bar))
     expect(await screen.findByText(linked.detached(name))).toBeInTheDocument()
     // Le bouton « Détacher » a disparu : le focus va à la ligne du bloc dans le plan.
     await waitFor(() =>
@@ -2403,12 +2145,8 @@ describe("éditeur des contenus : le builder relu sur un article complet (03/10/
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
     choose(texts.editor.blockLabel.image)
-    const bar = await screen.findByRole("toolbar", {
-      name: texts.editor.settings.actions,
-    })
-    fireEvent.click(
-      within(bar).getByRole("button", { name: texts.editor.settings.remove })
-    )
+    const bar = await findRole("toolbar", texts.editor.settings.actions)
+    fireEvent.click(role("button", texts.editor.settings.remove, bar))
     // L'aperçu des contenus n'a pas de poignée : c'est la ligne du plan du bloc suivant.
     await waitFor(() =>
       expect(document.activeElement).toBe(
@@ -2416,14 +2154,10 @@ describe("éditeur des contenus : le builder relu sur un article complet (03/10/
       )
     )
 
-    const plan = screen.getByRole("navigation", { name: outline.title })
+    const plan = role("navigation", outline.title)
     const label = texts.editor.blockLabel.text("Astuce")
-    fireEvent.click(
-      within(plan).getByRole("button", { name: outline.actions(label) })
-    )
-    fireEvent.click(
-      await screen.findByRole("menuitem", { name: outline.remove })
-    )
+    fireEvent.click(role("button", outline.actions(label), plan))
+    fireEvent.click(await findRole("menuitem", outline.remove))
     await waitFor(() =>
       expect(document.activeElement).toBe(
         document.querySelector(`[data-outline-id="${LAST}"]`)
@@ -2452,13 +2186,11 @@ describe("éditeur des contenus : une adresse d'aperçu qui ne vient pas", () =>
     )
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    const phone = screen.getByRole("region", { name: preview.screen.ios })
+    const phone = role("region", preview.screen.ios)
     expect(
       await within(phone).findByText(texts.editor.image.loadFailed)
     ).toBeVisible()
-    fireEvent.click(
-      within(phone).getByRole("button", { name: texts.common.retry })
-    )
+    fireEvent.click(role("button", texts.common.retry, phone))
     await waitFor(() =>
       expect(
         within(phone).queryByText(texts.editor.image.loadFailed)
@@ -2514,18 +2246,12 @@ describe("éditeur des contenus : le dernier bloc supprimé", () => {
     )
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
-    const plan = screen.getByRole("navigation", { name: outline.title })
+    const plan = role("navigation", outline.title)
     fireEvent.click(
-      within(plan).getByRole("button", {
-        name: outline.select(texts.editor.blockLabel.image),
-      })
+      role("button", outline.select(texts.editor.blockLabel.image), plan)
     )
-    const bar = await screen.findByRole("toolbar", {
-      name: texts.editor.settings.actions,
-    })
-    fireEvent.click(
-      within(bar).getByRole("button", { name: texts.editor.settings.remove })
-    )
+    const bar = await findRole("toolbar", texts.editor.settings.actions)
+    fireEvent.click(role("button", texts.editor.settings.remove, bar))
     await waitFor(() =>
       expect(document.activeElement).toBe(
         document.getElementById("colonne-gauche-ajouter")
@@ -2534,11 +2260,7 @@ describe("éditeur des contenus : le dernier bloc supprimé", () => {
     // Son « Annuler » part avec l'éditeur : après la fermeture, il ne ferait plus rien.
     const removed = texts.editor.settings.removed(texts.editor.blockLabel.image)
     expect(await screen.findByText(removed)).toBeInTheDocument()
-    fireEvent.click(
-      screen.getByRole("link", {
-        name: texts.editor.back(texts.sections.blog.title),
-      })
-    )
+    fireEvent.click(role("link", texts.editor.back(texts.sections.blog.title)))
     await waitFor(() => expect(screen.queryByText(removed)).toBeNull())
   })
 })
