@@ -11,7 +11,7 @@ import type { CheckResult } from "./svg.ts"
 export const MAX_CHECKED_BYTES = 5 * 1024 * 1024
 const MAX_SIDE = 8192
 
-export const lottieReasons = {
+const lottieReasons = {
   unreadable: "lottie_illisible",
   invalid: "lottie_invalide",
   externalLink: "lottie_lien_externe",

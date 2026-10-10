@@ -6,7 +6,7 @@
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(66);
+select plan(67);
 
 select pg_temp.create_people();
 select pg_temp.empty_media_library();
@@ -267,6 +267,21 @@ select throws_ok(
   $$select public.schedule(pg_temp.cid('a1'), now() + interval '1 day')$$, '42501', 'reserve_a_l_equipe',
   'schedule() refusé sans membre'
 );
+
+-- Une page sans adresse ne se programme pas : elle ne pourrait pas se publier à l'heure dite.
+select pg_temp.as_person('editor');
+select pg_temp.create_content('p0', 'page', content_title => 'Sans adresse');
+select pg_temp.save('p0', pg_temp.draft(
+  jsonb_build_array(pg_temp.text_block('00000000-0000-4000-8000-000000000001')), 'Sans adresse'),
+  '{"access_level_id": null}');
+select pg_temp.as_postgres();
+update public.contents set slug = null where id = pg_temp.cid('p0');
+select pg_temp.as_person('editor');
+select throws_ok(
+  format('select public.schedule(%L, %L)', pg_temp.cid('p0'), now() + interval '1 day'),
+  'P0001', 'adresse_manquante', 'schedule() refuse une page sans adresse'
+);
+select pg_temp.as_postgres();
 
 select * from finish();
 rollback;

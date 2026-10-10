@@ -10,7 +10,7 @@
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(23);
+select plan(24);
 
 select pg_temp.create_people();
 select pg_temp.empty_media_library();
@@ -186,6 +186,12 @@ select ok(
       and v.origin = 'files'
     from pg_temp.live('x') v),
   'la version en ligne montre le nouveau fichier (blocs et informations figées)'
+);
+
+select is(
+  (select l.draft_rev from public.edit_locks l where l.content_id = pg_temp.cid('y')),
+  (select c.draft_rev from public.contents c where c.id = pg_temp.cid('y')),
+  'media_replace : le verrou de Y suit la nouvelle révision (qui le lit voit le changement)'
 );
 
 select * from finish();

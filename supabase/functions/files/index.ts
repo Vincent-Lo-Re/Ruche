@@ -18,15 +18,10 @@
 // SUPABASE_SERVICE_ROLE_KEY) : aucun secret n'est écrit ici ni rangé dans la base.
 
 import { createClient } from "@supabase/supabase-js"
-import { corsHeaders } from "./cors.ts"
+import { corsHeaders } from "../_shared/cors.ts"
+import { HttpError, json, readKey } from "../_shared/http.ts"
 import { memberToken, parseMode } from "./request.ts"
 import { type Database, type Orphan, runClean, runKick, type Store, type WorkItem } from "./work.ts"
-
-class HttpError extends Error {
-  constructor(readonly status: number, readonly code: string, message: string) {
-    super(message)
-  }
-}
 
 const messages = {
   notSignedIn: "Connecte-toi pour continuer.",
@@ -36,26 +31,6 @@ const messages = {
   methodNotAllowed: "Méthode non autorisée.",
   server: "Un problème est survenu. Réessaie dans un instant.",
 } as const
-
-// Clés fournies par la plateforme (en ligne et en local) : un dictionnaire JSON { default: "…" }.
-// Repli sur les anciennes variables si besoin.
-function readKey(dictionaryVariable: string, legacyVariable: string): string {
-  const dictionary = Deno.env.get(dictionaryVariable)
-  if (dictionary) {
-    const key = (JSON.parse(dictionary) as Record<string, string>).default
-    if (key) return key
-  }
-  const legacy = Deno.env.get(legacyVariable)
-  if (legacy) return legacy
-  throw new Error(`Variable manquante : ${dictionaryVariable}`)
-}
-
-function json(status: number, body: unknown, headers: Record<string, string>): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...headers, "Content-Type": "application/json; charset=utf-8" },
-  })
-}
 
 function failure(label: string, error: { message: string } | null): Error {
   return new Error(`${label} : ${error?.message ?? "erreur inconnue"}`)

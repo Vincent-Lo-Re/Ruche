@@ -11,7 +11,8 @@
 // plateforme ; aucune clé n'est écrite ici.
 
 import { createClient, isAuthApiError, type User } from "@supabase/supabase-js"
-import { corsHeaders } from "./cors.ts"
+import { corsHeaders } from "../_shared/cors.ts"
+import { HttpError, json, readKey } from "../_shared/http.ts"
 import { parseRequest, type TeamLanguage, type TeamRequest, type TeamRole } from "./validation.ts"
 
 type Profile = {
@@ -42,12 +43,6 @@ export type Member = Profile & {
   mfa_enabled_at: string | null
 }
 
-class HttpError extends Error {
-  constructor(readonly status: number, readonly code: string, message: string) {
-    super(message)
-  }
-}
-
 const messages = {
   notSignedIn: "Connecte-toi pour continuer.",
   staffOnly: "Réservé à l'équipe, après la double vérification.",
@@ -62,32 +57,12 @@ const messages = {
   server: "Un problème est survenu. Réessaie dans un instant.",
 } as const
 
-// Clés fournies par la plateforme (en ligne et en local) : un dictionnaire JSON { default: "…" }.
-// Repli sur les anciennes variables si besoin.
-function readKey(dictionaryVariable: string, legacyVariable: string): string {
-  const dictionary = Deno.env.get(dictionaryVariable)
-  if (dictionary) {
-    const key = (JSON.parse(dictionary) as Record<string, string>).default
-    if (key) return key
-  }
-  const legacy = Deno.env.get(legacyVariable)
-  if (legacy) return legacy
-  throw new Error(`Variable manquante : ${dictionaryVariable}`)
-}
-
 const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? ""
 const publishableKey = readKey("SUPABASE_PUBLISHABLE_KEYS", "SUPABASE_ANON_KEY")
 const secretKey = readKey("SUPABASE_SECRET_KEYS", "SUPABASE_SERVICE_ROLE_KEY")
 
 const clientOptions = { auth: { persistSession: false, autoRefreshToken: false } }
 const admin = createClient(supabaseUrl, secretKey, clientOptions)
-
-function json(status: number, body: unknown, headers: Record<string, string>): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...headers, "Content-Type": "application/json; charset=utf-8" },
-  })
-}
 
 // Vérifie la session de l'appelant et son rôle d'admin (en aal2). Renvoie son compte.
 /** L'appelant, de l'équipe (sinon refusé), et s'il est admin. */
@@ -269,7 +244,11 @@ async function run(request: TeamRequest, caller: User): Promise<unknown> {
       const profile = await getProfile(request.user_id)
       if (profile.role === "admin") await ensureAnotherAdmin(profile.id)
       const { error } = await admin.auth.admin.deleteUser(profile.id)
-      if (error) throw new Error(`suppression : ${error.message}`)
+      if (error) {
+        // Deux admins retirés en même temps : la base garde le dernier (protect_last_admin).
+        if (profile.role === "admin") await ensureAnotherAdmin(profile.id)
+        throw new Error(`suppression : ${error.message}`)
+      }
       return { ok: true }
     }
 
