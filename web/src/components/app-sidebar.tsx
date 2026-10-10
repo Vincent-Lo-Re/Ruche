@@ -77,7 +77,7 @@ function Copyright() {
   if (!brand) return null
   return (
     <p className="px-2 py-1 text-center text-xs text-sidebar-foreground/60">
-      {texts.common.copyright(new Date().getFullYear(), brand)}
+      {texts.nav.copyright(new Date().getFullYear(), brand)}
     </p>
   )
 }

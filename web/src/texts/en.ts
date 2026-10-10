@@ -20,7 +20,7 @@ export const en = {
 
   // Les mots de l'interface qui ne dépendent pas de la page : une seule fois ici.
   common: {
-    // En bas du menu et sous la carte des pages de connexion, au nom de la marque (« Ruche »
+    // Sous la carte des pages de connexion, au nom de la marque (« Ruche »
     // sans nom enregistré).
     copyright: (year: number, brand: string) =>
       `© ${year} ${brand}. All rights reserved.`,
@@ -111,6 +111,8 @@ export const en = {
 
   nav: {
     label: "Main menu",
+    // En bas du menu, au nom de la marque (« Ruche » sans nom enregistré).
+    copyright: (year: number, brand: string) => `© ${year} ${brand}`,
     groups: {
       contents: "Content",
       tools: "Tools",
@@ -2613,10 +2615,9 @@ export const en = {
     failed: "Couldn't play this audio. Check your connection, then try again.",
   },
 
-  // En bas à droite du contenu des pages avec le menu : la version de l'admin et le contact.
+  // En bas à droite du contenu des pages avec le menu : la version de l'admin.
   footer: {
     version: (version: string) => `Version ${version}`,
-    feedback: "A feature, a bug?",
   },
 
   // Menu de l'avatar, en haut à droite de chaque page.
