@@ -11,31 +11,9 @@ import { texts } from "@/texts"
 import { findRole, queryRole, role } from "@/test/queries"
 
 // La base, le stockage et la fonction « files » sont simulés.
-vi.mock("@/lib/media/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof api>()
-  return {
-    ...actual,
-    listMedia: vi.fn(),
-    getStorageUsed: vi.fn(),
-    getLatestAudit: vi.fn(),
-    getPreviewUrls: vi.fn(),
-    getMediaUses: vi.fn(),
-    getMediaOutdated: vi.fn(),
-    pushMediaTexts: vi.fn(),
-    updateMedia: vi.fn(),
-    trashMedia: vi.fn(),
-    restoreMedia: vi.fn(),
-    callFiles: vi.fn(),
-    kickFiles: vi.fn(),
-    createMedia: vi.fn(),
-    confirmMedia: vi.fn(),
-    discardUpload: vi.fn(),
-    getMediaVerdicts: vi.fn(),
-    getMedia: vi.fn(),
-    replaceMedia: vi.fn(),
-    replaceMediaLive: vi.fn(),
-  }
-})
+vi.mock("@/lib/media/api", async (original) =>
+  (await import("@/test/mocks")).mediaApi(original)
+)
 vi.mock("@/lib/media/transfer", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/lib/media/transfer")>()),
   sendFile: vi.fn(),

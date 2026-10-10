@@ -20,43 +20,17 @@ import { findRole, queryRole, role } from "@/test/queries"
 // Listes du Blog, des Podcasts et des Pages (étape 7) : colonnes, recherche, filtres, création
 // (vide ou point de départ, [D42]) et corbeille. La base est simulée.
 
-vi.mock("@/lib/contents/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof api>()
-  return {
-    ...actual,
-    findPageBySlug: vi.fn(async () => null),
-    findContentByTitle: vi.fn(async () => null),
-    listContents: vi.fn(),
-    reorderContents: vi.fn(async () => {}),
-    getMediaByIds: vi.fn(async () => []),
-    createContent: vi.fn(),
-    getContent: vi.fn(async () => null),
-    lockTake: vi.fn(),
-    lockStatus: vi.fn(),
-    saveDraft: vi.fn(async () => ({
-      rev: 2,
-      savedAt: "2026-09-28T08:01:00Z",
-    })),
-    lockRelease: vi.fn(async () => true),
-    lockReleaseOnExit: vi.fn(),
-    subscribeLock: vi.fn(() => () => {}),
-  }
-})
+vi.mock("@/lib/contents/api", async (original) =>
+  (await import("@/test/mocks")).contentsApi(original)
+)
 
-vi.mock("@/lib/contents/publication", async (importOriginal) => {
-  const actual = await importOriginal<typeof publicationApi>()
-  return {
-    ...actual,
-    getPublication: vi.fn(async () => null),
-    trashContent: vi.fn(),
-    restoreContent: vi.fn(),
-  }
-})
+vi.mock("@/lib/contents/publication", async (original) =>
+  (await import("@/test/mocks")).publicationApi(original)
+)
 
-vi.mock("@/lib/contents/templates", async (importOriginal) => {
-  const actual = await importOriginal<typeof templatesApi>()
-  return { ...actual, listStarters: vi.fn(async () => []) }
-})
+vi.mock("@/lib/contents/templates", async (original) =>
+  (await import("@/test/mocks")).templatesApi(original)
+)
 
 vi.mock("@/lib/categories", async (importOriginal) => {
   const actual = await importOriginal<typeof categoriesApi>()
@@ -77,16 +51,9 @@ vi.mock("@/lib/access-levels", async (importOriginal) => {
   }
 })
 
-vi.mock("@/lib/media/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof mediaApi>()
-  return {
-    ...actual,
-    kickFiles: vi.fn(async () => {}),
-    getPreviewUrls: vi.fn(async (keys: string[]) =>
-      Object.fromEntries(keys.map((key) => [key, `blob:${key}`]))
-    ),
-  }
-})
+vi.mock("@/lib/media/api", async (original) =>
+  (await import("@/test/mocks")).mediaApi(original)
+)
 
 const labels = texts.contentList
 const SOMMEIL = "00000000-0000-4000-8000-00000000c001"

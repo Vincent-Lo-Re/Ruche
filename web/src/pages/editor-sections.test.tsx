@@ -47,26 +47,13 @@ vi.mock("@/lib/contents/api", async (importOriginal) => {
   }
 })
 
-vi.mock("@/lib/contents/publication", async (importOriginal) => {
-  const actual = await importOriginal<typeof publicationApi>()
-  return {
-    ...actual,
-    getPublication: vi.fn(),
-    listVersions: vi.fn(async () => []),
-    publishContent: vi.fn(),
-    scheduleContent: vi.fn(),
-  }
-})
+vi.mock("@/lib/contents/publication", async (original) =>
+  (await import("@/test/mocks")).publicationApi(original)
+)
 
-vi.mock("@/lib/contents/templates", async (importOriginal) => {
-  const actual = await importOriginal<typeof templatesApi>()
-  return {
-    ...actual,
-    getTemplatesByIds: vi.fn(async () => []),
-    listTemplates: vi.fn(async () => []),
-    listStarters: vi.fn(async () => []),
-  }
-})
+vi.mock("@/lib/contents/templates", async (original) =>
+  (await import("@/test/mocks")).templatesApi(original)
+)
 
 vi.mock("@/lib/media/api", async (importOriginal) => {
   const actual = await importOriginal<typeof mediaApi>()

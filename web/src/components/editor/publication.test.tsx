@@ -31,29 +31,18 @@ vi.mock("@/lib/contents/api", async (importOriginal) => {
   }
 })
 
-vi.mock("@/lib/contents/publication", async (importOriginal) => {
-  const actual = await importOriginal<typeof publicationApi>()
-  return {
-    ...actual,
-    getPublication: vi.fn(),
-    listVersions: vi.fn(async () => []),
-    publishContent: vi.fn(),
-    scheduleContent: vi.fn(),
-    unscheduleContent: vi.fn(),
-    unpublishContent: vi.fn(),
-    revertToVersion: vi.fn(),
-  }
-})
+vi.mock("@/lib/contents/publication", async (original) =>
+  (await import("@/test/mocks")).publicationApi(original)
+)
 
 vi.mock("@/lib/access-levels", async (importOriginal) => {
   const actual = await importOriginal<typeof levelsApi>()
   return { ...actual, listAccessLevels: vi.fn() }
 })
 
-vi.mock("@/lib/media/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof mediaApi>()
-  return { ...actual, kickFiles: vi.fn(async () => {}) }
-})
+vi.mock("@/lib/media/api", async (original) =>
+  (await import("@/test/mocks")).mediaApi(original)
+)
 
 const PAGE_ID = "00000000-0000-4000-8000-0000000000aa"
 const PREMIUM = "00000000-0000-4000-8000-0000000000f1"

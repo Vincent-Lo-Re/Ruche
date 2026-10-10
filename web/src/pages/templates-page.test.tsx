@@ -6,7 +6,6 @@ import * as levelsApi from "@/lib/access-levels"
 import * as api from "@/lib/contents/api"
 import * as publicationApi from "@/lib/contents/publication"
 import * as templatesApi from "@/lib/contents/templates"
-import * as mediaApi from "@/lib/media/api"
 import { createFromDialog } from "@/test/new-content"
 import { renderApp } from "@/test/render"
 import { texts } from "@/texts"
@@ -15,48 +14,17 @@ import { findRole, queryRole, role } from "@/test/queries"
 // La section Modèles (étape 6) et « Nouvelle page » avec les points de départ ([D42]). La base
 // est simulée.
 
-vi.mock("@/lib/contents/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof api>()
-  return {
-    ...actual,
-    findPageBySlug: vi.fn(async () => null),
-    findContentByTitle: vi.fn(async () => null),
-    listContents: vi.fn(async () => []),
-    createContent: vi.fn(),
-    getContent: vi.fn(async () => null),
-    lockTake: vi.fn(),
-    lockStatus: vi.fn(),
-    lockRelease: vi.fn(async () => true),
-    lockReleaseOnExit: vi.fn(),
-    subscribeLock: vi.fn(() => () => {}),
-  }
-})
+vi.mock("@/lib/contents/api", async (original) =>
+  (await import("@/test/mocks")).contentsApi(original)
+)
 
-vi.mock("@/lib/contents/publication", async (importOriginal) => {
-  const actual = await importOriginal<typeof publicationApi>()
-  return {
-    ...actual,
-    getPublication: vi.fn(async () => null),
-    trashContent: vi.fn(),
-    restoreContent: vi.fn(),
-  }
-})
+vi.mock("@/lib/contents/publication", async (original) =>
+  (await import("@/test/mocks")).publicationApi(original)
+)
 
-vi.mock("@/lib/contents/templates", async (importOriginal) => {
-  const actual = await importOriginal<typeof templatesApi>()
-  return {
-    ...actual,
-    listTemplates: vi.fn(),
-    listTemplateUses: vi.fn(async () => []),
-    templateUsage: vi.fn(async () => new Map()),
-    getTemplateUses: vi.fn(async () => []),
-    getTemplatesByIds: vi.fn(async () => []),
-    listStarters: vi.fn(async () => []),
-    getTemplateOutdated: vi.fn(async () => []),
-    createTemplate: vi.fn(),
-    detachTemplateEverywhere: vi.fn(),
-  }
-})
+vi.mock("@/lib/contents/templates", async (original) =>
+  (await import("@/test/mocks")).templatesApi(original)
+)
 
 // Les formules, lues par l'éditeur d'un modèle ou d'une page.
 vi.mock("@/lib/access-levels", async (importOriginal) => {
@@ -64,10 +32,9 @@ vi.mock("@/lib/access-levels", async (importOriginal) => {
   return { ...actual, listAccessLevels: vi.fn(async () => []) }
 })
 
-vi.mock("@/lib/media/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof mediaApi>()
-  return { ...actual, kickFiles: vi.fn(async () => {}) }
-})
+vi.mock("@/lib/media/api", async (original) =>
+  (await import("@/test/mocks")).mediaApi(original)
+)
 
 const CONTACT = "00000000-0000-4000-8000-0000000000c1"
 const RETENIR = "00000000-0000-4000-8000-0000000000c2"

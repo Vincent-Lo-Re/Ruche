@@ -1,28 +1,19 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
-import * as contentsApi from "@/lib/contents/api"
 import * as api from "@/lib/media/api"
 import { fakeAuth, renderApp } from "@/test/render"
 import { texts } from "@/texts"
 import { findRole, role } from "@/test/queries"
 
 // « Ouvrir » un contenu restauré : son éditeur le lit.
-vi.mock("@/lib/contents/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof contentsApi>()
-  return { ...actual, getContent: vi.fn(async () => null) }
-})
+vi.mock("@/lib/contents/api", async (original) =>
+  (await import("@/test/mocks")).contentsApi(original)
+)
 
-vi.mock("@/lib/media/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof api>()
-  return {
-    ...actual,
-    listTrash: vi.fn(),
-    restoreTrashItem: vi.fn(),
-    emptyTrash: vi.fn(),
-    kickFiles: vi.fn(),
-  }
-})
+vi.mock("@/lib/media/api", async (original) =>
+  (await import("@/test/mocks")).mediaApi(original)
+)
 
 const photo: api.TrashItem = {
   item_type: "file",

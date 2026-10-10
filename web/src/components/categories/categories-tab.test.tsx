@@ -2,9 +2,7 @@ import { fireEvent, screen, waitFor, within } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import * as categoriesApi from "@/lib/categories"
-import * as api from "@/lib/contents/api"
 import * as settingsApi from "@/lib/contents/settings"
-import * as templatesApi from "@/lib/contents/templates"
 import { renderApp } from "@/test/render"
 import { texts } from "@/texts"
 import { findRole, queryRole, role } from "@/test/queries"
@@ -13,15 +11,13 @@ import { findRole, queryRole, role } from "@/test/queries"
 // créer ou modifier, suppression définitive ([D28]), une à une ou cochées. Le rangement au clavier
 // et à la souris est vérifié par Playwright (web/e2e/sections.spec.ts). La base est simulée.
 
-vi.mock("@/lib/contents/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof api>()
-  return { ...actual, listContents: vi.fn(async () => []) }
-})
+vi.mock("@/lib/contents/api", async (original) =>
+  (await import("@/test/mocks")).contentsApi(original)
+)
 
-vi.mock("@/lib/contents/templates", async (importOriginal) => {
-  const actual = await importOriginal<typeof templatesApi>()
-  return { ...actual, listStarters: vi.fn(async () => []) }
-})
+vi.mock("@/lib/contents/templates", async (original) =>
+  (await import("@/test/mocks")).templatesApi(original)
+)
 
 vi.mock("@/lib/contents/settings", async (importOriginal) => {
   const actual = await importOriginal<typeof settingsApi>()

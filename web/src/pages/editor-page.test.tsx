@@ -5,7 +5,6 @@ import type { Draft, ImageBlock, TextBlock } from "@/blocks/types"
 import * as levelsApi from "@/lib/access-levels"
 import * as api from "@/lib/contents/api"
 import * as publicationApi from "@/lib/contents/publication"
-import * as templatesApi from "@/lib/contents/templates"
 import * as mediaApi from "@/lib/media/api"
 import type { Media } from "@/lib/media/constants"
 import { createFromDialog } from "@/test/new-content"
@@ -14,62 +13,21 @@ import { texts } from "@/texts"
 import { findRole, queryRole, role } from "@/test/queries"
 
 // La base et Realtime sont simulés.
-vi.mock("@/lib/contents/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof api>()
-  return {
-    ...actual,
-    findPageBySlug: vi.fn(async () => null),
-    findContentByTitle: vi.fn(async () => null),
-    listContents: vi.fn(),
-    createContent: vi.fn(),
-    getContent: vi.fn(),
-    getMediaByIds: vi.fn(async () => []),
-    saveDraft: vi.fn(),
-    lockTake: vi.fn(),
-    lockStatus: vi.fn(),
-    lockHeartbeat: vi.fn(async () => true),
-    lockRelease: vi.fn(async () => true),
-    lockReleaseOnExit: vi.fn(),
-    subscribeLock: vi.fn(() => () => {}),
-  }
-})
+vi.mock("@/lib/contents/api", async (original) =>
+  (await import("@/test/mocks")).contentsApi(original)
+)
 
-vi.mock("@/lib/contents/publication", async (importOriginal) => {
-  const actual = await importOriginal<typeof publicationApi>()
-  return {
-    ...actual,
-    getPublication: vi.fn(),
-    listVersions: vi.fn(async () => []),
-    publishContent: vi.fn(),
-    scheduleContent: vi.fn(),
-    unscheduleContent: vi.fn(),
-    unpublishContent: vi.fn(),
-    revertToVersion: vi.fn(),
-    trashContent: vi.fn(),
-    restoreContent: vi.fn(),
-  }
-})
+vi.mock("@/lib/contents/publication", async (original) =>
+  (await import("@/test/mocks")).publicationApi(original)
+)
 
-vi.mock("@/lib/contents/templates", async (importOriginal) => {
-  const actual = await importOriginal<typeof templatesApi>()
-  return {
-    ...actual,
-    listTemplates: vi.fn(async () => []),
-    listTemplateUses: vi.fn(async () => []),
-    getTemplatesByIds: vi.fn(async () => []),
-    listStarters: vi.fn(async () => []),
-    getTemplateOutdated: vi.fn(async () => []),
-    createTemplate: vi.fn(),
-    createTemplateFrom: vi.fn(),
-    pushTemplate: vi.fn(),
-    detachTemplateEverywhere: vi.fn(),
-  }
-})
+vi.mock("@/lib/contents/templates", async (original) =>
+  (await import("@/test/mocks")).templatesApi(original)
+)
 
-vi.mock("@/lib/media/api", async (importOriginal) => {
-  const actual = await importOriginal<typeof mediaApi>()
-  return { ...actual, kickFiles: vi.fn(async () => {}) }
-})
+vi.mock("@/lib/media/api", async (original) =>
+  (await import("@/test/mocks")).mediaApi(original)
+)
 
 vi.mock("@/lib/access-levels", async (importOriginal) => {
   const actual = await importOriginal<typeof levelsApi>()
