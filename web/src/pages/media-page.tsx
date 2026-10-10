@@ -31,7 +31,6 @@ import { useBulkTrash } from "@/components/media/use-bulk-trash"
 import { usePreviewUrls } from "@/components/media/use-preview-urls"
 import { PageHeader } from "@/components/page-header"
 import { SearchInput } from "@/components/search-input"
-import { useAccessCheck } from "@/components/team/use-access-check"
 import { HiddenFileInput } from "@/components/file-input"
 import { Button } from "@/components/ui/button"
 import {
@@ -111,7 +110,6 @@ function needsRefresh(items: Media[] | undefined): boolean {
 /** Médiathèque : tous les fichiers, l'envoi, la fiche de chaque fichier. */
 export function MediaPage() {
   const { title, description } = texts.sections.media
-  const checkAccess = useAccessCheck()
   // Les envois se suivent dans la fenêtre des envois (UploadWindow, dans AppLayout).
   const queue = getUploadQueue()
   // La recherche et les filtres, gardés dans l'adresse (on retrouve la liste en y revenant).
@@ -147,9 +145,6 @@ export function MediaPage() {
     placeholderData: keepPreviousData,
     refetchInterval: (query) => (needsRefresh(query.state.data) ? 3000 : false),
   })
-  useEffect(() => {
-    if (media.error) checkAccess(media.error)
-  }, [media.error, checkAccess])
 
   // La fiche demandée par l'adresse, tant qu'aucune autre n'a été ouverte.
   const [searchParams, setSearchParams] = useSearchParams()

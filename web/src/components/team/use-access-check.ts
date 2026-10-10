@@ -2,16 +2,12 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useCallback } from "react"
 
 import { profileQueryKey, useAuth } from "@/auth/auth-context"
-import { isAccessLevelAccessLost } from "@/lib/access-levels"
-import { isCategoryAccessLost } from "@/lib/categories"
-import { isContentAccessLost } from "@/lib/contents/api"
-import { isMediaAccessLost } from "@/lib/media/api"
-import { isAccessLost } from "@/lib/team"
+import { isAccessLostError } from "@/lib/access-lost"
 
 /**
- * Quand la fonction « equipe », la base ou la fonction « files » répond que la personne n'a
- * plus accès (rôle retiré par un admin, compte supprimé, session fermée), relit sa fiche : le
- * menu et les pages réservées suivent aussitôt, sans attendre un rechargement.
+ * Pour une erreur attrapée hors d'une lecture ou d'un enregistrement de TanStack Query (un
+ * try/catch, un résultat partiel) : si la personne n'a plus accès, relit sa fiche, comme le fait
+ * déjà lib/query-client.ts pour les autres.
  */
 export function useAccessCheck() {
   const { profile } = useAuth()
@@ -20,14 +16,7 @@ export function useAccessCheck() {
 
   return useCallback(
     (error: unknown) => {
-      if (
-        userId &&
-        (isAccessLost(error) ||
-          isMediaAccessLost(error) ||
-          isContentAccessLost(error) ||
-          isAccessLevelAccessLost(error) ||
-          isCategoryAccessLost(error))
-      ) {
+      if (userId && isAccessLostError(error)) {
         void queryClient.invalidateQueries({
           queryKey: profileQueryKey(userId),
         })

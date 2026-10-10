@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { toast } from "sonner"
 
-import { useAccessCheck } from "@/components/team/use-access-check"
 import type { AccessLevel } from "@/lib/access-levels"
 import {
   ContentError,
@@ -90,7 +89,6 @@ const NO_PUBLICATION = {
 export function usePublication(bridge: PublicationBridge) {
   const { contentId, kind, settings } = bridge
   const queryClient = useQueryClient()
-  const checkAccess = useAccessCheck()
   const [dialog, setDialog] = useState<DialogState>(null)
 
   const query = useQuery({
@@ -105,9 +103,6 @@ export function usePublication(bridge: PublicationBridge) {
   const publication = query.data ?? null
   // Pas encore lu (échec) : l'état est inconnu, jamais « Brouillon » par défaut.
   const failed = query.isError && query.data === undefined
-  useEffect(() => {
-    if (query.error) checkAccess(query.error)
-  }, [query.error, checkAccess])
   const draftRev = Math.max(bridge.draftRev, publication?.draft_rev ?? 0)
   const status = publicationStatus(
     publication ?? NO_PUBLICATION,
@@ -170,7 +165,6 @@ export function usePublication(bridge: PublicationBridge) {
     } else {
       toast.error(error.message)
     }
-    checkAccess(error)
   }
 
   /** Enregistre le niveau choisi dans la fenêtre (s'il y en a un), sinon termine l'enregistrement. */

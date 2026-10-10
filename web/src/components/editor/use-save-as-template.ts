@@ -6,7 +6,6 @@ import { toast } from "sonner"
 import { selectedRootIds } from "@/blocks/templates"
 import type { Draft } from "@/blocks/types"
 import type { OutlineSelection } from "@/components/editor/outline-panel"
-import { useAccessCheck } from "@/components/team/use-access-check"
 import type { Content } from "@/lib/contents/api"
 import { createTemplateFrom, templateKeys } from "@/lib/contents/templates"
 import type { TemplateValues } from "@/lib/schemas"
@@ -37,7 +36,6 @@ export function useSaveAsTemplate({
 }) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
-  const checkAccess = useAccessCheck()
   const [choosing, setChoosing] = useState(false)
   const [chosen, setChosen] = useState<ReadonlySet<string>>(() => new Set())
   // Les blocs de la fenêtre ouverte (null : fermée).
@@ -76,7 +74,6 @@ export function useSaveAsTemplate({
         toast.success(words.saved(name), { action: open })
       }
     },
-    onError: (error) => checkAccess(error),
   })
 
   /** Ouvre la fenêtre du nouveau modèle pour ces blocs. */

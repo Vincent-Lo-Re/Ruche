@@ -7,7 +7,7 @@ import {
   RotateCcw,
   TriangleAlert,
 } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useNavigate } from "react-router"
 import { toast } from "sonner"
 
@@ -17,7 +17,6 @@ import { SelectAllHead } from "@/components/bulk-selection"
 import { LoadState, RefreshFailed } from "@/components/load-state"
 import { kindIcons } from "@/components/media/media-kinds"
 import { PageHeader } from "@/components/page-header"
-import { useAccessCheck } from "@/components/team/use-access-check"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { TruncatedText } from "@/components/truncated-text"
 import { Badge } from "@/components/ui/badge"
@@ -76,7 +75,6 @@ const keyOf = (item: TrashItem) => `${item.item_type}-${item.id}`
 export function TrashPage() {
   const { title, description } = texts.sections.trash
   const queryClient = useQueryClient()
-  const checkAccess = useAccessCheck()
   const navigate = useNavigate()
   // Gardé dans l'adresse : on retrouve le filtre en revenant à la Corbeille.
   const [filter, setFilter] = useAddressState(
@@ -87,9 +85,6 @@ export function TrashPage() {
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null)
 
   const trash = useQuery(trashRead())
-  useEffect(() => {
-    if (trash.error) checkAccess(trash.error)
-  }, [trash.error, checkAccess])
 
   const refresh = () =>
     Promise.all([
@@ -131,7 +126,6 @@ export function TrashPage() {
             ? (error.detail ?? undefined)
             : undefined,
       })
-      checkAccess(error)
     },
     onSettled: refresh,
   })
@@ -149,7 +143,6 @@ export function TrashPage() {
     },
     onError: (error) => {
       toast.error(error.message)
-      checkAccess(error)
     },
     onSettled: () => {
       setConfirmation(null)

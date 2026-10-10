@@ -5,7 +5,6 @@ import { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-import { useAccessCheck } from "@/components/team/use-access-check"
 import { FormField } from "@/components/form-field"
 import { Button } from "@/components/ui/button"
 import {
@@ -48,7 +47,6 @@ const emptyForm = { email: "", full_name: "", role: "editor" as TeamRole }
 export function InviteDialog() {
   const [open, setOpen] = useState(false)
   const queryClient = useQueryClient()
-  const checkAccess = useAccessCheck()
   const form = useForm({
     resolver: zodResolver(inviteSchema),
     defaultValues: emptyForm,
@@ -65,7 +63,6 @@ export function InviteDialog() {
     },
     onError: (error) => {
       form.setError("root", { message: error.message })
-      checkAccess(error)
     },
     // Même en cas d'échec, la liste est relue : elle montre l'état réel de l'équipe
     // (par exemple une réponse perdue alors que l'invitation est partie).

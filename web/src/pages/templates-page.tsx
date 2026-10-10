@@ -9,7 +9,7 @@ import {
   TriangleAlert,
   Unlink,
 } from "lucide-react"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { Link, useNavigate } from "react-router"
 import { toast } from "sonner"
 
@@ -25,7 +25,6 @@ import { SavedCell } from "@/components/contents/row-cells"
 import { useContentsSelection } from "@/components/contents/use-contents-selection"
 import { LoadState, RefreshFailed } from "@/components/load-state"
 import { PageHeader } from "@/components/page-header"
-import { useAccessCheck } from "@/components/team/use-access-check"
 import { TemplateDialog } from "@/components/templates/template-dialog"
 import { templateSortIcons } from "@/components/templates/sort-icons"
 import { TemplateStatus } from "@/components/templates/template-uses"
@@ -113,7 +112,6 @@ export function TemplatesPage() {
   const { title, description } = texts.sections.templates
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const checkAccess = useAccessCheck()
   const [creating, setCreating] = useState(false)
   const [toTrash, setToTrash] = useState<TemplateItem | null>(null)
 
@@ -121,9 +119,6 @@ export function TemplatesPage() {
     ...templateListRead(),
     refetchInterval: 30_000,
   })
-  useEffect(() => {
-    if (list.error) checkAccess(list.error)
-  }, [list.error, checkAccess])
 
   const create = useMutation({
     mutationFn: (template: NewTemplate) => createTemplate(template),
@@ -133,7 +128,6 @@ export function TemplatesPage() {
       setCreating(false)
       void navigate(editorPath("templates", content.id))
     },
-    onError: (error) => checkAccess(error),
   })
 
   // L'onglet ouvert : « Tous les blocs », ou une sorte de modèle.
@@ -451,7 +445,6 @@ function TrashTemplateDialog({
   onClose: () => void
 }) {
   const queryClient = useQueryClient()
-  const checkAccess = useAccessCheck()
   const name = nameOf(template)
   const shared = template.sort === "shared"
 
@@ -487,7 +480,6 @@ function TrashTemplateDialog({
             ? (error.detail ?? undefined)
             : undefined,
       })
-      checkAccess(error)
     },
     onSettled: () =>
       Promise.all([
@@ -522,7 +514,6 @@ function TrashTemplateDialog({
             ? (error.detail ?? undefined)
             : undefined,
       })
-      checkAccess(error)
     },
     onSettled: refresh,
   })

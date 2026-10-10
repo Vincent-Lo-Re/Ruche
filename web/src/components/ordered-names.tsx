@@ -7,14 +7,13 @@ import {
 } from "@tanstack/react-query"
 import { cn } from "cn"
 import { Pencil, Plus, Eraser } from "lucide-react"
-import { useEffect, useRef, useState, type ReactNode } from "react"
+import { useRef, useState, type ReactNode } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import type { z } from "zod"
 
 import { DragHandle, SortableList } from "@/components/list-sorting"
 import { LoadState } from "@/components/load-state"
-import { useAccessCheck } from "@/components/team/use-access-check"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { RowActionsMenu } from "@/components/row-actions-menu"
 import { FormField } from "@/components/form-field"
@@ -124,10 +123,6 @@ export function OrderedNames<T extends Named>({
   before,
 }: OrderedNamesProps<T>) {
   const queryClient = useQueryClient()
-  const checkAccess = useAccessCheck()
-  useEffect(() => {
-    if (query.error) checkAccess(query.error)
-  }, [query.error, checkAccess])
   const [toRemove, setToRemove] = useState<T | null>(null)
   // Après une suppression, le bouton qui avait ouvert la confirmation disparaît avec sa ligne :
   // le focus va à la ligne suivante (ou précédente), sinon au champ du nouveau nom. undefined :
@@ -137,7 +132,6 @@ export function OrderedNames<T extends Named>({
 
   const onError = (error: Error) => {
     toast.error(error.message)
-    checkAccess(error)
   }
 
   const reorder = useMutation({
@@ -383,7 +377,6 @@ function RenameForm<T extends Named>({
   rename: renameItem,
   refresh,
 }: RowOptions<T> & { item: T; onDone: () => void }) {
-  const checkAccess = useAccessCheck()
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: { name: item.name },
@@ -396,7 +389,6 @@ function RenameForm<T extends Named>({
     },
     onError: (error) => {
       form.setError("name", { message: error.message })
-      checkAccess(error)
     },
     onSettled: refresh,
   })
@@ -463,7 +455,6 @@ function AddForm<T extends Named>({
   OrderedNamesProps<T>,
   "labels" | "schema" | "inputId" | "create" | "refresh"
 >) {
-  const checkAccess = useAccessCheck()
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: { name: "" },
@@ -476,7 +467,6 @@ function AddForm<T extends Named>({
     },
     onError: (error) => {
       form.setError("name", { message: error.message })
-      checkAccess(error)
     },
     onSettled: refresh,
   })

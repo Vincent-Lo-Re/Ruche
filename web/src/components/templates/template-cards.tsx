@@ -6,7 +6,6 @@ import { toast } from "sonner"
 
 import { LoadState } from "@/components/load-state"
 import { PanelCard } from "@/components/panel-card"
-import { useAccessCheck } from "@/components/team/use-access-check"
 import { templateSortIcons } from "@/components/templates/sort-icons"
 import { useTemplateUses } from "@/components/templates/use-template-uses"
 import { ConfirmDialog } from "@/components/confirm-dialog"
@@ -88,7 +87,6 @@ export function TemplateSortCard({
  */
 export function TemplateUsesCard({ templateId }: { templateId: string }) {
   const queryClient = useQueryClient()
-  const checkAccess = useAccessCheck()
   const [confirming, setConfirming] = useState(false)
   const uses = useTemplateUses(templateId, true)
   const outdated = useQuery({
@@ -111,7 +109,6 @@ export function TemplateUsesCard({ templateId }: { templateId: string }) {
             ? (error.detail ?? undefined)
             : undefined,
       })
-      checkAccess(error)
     },
     onSettled: () =>
       Promise.all([

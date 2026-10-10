@@ -8,7 +8,7 @@ import {
   UserMinus,
   UserPen,
 } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { toast } from "sonner"
 
 import { useAuth } from "@/auth/auth-context"
@@ -17,7 +17,6 @@ import { LoadState, RefreshFailed } from "@/components/load-state"
 import { PageHeader } from "@/components/page-header"
 import { RoleBadge } from "@/components/role-badge"
 import { InviteDialog } from "@/components/team/invite-dialog"
-import { useAccessCheck } from "@/components/team/use-access-check"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { RowActionsMenu } from "@/components/row-actions-menu"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -80,14 +79,9 @@ export function TeamPage() {
   const queryClient = useQueryClient()
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null)
 
-  const checkAccess = useAccessCheck()
-
   const members = useQuery(teamRead())
   // Une page de La team (25 personnes) : en pratique, une seule.
   const paged = usePagination(members.data ?? [], PAGE_SIZE, "")
-  useEffect(() => {
-    if (members.error) checkAccess(members.error)
-  }, [members.error, checkAccess])
 
   const action = useMutation({
     mutationFn: (request: MemberRequest) => callTeam(request),
@@ -97,7 +91,6 @@ export function TeamPage() {
     },
     onError: (error) => {
       toast.error(error.message)
-      checkAccess(error)
     },
     onSettled: () => setConfirmation(null),
   })
