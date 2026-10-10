@@ -6,8 +6,6 @@
 @reference "../../index.css";
 
 .style-preview {
-  /* Le téléphone réduit pour tenir dans la colonne de l'aperçu. */
-  --blocks-device-scale: 0.6;
   --blocks-color-background: var(--style-background);
   --blocks-color-text: var(--style-text);
 }

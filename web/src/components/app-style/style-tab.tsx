@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { CloudCheck, CloudOff, LoaderCircle, Send, Undo2 } from "lucide-react"
 import { useMemo, useState, type ReactNode } from "react"
+import { createPortal } from "react-dom"
 
 import { ColorRolesCard, PaletteCard } from "@/components/app-style/color-cards"
 import {
@@ -21,6 +22,13 @@ import {
 } from "@/components/app-style/look-cards"
 import { StylePreview } from "@/components/app-style/style-preview"
 import {
+  SectionLinks,
+  SectionSelect,
+} from "@/components/app-style/style-sections-nav"
+import { useStickyFrame } from "@/components/app-style/use-sticky-frame"
+import { useStyleSections } from "@/components/app-style/use-style-sections"
+import { useAppTabActions } from "@/components/app-tab-actions"
+import {
   useStyleDraft,
   type DraftStatus,
 } from "@/components/app-style/use-style-draft"
@@ -35,6 +43,12 @@ import { Spinner } from "@/components/ui/spinner"
 import type { AppStyleRow } from "@/lib/app-style/api"
 import { fontFaces } from "@/lib/app-style/fonts"
 import { readabilityIssues } from "@/lib/app-style/problems"
+import {
+  sectionAnchor,
+  sectionsWithIssues,
+  styleSections,
+  type StyleSection,
+} from "@/lib/app-style/sections"
 import { styleModes, type StyleMode } from "@/lib/app-style/style"
 import { formatDateTime } from "@/lib/dates"
 import { appStyleRead } from "@/lib/reads"
@@ -69,128 +83,105 @@ function StyleEditor({ row }: { row: AppStyleRow }) {
   const modes = styleModes(style)
   const mode = modes.includes(chosenMode) ? chosenMode : modes[0]
   const issues = useMemo(() => readabilityIssues(style), [style])
+  const flagged = useMemo(() => sectionsWithIssues(issues), [issues])
   const [discarding, setDiscarding] = useState(false)
   const faces = useMemo(() => fontFaces(style.fonts), [style.fonts])
+  const { slot } = useAppTabActions()
+  const frame = useStickyFrame()
+  const sections = useStyleSections()
+  const cardProps = { appStyle: style, change }
+  const colorProps = { ...cardProps, mode, issues }
 
-  const section = (
-    key:
-      | "darkMode"
-      | "colors"
-      | "roles"
-      | "tints"
-      | "badges"
-      | "buttons"
-      | "fields"
-      | "fonts"
-      | "fontRoles"
-      | "sizes"
-      | "shapes"
-      | "file",
-    card: ReactNode
-  ) => (
-    <SettingsSection
-      title={labels[key].title}
-      description={labels[key].description}
-    >
-      {card}
-    </SettingsSection>
-  )
+  const cards: Record<StyleSection, ReactNode> = {
+    darkMode: <DarkModeCard {...cardProps} />,
+    colors: <PaletteCard {...cardProps} />,
+    roles: <ColorRolesCard {...colorProps} />,
+    tints: <TintsCard {...colorProps} />,
+    badges: <BadgesCard {...colorProps} />,
+    buttons: <ButtonsCard {...colorProps} />,
+    fields: <FieldsCard {...cardProps} />,
+    fonts: <FontsCard {...cardProps} />,
+    fontRoles: <FontRolesCard {...cardProps} />,
+    sizes: <SizesCard {...cardProps} />,
+    shapes: <ShapesCard {...cardProps} />,
+    file: <FileCard {...cardProps} />,
+  }
 
   return (
-    <div className="space-y-6 pt-4">
+    <div className="space-y-4 pt-4">
       {/* Les polices de la charte, servies par l'admin (public/fonts/). */}
       {faces && <style>{faces}</style>}
-      <div className="flex flex-wrap items-center gap-2">
-        <PublishState row={row} modified={draft.modified} />
-        <DraftState status={draft.status} />
-        <span className="flex-1" />
-        <Button
-          variant="outline"
-          disabled={!draft.modified || draft.discard.isPending}
-          onClick={() => setDiscarding(true)}
-        >
-          <Undo2 aria-hidden />
-          {labels.discard}
-        </Button>
-        <Button
-          disabled={
-            !draft.modified ||
-            draft.status === "blocked" ||
-            draft.publish.isPending
-          }
-          onClick={() => draft.publish.mutate()}
-        >
-          {draft.publish.isPending ? <Spinner /> : <Send aria-hidden />}
-          {labels.publish}
-        </Button>
-      </div>
+      {/* L'état et les actions, à droite des onglets : toujours en haut, même en défilant. */}
+      {slot &&
+        createPortal(
+          <>
+            <PublishState row={row} modified={draft.modified} />
+            <DraftState status={draft.status} />
+            <Button
+              variant="outline"
+              disabled={!draft.modified || draft.discard.isPending}
+              onClick={() => setDiscarding(true)}
+            >
+              <Undo2 aria-hidden />
+              {labels.discard}
+            </Button>
+            <Button
+              disabled={
+                !draft.modified ||
+                draft.status === "blocked" ||
+                draft.publish.isPending
+              }
+              onClick={() => draft.publish.mutate()}
+            >
+              {draft.publish.isPending ? <Spinner /> : <Send aria-hidden />}
+              {labels.publish}
+            </Button>
+          </>,
+          slot
+        )}
       {draft.status === "blocked" && (
         <Alert>
           <AlertDescription>{labels.blocked}</AlertDescription>
         </Alert>
       )}
-      <div className="grid items-start gap-8 xl:grid-cols-style-editor">
-        <div className="@container min-w-0 space-y-8">
-          {section(
-            "darkMode",
-            <DarkModeCard appStyle={style} change={change} />
-          )}
-          {section("colors", <PaletteCard appStyle={style} change={change} />)}
-          {section(
-            "roles",
-            <ColorRolesCard
-              appStyle={style}
-              mode={mode}
-              issues={issues}
-              change={change}
-            />
-          )}
-          {section(
-            "tints",
-            <TintsCard
-              appStyle={style}
-              mode={mode}
-              issues={issues}
-              change={change}
-            />
-          )}
-          {section(
-            "badges",
-            <BadgesCard
-              appStyle={style}
-              mode={mode}
-              issues={issues}
-              change={change}
-            />
-          )}
-          {section(
-            "buttons",
-            <ButtonsCard
-              appStyle={style}
-              mode={mode}
-              issues={issues}
-              change={change}
-            />
-          )}
-          {section("fields", <FieldsCard appStyle={style} change={change} />)}
-          {section("fonts", <FontsCard appStyle={style} change={change} />)}
-          {section(
-            "fontRoles",
-            <FontRolesCard appStyle={style} change={change} />
-          )}
-          {section("sizes", <SizesCard appStyle={style} change={change} />)}
-          {section("shapes", <ShapesCard appStyle={style} change={change} />)}
-          {section("file", <FileCard appStyle={style} change={change} />)}
-        </div>
-        <div className="xl:sticky xl:top-16">
-          <StylePreview
-            appStyle={style}
-            mode={mode}
-            onModeChange={setMode}
-            largeText={largeText}
-            onLargeTextChange={setLargeText}
-            issues={issues}
+      {/* Trois colonnes (deux sur un écran plus étroit) : les sections, le téléphone, les
+          réglages. Les réglages défilent avec la page ; les deux autres restent en haut. */}
+      <div className="grid grid-cols-style-workspace items-start gap-6 wide:grid-cols-style-workspace-wide">
+        <div
+          className="sticky hidden overflow-y-auto py-6 wide:block"
+          // eslint-disable-next-line no-restricted-syntax -- position et hauteur tirées d'une mesure (le panneau visible)
+          style={frame ? { top: frame.top, height: frame.height } : undefined}
+        >
+          <SectionLinks
+            current={sections.current}
+            flagged={flagged}
+            hardToRead={issues.length}
+            onGo={sections.go}
           />
+        </div>
+        <StylePreview
+          frame={frame}
+          appStyle={style}
+          mode={mode}
+          onModeChange={setMode}
+          largeText={largeText}
+          onLargeTextChange={setLargeText}
+          onPick={sections.go}
+        />
+        <div className="@container min-w-0 space-y-8 py-6">
+          <div className="wide:hidden">
+            <SectionSelect current={sections.current} onGo={sections.go} />
+          </div>
+          {styleSections.map(({ key }) => (
+            <SettingsSection
+              key={key}
+              id={sectionAnchor(key)}
+              title={labels[key].title}
+              description={labels[key].description}
+            >
+              {cards[key]}
+            </SettingsSection>
+          ))}
         </div>
       </div>
       <TrashDialog

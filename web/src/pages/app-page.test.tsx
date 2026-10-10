@@ -118,4 +118,49 @@ describe("App : la charte graphique", () => {
     await new Promise((resolve) => setTimeout(resolve, 900))
     expect(styleApi.saveStyle).not.toHaveBeenCalled()
   })
+
+  it("la colonne des sections et le téléphone mènent à chaque réglage", async () => {
+    await renderApp("/app")
+    const nav = await screen.findByRole("navigation", {
+      name: labels.sections.label,
+    })
+    fireEvent.click(
+      within(nav).getByRole("link", { name: labels.buttons.title })
+    )
+    expect(document.getElementById("style-buttons")).toHaveFocus()
+    expect(
+      within(nav).getByRole("link", { name: labels.buttons.title })
+    ).toHaveAttribute("aria-current", "location")
+
+    // Un élément du téléphone (ici, l'encadré) mène à son réglage.
+    fireEvent.click(document.querySelector('[data-style-section="tints"]')!)
+    expect(document.getElementById("style-tints")).toHaveFocus()
+  })
+
+  it("un bouton se replie : un seul est ouvert à la fois", async () => {
+    await renderApp("/app")
+    const primary = await screen.findByRole("button", {
+      name: labels.buttons.details(labels.neutral.buttons.primary),
+    })
+    expect(primary).toHaveAttribute("aria-expanded", "false")
+    expect(
+      screen.queryByRole("group", { name: labels.buttons.kind })
+    ).toBeNull()
+
+    fireEvent.click(primary)
+    expect(primary).toHaveAttribute("aria-expanded", "true")
+    expect(
+      screen.getByRole("group", { name: labels.buttons.kind })
+    ).toBeVisible()
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: labels.buttons.details(labels.neutral.buttons.secondary),
+      })
+    )
+    expect(primary).toHaveAttribute("aria-expanded", "false")
+    expect(
+      screen.getAllByRole("group", { name: labels.buttons.kind })
+    ).toHaveLength(1)
+  })
 })

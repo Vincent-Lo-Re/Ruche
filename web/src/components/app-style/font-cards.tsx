@@ -31,7 +31,6 @@ import {
   SIZE_RANGE,
   sizeRoles,
   type AppStyle,
-  type FontRole,
   type StyleFont,
 } from "@/lib/app-style/style"
 import { texts } from "@/texts"
@@ -106,14 +105,30 @@ export function FontsCard({
             return (
               <li
                 key={font.id}
-                className="grid items-start gap-2 rounded-lg border p-2 @2xl:grid-cols-style-font"
+                className="grid grid-cols-2 items-start gap-2 rounded-lg border p-2"
               >
-                <NameInput
-                  value={font.name}
-                  label={words.name}
-                  others={style.fonts.filter((other) => other.id !== font.id)}
-                  onChange={(name) => update(font.id, { name })}
-                />
+                {/* Le nom, l'essai de la police, puis la gomme ; dessous, la famille et l'épaisseur. */}
+                <div className="col-span-2 flex min-w-0 items-start gap-2">
+                  <NameInput
+                    value={font.name}
+                    label={words.name}
+                    others={style.fonts.filter((other) => other.id !== font.id)}
+                    onChange={(name) => update(font.id, { name })}
+                  />
+                  <span className="flex h-10 max-w-28 items-center">
+                    <FontSample font={font}>{words.sampleText}</FontSample>
+                  </span>
+                  <RemoveButton
+                    label={words.remove(font.name)}
+                    blocked={blocked}
+                    onRemove={() =>
+                      change((current) => ({
+                        ...current,
+                        fonts: current.fonts.filter((f) => f.id !== font.id),
+                      }))
+                    }
+                  />
+                </div>
                 <Select
                   items={familyItems}
                   value={font.family}
@@ -158,20 +173,6 @@ export function FontsCard({
                     ))}
                   </SelectContent>
                 </Select>
-                <div className="flex h-10 min-w-0 items-center gap-1">
-                  <FontSample font={font}>{words.sampleText}</FontSample>
-                  <span className="flex-1" />
-                  <RemoveButton
-                    label={words.remove(font.name)}
-                    blocked={blocked}
-                    onRemove={() =>
-                      change((current) => ({
-                        ...current,
-                        fonts: current.fonts.filter((f) => f.id !== font.id),
-                      }))
-                    }
-                  />
-                </div>
               </li>
             )
           })}
@@ -211,9 +212,6 @@ export function FontRolesCard({
     value: font.id,
     label: font.name,
   }))
-  const fontOf = (role: FontRole) =>
-    style.fonts.find((font) => font.id === style.fontRoles[role]) ??
-    style.fonts[0]
   return (
     <Card>
       <CardContent>
@@ -221,7 +219,7 @@ export function FontRolesCard({
           {fontRoles.map((role) => (
             <li
               key={role}
-              className="grid items-center gap-2 @lg:grid-cols-style-role"
+              className="grid grid-cols-style-role items-center gap-2"
             >
               <span className="text-sm">{labels.fontRoles.names[role]}</span>
               <Select
@@ -249,9 +247,6 @@ export function FontRolesCard({
                   ))}
                 </SelectContent>
               </Select>
-              <FontSample font={fontOf(role)}>
-                {labels.fonts.sampleText}
-              </FontSample>
             </li>
           ))}
         </ul>
@@ -286,9 +281,6 @@ export function SizesCard({
         [role]: { ...current.sizes[role], ...patch },
       },
     }))
-  const fontOf = (role: FontRole) =>
-    style.fonts.find((font) => font.id === style.fontRoles[role]) ??
-    style.fonts[0]
   return (
     <Card>
       <CardContent>
@@ -298,7 +290,7 @@ export function SizesCard({
             return (
               <li
                 key={role}
-                className="grid items-center gap-2 @lg:grid-cols-style-size"
+                className="grid grid-cols-style-size items-center gap-2"
               >
                 <span className="text-sm">{words.names[role]}</span>
                 <NumberField
@@ -318,9 +310,6 @@ export function SizesCard({
                   step={LINE_HEIGHT_RANGE.step}
                   onChange={(value) => setSize(role, { lineHeight: value })}
                 />
-                <FontSample font={fontOf(role)} size={Math.min(size.size, 28)}>
-                  {labels.fonts.sampleText}
-                </FontSample>
               </li>
             )
           })}

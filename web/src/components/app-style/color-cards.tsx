@@ -139,9 +139,15 @@ export function ColorRolesCard({
               {roles.map((role) => (
                 <li
                   key={role}
-                  className="grid items-center gap-2 @lg:grid-cols-style-role"
+                  className="grid grid-cols-style-role items-center gap-2"
                 >
-                  <span className="text-sm">{labels.roles.names[role]}</span>
+                  <div className="min-w-0 space-y-0.5">
+                    <p className="text-sm">{labels.roles.names[role]}</p>
+                    <ReadabilityBadge
+                      issues={roleIssues(role)}
+                      showReadable={readOn[role] !== undefined}
+                    />
+                  </div>
                   <ColorSelect
                     appStyle={style}
                     value={style.roles[role]}
@@ -153,10 +159,6 @@ export function ColorRolesCard({
                         roles: { ...current.roles, [role]: id },
                       }))
                     }
-                  />
-                  <ReadabilityBadge
-                    issues={roleIssues(role)}
-                    showReadable={readOn[role] !== undefined}
                   />
                 </li>
               ))}

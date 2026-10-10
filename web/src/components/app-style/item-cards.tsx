@@ -1,5 +1,5 @@
-import { Plus } from "lucide-react"
-import type { ReactNode } from "react"
+import { ChevronDown, Plus } from "lucide-react"
+import { useState, type ReactNode } from "react"
 
 import {
   ColorSelect,
@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { cn } from "cn"
 import type { ReadabilityIssue } from "@/lib/app-style/problems"
 import {
   badgeParts,
@@ -313,6 +314,8 @@ export function ButtonsCard({
   change: Change
 }) {
   const words = labels.buttons
+  // Un bouton à la fois est ouvert (style, forme, couleurs) ; les autres tiennent sur une ligne.
+  const [open, setOpen] = useState<string | null>(null)
   const update = (id: string, patch: Partial<StyleButton>) =>
     change((current) => ({
       ...current,
@@ -326,15 +329,14 @@ export function ButtonsCard({
       addLabel={words.add}
       minOne={words.minOne}
       change={change}
-      onAdd={() =>
+      onAdd={() => {
+        const added = newButton(style, freeName(words.newName, style.buttons))
         change((current) => ({
           ...current,
-          buttons: [
-            ...current.buttons,
-            newButton(current, freeName(words.newName, current.buttons)),
-          ],
+          buttons: [...current.buttons, added],
         }))
-      }
+        setOpen(added.id)
+      }}
     >
       {(button, position) => {
         // Dans un dégradé, le fond s'appelle « Début ».
@@ -364,52 +366,79 @@ export function ButtonsCard({
                   (issue) => issue.kind === "button" && issue.id === button.id
                 )}
               />
-            </div>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <ToggleGroup
-                variant="outline"
-                size="sm"
-                aria-label={words.kind}
-                value={[button.kind]}
-                onValueChange={(value: string[]) => {
-                  const kind = buttonKinds.find((k) => k === value[0])
-                  if (kind) update(button.id, { kind: kind as ButtonKind })
-                }}
+              {open !== button.id && (
+                <span className="flex h-10 items-center text-sm text-muted-foreground">
+                  {words.kinds[button.kind]}
+                </span>
+              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label={words.details(button.name)}
+                aria-expanded={open === button.id}
+                aria-controls={`button-${button.id}`}
+                onClick={() =>
+                  setOpen((shown) => (shown === button.id ? null : button.id))
+                }
               >
-                {buttonKinds.map((kind) => (
-                  <ToggleGroupItem key={kind} value={kind}>
-                    {words.kinds[kind]}
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
-              <Select
-                items={shapeItems}
-                value={button.shape}
-                onValueChange={(value) => {
-                  const shape = shapes.find((s) => s === value)
-                  if (shape) update(button.id, { shape })
-                }}
-              >
-                <SelectTrigger aria-label={words.shape}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {shapeItems.map((item) => (
-                    <SelectItem key={item.value} value={item.value}>
-                      {item.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <ChevronDown
+                  aria-hidden
+                  className={cn(
+                    "transition-transform motion-reduce:transition-none",
+                    open === button.id && "rotate-180"
+                  )}
+                />
+              </Button>
             </div>
-            <PartSelects
-              appStyle={style}
-              item={button}
-              parts={buttonParts[button.kind]}
-              partLabels={partLabels}
-              mode={mode}
-              onChange={(part, id) => update(button.id, { [part]: id })}
-            />
+            {open === button.id && (
+              <div id={`button-${button.id}`}>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <ToggleGroup
+                    variant="outline"
+                    size="sm"
+                    aria-label={words.kind}
+                    value={[button.kind]}
+                    onValueChange={(value: string[]) => {
+                      const kind = buttonKinds.find((k) => k === value[0])
+                      if (kind) update(button.id, { kind: kind as ButtonKind })
+                    }}
+                  >
+                    {buttonKinds.map((kind) => (
+                      <ToggleGroupItem key={kind} value={kind}>
+                        {words.kinds[kind]}
+                      </ToggleGroupItem>
+                    ))}
+                  </ToggleGroup>
+                  <Select
+                    items={shapeItems}
+                    value={button.shape}
+                    onValueChange={(value) => {
+                      const shape = shapes.find((s) => s === value)
+                      if (shape) update(button.id, { shape })
+                    }}
+                  >
+                    <SelectTrigger aria-label={words.shape}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {shapeItems.map((item) => (
+                        <SelectItem key={item.value} value={item.value}>
+                          {item.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <PartSelects
+                  appStyle={style}
+                  item={button}
+                  parts={buttonParts[button.kind]}
+                  partLabels={partLabels}
+                  mode={mode}
+                  onChange={(part, id) => update(button.id, { [part]: id })}
+                />
+              </div>
+            )}
           </>
         )
       }}

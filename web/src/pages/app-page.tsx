@@ -5,8 +5,10 @@ import {
   Palette,
   type LucideIcon,
 } from "lucide-react"
+import { useMemo, useState } from "react"
 
 import { StyleTab } from "@/components/app-style/style-tab"
+import { AppTabActionsContext } from "@/components/app-tab-actions"
 import { ListEmpty } from "@/components/list-card"
 import { PageHeader } from "@/components/page-header"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -37,6 +39,10 @@ const tabIcons: Record<AppTab, LucideIcon> = {
 export function AppPage() {
   const { title, description } = texts.sections.app
   const [tab, setTab] = useAddressState(appTabFromAddress, writeAppTab)
+  // La ligne des onglets et la place de leurs actions, pour l'onglet ouvert.
+  const [bar, setBar] = useState<HTMLElement | null>(null)
+  const [slot, setSlot] = useState<HTMLElement | null>(null)
+  const actions = useMemo(() => ({ bar, slot }), [bar, slot])
   return (
     <>
       <PageHeader
@@ -45,8 +51,12 @@ export function AppPage() {
         description={description}
       />
       <Tabs value={tab} onValueChange={(value: AppTab) => setTab(value)}>
-        {/* Les onglets restent en haut quand la page défile, sur le fond du panneau. */}
-        <div className="sticky top-0 z-10 -mx-8 -my-3 self-stretch bg-panel-solid px-8 py-3">
+        {/* Les onglets restent en haut quand la page défile, sur le fond du panneau, avec à
+            droite les actions de l'onglet ouvert. */}
+        <div
+          ref={setBar}
+          className="sticky top-0 z-10 -mx-8 -my-3 flex flex-wrap items-center gap-x-4 gap-y-2 self-stretch bg-panel-solid px-8 py-3"
+        >
           <TabsList aria-label={labels.tabs.label}>
             {appTabs.map((value) => {
               const Icon = tabIcons[value]
@@ -58,11 +68,17 @@ export function AppPage() {
               )
             })}
           </TabsList>
+          <div
+            ref={setSlot}
+            className="ml-auto flex flex-wrap items-center gap-2"
+          />
         </div>
         {appTabs.map((value) => (
           <TabsContent key={value} value={value} data-app-tab={value}>
             {value === "style" ? (
-              <StyleTab />
+              <AppTabActionsContext value={actions}>
+                <StyleTab />
+              </AppTabActionsContext>
             ) : (
               <ListEmpty
                 icon={tabIcons[value]}

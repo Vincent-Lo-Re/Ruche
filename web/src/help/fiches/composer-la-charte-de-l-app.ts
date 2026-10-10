@@ -29,7 +29,7 @@ export const fiche: HelpFiche = {
     "Ouvre « App » dans le menu, onglet « Charte graphique ».",
     "Dans « Couleurs », nomme tes couleurs et donne à chacune sa valeur en clair et en sombre (clique sur un code pour ouvrir le nuancier, ou colle un code comme #9b3b5e).",
     "Dans « Où va chaque couleur », choisis la couleur de chaque usage : fond, texte, liens, barres, états. Fais de même pour les teintes des encadrés, les pastilles, les boutons et les polices.",
-    "Regarde l'aperçu à droite, en clair, en sombre et en grand texte : il suit chaque changement.",
+    "Le téléphone, au centre, suit chaque changement ; sa barre d'outils le montre en iPhone ou Android, en clair ou en sombre, en grand texte. Un clic sur un élément du téléphone (un bouton, un encadré, le titre…) mène à son réglage, comme les liens de la colonne de gauche.",
     "Clique sur « Publier » : l'app se sert de la charte publiée.",
   ],
   notes: [

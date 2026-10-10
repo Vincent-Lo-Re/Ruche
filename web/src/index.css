@@ -184,14 +184,19 @@
   grid-template-columns: minmax(0, 1fr) --spacing(80);
 }
 
-/* La charte de l'app (section « App ») : les réglages, puis l'aperçu du téléphone. */
-@utility grid-cols-style-editor {
-  grid-template-columns: minmax(0, 1fr) --spacing(84);
+/* La charte de l'app (section « App ») : le téléphone, puis les réglages ; sur un écran large,
+   la colonne des sections d'abord. */
+@utility grid-cols-style-workspace {
+  grid-template-columns: auto minmax(0, 1fr);
 }
 
-/* Une ligne d'usage de la charte : son nom, le choix, puis sa lisibilité. */
+@utility grid-cols-style-workspace-wide {
+  grid-template-columns: --spacing(52) auto minmax(0, 1fr);
+}
+
+/* Une ligne d'usage de la charte : son nom (et sa lisibilité), puis le choix. */
 @utility grid-cols-style-role {
-  grid-template-columns: minmax(0, 1fr) minmax(0, --spacing(56)) --spacing(28);
+  grid-template-columns: minmax(0, 1fr) minmax(0, --spacing(44));
 }
 
 /* Les couleurs d'une teinte, d'une pastille ou d'un bouton. */
@@ -199,14 +204,9 @@
   grid-template-columns: repeat(auto-fill, minmax(--spacing(36), 1fr));
 }
 
-/* Une police : son nom, sa famille, son épaisseur, puis l'essai et la gomme. */
-@utility grid-cols-style-font {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) --spacing(36) auto;
-}
-
-/* Une taille de texte : son nom, la taille, l'interligne, puis l'essai. */
+/* Une taille de texte : son nom, la taille, puis l'interligne. */
 @utility grid-cols-style-size {
-  grid-template-columns: minmax(0, 1fr) auto auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto auto;
 }
 
 /*
