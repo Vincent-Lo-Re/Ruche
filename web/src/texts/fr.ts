@@ -20,6 +20,15 @@ export const fr: Texts = {
 
   // Les mots de l'interface qui ne dépendent pas de la page : une seule fois ici.
   common: {
+    // La pagination des listes (lib/pagination.ts).
+    pagination: {
+      label: "Pages",
+      previous: "Page précédente",
+      next: "Page suivante",
+      page: (page: number) => `Page ${page}`,
+      range: (from: string, to: string, total: string) =>
+        `${from}–${to} sur ${total}`,
+    },
     close: "Fermer",
     cancel: "Annuler",
     retry: "Réessayer",
@@ -520,8 +529,6 @@ export const fr: Texts = {
       description:
         "Aucun fichier non utilisé ici : chacun est dans un brouillon ou un contenu en ligne.",
     },
-    tooMany: (count: number) =>
-      `Seuls les ${count} fichiers les plus récents sont affichés. Affine ta recherche pour trouver les autres.`,
     loadFailed: "La Médiathèque n'a pas pu être chargée.",
     refreshFailed:
       "La Médiathèque n'a pas pu être mise à jour : elle date peut-être un peu.",
@@ -1052,6 +1059,9 @@ export const fr: Texts = {
     order: {
       column: "Ordre",
       handle: (title: string) => `Déplacer « ${title} »`,
+      // Menu « … » d'une ligne : d'une page à l'autre, sans glisser.
+      moveTop: "Mettre en tête",
+      moveBottom: "Mettre à la fin",
       filtering:
         "Pour ranger la liste, efface d'abord la recherche et les filtres.",
       // Le nouvel ordre est dans l'app tout de suite, sans « Publier ».

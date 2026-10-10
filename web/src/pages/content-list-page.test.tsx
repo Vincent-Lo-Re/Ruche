@@ -26,6 +26,7 @@ vi.mock("@/lib/contents/api", async (importOriginal) => {
     findPageBySlug: vi.fn(async () => null),
     findContentByTitle: vi.fn(async () => null),
     listContents: vi.fn(),
+    reorderContents: vi.fn(async () => {}),
     getMediaByIds: vi.fn(async () => []),
     createContent: vi.fn(),
     getContent: vi.fn(async () => null),
@@ -314,6 +315,68 @@ describe("Blog", () => {
     expect(noResults).toBeVisible()
     // Sans résultat : l'Empty de shadcn, dans la carte blanche d'une liste (ADMIN § 7).
     expect(noResults.closest('[data-slot="empty"]')).toHaveClass("bg-card")
+  })
+
+  it("25 articles par page : la page dans l'adresse, la recherche ramène à la première, « Mettre en tête » depuis la page 2", async () => {
+    const many = Array.from({ length: 30 }, (_, index) =>
+      row(
+        `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
+        `Article ${index + 1}`,
+        { list_position: index }
+      )
+    )
+    vi.mocked(api.listContents).mockResolvedValue(many)
+    const { router } = await renderApp("/blog")
+    await waitFor(() => expect(shownTitles()).toHaveLength(25))
+    const pages = screen.getByRole("navigation", {
+      name: texts.common.pagination.label,
+    })
+    expect(screen.getByText("1–25 sur 30")).toBeVisible()
+    expect(
+      within(pages).getByRole("button", {
+        name: texts.common.pagination.previous,
+      })
+    ).toBeDisabled()
+
+    fireEvent.click(
+      within(pages).getByRole("button", {
+        name: texts.common.pagination.page(2),
+      })
+    )
+    await waitFor(() => expect(shownTitles()).toHaveLength(5))
+    expect(shownTitles()[0]).toBe("Article 26")
+    expect(router.state.location.search).toBe("?page=2")
+    expect(router.state.historyAction).toBe("REPLACE")
+
+    // « Mettre en tête » : de la page 2 au début de toute la liste.
+    fireEvent.click(
+      screen.getByRole("button", { name: labels.actions("Article 28") })
+    )
+    fireEvent.click(
+      await screen.findByRole("menuitem", { name: labels.order.moveTop })
+    )
+    await waitFor(() => expect(api.reorderContents).toHaveBeenCalled())
+    const ids = vi.mocked(api.reorderContents).mock.calls[0][1]
+    expect(ids).toHaveLength(30)
+    expect(ids[0]).toBe(many[27].id)
+
+    // Une recherche : la première page, et la page quitte l'adresse.
+    fireEvent.change(
+      screen.getByRole("searchbox", { name: labels.kinds.article.search }),
+      { target: { value: "Article 1" } }
+    )
+    await waitFor(() =>
+      expect(
+        new URLSearchParams(router.state.location.search).get("page")
+      ).toBeNull()
+    )
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("navigation", {
+          name: texts.common.pagination.label,
+        })
+      ).toBeNull()
+    )
   })
 
   it("la recherche et les filtres sont dans l'adresse ; les changer ne fait pas d'étape au retour (QCM du 05/10/2026)", async () => {

@@ -10,6 +10,7 @@ import type { TablesInsert } from "@/lib/database.types"
 import { isLockAlive } from "@/lib/editor/edit-lock"
 import { displayName, type PersonName } from "@/lib/people"
 import type { ContentUse } from "@/lib/uses-export"
+import { readAll } from "@/lib/read-all"
 import { supabase } from "@/lib/supabase"
 import type { ContentKind } from "@/lib/contents/api"
 import { texts } from "@/texts"
@@ -86,12 +87,16 @@ function toCategory(row: CategoryRow): Category {
 export async function listCategories(
   section: CategorySection
 ): Promise<Category[]> {
-  const { data, error } = await supabase
-    .from("categories")
-    .select("id, name, position, created_at, content_categories(count)")
-    .eq("section", section)
-    .order("position")
-    .order("name")
+  const { data, error } = await readAll((from, to) =>
+    supabase
+      .from("categories")
+      .select("id, name, position, created_at, content_categories(count)")
+      .eq("section", section)
+      .order("position")
+      .order("name")
+      .order("id")
+      .range(from, to)
+  )
   if (error) throw toCategoryError(error)
   return (data as CategoryRow[]).map(toCategory)
 }

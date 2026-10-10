@@ -7,6 +7,7 @@ import type { PostgrestError } from "@supabase/supabase-js"
 import type { Draft } from "@/blocks/types"
 import type { Json, Tables } from "@/lib/database.types"
 import type { Media } from "@/lib/media/constants"
+import { readAll } from "@/lib/read-all"
 import { supabase } from "@/lib/supabase"
 import { recordTemplateCopy } from "@/lib/contents/template-copies"
 import { describeFacts } from "@/lib/error-facts"
@@ -245,19 +246,23 @@ export async function reorderContents(
 export async function listContents(
   kind: ContentKind
 ): Promise<ContentListItem[]> {
-  const query = supabase
-    .from("contents")
-    .select(
-      "id, title, slug, cover_id:draft->cover->>mediaId, list_position, draft_rev, draft_saved_at, first_published_at, scheduled_at, schedule_error, access_chosen, access_level_id, live:versions!contents_live_version_fkey(draft_rev), content_categories(category_id)"
-    )
-    .eq("kind", kind)
-    .is("deleted_at", null)
+  const query = () =>
+    supabase
+      .from("contents")
+      .select(
+        "id, title, slug, cover_id:draft->cover->>mediaId, list_position, draft_rev, draft_saved_at, first_published_at, scheduled_at, schedule_error, access_chosen, access_level_id, live:versions!contents_live_version_fkey(draft_rev), content_categories(category_id)"
+      )
+      .eq("kind", kind)
+      .is("deleted_at", null)
   // Blog, Podcasts : dans l'ordre de la liste ([D47], comme l'app) ; les
   // pages : les dernières modifiées d'abord.
-  const ordered = isOrderedKind(kind)
-    ? query.order("list_position").order("id")
-    : query.order("draft_saved_at", { ascending: false })
-  const { data, error, status } = await ordered.limit(500)
+  const ordered = () =>
+    isOrderedKind(kind)
+      ? query().order("list_position").order("id")
+      : query().order("draft_saved_at", { ascending: false }).order("id")
+  const { data, error, status } = await readAll((from, to) =>
+    ordered().range(from, to)
+  )
   if (error) throw toContentError(error, status)
   return data.map((row) => {
     const live = row.live as { draft_rev: number } | null

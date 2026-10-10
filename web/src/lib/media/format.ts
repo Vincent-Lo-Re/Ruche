@@ -56,6 +56,11 @@ export function formatDimensions(width: number, height: number): string {
   return units.dimensions(width, height)
 }
 
+/** Un nombre entier, avec le séparateur des milliers du format régional : « 1 263 ». */
+export function formatCount(value: number): string {
+  return integer.format(value)
+}
+
 /** « 42 % » (progression d'un envoi, de 0 à 1). */
 export function formatPercent(fraction: number): string {
   return units.percent(Math.round(fraction * 100))

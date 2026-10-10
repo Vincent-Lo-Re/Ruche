@@ -28,10 +28,12 @@ import {
 import { ListCard, ListEmpty } from "@/components/list-card"
 import { LoadState } from "@/components/load-state"
 import { acceptedFiles, kindIcons } from "@/components/media/media-kinds"
+import { ListPagination } from "@/components/list-pagination"
 import { MediaGrid, MediaTable } from "@/components/media/media-collection"
 import { MediaSheet } from "@/components/media/media-sheet"
 import { OrphansNotice } from "@/components/media/orphans-notice"
 import { StorageUsage } from "@/components/media/storage-usage"
+import { usePagination } from "@/hooks/use-pagination"
 import { useBulkTrash } from "@/components/media/use-bulk-trash"
 import { usePreviewUrls } from "@/components/media/use-preview-urls"
 import { PageHeader } from "@/components/page-header"
@@ -68,7 +70,8 @@ import {
   toggleSelected,
   type Kept,
 } from "@/lib/bulk-trash"
-import { MEDIA_LIST_LIMIT, type MediaFilters } from "@/lib/media/api"
+import type { MediaFilters } from "@/lib/media/api"
+import { MEDIA_PAGE_SIZE } from "@/lib/pagination"
 import {
   INTERRUPTED_AFTER_MS,
   mediaKinds,
@@ -263,7 +266,13 @@ export function MediaPage() {
       ? texts.media.noUnused
       : texts.media.noResults
 
-  const shownItems = media.data ?? []
+  // 48 fichiers par page, en grille comme en liste : changer de vue garde les mêmes fichiers.
+  const paged = usePagination(
+    media.data ?? [],
+    MEDIA_PAGE_SIZE,
+    JSON.stringify(filters)
+  )
+  const shownItems = paged.items
   const selection = selectionOf(checkedIds, shownItems)
   const bulkTrash = useBulkTrash((result) => {
     setCheckedIds((current) => {
@@ -512,7 +521,7 @@ export function MediaPage() {
               )}
               {view === "grid" ? (
                 <MediaGrid
-                  items={media.data}
+                  items={shownItems}
                   urlFor={urlFor}
                   onOpen={setOpened}
                   now={media.dataUpdatedAt}
@@ -520,7 +529,7 @@ export function MediaPage() {
                 />
               ) : (
                 <MediaTable
-                  items={media.data}
+                  items={shownItems}
                   urlFor={urlFor}
                   onOpen={setOpened}
                   now={media.dataUpdatedAt}
@@ -529,11 +538,7 @@ export function MediaPage() {
               )}
             </>
           )}
-          {media.data.length >= MEDIA_LIST_LIMIT && (
-            <p className="text-sm text-muted-foreground">
-              {texts.media.tooMany(MEDIA_LIST_LIMIT)}
-            </p>
-          )}
+          <ListPagination pagination={paged} />
         </div>
       )}
 

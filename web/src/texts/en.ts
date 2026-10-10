@@ -20,6 +20,15 @@ export const en = {
 
   // Les mots de l'interface qui ne dépendent pas de la page : une seule fois ici.
   common: {
+    // La pagination des listes (lib/pagination.ts).
+    pagination: {
+      label: "Pages",
+      previous: "Previous page",
+      next: "Next page",
+      page: (page: number) => `Page ${page}`,
+      range: (from: string, to: string, total: string) =>
+        `${from}–${to} of ${total}`,
+    },
     close: "Close",
     cancel: "Cancel",
     retry: "Try again",
@@ -508,8 +517,6 @@ export const en = {
       title: "All files are in use",
       description: "Every file is used in a draft or in published content.",
     },
-    tooMany: (count: number) =>
-      `Showing the ${count} most recent files. Refine your search to see the rest.`,
     loadFailed: "Couldn't load the Media library.",
     refreshFailed:
       "Couldn't refresh the Media library. It may be slightly out of date.",
@@ -1033,6 +1040,9 @@ export const en = {
     order: {
       column: "Order",
       handle: (title: string) => `Move “${title}”`,
+      // Menu « … » d'une ligne : d'une page à l'autre, sans glisser.
+      moveTop: "Move to top",
+      moveBottom: "Move to bottom",
       filtering: "Clear the search and filters to reorder the list.",
       // Le nouvel ordre est dans l'app tout de suite, sans « Publier ».
       saved: "New order saved. It shows in the app right away.",

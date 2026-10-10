@@ -87,6 +87,8 @@ export function writeListFilters(
   params: URLSearchParams,
   filters: ListFilters
 ) {
+  // Une autre recherche ou un autre filtre : la liste repart de sa première page.
+  params.delete("page")
   writeText(params, SEARCH, filters.search)
   writeChoice(params, stateChoice, filters.state)
   if (filters.category === ALL_CATEGORIES) params.delete(CATEGORY)
@@ -114,6 +116,8 @@ export function listTabFromAddress(params: URLSearchParams): ListTab {
 
 /** Écrit l'onglet d'une liste de contenus dans l'adresse. */
 export function writeListTab(params: URLSearchParams, tab: ListTab) {
+  // Chaque onglet a sa propre liste : on repart de sa première page.
+  params.delete("page")
   writeChoice(params, listTabChoice, tab)
 }
 
@@ -158,6 +162,8 @@ export function writeMediaFilters(
   params: URLSearchParams,
   filters: MediaFilters
 ) {
+  // Une autre recherche ou un autre filtre : la liste repart de sa première page.
+  params.delete("page")
   writeChoice(params, kindChoice, filters.kind)
   writeText(params, SEARCH, filters.search)
   if (filters.unused) params.set(UNUSED, "true")
@@ -190,6 +196,8 @@ export function writeTemplateTab(
   params: URLSearchParams,
   tab: "all" | TemplateSort | "unused"
 ) {
+  // Chaque onglet a sa propre liste : on repart de sa première page.
+  params.delete("page")
   writeChoice(params, tabChoice, tab)
 }
 
@@ -242,5 +250,7 @@ export function trashFilterFromAddress(params: URLSearchParams): TrashFilter {
 
 /** Écrit le filtre de la Corbeille dans l'adresse. */
 export function writeTrashFilter(params: URLSearchParams, filter: TrashFilter) {
+  // Une autre recherche ou un autre filtre : la liste repart de sa première page.
+  params.delete("page")
   writeChoice(params, trashChoice, filter)
 }

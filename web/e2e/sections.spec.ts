@@ -36,6 +36,7 @@ import {
   appCategories,
   appFeed,
   appPage,
+  createCategoriesMarked,
   deleteCategoriesMarked,
 } from "./support/sections.ts"
 
@@ -157,6 +158,37 @@ async function uploadInImagePicker(page: Page, name: string) {
     ])
   await expect(picker).toHaveCount(0, { timeout: 60_000 })
 }
+
+test("Pagination : 25 catégories par page, la page dans l'adresse", async ({
+  page,
+  team,
+}) => {
+  const id = uniqueId()
+  const admin = await team.createAdmin("Paul Pages")
+  await createCategoriesMarked(id, 30)
+  try {
+    await open(page, "/blog", admin)
+    await page.getByRole("tab", { name: categories.tab }).click()
+    await page.getByRole("searchbox").fill(id)
+    const pages = page.getByRole("navigation", {
+      name: texts.common.pagination.label,
+    })
+    await expect(page.getByText("1–25 sur 30")).toBeVisible()
+    await pages
+      .getByRole("button", { name: texts.common.pagination.page(2) })
+      .click()
+    await expect(page).toHaveURL(/[?&]page=2/)
+    await expect(page.getByText("26–30 sur 30")).toBeVisible()
+    await expect(
+      page.getByRole("cell", { name: `${id} 30`, exact: true })
+    ).toBeVisible()
+    await expect(
+      page.getByRole("cell", { name: `${id} 01`, exact: true })
+    ).toHaveCount(0)
+  } finally {
+    await deleteCategoriesMarked(id)
+  }
+})
 
 test("Un titre par section : un second article du même titre est refusé, un épisode l'accepte", async ({
   page,
