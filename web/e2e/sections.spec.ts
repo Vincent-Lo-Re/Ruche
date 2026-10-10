@@ -387,7 +387,7 @@ test("Éditeur du Blog : « Ajouter un bloc » ouvre les Blocs, bloc glissé, pl
   await page.keyboard.press("Space")
   await expect(rows).toHaveText([emptyBox, "Les bons réflexes", emptyBox])
 
-  // Le plan range les blocs : l'aperçu du Fil n'a pas de poignée.
+  // Le plan range les blocs : le téléphone n'a pas de poignée.
   await expect(phone.getByRole("button", { name: /^Déplacer : / })).toHaveCount(
     0
   )
