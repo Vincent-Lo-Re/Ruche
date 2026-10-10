@@ -13,6 +13,7 @@ import {
 import type { PreparedFile } from "@/lib/media/prepare"
 import type { ContentKind } from "@/lib/contents/api"
 import { restoreContent } from "@/lib/contents/publication"
+import { readAll } from "@/lib/read-all"
 import { supabase } from "@/lib/supabase"
 import { describeFacts } from "@/lib/error-facts"
 import type { ContentUse } from "@/lib/uses-export"
@@ -97,9 +98,6 @@ export const trashKey = ["trash"] as const
 // Lecture
 // ---------------------------------------------------------------------------------------------
 
-// Au-delà, la page invite à affiner la recherche.
-export const MEDIA_LIST_LIMIT = 500
-
 function toMedia(
   row: Omit<Tables<"media">, "media_in_use"> & {
     media_in_use?: boolean | null
@@ -115,18 +113,21 @@ function likePattern(search: string): string {
 
 /** Fichiers hors corbeille, les plus récents d'abord. */
 export async function listMedia(filters: MediaFilters): Promise<Media[]> {
-  let query = supabase
-    .from("media")
-    // media_in_use : colonne calculée par la base, pour le badge « Non utilisé » et le filtre.
-    .select("*, media_in_use")
-    .is("deleted_at", null)
-    .order("created_at", { ascending: false })
-    .limit(MEDIA_LIST_LIMIT)
-  if (filters.kind !== "all") query = query.eq("kind", filters.kind)
-  if (filters.unused) query = query.eq("media_in_use", false)
   const search = filters.search.trim()
-  if (search !== "") query = query.ilike("name", likePattern(search))
-  const { data, error } = await query
+  const { data, error } = await readAll((from, to) => {
+    let query = supabase
+      .from("media")
+      // media_in_use : colonne calculée par la base, pour le badge « Non utilisé » et le filtre.
+      .select("*, media_in_use")
+      .is("deleted_at", null)
+    if (filters.kind !== "all") query = query.eq("kind", filters.kind)
+    if (filters.unused) query = query.eq("media_in_use", false)
+    if (search !== "") query = query.ilike("name", likePattern(search))
+    return query
+      .order("created_at", { ascending: false })
+      .order("id")
+      .range(from, to)
+  })
   if (error) throw toMediaError(error)
   return data.map(toMedia)
 }
@@ -335,12 +336,16 @@ export type TrashItem = (
 
 /** Tout ce qui est dans la corbeille, le plus récent d'abord. */
 export async function listTrash(): Promise<TrashItem[]> {
-  const { data, error } = await supabase
-    .from("trash_items")
-    .select(
-      "item_type, id, kind, title, deleted_at, deleted_by_name, purge_at, purge_error"
-    )
-    .order("deleted_at", { ascending: false })
+  const { data, error } = await readAll((from, to) =>
+    supabase
+      .from("trash_items")
+      .select(
+        "item_type, id, kind, title, deleted_at, deleted_by_name, purge_at, purge_error"
+      )
+      .order("deleted_at", { ascending: false })
+      .order("id")
+      .range(from, to)
+  )
   if (error) throw toMediaError(error)
   return data as TrashItem[]
 }

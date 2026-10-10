@@ -10,6 +10,7 @@ import {
   type Content,
   type ContentKind,
 } from "@/lib/contents/api"
+import { readAll } from "@/lib/read-all"
 import { supabase } from "@/lib/supabase"
 import type { ContentUse } from "@/lib/uses-export"
 
@@ -77,13 +78,16 @@ export type TemplateItem = {
 
 /** Tous les modèles hors corbeille, par nom. */
 export async function listTemplates(): Promise<TemplateItem[]> {
-  const { data, error, status } = await supabase
-    .from("contents")
-    .select("id, title, template_sort, template_for, draft, draft_saved_at")
-    .eq("kind", "template")
-    .is("deleted_at", null)
-    .order("title")
-    .limit(500)
+  const { data, error, status } = await readAll((from, to) =>
+    supabase
+      .from("contents")
+      .select("id, title, template_sort, template_for, draft, draft_saved_at")
+      .eq("kind", "template")
+      .is("deleted_at", null)
+      .order("title")
+      .order("id")
+      .range(from, to)
+  )
   if (error) throw toContentError(error, status)
   return data.flatMap((row) => {
     if (!isTemplateSort(row.template_sort)) return []
@@ -116,15 +120,19 @@ export type TemplateUse = {
 export async function listTemplateUses(
   templateIds?: string[]
 ): Promise<TemplateUse[]> {
-  let query = supabase
-    .from("contents")
-    .select("id, kind, title, deleted_at, draft_template_ids")
-    .order("title")
-    .limit(1000)
-  query = templateIds
-    ? query.overlaps("draft_template_ids", templateIds)
-    : query.not("draft_template_ids", "eq", "{}")
-  const { data, error, status } = await query
+  const { data, error, status } = await readAll((from, to) => {
+    const query = supabase
+      .from("contents")
+      .select("id, kind, title, deleted_at, draft_template_ids")
+    return (
+      templateIds
+        ? query.overlaps("draft_template_ids", templateIds)
+        : query.not("draft_template_ids", "eq", "{}")
+    )
+      .order("title")
+      .order("id")
+      .range(from, to)
+  })
   if (error) throw toContentError(error, status)
   return data.map((row) => ({
     id: row.id,
@@ -237,10 +245,14 @@ export async function templateUsage(): Promise<Map<string, number>> {
 async function listTemplateCopies(): Promise<
   { templateId: string; contentId: string }[]
 > {
-  const { data, error, status } = await supabase
-    .from("template_copies")
-    .select("template_id, content_id")
-    .limit(5000)
+  const { data, error, status } = await readAll((from, to) =>
+    supabase
+      .from("template_copies")
+      .select("template_id, content_id")
+      .order("template_id")
+      .order("content_id")
+      .range(from, to)
+  )
   if (error) throw toContentError(error, status)
   return data.map((row) => ({
     templateId: row.template_id,

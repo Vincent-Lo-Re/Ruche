@@ -180,7 +180,7 @@ describe("listMedia", () => {
   function recordQuery() {
     const calls: [string, ...unknown[]][] = []
     const query: Record<string, unknown> = {}
-    for (const method of ["select", "is", "order", "limit", "eq", "ilike"]) {
+    for (const method of ["select", "is", "order", "range", "eq", "ilike"]) {
       query[method] = (...args: unknown[]) => {
         calls.push([method, ...args])
         return query

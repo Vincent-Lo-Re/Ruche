@@ -61,6 +61,9 @@ import {
   type TeamRequest,
 } from "@/lib/team"
 import { sections } from "@/navigation"
+import { ListPagination } from "@/components/list-pagination"
+import { usePagination } from "@/hooks/use-pagination"
+import { PAGE_SIZE } from "@/lib/pagination"
 import { texts } from "@/texts"
 
 // Actions qui demandent une confirmation.
@@ -93,6 +96,8 @@ export function TeamPage() {
   const checkAccess = useAccessCheck()
 
   const members = useQuery(teamRead())
+  // Une page de La team (25 personnes) : en pratique, une seule.
+  const paged = usePagination(members.data ?? [], PAGE_SIZE, "")
   useEffect(() => {
     if (members.error) checkAccess(members.error)
   }, [members.error, checkAccess])
@@ -164,7 +169,7 @@ export function TeamPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {members.data.map((member) => {
+                {paged.items.map((member) => {
                   const isMe = member.id === profile?.id
                   // Heure de la liste chargée : l'affichage ne dépend pas de l'heure du rendu.
                   const state = memberState(member, members.dataUpdatedAt)
@@ -256,6 +261,7 @@ export function TeamPage() {
               </TableBody>
             </Table>
           </ListCard>
+          <ListPagination pagination={paged} />
         </div>
       )}
 

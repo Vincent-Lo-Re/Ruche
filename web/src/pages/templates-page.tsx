@@ -80,6 +80,9 @@ import { kickFiles } from "@/lib/media/api"
 import { templateListRead, templateUsageRead } from "@/lib/reads"
 import { refreshAfterContentTrash } from "@/lib/refresh"
 import { editorPath, sections } from "@/navigation"
+import { ListPagination } from "@/components/list-pagination"
+import { usePagination } from "@/hooks/use-pagination"
+import { PAGE_SIZE } from "@/lib/pagination"
 import { texts } from "@/texts"
 
 const labels = texts.templates.list
@@ -153,9 +156,12 @@ export function TemplatesPage() {
     [list.data, tab, usage.data]
   )
 
-  // Sélection en masse ; un bloc identique partout encore utilisé est gardé et listé.
+  // Une page de l'onglet (25 lignes) ; changer d'onglet ramène à la première.
+  const paged = usePagination(shown, PAGE_SIZE, tab)
+  // Sélection en masse, sur la page affichée ; un bloc identique partout encore utilisé est gardé
+  // et listé.
   const bulk = useContentsSelection({
-    shown,
+    shown: paged.items,
     words: labels,
     nameOf,
   })
@@ -248,7 +254,7 @@ export function TemplatesPage() {
                   )
                 )}
                 <TemplateTable
-                  items={shown}
+                  items={paged.items}
                   withType={value === ALL || value === UNUSED}
                   usesOf={usage.data ? usesOf : null}
                   emptyTitle={
@@ -260,6 +266,7 @@ export function TemplatesPage() {
                   selectionDisabled={bulk.pending}
                   onTrash={setToTrash}
                 />
+                <ListPagination pagination={paged} />
               </TabsContent>
             ))}
           </Tabs>

@@ -67,6 +67,19 @@ export function appCategories(
   return appRpc("app_categories", { section })
 }
 
+/** Crée d'un coup des catégories du Blog « <repère> 01 », « <repère> 02 »… (pagination). */
+export async function createCategoriesMarked(marker: string, count: number) {
+  const sql = database()
+  try {
+    for (let index = 1; index <= count; index += 1) {
+      await sql`insert into public.categories (section, name)
+        values ('blog', ${`${marker} ${String(index).padStart(2, "0")}`})`
+    }
+  } finally {
+    await sql.end()
+  }
+}
+
 /** Supprime les catégories dont le nom contient ce repère (fin d'un test). */
 export async function deleteCategoriesMarked(marker: string) {
   const sql = database()

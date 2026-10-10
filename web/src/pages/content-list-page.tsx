@@ -10,6 +10,8 @@ import {
   SquarePen,
   Eraser,
   TriangleAlert,
+  ArrowDownToLine,
+  ArrowUpToLine,
 } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { Link, useNavigate } from "react-router"
@@ -25,6 +27,7 @@ import {
 import { CategoriesTab } from "@/components/categories/categories-tab"
 import { useCategoriesBulk } from "@/components/categories/use-categories-bulk"
 import { ListCard, ListEmpty } from "@/components/list-card"
+import { ListPagination } from "@/components/list-pagination"
 import { CoverCell, SavedCell } from "@/components/contents/row-cells"
 import { useContentsSelection } from "@/components/contents/use-contents-selection"
 import { ListSettingsSheet } from "@/components/contents/list-settings-sheet"
@@ -107,8 +110,10 @@ import { createWithSettings } from "@/lib/contents/settings"
 import { contentProfile } from "@/lib/editor/profile"
 import { useCategories } from "@/hooks/use-categories"
 import { useDebouncedValue } from "@/hooks/use-debounced-value"
+import { usePagination } from "@/hooks/use-pagination"
 import { errorMessage } from "@/lib/errors"
 import { kickFiles } from "@/lib/media/api"
+import { movedTo, PAGE_SIZE, withPageOrder } from "@/lib/pagination"
 import { accessLevelsRead, contentListRead, startersRead } from "@/lib/reads"
 import { refreshAfterContentTrash } from "@/lib/refresh"
 import { editorPath, sections, type SectionKey } from "@/navigation"
@@ -192,9 +197,17 @@ export function ContentListPage({
         : [],
     [items, list.dataUpdatedAt, filters, search, category, known]
   )
-  // Sélection en masse ; un contenu que quelqu'un d'autre écrit est gardé et listé.
-  const bulk = useContentsSelection({
+  // Une page de la liste (25 lignes) ; une recherche ou un filtre ramène à la première.
+  const paged = usePagination(
     shown,
+    PAGE_SIZE,
+    JSON.stringify({ ...filters, search, category, tab }),
+    !onCategories
+  )
+  // Sélection en masse, sur la page affichée ; un contenu que quelqu'un d'autre écrit est gardé
+  // et listé.
+  const bulk = useContentsSelection({
+    shown: paged.items,
     words: { ...kindLabels, undo: labels.undo },
     nameOf: (item) => displayTitle(item.title),
   })
@@ -369,7 +382,7 @@ export function ContentListPage({
                 <ContentTable
                   kind={kind}
                   section={section}
-                  items={shown}
+                  items={paged.items}
                   now={list.dataUpdatedAt}
                   categories={categories.data}
                   selectAll={bulk.selectAll}
@@ -384,11 +397,29 @@ export function ContentListPage({
                       ? {
                           disabled:
                             filtering || reorder.isPending || bulk.pending,
-                          onReorder: (ids) => reorder.mutate(ids),
+                          // Rangée dans la page : toute la liste suit (sans filtre, shown
+                          // est la liste entière, dans son ordre).
+                          onReorder: (ids) =>
+                            reorder.mutate(
+                              withPageOrder(
+                                shown.map((item) => item.id),
+                                ids,
+                                paged.from - 1
+                              )
+                            ),
+                          onMove: (item, place) =>
+                            reorder.mutate(
+                              movedTo(
+                                shown.map((one) => one.id),
+                                item.id,
+                                place
+                              )
+                            ),
                         }
                       : undefined
                   }
                 />
+                <ListPagination pagination={paged} />
               </>
             )}
           </>
@@ -654,7 +685,12 @@ function ContentTable({
   onSettings: (item: ContentListItem) => void
   // Blog, Podcasts : le glisser-déposer ([D47]) ; disabled pendant une
   // recherche, un filtre ou un enregistrement (on ne range que la liste complète).
-  order?: { disabled: boolean; onReorder: (ids: string[]) => void }
+  // « Mettre en tête » et « Mettre à la fin » (menu « … »), d'une page à l'autre.
+  order?: {
+    disabled: boolean
+    onReorder: (ids: string[]) => void
+    onMove: (item: ContentListItem, place: "top" | "bottom") => void
+  }
   // L'image mise en avant de chacun (celles de toute la liste, lues en une fois).
   coverFor: ReturnType<typeof useCovers>
 }) {
@@ -731,6 +767,11 @@ function ContentTable({
                     disabled={trashing}
                     onTrash={() => onTrash(item)}
                     onSettings={() => onSettings(item)}
+                    onMove={
+                      order && !order.disabled
+                        ? (place) => order.onMove(item, place)
+                        : undefined
+                    }
                   />
                 </TableCell>
               </>
@@ -826,12 +867,15 @@ function RowActions({
   disabled,
   onTrash,
   onSettings,
+  onMove,
 }: {
   title: string
   editPath: string
   disabled: boolean
   onTrash: () => void
   onSettings: () => void
+  // Blog, Podcasts, sans recherche ni filtre : « Mettre en tête », « Mettre à la fin ».
+  onMove?: (place: "top" | "bottom") => void
 }) {
   const navigate = useNavigate()
   return (
@@ -852,6 +896,19 @@ function RowActions({
           <Settings2 />
           {labels.settings.action}
         </DropdownMenuItem>
+        {onMove && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => onMove("top")}>
+              <ArrowUpToLine />
+              {labels.order.moveTop}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onMove("bottom")}>
+              <ArrowDownToLine />
+              {labels.order.moveBottom}
+            </DropdownMenuItem>
+          </>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onClick={onTrash}>
           <Eraser />

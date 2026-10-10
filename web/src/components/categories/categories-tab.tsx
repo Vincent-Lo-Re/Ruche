@@ -6,6 +6,8 @@ import {
   SquarePen,
   Tags,
   Eraser,
+  ArrowDownToLine,
+  ArrowUpToLine,
 } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
@@ -16,6 +18,7 @@ import { CategoryUsesButton } from "@/components/categories/category-uses"
 import type { CategoriesBulk } from "@/components/categories/use-categories-bulk"
 import { SortableRow } from "@/components/contents/sortable-rows"
 import { ListCard, ListEmpty } from "@/components/list-card"
+import { ListPagination } from "@/components/list-pagination"
 import { SortableList } from "@/components/list-sorting"
 import { LoadState } from "@/components/load-state"
 import { SearchInput } from "@/components/search-input"
@@ -54,9 +57,11 @@ import {
   type Category,
   type CategorySection,
 } from "@/lib/categories"
+import { usePagination } from "@/hooks/use-pagination"
 import { contentKeys } from "@/lib/contents/api"
 import { normalizeSearch } from "@/lib/contents/list-filters"
 import { formatDateTime } from "@/lib/dates"
+import { movedTo, PAGE_SIZE, withPageOrder } from "@/lib/pagination"
 import { errorMessage } from "@/lib/errors"
 import { categoriesRead, REREAD_MS } from "@/lib/reads"
 import { texts } from "@/texts"
@@ -111,14 +116,21 @@ export function CategoriesTab({
     )
   }, [all, search, usage])
   const filtering = search.trim() !== "" || usage !== "all"
-  // Une recherche ou un filtre décoche ce qu'ils cachent : « Supprimer définitivement (n) » ne
-  // compte que les lignes affichées.
+  // Une page de la liste (25 lignes) ; une recherche ou un filtre ramène à la première.
+  const paged = usePagination(
+    shown,
+    PAGE_SIZE,
+    JSON.stringify({ search, usage })
+  )
+  const pageItems = paged.items
+  // Une recherche, un filtre ou une autre page décochent ce qu'ils cachent : « Supprimer
+  // définitivement (n) » ne compte que les lignes affichées.
   useEffect(() => {
-    const visible = new Set(shown.map((category) => category.id))
+    const visible = new Set(pageItems.map((category) => category.id))
     if ([...selected].some((id) => !visible.has(id)))
       setSelected(new Set([...selected].filter((id) => visible.has(id))))
-  }, [shown, selected, setSelected])
-  const checked = shown.filter((category) => selected.has(category.id))
+  }, [pageItems, selected, setSelected])
+  const checked = pageItems.filter((category) => selected.has(category.id))
 
   // Les listes du Blog ou des Podcasts montrent les noms : relues aussi.
   const refresh = () =>
@@ -295,7 +307,7 @@ export function CategoriesTab({
                 </p>
               )}
               <CategoryTable
-                items={shown}
+                items={pageItems}
                 selected={selected}
                 checkedCount={checked.length}
                 disabled={busy}
@@ -304,14 +316,33 @@ export function CategoriesTab({
                 onToggleAll={(on) =>
                   setSelected(
                     on
-                      ? new Set(shown.map((category) => category.id))
+                      ? new Set(pageItems.map((category) => category.id))
                       : without(
                           selected,
-                          shown.map((category) => category.id)
+                          pageItems.map((category) => category.id)
                         )
                   )
                 }
-                onReorder={(ids) => reorder.mutate(ids)}
+                // Rangée dans la page : toute la liste suit (sans recherche, shown est la
+                // liste entière, dans son ordre).
+                onReorder={(ids) =>
+                  reorder.mutate(
+                    withPageOrder(
+                      shown.map((category) => category.id),
+                      ids,
+                      paged.from - 1
+                    )
+                  )
+                }
+                onMove={(category, place) =>
+                  reorder.mutate(
+                    movedTo(
+                      shown.map((one) => one.id),
+                      category.id,
+                      place
+                    )
+                  )
+                }
                 onEdit={setEditing}
                 onRemove={(category) => {
                   setToRemove(category)
@@ -319,6 +350,7 @@ export function CategoriesTab({
                   void categories.refetch()
                 }}
               />
+              <ListPagination pagination={paged} />
             </>
           )}
         </>
@@ -380,6 +412,7 @@ function CategoryTable({
   onToggle,
   onToggleAll,
   onReorder,
+  onMove,
   onEdit,
   onRemove,
 }: {
@@ -392,6 +425,8 @@ function CategoryTable({
   onToggle: (category: Category, on: boolean) => void
   onToggleAll: (on: boolean) => void
   onReorder: (ids: string[]) => void
+  // « Mettre en tête », « Mettre à la fin » : d'une page à l'autre, sans glisser.
+  onMove: (category: Category, place: "top" | "bottom") => void
   onEdit: (category: Category) => void
   onRemove: (category: Category) => void
 }) {
@@ -472,6 +507,23 @@ function CategoryTable({
                         <SquarePen />
                         {labels.edit}
                       </DropdownMenuItem>
+                      {!reorderDisabled && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => onMove(category, "top")}
+                          >
+                            <ArrowUpToLine />
+                            {texts.contentList.order.moveTop}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => onMove(category, "bottom")}
+                          >
+                            <ArrowDownToLine />
+                            {texts.contentList.order.moveBottom}
+                          </DropdownMenuItem>
+                        </>
+                      )}
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         variant="destructive"

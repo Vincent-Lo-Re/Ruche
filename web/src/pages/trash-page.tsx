@@ -62,6 +62,9 @@ import { trashRead } from "@/lib/reads"
 import { contentEditorPath, sections } from "@/navigation"
 import { filterTrash, trashFilters, trashTypeLabel } from "@/lib/trash"
 import { displayTitle } from "@/lib/titles"
+import { ListPagination } from "@/components/list-pagination"
+import { usePagination } from "@/hooks/use-pagination"
+import { PAGE_SIZE } from "@/lib/pagination"
 import { texts } from "@/texts"
 
 // Ce qui attend une confirmation : tout vider, effacer la sélection, ou un seul élément.
@@ -167,7 +170,13 @@ export function TrashPage() {
   const filters = trashFilters(items)
   // Un filtre dont le dernier élément vient de partir revient à « Tout ».
   const activeFilter = filters.includes(filter) ? filter : "all"
-  const shown = filterTrash(items, activeFilter)
+  // Une page (25 lignes) ; changer de filtre ramène à la première. La sélection porte sur la page.
+  const paged = usePagination(
+    filterTrash(items, activeFilter),
+    PAGE_SIZE,
+    activeFilter
+  )
+  const shown = paged.items
   const shownKeys = new Set(shown.map(keyOf))
   const selection = shown.filter((item) => selected.has(keyOf(item)))
   const busy = restore.isPending || erase.isPending
@@ -314,6 +323,7 @@ export function TrashPage() {
               </Table>
             </ListCard>
           )}
+          <ListPagination pagination={paged} />
         </div>
       )}
 

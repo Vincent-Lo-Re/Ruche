@@ -282,6 +282,33 @@ describe("Médiathèque", () => {
     expect(localStorage.getItem("ruche:mediatheque:affichage")).toBe("list")
   })
 
+  it("48 fichiers par page, en grille comme en liste : changer de vue garde la page", async () => {
+    const files = Array.from({ length: 50 }, (_, index) =>
+      media({
+        id: `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
+        name: `photo-${index + 1}.webp`,
+      })
+    )
+    vi.mocked(api.listMedia).mockResolvedValue(files)
+    const { router } = await renderApp("/media")
+    await screen.findByText("photo-1.webp")
+    expect(screen.queryByText("photo-49.webp")).toBeNull()
+    expect(screen.getByText("1–48 sur 50")).toBeVisible()
+
+    fireEvent.click(
+      screen.getByRole("button", { name: texts.common.pagination.page(2) })
+    )
+    expect(await screen.findByText("photo-49.webp")).toBeVisible()
+    expect(screen.queryByText("photo-1.webp")).toBeNull()
+    expect(router.state.location.search).toBe("?page=2")
+
+    fireEvent.click(screen.getByRole("button", { name: texts.media.view.list }))
+    expect(
+      await screen.findByRole("row", { name: /photo-50\.webp/ })
+    ).toBeVisible()
+    expect(screen.queryByText("photo-1.webp")).toBeNull()
+  })
+
   it("dit quand la médiathèque est vide", async () => {
     vi.mocked(api.listMedia).mockResolvedValue([])
     await renderApp("/media")
