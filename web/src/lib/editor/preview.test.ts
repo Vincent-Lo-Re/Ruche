@@ -5,10 +5,9 @@ import {
   defaultPreview,
   devices,
   deviceHeightOf,
-  fullScreenScale,
+  phoneScale,
   previewFromSearch,
   previewLocked,
-  showsFullScreen,
   withPreview,
 } from "@/lib/editor/preview"
 
@@ -47,24 +46,15 @@ describe("previewLocked", () => {
   })
 })
 
-describe("écran entier", () => {
-  it("seulement en Lecture", () => {
-    const full = { ...defaultPreview, fit: "full" as const }
-    expect(showsFullScreen(full)).toBe(false)
-    expect(showsFullScreen({ ...full, mode: "read" })).toBe(true)
-    expect(showsFullScreen({ ...full, mode: "read", fit: "adjust" })).toBe(
-      false
-    )
-  })
-
+describe("le téléphone en entier (10/10/2026)", () => {
   it("réduit le téléphone pour qu'il tienne en hauteur, sans l'agrandir ni trop le réduire", () => {
     // iPhone : 874 + 2 × 10 = 894 de haut.
-    expect(fullScreenScale(894, 1000)).toBe(1)
-    expect(fullScreenScale(894, 894)).toBe(1)
-    expect(fullScreenScale(894, 700)).toBe(0.78)
+    expect(phoneScale(894, 1000)).toBe(1)
+    expect(phoneScale(894, 894)).toBe(1)
+    expect(phoneScale(894, 700)).toBe(0.78)
     // Android : 915 + 2 × 9 = 933.
-    expect(fullScreenScale(933, 700)).toBe(0.75)
-    expect(fullScreenScale(894, 100)).toBe(0.4)
+    expect(phoneScale(933, 700)).toBe(0.75)
+    expect(phoneScale(894, 100)).toBe(0.4)
   })
 
   it("lit la hauteur du téléphone dans les variables de l'aperçu", () => {
@@ -84,16 +74,17 @@ describe("les réglages du téléphone dans l'adresse (QCM du 04/10/2026)", () =
     theme: "dark",
     largeText: true,
     reader: "visitor",
-    fit: "full",
   } as const
 
   it("n'écrit que ce qui diffère du départ, en mots français", () => {
     expect(withPreview("", defaultPreview).toString()).toBe("")
+    // L'ancien choix « Ajuster / Écran entier » (retiré le 10/10/2026) disparaît de l'adresse.
+    expect(withPreview("fit=full", defaultPreview).toString()).toBe("")
     expect(
       withPreview("", { ...defaultPreview, mode: "read" }).toString()
     ).toBe("mode=read")
     expect(withPreview("", everything).toString()).toBe(
-      "mode=read&device=android&theme=dark&reader=visitor&fit=full&text=large"
+      "mode=read&device=android&theme=dark&reader=visitor&text=large"
     )
   })
 
