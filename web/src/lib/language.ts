@@ -3,6 +3,8 @@
 // Celle du membre (Mon compte) passe avant celle de toute l'admin (Paramètres › Avancé) ; les deux
 // sont gardées sur ce navigateur pour être connues dès le chargement, connexion comprise.
 
+import { memberAdminChoice } from "@/lib/stored-choice"
+
 export const LANGUAGES = ["en", "fr"] as const
 export type Language = (typeof LANGUAGES)[number]
 
@@ -19,33 +21,14 @@ const DEFAULT_LANGUAGE: Language = isLanguage(
   : "en"
 
 // La langue choisie par le membre, et celle de toute l'admin, retenues à la dernière visite.
-const MEMBER_KEY = "ruche-langue"
-const ADMIN_KEY = "ruche-langue-admin"
+const choice = memberAdminChoice({
+  memberKey: "ruche-langue",
+  adminKey: "ruche-langue-admin",
+  isValid: isLanguage,
+  fallback: DEFAULT_LANGUAGE,
+})
 
-function read(key: string): Language | null {
-  try {
-    const stored = localStorage.getItem(key)
-    return isLanguage(stored) ? stored : null
-  } catch {
-    // Stockage indisponible.
-    return null
-  }
-}
-
-function write(key: string, value: Language | null): void {
-  try {
-    if (value) localStorage.setItem(key, value)
-    else localStorage.removeItem(key)
-  } catch {
-    // Le choix vaut pour cette visite ; il reste enregistré sur le compte ou dans la base.
-  }
-}
-
-function effectiveLanguage(): Language {
-  return read(MEMBER_KEY) ?? read(ADMIN_KEY) ?? DEFAULT_LANGUAGE
-}
-
-export const language: Language = effectiveLanguage()
+export const language: Language = choice.current
 
 /** La langue choisie par le membre dans Mon compte, rangée sur son compte ; null s'il suit l'admin. */
 export function memberLanguage(
@@ -55,20 +38,14 @@ export function memberLanguage(
   return isLanguage(chosen) ? chosen : null
 }
 
-// Recharge la page si la langue qui s'applique a changé : tous les textes, même ceux lus au
-// chargement d'un module, passent dans la nouvelle langue.
-function reloadIfChanged(): void {
-  if (effectiveLanguage() !== language) window.location.reload()
-}
-
-/** La langue du membre (null : celle de l'admin), gardée sur ce navigateur. */
-export function applyMemberLanguage(next: Language | null): void {
-  write(MEMBER_KEY, next)
-  reloadIfChanged()
-}
+/**
+ * La langue du membre (null : celle de l'admin), gardée sur ce navigateur. La page se recharge
+ * si la langue qui s'applique a changé : tous les textes, même ceux lus au chargement d'un
+ * module, passent dans la nouvelle langue.
+ */
+export const applyMemberLanguage = choice.applyMember
 
 /** La langue de toute l'admin (Paramètres › Avancé), gardée sur ce navigateur. */
 export function applyAdminLanguage(next: Language): void {
-  write(ADMIN_KEY, next)
-  reloadIfChanged()
+  choice.applyAdmin(next)
 }

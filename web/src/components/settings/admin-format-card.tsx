@@ -1,11 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
+import { useQuery } from "@tanstack/react-query"
 
 import { ListSelect } from "@/components/list-select"
 import { LoadState } from "@/components/load-state"
 import { Card, CardContent } from "@/components/ui/card"
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
-import { adminBrandKey, saveAdminFormat } from "@/lib/admin-identity"
+import { useBrandMutation } from "@/hooks/use-brand-name"
+import { saveAdminFormat } from "@/lib/admin-identity"
 import { formatSample } from "@/lib/dates"
 import { language } from "@/lib/language"
 import { adminBrandRead } from "@/lib/reads"
@@ -26,18 +26,13 @@ const LANGUAGE_CHOICE = "language"
 /**
  * Le format régional de toute l'admin (onglet « Avancé » des Paramètres, admins) : l'écriture des
  * dates, des heures et des nombres, tant qu'un membre n'a pas choisi le sien dans Mon compte ; un
- * exemple sous la liste. L'identité de l'admin relue, useAdminFormat recharge la page s'il change.
+ * exemple sous la liste. L'identité de l'admin relue, useAdminSettings recharge la page s'il change.
  */
 export function AdminFormatCard() {
-  const queryClient = useQueryClient()
   const brand = useQuery(adminBrandRead())
-  const save = useMutation({
+  const save = useBrandMutation({
     mutationFn: (format: RegionalFormat | null) => saveAdminFormat(format),
-    onSuccess: async () => {
-      toast.success(labels.saved)
-      await queryClient.invalidateQueries({ queryKey: adminBrandKey })
-    },
-    onError: () => toast.error(texts.common.unexpected),
+    saved: labels.saved,
   })
 
   return (

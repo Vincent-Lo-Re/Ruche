@@ -1,7 +1,9 @@
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
 
-import { brandName, type AdminBrand } from "@/lib/admin-identity"
+import { adminBrandKey, brandName, type AdminBrand } from "@/lib/admin-identity"
 import { adminBrandRead } from "@/lib/reads"
+import { texts } from "@/texts"
 
 /**
  * L'identité de l'admin (nom, logotype, monogramme), lue dès l'ouverture de l'admin (main.tsx) ;
@@ -20,4 +22,33 @@ export function useBrandName(): string {
   const { data, isPending, isError } = useQuery(adminBrandRead())
   if (isPending && !isError) return ""
   return brandName(data?.name)
+}
+
+/**
+ * Enregistre un réglage de l'identité de l'admin (Paramètres) : le message de réussite, puis
+ * l'identité relue pour toute l'admin. onSaved : juste avant (remettre un formulaire à zéro) ;
+ * errorText : le message d'un échec (sinon « erreur inattendue »).
+ */
+export function useBrandMutation<V, R = unknown>({
+  mutationFn,
+  saved,
+  onSaved,
+  errorText,
+}: {
+  mutationFn: (variables: V) => Promise<R>
+  saved: string | ((variables: V) => string)
+  onSaved?: (variables: V) => void
+  errorText?: (error: Error) => string
+}) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn,
+    onSuccess: async (_, variables) => {
+      onSaved?.(variables)
+      toast.success(typeof saved === "function" ? saved(variables) : saved)
+      await queryClient.invalidateQueries({ queryKey: adminBrandKey })
+    },
+    onError: (error) =>
+      toast.error(errorText?.(error) ?? texts.common.unexpected),
+  })
 }

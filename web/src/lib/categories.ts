@@ -13,6 +13,7 @@ import type { ContentUse } from "@/lib/uses-export"
 import { readAll } from "@/lib/read-all"
 import { supabase } from "@/lib/supabase"
 import type { ContentKind } from "@/lib/contents/api"
+import { CodedError, isErrorCode } from "@/lib/errors"
 import { texts } from "@/texts"
 
 /** La section d'une catégorie : Blog (articles) ou Podcasts (épisodes). */
@@ -36,20 +37,15 @@ export const categoryKeys = {
 type CategoryErrorCode = keyof typeof texts.categories.errors
 
 /** Erreur de la base sur une catégorie, avec son code (s'il est connu). */
-export class CategoryError extends Error {
-  readonly code: CategoryErrorCode | null
-
+export class CategoryError extends CodedError<CategoryErrorCode> {
   constructor(code: CategoryErrorCode | null) {
-    super(code ? texts.categories.errors[code] : texts.common.unexpected)
-    this.name = "CategoryError"
-    this.code = code
+    super("CategoryError", texts.categories.errors, code)
   }
 }
 
 export function toCategoryError(error: PostgrestError): CategoryError {
-  const known = texts.categories.errors
-  if (Object.hasOwn(known, error.message)) {
-    return new CategoryError(error.message as CategoryErrorCode)
+  if (isErrorCode(texts.categories.errors, error.message)) {
+    return new CategoryError(error.message)
   }
   // Nom déjà pris dans la section (index unique, à la casse près).
   if (error.code === "23505") return new CategoryError("nom_en_double")

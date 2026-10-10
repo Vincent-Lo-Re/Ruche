@@ -17,6 +17,7 @@ import { readAll } from "@/lib/read-all"
 import { supabase } from "@/lib/supabase"
 import { describeFacts } from "@/lib/error-facts"
 import type { ContentUse } from "@/lib/uses-export"
+import { CodedError, isErrorCode } from "@/lib/errors"
 import { texts } from "@/texts"
 
 // ---------------------------------------------------------------------------------------------
@@ -25,21 +26,14 @@ import { texts } from "@/texts"
 
 type MediaErrorCode = keyof typeof texts.media.errors
 
-function isMediaErrorCode(code: unknown): code is MediaErrorCode {
-  return typeof code === "string" && Object.hasOwn(texts.media.errors, code)
-}
-
 /** Erreur de la base ou de la fonction « files » : son code (s'il est connu) et le message. */
-export class MediaError extends Error {
-  readonly code: MediaErrorCode | null
+export class MediaError extends CodedError<MediaErrorCode> {
   // Précision écrite par l'admin à partir des faits de la base (lib/error-facts.ts), par exemple
   // la liste des contenus qui utilisent un fichier.
   readonly detail: string | null
 
   constructor(code: MediaErrorCode | null, detail: string | null = null) {
-    super(code ? texts.media.errors[code] : texts.common.unexpected)
-    this.name = "MediaError"
-    this.code = code
+    super("MediaError", texts.media.errors, code)
     this.detail = detail
   }
 }
@@ -53,7 +47,9 @@ export function usedFileDetail(error: unknown): string | null {
 
 /** Traduit une erreur de la base (RPC ou table). */
 function toMediaError(error: PostgrestError): MediaError {
-  const code = isMediaErrorCode(error.message) ? error.message : null
+  const code = isErrorCode(texts.media.errors, error.message)
+    ? error.message
+    : null
   return new MediaError(code, describeFacts(code, error.hint || null))
 }
 
@@ -489,7 +485,7 @@ export async function callFiles<M extends FilesMode>(
         const body: unknown = await (error.context as Response).json()
         const code = (body as { error?: { code?: unknown } } | null)?.error
           ?.code
-        if (isMediaErrorCode(code)) throw new MediaError(code)
+        if (isErrorCode(texts.media.errors, code)) throw new MediaError(code)
       } catch (parsed) {
         if (parsed instanceof MediaError) throw parsed
       }

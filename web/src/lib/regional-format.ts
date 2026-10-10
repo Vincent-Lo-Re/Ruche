@@ -7,6 +7,7 @@
 // si celui qui s'applique change.
 
 import { language, type Language } from "@/lib/language"
+import { memberAdminChoice } from "@/lib/stored-choice"
 
 /** Les formats proposés : ceux des langues de l'admin, et leurs voisins les plus courants. */
 export const REGIONAL_FORMATS = [
@@ -38,34 +39,15 @@ export function languageFormat(of: Language): RegionalFormat {
   return of === "fr" ? "fr-FR" : "en-US"
 }
 
-const MEMBER_KEY = "ruche-format"
-const ADMIN_KEY = "ruche-format-admin"
-
-function read(key: string): RegionalFormat | null {
-  try {
-    const stored = localStorage.getItem(key)
-    return isRegionalFormat(stored) ? stored : null
-  } catch {
-    // Stockage indisponible.
-    return null
-  }
-}
-
-function write(key: string, value: RegionalFormat | null): void {
-  try {
-    if (value) localStorage.setItem(key, value)
-    else localStorage.removeItem(key)
-  } catch {
-    // Le choix vaut pour cette visite ; il reste enregistré sur le compte ou dans la base.
-  }
-}
-
-function effectiveFormat(): RegionalFormat {
-  return read(MEMBER_KEY) ?? read(ADMIN_KEY) ?? languageFormat(language)
-}
+const choice = memberAdminChoice({
+  memberKey: "ruche-format",
+  adminKey: "ruche-format-admin",
+  isValid: isRegionalFormat,
+  fallback: languageFormat(language),
+})
 
 /** Pour Intl : le format régional qui s'applique (« fr-FR », « en-GB »). */
-export const locale: RegionalFormat = effectiveFormat()
+export const locale: RegionalFormat = choice.current
 
 /** Le format choisi par le membre dans Mon compte, rangé sur son compte ; null s'il suit l'admin. */
 export function memberFormat(
@@ -75,21 +57,11 @@ export function memberFormat(
   return isRegionalFormat(chosen) ? chosen : null
 }
 
-function reloadIfChanged(): void {
-  if (effectiveFormat() !== locale) window.location.reload()
-}
-
 /** Le format du membre (null : celui de l'admin), gardé sur ce navigateur. */
-export function applyMemberFormat(next: RegionalFormat | null): void {
-  write(MEMBER_KEY, next)
-  reloadIfChanged()
-}
+export const applyMemberFormat = choice.applyMember
 
 /** Le format de toute l'admin (null : celui de la langue), gardé sur ce navigateur. */
-export function applyAdminFormat(next: RegionalFormat | null): void {
-  write(ADMIN_KEY, next)
-  reloadIfChanged()
-}
+export const applyAdminFormat = choice.applyAdmin
 
 /** Le nom d'un format dans la langue de l'admin : « Anglais (Royaume-Uni) », « British English ». */
 export function regionalFormatName(format: RegionalFormat): string {

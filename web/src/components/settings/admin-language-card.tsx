@@ -1,11 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
+import { useQuery } from "@tanstack/react-query"
 
 import { ListSelect } from "@/components/list-select"
 import { LoadState } from "@/components/load-state"
 import { Card, CardContent } from "@/components/ui/card"
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
-import { adminBrandKey, saveAdminLanguage } from "@/lib/admin-identity"
+import { useBrandMutation } from "@/hooks/use-brand-name"
+import { saveAdminLanguage } from "@/lib/admin-identity"
 import { isLanguage, LANGUAGES, type Language } from "@/lib/language"
 import { adminBrandRead } from "@/lib/reads"
 import { texts } from "@/texts"
@@ -20,18 +20,13 @@ const items = LANGUAGES.map((value) => ({
 /**
  * La langue de toute l'admin (onglet « Avancé » des Paramètres, admins) : celle de l'équipe tant
  * qu'un membre n'a pas choisi la sienne dans Mon compte, et celle des pages de connexion.
- * L'identité de l'admin relue, useAdminLanguage recharge la page si la langue change.
+ * L'identité de l'admin relue, useAdminSettings recharge la page si la langue change.
  */
 export function AdminLanguageCard() {
-  const queryClient = useQueryClient()
   const brand = useQuery(adminBrandRead())
-  const save = useMutation({
+  const save = useBrandMutation({
     mutationFn: (language: Language) => saveAdminLanguage(language),
-    onSuccess: async () => {
-      toast.success(labels.saved)
-      await queryClient.invalidateQueries({ queryKey: adminBrandKey })
-    },
-    onError: () => toast.error(texts.common.unexpected),
+    saved: labels.saved,
   })
 
   return (

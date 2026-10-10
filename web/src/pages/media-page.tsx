@@ -79,6 +79,7 @@ import { getUploadQueue } from "@/lib/media/upload-queue"
 import { mediaListRead, mediaRead } from "@/lib/reads"
 import { sections } from "@/navigation"
 import { texts } from "@/texts"
+import { readStored, writeStored } from "@/lib/stored-choice"
 
 type View = "grid" | "list"
 
@@ -90,19 +91,11 @@ const viewChoices: { value: View; Icon: typeof LayoutGrid }[] = [
 ]
 
 function readView(): View {
-  try {
-    return localStorage.getItem(viewStorageKey) === "list" ? "list" : "grid"
-  } catch {
-    return "grid"
-  }
+  return readStored(viewStorageKey) === "list" ? "list" : "grid"
 }
 
 function saveView(view: View) {
-  try {
-    localStorage.setItem(viewStorageKey, view)
-  } catch {
-    // Préférence non gardée : sans conséquence.
-  }
+  writeStored(viewStorageKey, view)
 }
 
 /**

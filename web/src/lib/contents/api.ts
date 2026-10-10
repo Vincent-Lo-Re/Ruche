@@ -11,6 +11,7 @@ import { readAll } from "@/lib/read-all"
 import { supabase } from "@/lib/supabase"
 import { recordTemplateCopy } from "@/lib/contents/template-copies"
 import { describeFacts } from "@/lib/error-facts"
+import { CodedError, isErrorCode } from "@/lib/errors"
 import { texts } from "@/texts"
 
 // ---------------------------------------------------------------------------------------------
@@ -19,16 +20,11 @@ import { texts } from "@/texts"
 
 type ContentErrorCode = keyof typeof texts.editor.errors
 
-function isContentErrorCode(code: unknown): code is ContentErrorCode {
-  return typeof code === "string" && Object.hasOwn(texts.editor.errors, code)
-}
-
 /**
  * Erreur de la base : son code (s'il est connu), la précision de la base, et si l'on peut
  * réessayer plus tard (réseau coupé, serveur indisponible).
  */
-export class ContentError extends Error {
-  readonly code: ContentErrorCode | null
+export class ContentError extends CodedError<ContentErrorCode> {
   readonly detail: string | null
   // Complément de la base : le nom de la personne qui écrit (verrou_tenu).
   readonly hint: string | null
@@ -46,9 +42,7 @@ export class ContentError extends Error {
       retryable?: boolean
     } = {}
   ) {
-    super(code ? texts.editor.errors[code] : texts.common.unexpected)
-    this.name = "ContentError"
-    this.code = code
+    super("ContentError", texts.editor.errors, code)
     this.detail = detail
     this.hint = hint
     this.retryable = retryable
@@ -83,7 +77,9 @@ export function toContentError(
   error: PostgrestError,
   status: number
 ): ContentError {
-  const code = isContentErrorCode(error.message) ? error.message : null
+  const code = isErrorCode(texts.editor.errors, error.message)
+    ? error.message
+    : null
   const offline = typeof navigator !== "undefined" && navigator.onLine === false
   const retryable =
     code === null &&

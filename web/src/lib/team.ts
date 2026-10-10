@@ -3,6 +3,7 @@ import { FunctionsHttpError } from "@supabase/supabase-js"
 import type { Database } from "@/lib/database.types"
 import type { Language } from "@/lib/language"
 import { supabase } from "@/lib/supabase"
+import { CodedError, isErrorCode } from "@/lib/errors"
 import { texts } from "@/texts"
 
 // Appels à la fonction serveur « equipe » (supabase/functions/equipe), réservée aux admins.
@@ -40,18 +41,10 @@ export type TeamRequest =
 
 type TeamErrorCode = keyof typeof texts.team.errors
 
-function isTeamErrorCode(code: unknown): code is TeamErrorCode {
-  return typeof code === "string" && Object.hasOwn(texts.team.errors, code)
-}
-
 /** Erreur de la fonction « equipe » : son code (s'il est connu) et le message à afficher. */
-export class TeamError extends Error {
-  readonly code: TeamErrorCode | null
-
+export class TeamError extends CodedError<TeamErrorCode> {
   constructor(code: TeamErrorCode | null) {
-    super(code ? texts.team.errors[code] : texts.common.unexpected)
-    this.name = "TeamError"
-    this.code = code
+    super("TeamError", texts.team.errors, code)
   }
 }
 
@@ -61,7 +54,7 @@ export async function toTeamError(error: unknown): Promise<TeamError> {
     try {
       const body: unknown = await (error.context as Response).json()
       const code = (body as { error?: { code?: unknown } } | null)?.error?.code
-      if (isTeamErrorCode(code)) return new TeamError(code)
+      if (isErrorCode(texts.team.errors, code)) return new TeamError(code)
     } catch {
       // Réponse illisible : message général.
     }

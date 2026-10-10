@@ -6,16 +6,12 @@ import {
   ThemeContext,
   type Theme,
 } from "./theme-context"
+import { readStored, writeStored } from "@/lib/stored-choice"
 
 // Le choix est gardé sur le navigateur de chacun.
 function readStoredTheme(): Theme {
-  try {
-    const stored = localStorage.getItem(THEME_STORAGE_KEY)
-    if (isTheme(stored)) return stored
-  } catch {
-    // Stockage indisponible (navigation privée…) : on suit l'ordinateur.
-  }
-  return "system"
+  const stored = readStored(THEME_STORAGE_KEY)
+  return isTheme(stored) ? stored : "system"
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -35,11 +31,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme])
 
   const setTheme = (next: Theme) => {
-    try {
-      localStorage.setItem(THEME_STORAGE_KEY, next)
-    } catch {
-      // Le choix vaut pour cette visite seulement.
-    }
+    writeStored(THEME_STORAGE_KEY, next)
     setThemeState(next)
   }
 

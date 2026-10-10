@@ -1,3 +1,5 @@
+import { readStored, writeStored } from "@/lib/stored-choice"
+
 /**
  * Les couleurs de l'admin que chacun choisit dans Mon compte (ADMIN § 7, « Les couleurs de
  * chacun ») : une couleur de base, qui teinte les gris, et une couleur d'accent, qui colore le
@@ -1139,22 +1141,18 @@ export function paletteCss(palette: Palette): string {
 export function readPalette(): Palette {
   try {
     const stored: unknown = JSON.parse(
-      localStorage.getItem(PALETTE_STORAGE_KEY) ?? "null"
+      readStored(PALETTE_STORAGE_KEY) ?? "null"
     )
     if (isPalette(stored)) return stored
   } catch {
-    // Stockage indisponible ou valeur abîmée : les couleurs de départ.
+    // Valeur abîmée : les couleurs de départ.
   }
   return DEFAULT_PALETTE
 }
 
 /** Garde le choix sur ce navigateur. */
 export function savePalette(palette: Palette) {
-  try {
-    localStorage.setItem(PALETTE_STORAGE_KEY, JSON.stringify(palette))
-  } catch {
-    // Le choix vaut pour cette visite seulement.
-  }
+  writeStored(PALETTE_STORAGE_KEY, JSON.stringify(palette))
 }
 
 const STYLE_ID = "ruche-couleurs"

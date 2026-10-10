@@ -1,8 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { cn } from "cn"
 import { Eraser, ImagePlus, UploadCloud } from "lucide-react"
 import { useId } from "react"
-import { toast } from "sonner"
 
 import { AnimatedMonogram } from "@/components/auth/animated-monogram"
 import { InfoTip } from "@/components/info-tip"
@@ -27,8 +25,8 @@ import {
 } from "@/components/ui/tooltip"
 import { useFileDrop } from "@/hooks/use-file-drop"
 import { useMonogramSvg } from "@/hooks/use-monogram-svg"
+import { useBrand, useBrandMutation } from "@/hooks/use-brand-name"
 import {
-  adminBrandKey,
   BrandFileError,
   loginImageAccept,
   prepareLoginImage,
@@ -43,7 +41,6 @@ import {
   motionBlocker,
   MOTIONS,
 } from "@/lib/monogram-motion"
-import { adminBrandRead } from "@/lib/reads"
 import { texts } from "@/texts"
 
 const files = texts.settings.adminIdentity.files
@@ -61,42 +58,30 @@ const motionLabels = files.monogramMotion
  * l'équipe.
  */
 export function LoginScreenCard() {
-  const queryClient = useQueryClient()
   const inputId = useId()
-  const brand = useQuery(adminBrandRead()).data
+  const brand = useBrand()
   const monogram = useMonogramSvg()
   const image = brand?.loginImage ?? null
 
-  const refresh = async (message: string) => {
-    await queryClient.invalidateQueries({ queryKey: adminBrandKey })
-    toast.success(message)
-  }
-  const save = useMutation({
+  const save = useBrandMutation({
     mutationFn: async (chosen: File) =>
       saveLoginImage(await prepareLoginImage(chosen), image?.path ?? null),
-    onSuccess: () => refresh(files.saved),
-    onError: (error) =>
-      toast.error(
-        error instanceof BrandFileError
-          ? error.message
-          : texts.common.unexpected
-      ),
+    saved: files.saved,
+    errorText: (error) =>
+      error instanceof BrandFileError ? error.message : texts.common.unexpected,
   })
-  const remove = useMutation({
+  const remove = useBrandMutation({
     mutationFn: (path: string) => removeLoginImage(path),
-    onSuccess: () => refresh(files.removed),
-    onError: () => toast.error(texts.common.unexpected),
+    saved: files.removed,
   })
-  const motion = useMutation({
+  const motion = useBrandMutation({
     mutationFn: (next: boolean) => saveMonogramMotion(next),
-    onSuccess: (_, next) =>
-      refresh(next ? files.monogramMotion.on : files.monogramMotion.off),
-    onError: () => toast.error(texts.common.unexpected),
+    saved: (next) =>
+      next ? files.monogramMotion.on : files.monogramMotion.off,
   })
-  const chosenMotions = useMutation({
+  const chosenMotions = useBrandMutation({
     mutationFn: (next: Motion[]) => saveMonogramMotions(next),
-    onSuccess: () => refresh(motionLabels.saved),
-    onError: () => toast.error(texts.common.unexpected),
+    saved: motionLabels.saved,
   })
   const busy = save.isPending || remove.isPending
   // Pendant l'enregistrement, l'interrupteur et les cases montrent déjà le choix.

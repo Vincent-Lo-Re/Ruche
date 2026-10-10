@@ -5,6 +5,7 @@
 
 // Imports relatifs, sans le DOM : les parcours Playwright lisent aussi les textes (texts/fr.ts).
 import { defaultSectionNames } from "../texts/section-names.ts"
+import { readStored, writeStored } from "./stored-choice.ts"
 
 type Language = keyof typeof defaultSectionNames
 
@@ -41,7 +42,7 @@ function formsOf(value: unknown): SectionForms | null {
 /** Les noms gardés sur ce navigateur (rien d'illisible : le nom d'origine). */
 function read(): CustomSectionNames {
   try {
-    const stored = JSON.parse(localStorage.getItem(KEY) ?? "null") as {
+    const stored = JSON.parse(readStored(KEY) ?? "null") as {
       fr?: Record<string, unknown>
       en?: Record<string, unknown>
     } | null
@@ -56,7 +57,7 @@ function read(): CustomSectionNames {
       },
     }
   } catch {
-    // Stockage indisponible ou illisible.
+    // Valeur illisible.
     return NO_CUSTOM_NAMES
   }
 }
@@ -88,11 +89,7 @@ export function sectionNamesFor(
 /** Les noms lus dans la base : gardés sur ce navigateur ; la page se recharge s'ils ont changé. */
 export function applySectionNames(next: CustomSectionNames): void {
   if (JSON.stringify(next) === JSON.stringify(stored)) return
-  try {
-    localStorage.setItem(KEY, JSON.stringify(next))
-  } catch {
-    // Pas de stockage : les noms d'origine, et pas de rechargement sans fin.
-    return
-  }
+  // Pas de stockage : les noms d'origine, et pas de rechargement sans fin.
+  if (!writeStored(KEY, JSON.stringify(next))) return
   ;(globalThis as { location?: { reload(): void } }).location?.reload()
 }
