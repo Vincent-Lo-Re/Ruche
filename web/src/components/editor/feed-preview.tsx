@@ -66,8 +66,14 @@ export function FeedPreview({
   appBar,
   focus,
   readers = true,
+  variables,
+  themeLocked = false,
   children,
 }: {
+  // La charte publiée de l'app, en variables CSS sur le téléphone.
+  variables?: Record<string, string>
+  // La charte garde un seul mode : pas de choix clair ou sombre.
+  themeLocked?: boolean
   preview: PreviewSettings
   onPreviewChange: (preview: PreviewSettings) => void
   // En Lecture, le choix « abonné / sans la formule » : pas pour un modèle de bloc, qui n'a pas
@@ -130,6 +136,7 @@ export function FeedPreview({
           theme={preview.theme}
           largeText={preview.largeText}
           appBar={appBar}
+          variables={variables}
         >
           {children}
         </PhoneDevice>
@@ -140,6 +147,7 @@ export function FeedPreview({
           onChange={onPreviewChange}
           focus={focus}
           readers={readers}
+          themeLocked={themeLocked}
         />
       </div>
     </div>
@@ -181,11 +189,13 @@ function PreviewTools({
   onChange,
   focus,
   readers,
+  themeLocked,
 }: {
   preview: PreviewSettings
   onChange: (preview: PreviewSettings) => void
   focus: FocusTool
   readers: boolean
+  themeLocked: boolean
 }) {
   return (
     <div
@@ -227,14 +237,18 @@ function PreviewTools({
           {texts.editor.focusMode.label} <Kbd>{focus.shortcut}</Kbd>
         </TooltipContent>
       </Tooltip>
-      <Separator className="my-1 w-5" />
-      <ToolGroup
-        label={labels.theme.label}
-        values={previewThemes}
-        choices={themeChoices}
-        value={preview.theme}
-        onChange={(theme) => onChange({ ...preview, theme })}
-      />
+      {!themeLocked && (
+        <>
+          <Separator className="my-1 w-5" />
+          <ToolGroup
+            label={labels.theme.label}
+            values={previewThemes}
+            choices={themeChoices}
+            value={preview.theme}
+            onChange={(theme) => onChange({ ...preview, theme })}
+          />
+        </>
+      )}
       <Separator className="my-1 w-5" />
       <Tooltip>
         <TooltipTrigger

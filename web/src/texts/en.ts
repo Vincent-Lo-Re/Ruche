@@ -1896,6 +1896,8 @@ export const en = {
         fill: "Background",
         border: "Border",
         hint: "A box can hold text and images, but not another box.",
+        tint: "Tint",
+        tintHint: "The box tints of your app style (App › Style).",
       },
       moveUp: "Move up",
       moveDown: "Move down",

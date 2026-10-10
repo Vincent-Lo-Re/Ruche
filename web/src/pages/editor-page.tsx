@@ -15,6 +15,7 @@ import "@/blocks/components/preview.css"
 
 import { BlockCanvas } from "@/blocks/components/block-canvas"
 import { BlocksEditorContext } from "@/blocks/components/context"
+import { BlocksStyleContext } from "@/blocks/components/style-context"
 import { singleLine, useAutoHeight } from "@/blocks/components/fields"
 import {
   DRAFT_WARN_BYTES,
@@ -116,6 +117,10 @@ import {
 } from "@/lib/scroll-memory"
 import { sections, type SectionKey } from "@/navigation"
 import { texts } from "@/texts"
+import { usePublishedStyle } from "@/hooks/use-published-style"
+import { fontFaces } from "@/lib/app-style/fonts"
+import type { StyleMode } from "@/lib/app-style/style"
+import { blocksVariables } from "@/lib/app-style/variables"
 import { useBrandName } from "@/hooks/use-brand-name"
 import { tabTitle } from "@/lib/admin-identity"
 
@@ -343,9 +348,28 @@ function ContentEditor({
   } = editing
   const { linkedIds, templateName, resolveLinked } = editing.linked
 
+  // La charte publiée de l'app habille le téléphone ; si elle ne garde qu'un mode, c'est le sien.
+  const appStyle = usePublishedStyle()
+  const themeLocked = appStyle.darkMode !== "auto"
+  const phoneTheme = themeLocked
+    ? (appStyle.darkMode as StyleMode)
+    : phoneView.theme
+  const blocksStyle = useMemo(
+    () => ({ style: appStyle, mode: phoneTheme }),
+    [appStyle, phoneTheme]
+  )
+  const phoneVariables = useMemo(
+    () => blocksVariables(appStyle, phoneTheme),
+    [appStyle, phoneTheme]
+  )
+  const fontStyles = useMemo(() => fontFaces(appStyle.fonts), [appStyle.fonts])
+
   const onPreviewChange = (next: PreviewSettings) => {
     if (next.mode === "read") setSelectedId(null)
-    setPhoneView(() => next)
+    // Le mode imposé par la charte ne va pas dans l'adresse.
+    setPhoneView(() =>
+      themeLocked ? { ...next, theme: phoneView.theme } : next
+    )
   }
 
   // Un bloc des Blocs glissé dans l'aperçu, à la place montrée par un trait.
@@ -827,256 +851,266 @@ function ContentEditor({
   )
 
   return (
-    <div className="flex h-svh flex-col bg-muted/40">
-      <title>{tabTitle(title.trim() || untitled, brand)}</title>
-      <p role="status" className="sr-only">
-        {announcement}
-      </p>
+    <BlocksStyleContext value={blocksStyle}>
+      <div className="flex h-svh flex-col bg-muted/40">
+        {/* Les polices de la charte de l'app, servies par l'admin (public/fonts/). */}
+        {fontStyles && <style>{fontStyles}</style>}
+        <title>{tabTitle(title.trim() || untitled, brand)}</title>
+        <p role="status" className="sr-only">
+          {announcement}
+        </p>
 
-      {/* La mise en page de l'éditeur des contenus (ADMIN § 4) : à gauche le plan des blocs, au centre le téléphone,
+        {/* La mise en page de l'éditeur des contenus (ADMIN § 4) : à gauche le plan des blocs, au centre le téléphone,
           à droite tout ce qui concerne le contenu. */}
-      <div className="flex min-h-0 flex-1">
-        <aside
-          id="editeur-plan"
-          aria-label={texts.editor.columns.left}
-          // Caché (et non retiré) en Concentration : les Blocs et « Mes blocs » restent ouverts.
-          className={cn(
-            "flex w-feed-column shrink-0 flex-col border-r bg-background",
-            focusMode && "hidden"
-          )}
-        >
-          <div className="relative min-h-0 flex-1">
-            {/* Sous la glissière des Blocs : hors du clavier et des lecteurs d'écran. */}
-            <div inert={libraryOpen} className="h-full">
-              {outlinePanel}
-            </div>
-            {/* Les Blocs, en glissière par-dessus le Plan : × ou Échap la referment. */}
-            {libraryOpen && (
-              <LibraryDrawer
-                back={backLink}
-                onClose={() => {
-                  closeLibrary()
-                  focusSoon(() => document.getElementById(LEFT_ADD_ID))
-                }}
-              >
-                <BlocksLibrary
-                  open={savedOpen}
-                  onOpenChange={setSavedOpen}
-                  editable={editable}
-                  canAdd={canAddRoot}
-                  inBox={targetBox !== null}
-                  onCancelTarget={() => setBoxTarget(null)}
-                  onAdd={addFromLibrary}
-                  onInsert={
-                    profile.savedBlocks
-                      ? (template) => {
-                          toEdit()
-                          onInsertTemplate(template)
-                        }
-                      : undefined
-                  }
-                />
-              </LibraryDrawer>
+        <div className="flex min-h-0 flex-1">
+          <aside
+            id="editeur-plan"
+            aria-label={texts.editor.columns.left}
+            // Caché (et non retiré) en Concentration : les Blocs et « Mes blocs » restent ouverts.
+            className={cn(
+              "flex w-feed-column shrink-0 flex-col border-r bg-background",
+              focusMode && "hidden"
             )}
-          </div>
-          {/* Un bloc partagé : la règle d'un seul bloc ([D11]), qui grise « Ajouter un bloc ».
-              L'icône orange la signale (la couleur des avertissements). */}
-          {isShared && (
-            <p className="flex shrink-0 items-start gap-2 px-4 pb-3 text-xs text-muted-foreground">
-              <Info aria-hidden className="size-4 shrink-0 text-warning" />
-              <span>{texts.templates.editor.sharedLimit}</span>
-            </p>
-          )}
-          {/* En bas, de la même hauteur que le bas de la colonne de droite : « Ajouter un bloc »
-              sur toute la largeur (le retour est en haut, dans l'en-tête du plan). */}
-          <div className="flex h-feed-footer shrink-0 items-stretch border-t">
-            <div className="flex min-w-0 flex-1 items-center px-4">
-              {/* Le même bouton que dans le téléphone ; en Lecture, il repasse en Édition. */}
-              <AddBlockButton
-                id={LEFT_ADD_ID}
-                label={texts.editor.add.label}
-                disabled={(!editable && !reading) || !canAddRoot}
-                onClick={() => {
-                  if (reading) toEdit()
-                  openLibrary()
-                }}
-              />
-            </div>
-          </div>
-        </aside>
-
-        <main
-          className="flex min-w-0 flex-1 flex-col overflow-x-auto bg-dot-grid"
-          data-backdrop
-          // Un clic sur le fond autour du téléphone (data-backdrop) remet l'éditeur à son état de
-          // base. La souris seulement : au clavier, Échap et « Fermer ».
-          onClick={(event) => {
-            if (
-              event.target instanceof Element &&
-              event.target.hasAttribute("data-backdrop")
-            )
-              resetFeedEditor()
-          }}
-        >
-          <FeedPreview
-            preview={phoneView}
-            onPreviewChange={onPreviewChange}
-            readers={profile.access !== null}
-            toolbar={
-              <FormatToolbar
-                editor={editing.toolbarEditor}
-                editable={editable && !reading}
-              />
-            }
-            focus={tool}
-            notices={
-              <>
-                {lockBanner}
-                {profile.publication === "own" && scheduleBanner}
-                {notices}
-              </>
-            }
-            appBar={<PhoneAppBar section={sectionTitle} />}
           >
-            {phoneView.mode === "read" ? (
-              // Les images lisent l'éditeur (fichier, aperçu), en lecture seule.
-              <BlocksEditorContext value={editing.readOnlyBlocks}>
-                <ReadView
-                  draft={draft}
-                  title={title.trim() || untitled}
-                  cover={
-                    profile.cover === "required" ||
-                    (profile.cover === "optional" && draft.cover)
-                      ? mediaFor(draft.cover?.mediaId ?? null)
-                      : null
-                  }
-                  audio={audio}
-                  meta={readMeta}
-                  locked={
-                    kind !== "template" && previewLocked(phoneView, settings)
-                      ? {
-                          kind,
-                          level:
-                            levels.data?.find(
-                              (level) => level.id === settings.accessLevelId
-                            )?.name ?? null,
-                        }
-                      : false
-                  }
-                  resolve={resolveLinked}
-                />
-              </BlocksEditorContext>
-            ) : (
-              phone
-            )}
-          </FeedPreview>
-        </main>
-
-        <aside
-          aria-label={texts.editor.columns.right[kind]}
-          className={cn(
-            "flex w-feed-column shrink-0 flex-col border-l bg-background",
-            focusMode && "hidden"
-          )}
-        >
-          {/* En tête, l'icône de la section et le titre du contenu (en entier dans l'infobulle
-              s'il est coupé). */}
-          <ColumnHeader
-            icon={SectionIcon}
-            title={title.trim() || untitled}
-            titleId={ARTICLE_TITLE_ID}
-            large
-          />
-          <div className="relative min-h-0 flex-1">
-            <section
-              aria-label={texts.editor.columns.content[kind]}
-              // Sous la glissière du bloc : hors du clavier et des lecteurs d'écran.
-              inert={selectedBlock !== null}
-              className="h-full overflow-y-auto px-4 py-3"
-            >
-              {articlePanel}
-            </section>
-            {/* Les réglages du bloc choisi, en glissière par-dessus l'Article. */}
-            {selectedBlock && (
-              <div className="absolute inset-0 z-10 bg-background motion-safe:animate-in motion-safe:slide-in-from-right-4">
-                {blockSettings}
+            <div className="relative min-h-0 flex-1">
+              {/* Sous la glissière des Blocs : hors du clavier et des lecteurs d'écran. */}
+              <div inert={libraryOpen} className="h-full">
+                {outlinePanel}
               </div>
+              {/* Les Blocs, en glissière par-dessus le Plan : × ou Échap la referment. */}
+              {libraryOpen && (
+                <LibraryDrawer
+                  back={backLink}
+                  onClose={() => {
+                    closeLibrary()
+                    focusSoon(() => document.getElementById(LEFT_ADD_ID))
+                  }}
+                >
+                  <BlocksLibrary
+                    open={savedOpen}
+                    onOpenChange={setSavedOpen}
+                    editable={editable}
+                    canAdd={canAddRoot}
+                    inBox={targetBox !== null}
+                    onCancelTarget={() => setBoxTarget(null)}
+                    onAdd={addFromLibrary}
+                    onInsert={
+                      profile.savedBlocks
+                        ? (template) => {
+                            toEdit()
+                            onInsertTemplate(template)
+                          }
+                        : undefined
+                    }
+                  />
+                </LibraryDrawer>
+              )}
+            </div>
+            {/* Un bloc partagé : la règle d'un seul bloc ([D11]), qui grise « Ajouter un bloc ».
+              L'icône orange la signale (la couleur des avertissements). */}
+            {isShared && (
+              <p className="flex shrink-0 items-start gap-2 px-4 pb-3 text-xs text-muted-foreground">
+                <Info aria-hidden className="size-4 shrink-0 text-warning" />
+                <span>{texts.templates.editor.sharedLimit}</span>
+              </p>
             )}
-          </div>
-          {/* En bas, toujours : la lecture (un épisode : la durée de son audio), la dernière
+            {/* En bas, de la même hauteur que le bas de la colonne de droite : « Ajouter un bloc »
+              sur toute la largeur (le retour est en haut, dans l'en-tête du plan). */}
+            <div className="flex h-feed-footer shrink-0 items-stretch border-t">
+              <div className="flex min-w-0 flex-1 items-center px-4">
+                {/* Le même bouton que dans le téléphone ; en Lecture, il repasse en Édition. */}
+                <AddBlockButton
+                  id={LEFT_ADD_ID}
+                  label={texts.editor.add.label}
+                  disabled={(!editable && !reading) || !canAddRoot}
+                  onClick={() => {
+                    if (reading) toEdit()
+                    openLibrary()
+                  }}
+                />
+              </div>
+            </div>
+          </aside>
+
+          <main
+            className="flex min-w-0 flex-1 flex-col overflow-x-auto bg-dot-grid"
+            data-backdrop
+            // Un clic sur le fond autour du téléphone (data-backdrop) remet l'éditeur à son état de
+            // base. La souris seulement : au clavier, Échap et « Fermer ».
+            onClick={(event) => {
+              if (
+                event.target instanceof Element &&
+                event.target.hasAttribute("data-backdrop")
+              )
+                resetFeedEditor()
+            }}
+          >
+            <FeedPreview
+              preview={
+                phoneTheme === phoneView.theme
+                  ? phoneView
+                  : { ...phoneView, theme: phoneTheme }
+              }
+              variables={phoneVariables}
+              themeLocked={themeLocked}
+              onPreviewChange={onPreviewChange}
+              readers={profile.access !== null}
+              toolbar={
+                <FormatToolbar
+                  editor={editing.toolbarEditor}
+                  editable={editable && !reading}
+                />
+              }
+              focus={tool}
+              notices={
+                <>
+                  {lockBanner}
+                  {profile.publication === "own" && scheduleBanner}
+                  {notices}
+                </>
+              }
+              appBar={<PhoneAppBar section={sectionTitle} />}
+            >
+              {phoneView.mode === "read" ? (
+                // Les images lisent l'éditeur (fichier, aperçu), en lecture seule.
+                <BlocksEditorContext value={editing.readOnlyBlocks}>
+                  <ReadView
+                    draft={draft}
+                    title={title.trim() || untitled}
+                    cover={
+                      profile.cover === "required" ||
+                      (profile.cover === "optional" && draft.cover)
+                        ? mediaFor(draft.cover?.mediaId ?? null)
+                        : null
+                    }
+                    audio={audio}
+                    meta={readMeta}
+                    locked={
+                      kind !== "template" && previewLocked(phoneView, settings)
+                        ? {
+                            kind,
+                            level:
+                              levels.data?.find(
+                                (level) => level.id === settings.accessLevelId
+                              )?.name ?? null,
+                          }
+                        : false
+                    }
+                    resolve={resolveLinked}
+                  />
+                </BlocksEditorContext>
+              ) : (
+                phone
+              )}
+            </FeedPreview>
+          </main>
+
+          <aside
+            aria-label={texts.editor.columns.right[kind]}
+            className={cn(
+              "flex w-feed-column shrink-0 flex-col border-l bg-background",
+              focusMode && "hidden"
+            )}
+          >
+            {/* En tête, l'icône de la section et le titre du contenu (en entier dans l'infobulle
+              s'il est coupé). */}
+            <ColumnHeader
+              icon={SectionIcon}
+              title={title.trim() || untitled}
+              titleId={ARTICLE_TITLE_ID}
+              large
+            />
+            <div className="relative min-h-0 flex-1">
+              <section
+                aria-label={texts.editor.columns.content[kind]}
+                // Sous la glissière du bloc : hors du clavier et des lecteurs d'écran.
+                inert={selectedBlock !== null}
+                className="h-full overflow-y-auto px-4 py-3"
+              >
+                {articlePanel}
+              </section>
+              {/* Les réglages du bloc choisi, en glissière par-dessus l'Article. */}
+              {selectedBlock && (
+                <div className="absolute inset-0 z-10 bg-background motion-safe:animate-in motion-safe:slide-in-from-right-4">
+                  {blockSettings}
+                </div>
+              )}
+            </div>
+            {/* En bas, toujours : la lecture (un épisode : la durée de son audio), la dernière
               modification, puis le cadenas (en lecture seule), l'état de publication et
               « Publier ». */}
-          <ArticleFooter
-            stats={stats}
-            audio={audio}
-            savedAt={autosave.savedAt}
-            saveStatus={feedSaveStatus}
-          >
-            {lockButton}
-            {templateSort ? (
-              // Un modèle ne se publie pas : sa sorte, à la place.
-              <TemplateSortBadge sort={templateSort} />
-            ) : (
-              <>
-                <PublicationBadge pub={pub} />
-                <span className="flex-1" />
-                <PublishButton
-                  pub={pub}
-                  disabled={publishDisabled}
-                  alwaysPublishable={linkedIds.length > 0}
-                  onHistory={() => setHistoryOpen(true)}
-                />
-              </>
-            )}
-          </ArticleFooter>
-        </aside>
-      </div>
+            <ArticleFooter
+              stats={stats}
+              audio={audio}
+              savedAt={autosave.savedAt}
+              saveStatus={feedSaveStatus}
+            >
+              {lockButton}
+              {templateSort ? (
+                // Un modèle ne se publie pas : sa sorte, à la place.
+                <TemplateSortBadge sort={templateSort} />
+              ) : (
+                <>
+                  <PublicationBadge pub={pub} />
+                  <span className="flex-1" />
+                  <PublishButton
+                    pub={pub}
+                    disabled={publishDisabled}
+                    alwaysPublishable={linkedIds.length > 0}
+                    onHistory={() => setHistoryOpen(true)}
+                  />
+                </>
+              )}
+            </ArticleFooter>
+          </aside>
+        </div>
 
-      {focusMode && (
-        <FocusPill
-          apple={apple}
-          saveStatus={saveStatus}
-          lockButton={lockButton}
-          onExit={toggleFocusMode}
-        />
-      )}
-      <LockDialog
-        situation={lockView}
-        holderName={lock.state.holderName}
-        open={lockDialog.open}
-        onOpenChange={lockDialog.setOpen}
-        canCopy={canCopy}
-        onTake={take}
-        onCopy={() => void onCopy()}
-      />
-
-      {!isTemplate && (
-        <>
-          <HistorySheet
-            open={historyOpen}
-            onOpenChange={setHistoryOpen}
-            contentId={contentId}
-            kind={kind}
-            liveVersionId={pub.publication?.live?.id ?? null}
-            canRevert={editable}
-            onRevert={onRevert}
+        {focusMode && (
+          <FocusPill
+            apple={apple}
+            saveStatus={saveStatus}
+            lockButton={lockButton}
+            onExit={toggleFocusMode}
           />
-          <PublicationDialogs pub={pub} />
-          <SaveAsDialog saveAs={saveAs} kind={kind} />
-        </>
-      )}
+        )}
+        <LockDialog
+          situation={lockView}
+          holderName={lock.state.holderName}
+          open={lockDialog.open}
+          onOpenChange={lockDialog.setOpen}
+          canCopy={canCopy}
+          onTake={take}
+          onCopy={() => void onCopy()}
+        />
 
-      <MediaPicker
-        kind={editing.isAudioPicker ? "audio" : "image"}
-        open={editing.pickerFor !== null}
-        onOpenChange={(open) => {
-          if (!open) setPickerFor(null)
-        }}
-        onChoose={editing.onChooseImage}
-        finalFocus={editing.pickerFinalFocus}
-      />
+        {!isTemplate && (
+          <>
+            <HistorySheet
+              open={historyOpen}
+              onOpenChange={setHistoryOpen}
+              contentId={contentId}
+              kind={kind}
+              liveVersionId={pub.publication?.live?.id ?? null}
+              canRevert={editable}
+              onRevert={onRevert}
+            />
+            <PublicationDialogs pub={pub} />
+            <SaveAsDialog saveAs={saveAs} kind={kind} />
+          </>
+        )}
 
-      <LeaveDialog blocker={blocker} />
-    </div>
+        <MediaPicker
+          kind={editing.isAudioPicker ? "audio" : "image"}
+          open={editing.pickerFor !== null}
+          onOpenChange={(open) => {
+            if (!open) setPickerFor(null)
+          }}
+          onChoose={editing.onChooseImage}
+          finalFocus={editing.pickerFinalFocus}
+        />
+
+        <LeaveDialog blocker={blocker} />
+      </div>
+    </BlocksStyleContext>
   )
 }
