@@ -5,12 +5,12 @@
 //    n'a pas d'image mise en avant ([D45]) ; l'image et une catégorie, puis
 //    publier ; l'app le liste avec sa vignette (publique, question 1) ; filtres par catégorie
 //    (admin et app) ; la catégorie supprimée, l'app l'ignore ([D28]).
-// 1 bis. L'éditeur du Fil : « Ajouter un bloc » ouvre les Blocs, un Texte glissé depuis les Blocs, un
+// 1 bis. L'éditeur des contenus : « Ajouter un bloc » ouvre les Blocs, un Texte glissé depuis les Blocs, un
 //    intertitre qui nomme sa ligne du plan, « … » › Dupliquer, le plan rangé au clavier, la Concentration,
 //    puis recharger.
-// 1 ter. L'éditeur du Fil en lecture seule : un second onglet prend la main, la fenêtre s'ouvre
+// 1 ter. L'éditeur des contenus en lecture seule : un second onglet prend la main, la fenêtre s'ouvre
 //    dans le premier, Échap y laisse le cadenas, qui la rouvre pour reprendre la main.
-// 2. Podcasts, dans l'éditeur du Fil : un épisode que « Publier » refuse sans audio ; l'audio
+// 2. Podcasts, dans l'éditeur des contenus : un épisode que « Publier » refuse sans audio ; l'audio
 //    choisi dans la médiathèque, son lecteur dans le téléphone, sa durée dans la carte Audio et
 //    en bas de la colonne, la transcription conseillée ([D46]) ; publier ; l'app le liste avec sa
 //    durée ; la transcription ajoutée depuis sa fiche fait taire l'avertissement.
@@ -75,7 +75,7 @@ async function createBlank(page: Page, kind: "article" | "episode") {
 }
 
 /**
- * L'Article (l'Épisode, la Page), dans la colonne de droite de l'éditeur du Fil : image, audio,
+ * L'Article (l'Épisode, la Page), dans la colonne de droite de l'éditeur des contenus : image, audio,
  * adresse, niveau d'accès, catégories.
  */
 function articleTab(
@@ -138,7 +138,7 @@ async function publishFree(page: Page) {
   await expect(page.getByText(publication.published(1))).toBeVisible()
 }
 
-/** Une page, dans l'éditeur du Fil : son adresse (dans sa carte), puis « Gratuit ». */
+/** Une page, dans l'éditeur des contenus : son adresse (dans sa carte), puis « Gratuit ». */
 async function pageFree(page: Page, slug: string) {
   const address = articleTab(page, "page")
     .getByRole("region", { name: publication.settings.slug.label })

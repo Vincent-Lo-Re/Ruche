@@ -66,7 +66,7 @@ async function newPage(page: Page, title: string) {
   await createBlankPage(page, title)
 }
 
-/** Éditeur du Fil : un bloc ajouté par les Blocs (« Ajouter un bloc » en bas à gauche). */
+/** Éditeur des contenus : un bloc ajouté par les Blocs (« Ajouter un bloc » en bas à gauche). */
 async function addBlock(page: Page, type: "text" | "image") {
   await page.locator("#colonne-gauche-ajouter").click()
   await page
