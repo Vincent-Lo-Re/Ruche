@@ -121,7 +121,7 @@ export function FormatToolbar({
       <TooltipTrigger
         render={
           <Toggle
-            size="icon-sm"
+            size="icon"
             aria-label={label}
             pressed={formats[key]}
             disabled={!usable || disabled}
@@ -142,7 +142,7 @@ export function FormatToolbar({
       role="toolbar"
       aria-label={labels.label}
       aria-orientation="vertical"
-      className="flex flex-col items-center gap-0.5 rounded-lg border bg-background p-1 shadow-xs"
+      className="flex flex-col items-center gap-1 rounded-lg border bg-background p-1 shadow-xs"
     >
       {toggle("paragraph", labels.paragraph, Pilcrow, () =>
         chain().setParagraph().run()
@@ -179,7 +179,7 @@ export function FormatToolbar({
           render={
             <Button
               variant="ghost"
-              size="icon-sm"
+              size="icon"
               aria-label={labels.undo}
               disabled={!usable || !formats.canUndo}
               onMouseDown={(event) => event.preventDefault()}
@@ -196,7 +196,7 @@ export function FormatToolbar({
           render={
             <Button
               variant="ghost"
-              size="icon-sm"
+              size="icon"
               aria-label={labels.redo}
               disabled={!usable || !formats.canRedo}
               onMouseDown={(event) => event.preventDefault()}

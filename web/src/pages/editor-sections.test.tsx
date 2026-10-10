@@ -1041,15 +1041,20 @@ describe("éditeur d'un article (Blog)", () => {
     await renderApp(`/blog/${ARTICLE}`)
     await editable()
     const tools = screen.getByRole("toolbar", { name: preview.tools })
-    // « 40 % » à l'écran, la phrase entière pour les lecteurs d'écran, dès l'Édition.
-    expect(within(tools).getByText(preview.scale(40))).toBeVisible()
-    expect(within(tools).getByText(preview.scaleLabel(40))).toBeInTheDocument()
+    const layout = document.querySelector<HTMLElement>("[data-device]")!
+    // Réduit dès l'Édition, sans pourcentage affiché (il soulèverait plus de questions).
+    expect(layout.style.getPropertyValue("--blocks-device-scale")).toBe("0.4")
+    expect(within(tools).queryByText(/%/)).toBeNull()
+    // La barre du haut de l'app, en Édition aussi.
+    expect(document.querySelector(".blocks-appbar")).toHaveTextContent(
+      texts.sections.blog.title
+    )
 
     // En Lecture aussi, sans choix de taille.
     fireEvent.click(
       within(tools).getByRole("button", { name: preview.mode.read })
     )
-    expect(within(tools).getByText(preview.scale(40))).toBeVisible()
+    expect(layout.style.getPropertyValue("--blocks-device-scale")).toBe("0.4")
     vi.unstubAllGlobals()
   })
 

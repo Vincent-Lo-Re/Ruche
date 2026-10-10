@@ -26,7 +26,7 @@ export const fiche: HelpFiche = {
     "En Lecture, rien ne se modifie et tu ne prends pas la main : les autres peuvent écrire pendant que tu lis, et tu vois leurs changements.",
     "Un clic sur une ligne du Plan fait défiler le téléphone jusqu'au bloc, sans quitter la Lecture.",
     "Tes choix restent d'un écran à l'autre, même après un rechargement. Un contenu ouvert depuis une liste s'ouvre toujours en Édition.",
-    "Le téléphone est toujours montré en entier, à ses vraies proportions : si la fenêtre est trop basse, il est réduit, et le pourcentage s'affiche en bas de la barre d'icônes.",
+    "Le téléphone est toujours montré en entier, à ses vraies proportions : si la fenêtre est trop basse, il est réduit.",
     "Sans la formule, un contenu réservé ne montre pas ses blocs : seulement l'image, le titre et l'invitation à prendre la formule.",
   ],
 }

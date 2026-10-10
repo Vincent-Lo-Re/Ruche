@@ -43,7 +43,7 @@ import {
 } from "@/components/editor/editor-chrome"
 import {
   FeedPreview,
-  ReadAppBar,
+  PhoneAppBar,
   ReadView,
 } from "@/components/editor/feed-preview"
 import { FormatToolbar } from "@/components/editor/format-toolbar"
@@ -936,7 +936,7 @@ function ContentEditor({
                 {notices}
               </>
             }
-            appBar={reading ? <ReadAppBar section={sectionTitle} /> : undefined}
+            appBar={<PhoneAppBar section={sectionTitle} />}
           >
             {phoneView.mode === "read" ? (
               // Les images lisent l'éditeur (fichier, aperçu), en lecture seule.

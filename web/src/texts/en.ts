@@ -1725,9 +1725,6 @@ export const en = {
         dark: "Dark",
       },
       largeText: "Large text",
-      // Le téléphone réduit pour tenir dans la fenêtre.
-      scale: (percent: number) => `${percent}%`,
-      scaleLabel: (percent: number) => `Phone shown at ${percent}%`,
       reader: {
         label: "Reader",
         subscriber: "View as a subscriber with access",

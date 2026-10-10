@@ -82,7 +82,7 @@ export function FeedPreview({
   toolbar: ReactNode
   // Messages au-dessus du téléphone (brouillon trop lourd, échec d'enregistrement).
   notices: ReactNode
-  // En Lecture : la barre du haut de l'app, au-dessus de ce qui défile.
+  // La barre du haut de l'app, au-dessus de ce qui défile.
   appBar?: ReactNode
   children: ReactNode
 }) {
@@ -155,7 +155,6 @@ export function FeedPreview({
         <PreviewTools
           preview={preview}
           onChange={onPreviewChange}
-          scale={scale}
           focus={focus}
           readers={readers}
         />
@@ -197,14 +196,11 @@ type FocusTool = {
 function PreviewTools({
   preview,
   onChange,
-  scale,
   focus,
   readers,
 }: {
   preview: PreviewSettings
   onChange: (preview: PreviewSettings) => void
-  // La réduction du téléphone (1 : à sa vraie taille ; null : pas encore mesurée).
-  scale: number | null
   focus: FocusTool
   readers: boolean
 }) {
@@ -213,7 +209,7 @@ function PreviewTools({
       role="toolbar"
       aria-label={labels.tools}
       aria-orientation="vertical"
-      className="flex shrink-0 flex-col items-center gap-0.5 self-start rounded-lg border bg-background p-1 shadow-xs"
+      className="flex shrink-0 flex-col items-center gap-1 self-start rounded-lg border bg-background p-1 shadow-xs"
     >
       <ToolGroup
         label={labels.device.label}
@@ -234,7 +230,7 @@ function PreviewTools({
         <TooltipTrigger
           render={
             <Toggle
-              size="icon-sm"
+              size="icon"
               aria-label={texts.editor.focusMode.label}
               aria-keyshortcuts={focus.keys}
               pressed={focus.on}
@@ -261,7 +257,7 @@ function PreviewTools({
         <TooltipTrigger
           render={
             <Toggle
-              size="icon-sm"
+              size="icon"
               aria-label={labels.largeText}
               pressed={preview.largeText}
               onPressedChange={(largeText) =>
@@ -290,15 +286,6 @@ function PreviewTools({
           )}
         </>
       )}
-      {/* Réduit pour tenir dans la fenêtre : on ne le voit pas à sa vraie taille. */}
-      {scale !== null && scale < 1 && (
-        <span className="pb-1 text-xs text-muted-foreground tabular-nums">
-          <span aria-hidden>{labels.scale(Math.round(scale * 100))}</span>
-          <span className="sr-only">
-            {labels.scaleLabel(Math.round(scale * 100))}
-          </span>
-        </span>
-      )}
     </div>
   )
 }
@@ -320,7 +307,6 @@ function ToolGroup<T extends string>({
     <ToggleGroup
       aria-label={label}
       orientation="vertical"
-      spacing={0.5}
       className="flex-col"
       value={[value]}
       onValueChange={(next: string[]) => {
@@ -336,7 +322,7 @@ function ToolGroup<T extends string>({
               render={
                 <ToggleGroupItem
                   value={candidate}
-                  size="icon-sm"
+                  size="icon"
                   aria-label={itemLabel}
                 />
               }
@@ -352,10 +338,11 @@ function ToolGroup<T extends string>({
 }
 
 /**
- * En Lecture : la barre du haut de l'app (provisoire). Un article ou une page n'a pas d'écran du
- * dessus : la liste de l'app n'est pas imitée, et rien n'y a d'action.
+ * La barre du haut de l'app (provisoire), en Édition comme en Lecture (10/10/2026). Un article
+ * ou une page n'a pas d'écran du dessus : la liste de l'app n'est pas imitée, et rien n'y a
+ * d'action.
  */
-export function ReadAppBar({ section }: { section: string }) {
+export function PhoneAppBar({ section }: { section: string }) {
   return (
     <div className="blocks-appbar">
       <ChevronLeft aria-hidden />
