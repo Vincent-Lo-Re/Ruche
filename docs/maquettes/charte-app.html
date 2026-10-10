@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Maquette — charte graphique de l'app</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&family=Inter:wght@400;600;700&family=Lora:wght@400;700&family=Merriweather:wght@400;700&family=Nunito:wght@400;700&family=Playfair+Display:wght@400;700&family=Work+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&family=Fraunces:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&family=Lora:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Nunito:wght@400;600;700&family=Playfair+Display:wght@400;600;700&family=Poppins:wght@400;500;600;700&family=Source+Serif+4:wght@400;600;700&family=Space+Grotesk:wght@400;500;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f4f4f5;--card:#fff;--line:#e4e4e7;--muted:#71717a;--text:#18181b;--accent:#f4f4f5;--primary:#18181b;--warn:#b45309;--warn-bg:#fffbeb;--ok:#15803d}
 *{box-sizing:border-box}
@@ -28,10 +28,11 @@ h1{font-size:22px;margin:0 0 4px}
 section.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
 section.card h2{font-size:15px;margin:0 0 2px}
 section.card .desc{color:var(--muted);margin:0 0 14px;font-size:13px}
+section.card h3{font-size:13px;margin:18px 0 8px}
 button{font:inherit;cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.5}
 .btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 10px;color:var(--text)}
-.btn:hover{background:#fafafa}
-.btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn:hover:not(:disabled){background:#fafafa}
 .btn.ghost{border-color:transparent;background:none;color:var(--muted)}
 .btn.dashed{border-style:dashed;color:var(--muted)}
 .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -48,34 +49,38 @@ input[type=color]{width:34px;height:28px;border:1px solid var(--line);border-rad
 .pick select{flex:1}
 .warn{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--warn);background:var(--warn-bg);border:1px solid #fde68a;border-radius:999px;padding:1px 8px;white-space:nowrap}
 .ok{font-size:12px;color:var(--ok);white-space:nowrap}
-.tint{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:10px}
-.tint-head{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-.tint-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
-.tint-grid label,.field-label{font-size:12px;color:var(--muted);display:block;margin-bottom:3px}
+.item{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:10px}
+.item-head{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.item-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.item-grid label{font-size:12px;color:var(--muted);display:block;margin-bottom:3px}
 .opt-grid{display:grid;grid-template-columns:160px 1fr;gap:12px 16px;align-items:center}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg{justify-self:start;display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
 .seg button{border:0;background:#fff;padding:5px 10px;color:var(--muted)}
 .seg button.on{background:var(--primary);color:#fff}
+.sample{font-size:15px}
+.btn-sample{display:inline-block;padding:8px 16px;font-size:13px;min-width:120px;text-align:center}
 .side{position:sticky;top:16px;display:flex;flex-direction:column;gap:12px;align-items:center}
-.side .seg{align-self:center}
 .legend{font-size:12px;color:var(--muted);text-align:center;max-width:300px}
 /* téléphone */
 .phone{width:300px;height:620px;border-radius:40px;background:#111;padding:10px;box-shadow:0 20px 50px #0003}
-.screen{width:100%;height:100%;border-radius:31px;overflow:hidden;display:flex;flex-direction:column;background:var(--p-bg);color:var(--p-text);font-family:var(--p-body)}
-.status{height:30px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 22px;font-size:11px;font-weight:600}
+.screen{width:100%;height:100%;border-radius:31px;overflow:hidden;display:flex;flex-direction:column;background:var(--p-bg);color:var(--p-text)}
+.status{height:30px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 22px;font:600 11px system-ui}
 .topbar{height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--p-border)}
-.topbar b{font-family:var(--p-title);font-size:17px}
+.topbar b{font-size:17px}
 .dots{display:flex;gap:4px}.dots i{width:4px;height:4px;border-radius:50%;background:var(--p-muted)}
 .feed{flex:1;overflow:auto;padding:16px}
 .feed::-webkit-scrollbar{display:none}
 .cover{height:140px;border-radius:var(--p-radius);background:linear-gradient(135deg,var(--p-card),var(--p-border));margin-bottom:14px}
-.p-title{font-family:var(--p-title);font-size:24px;line-height:1.2;margin:0 0 6px;font-weight:700}
+.p-title{font-size:24px;line-height:1.2;margin:0 0 6px}
+.p-h2{font-size:18px;line-height:1.25;margin:18px 0 6px}
 .p-meta{color:var(--p-muted);font-size:12px;margin-bottom:12px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .p-badge{border:1px solid var(--p-primary);color:var(--p-link);border-radius:999px;padding:1px 8px;font-size:11px}
 .p-text{font-size:14px;line-height:1.5;margin:0 0 14px}
 .p-text a{color:var(--p-link)}
+.p-quote{border-left:3px solid var(--p-primary);padding:2px 0 2px 12px;margin:0 0 14px;font-size:16px;line-height:1.4}
+.p-caption{color:var(--p-muted);font-size:12px;margin:-6px 0 14px}
 .p-box{border:1px solid;border-radius:var(--p-radius);padding:12px;margin-bottom:12px;font-size:13px;line-height:1.45}
-.p-box b{display:block;font-family:var(--p-title);font-size:15px;margin-bottom:2px}
+.p-box b{display:block;font-size:15px;margin-bottom:2px}
 .p-box a{display:inline-block;margin-top:4px;font-weight:600}
 .p-card{background:var(--p-card);border:1px solid var(--p-border);border-radius:var(--p-radius);padding:12px;margin-bottom:14px;box-shadow:var(--p-shadow);display:flex;gap:10px;align-items:center}
 .p-card .th{width:44px;height:44px;border-radius:calc(var(--p-radius) * .6);background:var(--p-border);flex:none}
@@ -86,18 +91,17 @@ input[type=color]{width:34px;height:28px;border:1px solid var(--line);border-rad
 .p-field .ph{color:var(--p-muted)}
 .p-field.err div{border-color:var(--p-error);border-width:2px}
 .p-field.err small{color:var(--p-error);font-size:12px;display:block;margin-top:4px}
-.p-btn{display:block;width:100%;border:0;border-radius:var(--p-radius);padding:12px;font-weight:700;font-size:14px;margin-bottom:8px;font-family:var(--p-body)}
-.p-btn.main{background:var(--p-btn);color:var(--p-on)}
-.p-btn.second{background:none;border:1px solid var(--p-primary);color:var(--p-link)}
+.p-btn{display:block;width:100%;padding:12px;font-size:14px;margin-bottom:8px;border:1px solid transparent;background:none}
+.p-btn-label{font-size:10px;color:var(--p-muted);text-align:center;margin:-4px 0 8px}
 .tabbar{height:56px;flex:none;border-top:1px solid var(--p-border);display:flex;justify-content:space-around;align-items:center;font-size:10px;color:var(--p-muted);background:var(--p-bg)}
 .tabbar span{display:flex;flex-direction:column;align-items:center;gap:3px}
 .tabbar span i{width:18px;height:18px;border-radius:5px;border:2px solid currentColor}
-.tabbar span.on{color:var(--p-primary);font-weight:700}
+.tabbar span.on{color:var(--p-primary)}
 .sum{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;width:300px;font-size:12px}
 .sum h3{font-size:13px;margin:0 0 6px}
 .sum ul{margin:0;padding-left:16px;color:var(--warn)}
 @media (max-width:1100px){nav.menu{display:none}}
-@media (max-width:860px){.layout{grid-template-columns:1fr}.side{position:static}main{padding:16px}}
+@media (max-width:860px){.layout{grid-template-columns:1fr}.side{position:static}main{padding:16px}.opt-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -150,24 +154,33 @@ input[type=color]{width:34px;height:28px;border:1px solid var(--line);border-rad
         </section>
 
         <section class="card">
-          <h2>Formes et effets</h2>
-          <p class="desc">Des réglages simples, neutres au départ.</p>
-          <div class="opt-grid">
-            <span>Boutons</span>
-            <div class="row"><div class="seg" id="btnStyle"><button data-v="flat">Aplat</button><button data-v="gradient">Dégradé</button></div><span class="pick" id="gradEndWrap"></span></div>
-            <span>Arrondi des angles</span>
-            <div class="row"><input type="range" min="0" max="24" id="radius"> <span id="radiusVal" class="hex"></span></div>
-            <span>Ombres des cartes</span>
-            <div class="seg" id="shadow"><button data-v="none">Aucune</button><button data-v="light">Légère</button><button data-v="medium">Marquée</button><button data-v="strong">Forte</button></div>
-          </div>
+          <h2>Boutons</h2>
+          <p class="desc">Autant de boutons que tu veux, chacun avec son style. Dans le bloc Bouton, on choisit ensuite l'un d'eux. Le premier sert aux boutons de l'app (« Continuer », « S'abonner »).</p>
+          <div id="buttons"></div>
+          <button class="btn dashed" id="addButton">+ Ajouter un bouton</button>
         </section>
 
         <section class="card">
           <h2>Polices</h2>
-          <p class="desc">La police du téléphone au départ, ou une police libre de Google Fonts.</p>
+          <p class="desc">Tes polices : celle du téléphone, ou une police libre de Google Fonts, avec son épaisseur. Trois au moins.</p>
+          <table><thead><tr><th>Nom</th><th>Police</th><th>Épaisseur</th><th>Aperçu</th><th></th></tr></thead><tbody id="fonts"></tbody></table>
+          <button class="btn dashed" id="addFont" style="margin-top:10px">+ Ajouter une police</button>
+        </section>
+
+        <section class="card">
+          <h2>Où va chaque police</h2>
+          <p class="desc">Comme pour les couleurs : choisis parmi tes polices.</p>
+          <table><tbody id="fontRoles"></tbody></table>
+        </section>
+
+        <section class="card">
+          <h2>Formes et effets</h2>
+          <p class="desc">Pour toute l'app, neutres au départ.</p>
           <div class="opt-grid">
-            <span>Titres</span><select id="fontTitle"></select>
-            <span>Texte</span><select id="fontBody"></select>
+            <span>Arrondi des angles</span>
+            <div class="row"><input type="range" min="0" max="24" id="radius"> <span id="radiusVal" class="hex"></span></div>
+            <span>Ombres des cartes</span>
+            <div class="seg" id="shadow"><button data-v="none">Aucune</button><button data-v="light">Légère</button><button data-v="medium">Marquée</button><button data-v="strong">Forte</button></div>
           </div>
         </section>
 
@@ -193,33 +206,59 @@ input[type=color]{width:34px;height:28px;border:1px solid var(--line);border-rad
 </div>
 
 <script>
-const FONTS = [
+const FAMILIES = [
   ["system", "Police du téléphone", "-apple-system, system-ui, 'Segoe UI', Roboto, sans-serif"],
-  ["Inter", "Inter", "Inter, sans-serif"],
   ["DM Sans", "DM Sans", "'DM Sans', sans-serif"],
-  ["Work Sans", "Work Sans", "'Work Sans', sans-serif"],
-  ["Nunito", "Nunito", "Nunito, sans-serif"],
+  ["DM Serif Display", "DM Serif Display", "'DM Serif Display', serif", [400]],
+  ["Fraunces", "Fraunces", "Fraunces, serif"],
+  ["Inter", "Inter", "Inter, sans-serif"],
+  ["Libre Baskerville", "Libre Baskerville", "'Libre Baskerville', serif", [400, 700]],
   ["Lora", "Lora", "Lora, serif"],
-  ["Merriweather", "Merriweather", "Merriweather, serif"],
+  ["Merriweather", "Merriweather", "Merriweather, serif", [400, 700]],
+  ["Nunito", "Nunito", "Nunito, sans-serif"],
   ["Playfair Display", "Playfair Display", "'Playfair Display', serif"],
+  ["Poppins", "Poppins", "Poppins, sans-serif"],
+  ["Source Serif 4", "Source Serif", "'Source Serif 4', serif"],
+  ["Space Grotesk", "Space Grotesk", "'Space Grotesk', sans-serif"],
+  ["Work Sans", "Work Sans", "'Work Sans', sans-serif"],
 ];
+const WEIGHTS = [[400, "Normale"], [500, "Moyenne"], [600, "Demi-grasse"], [700, "Grasse"]];
 const ROLES = [
   ["background", "Fond de l'écran"],
   ["card", "Cartes et champs"],
   ["border", "Bordures"],
   ["text", "Texte", "background"],
   ["muted", "Texte secondaire", "background"],
-  ["primary", "Couleur principale (boutons)", null],
-  ["onPrimary", "Texte sur les boutons", "primary"],
+  ["primary", "Couleur principale (onglet choisi, filets)"],
   ["link", "Liens", "background"],
   ["error", "Erreur", "background"],
 ];
+const FONT_ROLES = [
+  ["brand", "Nom de la marque (barre du haut)"],
+  ["title", "Titre d'un contenu"],
+  ["heading", "Intertitres"],
+  ["body", "Texte courant"],
+  ["quote", "Citations"],
+  ["small", "Petits textes (dates, légendes, champs)"],
+  ["boxTitle", "Titres des encadrés"],
+  ["button", "Boutons"],
+  ["tabs", "Onglets de navigation"],
+];
 const TINT_PARTS = [["fill", "Fond"], ["border", "Bordure"], ["title", "Titre"], ["text", "Texte"], ["link", "Lien"]];
+const BUTTON_KINDS = [["flat", "Aplat"], ["gradient", "Dégradé"], ["outline", "Bordure"], ["text", "Texte seul"]];
+const BUTTON_PARTS = {
+  flat: [["fill", "Fond"], ["label", "Texte"]],
+  gradient: [["fill", "Début"], ["end", "Fin"], ["label", "Texte"]],
+  outline: [["border", "Bordure"], ["label", "Texte"]],
+  text: [["label", "Texte"]],
+};
+const SHAPES = [["chart", "Arrondi de la charte"], ["pill", "Pilule"], ["square", "Carré"]];
 const SHADOWS = { none: "none", light: "0 2px 8px", medium: "0 4px 14px", strong: "0 6px 16px" };
 const SHADOW_ALPHA = { light: [0.08, 0.3], medium: [0.14, 0.4], strong: [0.3, 0.55] };
+const MIN_FONTS = 3;
 
 let n = 0;
-const id = () => "c" + (++n);
+const id = (p = "c") => p + (++n);
 
 function neutral() {
   const c = (name, light, dark) => ({ id: id(), name, light, dark });
@@ -232,13 +271,21 @@ function neutral() {
     c("Rouge erreur", "#b42318", "#f97066"),
   ];
   const [w, g, b, m, k, e] = palette.map((p) => p.id);
+  const f = (name, family, weight) => ({ id: id("f"), name, family, weight });
+  const fonts = [f("Titres", "system", 700), f("Texte", "system", 400), f("Accent", "system", 600)];
+  const [ft, fb, fa] = fonts.map((x) => x.id);
   return {
     palette,
-    roles: { background: w, card: g, border: b, text: k, muted: m, primary: k, onPrimary: w, link: k, error: e },
-    tints: [{ id: id(), name: "Neutre", fill: g, border: b, title: k, text: k, link: k }],
-    button: { style: "flat", end: k },
+    roles: { background: w, card: g, border: b, text: k, muted: m, primary: k, link: k, error: e },
+    tints: [{ id: id("t"), name: "Neutre", fill: g, border: b, title: k, text: k, link: k }],
+    buttons: [
+      { id: id("b"), name: "Principal", kind: "flat", fill: k, end: m, border: k, label: w, shape: "chart" },
+      { id: id("b"), name: "Secondaire", kind: "outline", fill: k, end: m, border: k, label: k, shape: "chart" },
+      { id: id("b"), name: "Discret", kind: "text", fill: k, end: m, border: k, label: k, shape: "chart" },
+    ],
+    fonts,
+    fontRoles: { brand: ft, title: ft, heading: ft, body: fb, quote: fb, small: fb, boxTitle: fa, button: fa, tabs: fa },
     radius: 12, shadow: "none",
-    fonts: { title: "system", body: "system" },
     mode: "light",
   };
 }
@@ -252,7 +299,7 @@ function example() {
     c("Filet", "#e9e3d6", "#343843"),
     c("Encre", "#1f2a44", "#e8ebf2"),
     c("Ardoise", "#5b6478", "#a3abbd"),
-    c("Ocre", "#a5631a", "#e9a85a"),
+    c("Ocre", "#9a5b16", "#e9a85a"),
     c("Ocre clair", "#c98a3c", "#f2c27f"),
     c("Blanc", "#ffffff", "#16181d"),
     c("Sauge", "#e6efe6", "#1b2a20"),
@@ -261,17 +308,34 @@ function example() {
     c("Brique foncée", "#9b2c1f", "#f39a8c"),
   ];
   const P = Object.fromEntries(palette.map((p) => [p.name, p.id]));
+  const f = (name, family, weight) => ({ id: id("f"), name, family, weight });
+  const fonts = [
+    f("Grands titres", "Playfair Display", 700),
+    f("Texte", "Work Sans", 400),
+    f("Texte appuyé", "Work Sans", 600),
+    f("Citations", "Lora", 400),
+  ];
+  const F = Object.fromEntries(fonts.map((x) => [x.name, x.id]));
   return {
     palette,
-    roles: { background: P.Papier, card: P.Carte, border: P.Filet, text: P.Encre, muted: P.Ardoise, primary: P.Ocre, onPrimary: P.Blanc, link: P.Ocre, error: P["Brique foncée"] },
+    roles: { background: P.Papier, card: P.Carte, border: P.Filet, text: P.Encre, muted: P.Ardoise, primary: P.Ocre, link: P.Ocre, error: P["Brique foncée"] },
     tints: [
-      { id: id(), name: "Simple", fill: P.Carte, border: P.Filet, title: P.Encre, text: P.Encre, link: P.Ocre },
-      { id: id(), name: "Conseil", fill: P.Sauge, border: P.Sauge, title: P["Sauge foncée"], text: P.Encre, link: P["Sauge foncée"] },
-      { id: id(), name: "Attention", fill: P.Brique, border: P.Brique, title: P["Brique foncée"], text: P.Encre, link: P["Brique foncée"] },
+      { id: id("t"), name: "Simple", fill: P.Carte, border: P.Filet, title: P.Encre, text: P.Encre, link: P.Ocre },
+      { id: id("t"), name: "Conseil", fill: P.Sauge, border: P.Sauge, title: P["Sauge foncée"], text: P.Encre, link: P["Sauge foncée"] },
+      { id: id("t"), name: "Attention", fill: P.Brique, border: P.Brique, title: P["Brique foncée"], text: P.Encre, link: P["Brique foncée"] },
     ],
-    button: { style: "gradient", end: P["Ocre clair"] },
+    buttons: [
+      { id: id("b"), name: "Principal", kind: "gradient", fill: P.Ocre, end: P["Ocre clair"], border: P.Ocre, label: P.Blanc, shape: "pill" },
+      { id: id("b"), name: "Secondaire", kind: "outline", fill: P.Ocre, end: P.Ocre, border: P.Ocre, label: P.Ocre, shape: "pill" },
+      { id: id("b"), name: "Validation", kind: "flat", fill: P["Sauge foncée"], end: P.Sauge, border: P["Sauge foncée"], label: P.Blanc, shape: "pill" },
+      { id: id("b"), name: "Lien", kind: "text", fill: P.Ocre, end: P.Ocre, border: P.Ocre, label: P.Ocre, shape: "chart" },
+    ],
+    fonts,
+    fontRoles: {
+      brand: F["Grands titres"], title: F["Grands titres"], heading: F["Grands titres"], body: F.Texte, quote: F.Citations,
+      small: F.Texte, boxTitle: F["Texte appuyé"], button: F["Texte appuyé"], tabs: F["Texte appuyé"],
+    },
     radius: 16, shadow: "light",
-    fonts: { title: "Playfair Display", body: "Work Sans" },
     mode: "light",
   };
 }
@@ -281,7 +345,10 @@ let S = neutral();
 const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t).replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]);
 const color = (cid, mode = S.mode) => { const p = S.palette.find((x) => x.id === cid); return p ? p[mode] : "#ff00ff"; };
-const fontCss = (key) => (FONTS.find((f) => f[0] === key) || FONTS[0])[2];
+const family = (key) => FAMILIES.find((f) => f[0] === key) || FAMILIES[0];
+const fontOf = (fid) => S.fonts.find((f) => f.id === fid) || S.fonts[0];
+const fontStyle = (fid) => { const f = fontOf(fid); return `font-family:${family(f.family)[2]};font-weight:${f.weight}`; };
+const roleFont = (role) => fontStyle(S.fontRoles[role]);
 
 // Contraste WCAG.
 function lum(hex) {
@@ -291,6 +358,13 @@ function lum(hex) {
 function ratio(a, b) { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); }
 const fmt = (r) => r.toFixed(1).replace(".", ",") + ":1";
 
+// Le fond sur lequel se lit le texte d'un bouton.
+function buttonGrounds(b, mode) {
+  if (b.kind === "flat") return [color(b.fill, mode)];
+  if (b.kind === "gradient") return [color(b.fill, mode), color(b.end, mode)];
+  return [color(S.roles.background, mode)];
+}
+
 function problems() {
   const out = [];
   for (const mode of ["light", "dark"]) {
@@ -298,67 +372,123 @@ function problems() {
     for (const [key, label, against] of ROLES) {
       if (!against) continue;
       const r = ratio(color(S.roles[key], mode), color(S.roles[against], mode));
-      if (r < 4.5) out.push({ key, mode, text: `${label} (${M}) : contraste ${fmt(r)}, il faut 4,5:1` });
+      if (r < 4.5) out.push({ key, text: `${label} (${M}) : contraste ${fmt(r)}, il faut 4,5:1` });
     }
     for (const t of S.tints) {
       for (const part of ["title", "text", "link"]) {
         const r = ratio(color(t[part], mode), color(t.fill, mode));
-        if (r < 4.5) out.push({ tint: t.id, mode, text: `Teinte « ${t.name} », ${TINT_PARTS.find((p) => p[0] === part)[1].toLowerCase()} (${M}) : ${fmt(r)}` });
+        if (r < 4.5) out.push({ tint: t.id, text: `Encadré « ${t.name} », ${TINT_PARTS.find((p) => p[0] === part)[1].toLowerCase()} (${M}) : ${fmt(r)}` });
       }
+    }
+    for (const b of S.buttons) {
+      const r = Math.min(...buttonGrounds(b, mode).map((g) => ratio(color(b.label, mode), g)));
+      if (r < 4.5) out.push({ button: b.id, text: `Bouton « ${b.name} », texte (${M}) : ${fmt(r)}` });
     }
   }
   return out;
 }
 
-function options(selected) {
-  return S.palette.map((p) => `<option value="${p.id}" ${p.id === selected ? "selected" : ""}>${esc(p.name)}</option>`).join("");
+const warnTag = (bad) => bad.length ? `<span class="warn" title="${esc(bad.map((b) => b.text).join("\n"))}">⚠ Peu lisible</span>` : "";
+
+function colorPicker(selected, attrs) {
+  const opts = S.palette.map((p) => `<option value="${p.id}" ${p.id === selected ? "selected" : ""}>${esc(p.name)}</option>`).join("");
+  return `<span class="pick"><span class="sw" style="background:${color(selected)}"></span><select ${attrs}>${opts}</select></span>`;
 }
-function picker(selected, attrs) {
-  return `<span class="pick"><span class="sw" style="background:${color(selected)}"></span><select ${attrs}>${options(selected)}</select></span>`;
+function fontPicker(selected, attrs) {
+  return `<select ${attrs} style="width:100%">${S.fonts.map((f) => `<option value="${f.id}" ${f.id === selected ? "selected" : ""}>${esc(f.name)}</option>`).join("")}</select>`;
+}
+
+function colorUsed(cid) {
+  return Object.values(S.roles).includes(cid)
+    || S.tints.some((t) => TINT_PARTS.some(([k]) => t[k] === cid))
+    || S.buttons.some((b) => BUTTON_PARTS[b.kind].some(([k]) => b[k] === cid));
 }
 
 function renderPalette() {
-  $("#palette").innerHTML = S.palette.map((p) => {
-    const used = Object.values(S.roles).includes(p.id) || S.tints.some((t) => TINT_PARTS.some(([k]) => t[k] === p.id)) || S.button.end === p.id;
-    return `<tr data-id="${p.id}">
+  $("#palette").innerHTML = S.palette.map((p) => `<tr data-id="${p.id}">
       <td><input type="text" value="${esc(p.name)}" data-name></td>
       <td><span class="row"><input type="color" value="${p.light}" data-light><span class="hex">${p.light}</span></span></td>
       <td><span class="row"><input type="color" value="${p.dark}" data-dark><span class="hex">${p.dark}</span></span></td>
-      <td><button class="btn ghost" data-del ${used ? 'disabled title="Utilisée : choisis d\'abord une autre couleur là où elle sert"' : 'title="Supprimer"'}>✕</button></td>
-    </tr>`;
-  }).join("");
+      <td><button class="btn ghost" data-del ${colorUsed(p.id) ? 'disabled title="Utilisée : choisis d\'abord une autre couleur là où elle sert"' : 'title="Supprimer"'}>✕</button></td>
+    </tr>`).join("");
 }
 
 function renderRoles(issues) {
-  $("#roles").innerHTML = ROLES.map(([key, label]) => {
+  $("#roles").innerHTML = ROLES.map(([key, label, against]) => {
     const bad = issues.filter((i) => i.key === key);
-    return `<tr><td style="width:45%">${label}</td><td>${picker(S.roles[key], `data-role="${key}"`)}</td>
-      <td style="width:1%">${bad.length ? `<span class="warn" title="${esc(bad.map((b) => b.text).join("\n"))}">⚠ Peu lisible</span>` : ROLES.find((r) => r[0] === key)[2] ? '<span class="ok">✓ Lisible</span>' : ""}</td></tr>`;
+    return `<tr><td style="width:45%">${label}</td><td>${colorPicker(S.roles[key], `data-role="${key}"`)}</td>
+      <td style="width:1%">${bad.length ? warnTag(bad) : against ? '<span class="ok">✓ Lisible</span>' : ""}</td></tr>`;
   }).join("");
 }
 
 function renderTints(issues) {
-  $("#tints").innerHTML = S.tints.map((t) => {
-    const bad = issues.filter((i) => i.tint === t.id);
-    return `<div class="tint" data-tint="${t.id}">
-      <div class="tint-head"><input type="text" value="${esc(t.name)}" data-tname style="max-width:220px">
-        ${bad.length ? `<span class="warn" title="${esc(bad.map((b) => b.text).join("\n"))}">⚠ Peu lisible</span>` : ""}
+  $("#tints").innerHTML = S.tints.map((t) => `<div class="item" data-tint="${t.id}">
+      <div class="item-head"><input type="text" value="${esc(t.name)}" data-tname style="max-width:220px">
+        ${warnTag(issues.filter((i) => i.tint === t.id))}
         <span style="flex:1"></span>
         <button class="btn ghost" data-tdel ${S.tints.length === 1 ? 'disabled title="Il faut au moins une teinte"' : 'title="Supprimer"'}>✕</button></div>
-      <div class="tint-grid">${TINT_PARTS.map(([k, l]) => `<div><label>${l}</label>${picker(t[k], `data-tpart="${k}"`)}</div>`).join("")}</div>
-    </div>`;
+      <div class="item-grid">${TINT_PARTS.map(([k, l]) => `<div><label>${l}</label>${colorPicker(t[k], `data-tpart="${k}"`)}</div>`).join("")}</div>
+    </div>`).join("");
+}
+
+function buttonRadius(b) {
+  return b.shape === "pill" ? "999px" : b.shape === "square" ? "0" : S.radius + "px";
+}
+function buttonStyle(b, mode = S.mode) {
+  const label = color(b.label, mode);
+  const base = `color:${label};border-radius:${buttonRadius(b)};${roleFont("button")};`;
+  if (b.kind === "flat") return base + `background:${color(b.fill, mode)};border:1px solid ${color(b.fill, mode)}`;
+  if (b.kind === "gradient") return base + `background:linear-gradient(90deg, ${color(b.fill, mode)}, ${color(b.end, mode)});border:1px solid transparent`;
+  if (b.kind === "outline") return base + `background:transparent;border:1px solid ${color(b.border, mode)}`;
+  return base + "background:transparent;border:1px solid transparent;text-decoration:underline;text-underline-offset:3px";
+}
+
+function renderButtons(issues) {
+  const bg = color(S.roles.background);
+  $("#buttons").innerHTML = S.buttons.map((b, i) => `<div class="item" data-button="${b.id}">
+      <div class="item-head"><input type="text" value="${esc(b.name)}" data-bname style="max-width:220px">
+        ${i === 0 ? '<span class="hex">boutons de l\'app</span>' : ""}
+        ${warnTag(issues.filter((x) => x.button === b.id))}
+        <span style="flex:1"></span>
+        <button class="btn ghost" data-bup ${i === 0 ? "disabled" : ""} title="Monter">↑</button>
+        <button class="btn ghost" data-bdel ${S.buttons.length === 1 ? 'disabled title="Il faut au moins un bouton"' : 'title="Supprimer"'}>✕</button></div>
+      <div class="row" style="margin-bottom:10px">
+        <div class="seg" data-bkind>${BUTTON_KINDS.map(([k, l]) => `<button data-v="${k}" class="${b.kind === k ? "on" : ""}">${l}</button>`).join("")}</div>
+        <select data-bshape>${SHAPES.map(([k, l]) => `<option value="${k}" ${b.shape === k ? "selected" : ""}>${l}</option>`).join("")}</select>
+        <span style="flex:1"></span>
+        <span style="background:${bg};padding:8px;border-radius:8px;border:1px solid var(--line)"><span class="btn-sample" style="${buttonStyle(b)}">${esc(b.name)}</span></span>
+      </div>
+      <div class="item-grid">${BUTTON_PARTS[b.kind].map(([k, l]) => `<div><label>${l}</label>${colorPicker(b[k], `data-bpart="${k}"`)}</div>`).join("")}</div>
+    </div>`).join("");
+}
+
+function fontUsed(fid) { return Object.values(S.fontRoles).includes(fid); }
+
+function renderFonts() {
+  $("#fonts").innerHTML = S.fonts.map((f) => {
+    const fam = family(f.family);
+    const weights = WEIGHTS.filter(([w]) => !fam[3] || fam[3].includes(w));
+    const why = S.fonts.length <= MIN_FONTS ? "Il faut au moins trois polices" : fontUsed(f.id) ? "Utilisée : choisis d'abord une autre police là où elle sert" : "";
+    return `<tr data-font="${f.id}">
+      <td style="width:22%"><input type="text" value="${esc(f.name)}" data-fname></td>
+      <td><select data-ffamily style="width:100%">${FAMILIES.map(([k, l, css]) => `<option value="${k}" ${f.family === k ? "selected" : ""} style="font-family:${css}">${l}</option>`).join("")}</select></td>
+      <td><select data-fweight>${weights.map(([w, l]) => `<option value="${w}" ${f.weight === w ? "selected" : ""}>${l}</option>`).join("")}</select></td>
+      <td><span class="sample" style="${fontStyle(f.id)}">Aa Bb 123</span></td>
+      <td><button class="btn ghost" data-fdel ${why ? `disabled title="${why}"` : 'title="Supprimer"'}>✕</button></td>
+    </tr>`;
   }).join("");
 }
 
+function renderFontRoles() {
+  $("#fontRoles").innerHTML = FONT_ROLES.map(([key, label]) => `<tr><td style="width:45%">${label}</td>
+    <td>${fontPicker(S.fontRoles[key], `data-frole="${key}"`)}</td>
+    <td style="width:30%"><span class="sample" style="${roleFont(key)}">Aa Bb</span></td></tr>`).join("");
+}
+
 function renderOptions() {
-  document.querySelectorAll("#btnStyle button").forEach((b) => b.classList.toggle("on", b.dataset.v === S.button.style));
-  $("#gradEndWrap").innerHTML = S.button.style === "gradient" ? `vers ${picker(S.button.end, 'id="gradEnd"')}` : "";
   $("#radius").value = S.radius; $("#radiusVal").textContent = S.radius + " pt";
   document.querySelectorAll("#shadow button").forEach((b) => b.classList.toggle("on", b.dataset.v === S.shadow));
   document.querySelectorAll("#mode button").forEach((b) => b.classList.toggle("on", b.dataset.v === S.mode));
-  for (const [sel, key] of [["#fontTitle", "title"], ["#fontBody", "body"]]) {
-    $(sel).innerHTML = FONTS.map(([k, l, css]) => `<option value="${k}" ${S.fonts[key] === k ? "selected" : ""} style="font-family:${css}">${l}</option>`).join("");
-  }
 }
 
 function renderPhone() {
@@ -368,30 +498,32 @@ function renderPhone() {
   const alpha = S.shadow === "none" ? 0 : SHADOW_ALPHA[S.shadow][S.mode === "dark" ? 1 : 0];
   const vars = {
     "--p-bg": r("background"), "--p-card": r("card"), "--p-border": r("border"), "--p-text": r("text"), "--p-muted": r("muted"),
-    "--p-primary": r("primary"), "--p-on": r("onPrimary"), "--p-link": r("link"), "--p-error": r("error"),
-    "--p-btn": S.button.style === "gradient" ? `linear-gradient(90deg, ${r("primary")}, ${color(S.button.end)})` : r("primary"),
+    "--p-primary": r("primary"), "--p-link": r("link"), "--p-error": r("error"),
     "--p-radius": S.radius + "px",
     "--p-shadow": S.shadow === "none" ? "none" : `${SHADOWS[S.shadow]} rgba(${shadowColor},${alpha})`,
-    "--p-title": fontCss(S.fonts.title), "--p-body": fontCss(S.fonts.body),
   };
   Object.entries(vars).forEach(([k, v]) => el.style.setProperty(k, v));
   el.innerHTML = `
     <div class="status"><span>9:41</span><span>●●● ▮</span></div>
-    <div class="topbar"><b>Ma marque</b><div class="dots"><i></i><i></i><i></i></div></div>
-    <div class="feed">
+    <div class="topbar"><b style="${roleFont("brand")}">Ma marque</b><div class="dots"><i></i><i></i><i></i></div></div>
+    <div class="feed" style="${roleFont("body")}">
       <div class="cover"></div>
-      <h1 class="p-title">Titre de l'article</h1>
-      <div class="p-meta">12 oct. · 6 min de lecture <span class="p-badge">Catégorie</span></div>
+      <h1 class="p-title" style="${roleFont("title")}">Titre de l'article</h1>
+      <div class="p-meta" style="${roleFont("small")}">12 oct. · 6 min de lecture <span class="p-badge">Catégorie</span></div>
       <p class="p-text">Le texte courant de l'article, avec <a href="#" onclick="return false">un lien</a> au milieu de la phrase, pour juger de la lisibilité.</p>
+      <h2 class="p-h2" style="${roleFont("heading")}">Un intertitre</h2>
+      <p class="p-text">Un deuxième paragraphe, sous l'intertitre.</p>
+      <blockquote class="p-quote" style="${roleFont("quote")}">« Une citation, mise en valeur dans le texte. »</blockquote>
+      <div class="cover" style="height:90px;margin-bottom:10px"></div>
+      <p class="p-caption" style="${roleFont("small")}">La légende d'une image.</p>
       ${S.tints.map((t) => `<div class="p-box" style="background:${color(t.fill)};border-color:${color(t.border)};color:${color(t.text)}">
-        <b style="color:${color(t.title)}">${esc(t.name)}</b>Un encadré de cette teinte, avec son texte.<br><a style="color:${color(t.link)}">En savoir plus</a></div>`).join("")}
-      <div class="p-card"><div class="th"></div><div><b>Un article de la liste</b><small>Carte · 4 min</small></div></div>
-      <div class="p-field"><label>Ton prénom</label><div class="ph">Écris ton prénom…</div></div>
-      <div class="p-field err"><label>E-mail</label><div>adresse@</div><small>Cette adresse n'est pas complète.</small></div>
-      <button class="p-btn main">Continuer</button>
-      <button class="p-btn second">Plus tard</button>
+        <b style="color:${color(t.title)};${roleFont("boxTitle")}">${esc(t.name)}</b>Un encadré de cette teinte, avec son texte.<br><a style="color:${color(t.link)}">En savoir plus</a></div>`).join("")}
+      <div class="p-card"><div class="th"></div><div><b style="${roleFont("heading")}">Un article de la liste</b><small style="${roleFont("small")}">Carte · 4 min</small></div></div>
+      <div class="p-field" style="${roleFont("small")}"><label>Ton prénom</label><div class="ph">Écris ton prénom…</div></div>
+      <div class="p-field err" style="${roleFont("small")}"><label>E-mail</label><div>adresse@</div><small>Cette adresse n'est pas complète.</small></div>
+      ${S.buttons.map((b) => `<button class="p-btn" style="${buttonStyle(b)}">${esc(b.name)}</button>`).join("")}
     </div>
-    <div class="tabbar"><span class="on"><i></i>Accueil</span><span><i></i>Blog</span><span><i></i>Podcasts</span><span><i></i>Profil</span></div>`;
+    <div class="tabbar" style="${roleFont("tabs")}"><span class="on"><i></i>Accueil</span><span><i></i>Blog</span><span><i></i>Podcasts</span><span><i></i>Profil</span></div>`;
 }
 
 function renderSummary(issues) {
@@ -403,8 +535,14 @@ function renderSummary(issues) {
 function render(withPalette = true) {
   const issues = problems();
   if (withPalette) renderPalette();
-  renderRoles(issues); renderTints(issues); renderOptions(); renderPhone(); renderSummary(issues);
+  renderRoles(issues); renderTints(issues); renderButtons(issues); renderFonts(); renderFontRoles();
+  renderOptions(); renderPhone(); renderSummary(issues);
 }
+
+const owner = (t, attr) => t.closest(`[data-${attr}]`)?.dataset[attr];
+const tintOf = (t) => S.tints.find((x) => x.id === owner(t, "tint"));
+const buttonOf = (t) => S.buttons.find((x) => x.id === owner(t, "button"));
+const fontEntry = (t) => S.fonts.find((x) => x.id === owner(t, "font"));
 
 // Événements.
 document.addEventListener("input", (e) => {
@@ -419,27 +557,48 @@ document.addEventListener("input", (e) => {
 });
 document.addEventListener("change", (e) => {
   const t = e.target;
-  if (t.dataset.name !== undefined) { S.palette.find((x) => x.id === t.closest("tr").dataset.id).name = t.value.trim() || "Sans nom"; render(); }
+  const name = (v) => v.trim() || "Sans nom";
+  if (t.dataset.name !== undefined) { S.palette.find((x) => x.id === t.closest("tr").dataset.id).name = name(t.value); render(); }
   if (t.dataset.role) { S.roles[t.dataset.role] = t.value; render(); }
-  if (t.dataset.tname !== undefined) { S.tints.find((x) => x.id === t.closest("[data-tint]").dataset.tint).name = t.value.trim() || "Sans nom"; render(); }
-  if (t.dataset.tpart) { S.tints.find((x) => x.id === t.closest("[data-tint]").dataset.tint)[t.dataset.tpart] = t.value; render(); }
-  if (t.id === "gradEnd") { S.button.end = t.value; render(); }
-  if (t.id === "fontTitle") { S.fonts.title = t.value; render(); }
-  if (t.id === "fontBody") { S.fonts.body = t.value; render(); }
+  if (t.dataset.tname !== undefined) { tintOf(t).name = name(t.value); render(); }
+  if (t.dataset.tpart) { tintOf(t)[t.dataset.tpart] = t.value; render(); }
+  if (t.dataset.bname !== undefined) { buttonOf(t).name = name(t.value); render(); }
+  if (t.dataset.bpart) { buttonOf(t)[t.dataset.bpart] = t.value; render(); }
+  if (t.dataset.bshape !== undefined) { buttonOf(t).shape = t.value; render(); }
+  if (t.dataset.fname !== undefined) { fontEntry(t).name = name(t.value); render(); }
+  if (t.dataset.ffamily !== undefined) {
+    const f = fontEntry(t); f.family = t.value;
+    const allowed = family(f.family)[3];
+    if (allowed && !allowed.includes(f.weight)) f.weight = allowed.reduce((a, b) => (Math.abs(b - f.weight) < Math.abs(a - f.weight) ? b : a));
+    render();
+  }
+  if (t.dataset.fweight !== undefined) { fontEntry(t).weight = +t.value; render(); }
+  if (t.dataset.frole) { S.fontRoles[t.dataset.frole] = t.value; render(); }
   if (t.id === "import" && t.files[0]) {
     t.files[0].text().then((txt) => { try { S = JSON.parse(txt); render(); } catch { alert("Ce fichier n'est pas une charte."); } });
     t.value = "";
   }
 });
 document.addEventListener("click", (e) => {
-  const t = e.target.closest("button"); if (!t) return;
+  const t = e.target.closest("button"); if (!t || t.disabled) return;
   if (t.dataset.del !== undefined) { S.palette = S.palette.filter((x) => x.id !== t.closest("tr").dataset.id); render(); }
-  if (t.dataset.tdel !== undefined) { S.tints = S.tints.filter((x) => x.id !== t.closest("[data-tint]").dataset.tint); render(); }
-  if (t.closest("#btnStyle")) { S.button.style = t.dataset.v; render(); }
+  if (t.dataset.tdel !== undefined) { S.tints = S.tints.filter((x) => x.id !== owner(t, "tint")); render(); }
+  if (t.dataset.bdel !== undefined) { S.buttons = S.buttons.filter((x) => x.id !== owner(t, "button")); render(); }
+  if (t.dataset.bup !== undefined) {
+    const i = S.buttons.findIndex((x) => x.id === owner(t, "button"));
+    [S.buttons[i - 1], S.buttons[i]] = [S.buttons[i], S.buttons[i - 1]]; render();
+  }
+  if (t.closest("[data-bkind]")) { buttonOf(t).kind = t.dataset.v; render(); }
+  if (t.dataset.fdel !== undefined) { S.fonts = S.fonts.filter((x) => x.id !== owner(t, "font")); render(); }
   if (t.closest("#shadow")) { S.shadow = t.dataset.v; render(); }
   if (t.closest("#mode")) { S.mode = t.dataset.v; render(); }
   if (t.id === "addColor") { S.palette.push({ id: id(), name: "Nouvelle couleur", light: "#888888", dark: "#888888" }); render(); }
-  if (t.id === "addTint") { const r = S.roles; S.tints.push({ id: id(), name: "Nouvelle teinte", fill: r.card, border: r.border, title: r.text, text: r.text, link: r.link }); render(); }
+  if (t.id === "addTint") { const r = S.roles; S.tints.push({ id: id("t"), name: "Nouvelle teinte", fill: r.card, border: r.border, title: r.text, text: r.text, link: r.link }); render(); }
+  if (t.id === "addButton") {
+    const r = S.roles;
+    S.buttons.push({ id: id("b"), name: "Nouveau bouton", kind: "outline", fill: r.primary, end: r.primary, border: r.primary, label: r.primary, shape: "chart" }); render();
+  }
+  if (t.id === "addFont") { S.fonts.push({ id: id("f"), name: "Nouvelle police", family: "system", weight: 400 }); render(); }
   if (t.id === "example") { const mode = S.mode; S = example(); S.mode = mode; render(); }
   if (t.id === "reset") { const mode = S.mode; S = neutral(); S.mode = mode; render(); }
   if (t.id === "export") {
