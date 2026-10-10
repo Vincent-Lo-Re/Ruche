@@ -23,15 +23,15 @@ import {
 import { ListCard, ListEmpty } from "@/components/list-card"
 import { SavedCell } from "@/components/contents/row-cells"
 import { useContentsSelection } from "@/components/contents/use-contents-selection"
-import { LoadState } from "@/components/load-state"
+import { LoadState, RefreshFailed } from "@/components/load-state"
 import { PageHeader } from "@/components/page-header"
 import { useAccessCheck } from "@/components/team/use-access-check"
 import { TemplateDialog } from "@/components/templates/template-dialog"
 import { templateSortIcons } from "@/components/templates/sort-icons"
 import { TemplateStatus } from "@/components/templates/template-uses"
 import { UsesList } from "@/components/templates/uses-list"
-import { TrashDialog } from "@/components/trash-dialog"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { TrashDialog } from "@/components/confirm-dialog"
+import { Alert, AlertTitle } from "@/components/ui/alert"
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -208,12 +208,7 @@ export function TemplatesPage() {
         />
       ) : (
         <div className="space-y-4">
-          {list.isError && (
-            <Alert variant="destructive">
-              <TriangleAlert />
-              <AlertDescription>{labels.refreshFailed}</AlertDescription>
-            </Alert>
-          )}
+          <RefreshFailed query={list} text={labels.refreshFailed} />
           <KeptNotice
             kept={bulk.kept}
             nameOf={nameOf}

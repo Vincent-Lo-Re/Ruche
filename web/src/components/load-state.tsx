@@ -56,3 +56,32 @@ export function LoadState({
     )
   )
 }
+
+/**
+ * Une relecture qui a échoué alors que la liste est déjà là : la liste reste affichée, avec ce
+ * message et « Réessayer ». Rien tant que la relecture n'a pas échoué.
+ */
+export function RefreshFailed({
+  query,
+  text,
+}: {
+  query: { isError: boolean; refetch: () => unknown }
+  text: string
+}) {
+  if (!query.isError) return null
+  return (
+    <Alert variant="destructive">
+      <TriangleAlert />
+      <AlertDescription className="flex flex-wrap items-center gap-x-2">
+        {text}
+        <Button
+          variant="link"
+          className="h-auto p-0"
+          onClick={() => query.refetch()}
+        >
+          {texts.common.retry}
+        </Button>
+      </AlertDescription>
+    </Alert>
+  )
+}

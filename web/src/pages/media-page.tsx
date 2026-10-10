@@ -4,7 +4,6 @@ import {
   LayoutGrid,
   List,
   Search,
-  TriangleAlert,
   Unlink,
   Upload,
   UploadCloud,
@@ -26,7 +25,7 @@ import {
   type SelectAll,
 } from "@/components/bulk-selection"
 import { ListCard, ListEmpty } from "@/components/list-card"
-import { LoadState } from "@/components/load-state"
+import { LoadState, RefreshFailed } from "@/components/load-state"
 import { acceptedFiles, kindIcons } from "@/components/media/media-kinds"
 import { ListPagination } from "@/components/list-pagination"
 import { MediaGrid, MediaTable } from "@/components/media/media-collection"
@@ -39,7 +38,6 @@ import { usePreviewUrls } from "@/components/media/use-preview-urls"
 import { PageHeader } from "@/components/page-header"
 import { SearchInput } from "@/components/search-input"
 import { useAccessCheck } from "@/components/team/use-access-check"
-import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import {
   Empty,
@@ -485,21 +483,7 @@ export function MediaPage() {
         </ListCard>
       ) : (
         <div className="space-y-4">
-          {media.isError && (
-            <Alert variant="destructive">
-              <TriangleAlert />
-              <AlertDescription className="flex flex-wrap items-center gap-x-2">
-                {texts.media.refreshFailed}
-                <Button
-                  variant="link"
-                  className="h-auto p-0"
-                  onClick={() => media.refetch()}
-                >
-                  {texts.common.retry}
-                </Button>
-              </AlertDescription>
-            </Alert>
-          )}
+          <RefreshFailed query={media} text={texts.media.refreshFailed} />
           {media.data.length === 0 ? (
             <ListEmpty
               icon={filtering ? Search : UploadCloud}

@@ -15,15 +15,7 @@ import type { z } from "zod"
 import { DragHandle, SortableList } from "@/components/list-sorting"
 import { LoadState } from "@/components/load-state"
 import { useAccessCheck } from "@/components/team/use-access-check"
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import { ConfirmDialog } from "@/components/confirm-dialog"
 import { Button } from "@/components/ui/button"
 import { ButtonGroup } from "@/components/ui/button-group"
 import {
@@ -245,41 +237,21 @@ export function OrderedNames<T extends Named>({
         </CardContent>
       </Card>
 
-      <AlertDialog
+      <ConfirmDialog
         open={toRemove !== null}
-        onOpenChange={(open) => {
-          if (!open && !remove.isPending) setToRemove(null)
+        title={labels.confirmRemove.title}
+        description={
+          toRemove ? labels.confirmRemove.description(toRemove.name) : ""
+        }
+        confirmLabel={labels.confirmRemove.confirm}
+        pending={remove.isPending}
+        onCancel={() => setToRemove(null)}
+        onConfirm={() => {
+          if (toRemove) remove.mutate(toRemove)
         }}
-      >
-        {toRemove && (
-          <AlertDialogContent
-            finalFocus={() =>
-              // Après une suppression, le focus est placé ci-dessus, une fois la liste relue.
-              focusAfterRemove.current === undefined
-            }
-          >
-            <AlertDialogHeader>
-              <AlertDialogTitle>{labels.confirmRemove.title}</AlertDialogTitle>
-              <AlertDialogDescription>
-                {labels.confirmRemove.description(toRemove.name)}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel disabled={remove.isPending}>
-                {texts.common.cancel}
-              </AlertDialogCancel>
-              <Button
-                variant="destructive"
-                disabled={remove.isPending}
-                onClick={() => remove.mutate(toRemove)}
-              >
-                {remove.isPending && <Spinner />}
-                {labels.confirmRemove.confirm}
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        )}
-      </AlertDialog>
+        // Après une suppression, le focus est placé ci-dessus, une fois la liste relue.
+        finalFocus={() => focusAfterRemove.current === undefined}
+      />
     </div>
   )
 }

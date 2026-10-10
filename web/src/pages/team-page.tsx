@@ -6,7 +6,6 @@ import {
   Mail,
   ShieldAlert,
   ShieldCheck,
-  TriangleAlert,
   UserMinus,
   UserPen,
 } from "lucide-react"
@@ -15,21 +14,13 @@ import { toast } from "sonner"
 
 import { useAuth } from "@/auth/auth-context"
 import { ListCard } from "@/components/list-card"
-import { LoadState } from "@/components/load-state"
+import { LoadState, RefreshFailed } from "@/components/load-state"
 import { PageHeader } from "@/components/page-header"
 import { RoleBadge } from "@/components/role-badge"
 import { InviteDialog } from "@/components/team/invite-dialog"
 import { useAccessCheck } from "@/components/team/use-access-check"
+import { ConfirmDialog } from "@/components/confirm-dialog"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -39,7 +30,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Spinner } from "@/components/ui/spinner"
 import {
   Table,
   TableBody,
@@ -131,21 +121,7 @@ export function TeamPage() {
       ) : (
         <div className="space-y-4">
           {/* Une mise à jour a échoué : la liste déjà chargée reste affichée. */}
-          {members.isError && (
-            <Alert variant="destructive">
-              <TriangleAlert />
-              <AlertDescription className="flex flex-wrap items-center gap-x-2">
-                {texts.team.refreshFailed}
-                <Button
-                  variant="link"
-                  className="h-auto p-0"
-                  onClick={() => members.refetch()}
-                >
-                  {texts.common.retry}
-                </Button>
-              </AlertDescription>
-            </Alert>
-          )}
+          <RefreshFailed query={members} text={texts.team.refreshFailed} />
           {isAdmin && countActiveAdmins(members.data) < 2 && (
             <Alert role="status">
               <ShieldAlert />
@@ -265,25 +241,19 @@ export function TeamPage() {
         </div>
       )}
 
-      <AlertDialog
+      <ConfirmDialog
         open={confirmation !== null}
-        onOpenChange={(open) => {
-          if (!open && !action.isPending) setConfirmation(null)
+        {...confirmationWords(confirmation)}
+        pending={action.isPending}
+        onCancel={() => setConfirmation(null)}
+        onConfirm={() => {
+          if (confirmation)
+            action.mutate({
+              action: confirmation.action,
+              user_id: confirmation.member.id,
+            })
         }}
-      >
-        {confirmation && (
-          <ConfirmationContent
-            confirmation={confirmation}
-            pending={action.isPending}
-            onConfirm={() =>
-              action.mutate({
-                action: confirmation.action,
-                user_id: confirmation.member.id,
-              })
-            }
-          />
-        )}
-      </AlertDialog>
+      />
     </>
   )
 }
@@ -353,35 +323,16 @@ function MemberActions({
   )
 }
 
-function ConfirmationContent({
-  confirmation: { action, member },
-  pending,
-  onConfirm,
-}: {
-  confirmation: Confirmation
-  pending: boolean
-  onConfirm: () => void
-}) {
+/** Le titre, la description et le bouton d'une confirmation (retirer, réinitialiser). */
+function confirmationWords(confirmation: Confirmation | null) {
+  if (!confirmation) return { title: "", description: "", confirmLabel: "" }
   const copy =
-    action === "remove" ? texts.team.confirmRemove : texts.team.confirmResetMfa
-
-  return (
-    <AlertDialogContent>
-      <AlertDialogHeader>
-        <AlertDialogTitle>{copy.title}</AlertDialogTitle>
-        <AlertDialogDescription>
-          {copy.description(displayName(member))}
-        </AlertDialogDescription>
-      </AlertDialogHeader>
-      <AlertDialogFooter>
-        <AlertDialogCancel disabled={pending}>
-          {texts.common.cancel}
-        </AlertDialogCancel>
-        <Button variant="destructive" onClick={onConfirm} disabled={pending}>
-          {pending && <Spinner />}
-          {copy.confirm}
-        </Button>
-      </AlertDialogFooter>
-    </AlertDialogContent>
-  )
+    confirmation.action === "remove"
+      ? texts.team.confirmRemove
+      : texts.team.confirmResetMfa
+  return {
+    title: copy.title,
+    description: copy.description(displayName(confirmation.member)),
+    confirmLabel: copy.confirm,
+  }
 }

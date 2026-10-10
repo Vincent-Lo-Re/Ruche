@@ -13,24 +13,14 @@ import { toast } from "sonner"
 
 import { ListCard, ListEmpty } from "@/components/list-card"
 import { SelectAllHead } from "@/components/bulk-selection"
-import { LoadState } from "@/components/load-state"
+import { LoadState, RefreshFailed } from "@/components/load-state"
 import { kindIcons } from "@/components/media/media-kinds"
 import { PageHeader } from "@/components/page-header"
 import { useAccessCheck } from "@/components/team/use-access-check"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import { ConfirmDialog } from "@/components/confirm-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Spinner } from "@/components/ui/spinner"
 import {
   Table,
   TableBody,
@@ -254,21 +244,7 @@ export function TrashPage() {
         </ListCard>
       ) : (
         <div className="space-y-4">
-          {trash.isError && (
-            <Alert variant="destructive">
-              <TriangleAlert />
-              <AlertDescription className="flex flex-wrap items-center gap-x-2">
-                {texts.trash.refreshFailed}
-                <Button
-                  variant="link"
-                  className="h-auto p-0"
-                  onClick={() => trash.refetch()}
-                >
-                  {texts.common.retry}
-                </Button>
-              </AlertDescription>
-            </Alert>
-          )}
+          <RefreshFailed query={trash} text={texts.trash.refreshFailed} />
           {items.length === 0 ? (
             <ListEmpty
               icon={Eraser}
@@ -327,64 +303,42 @@ export function TrashPage() {
         </div>
       )}
 
-      <AlertDialog
+      <ConfirmDialog
         open={confirmation !== null}
-        onOpenChange={(open) => {
-          if (!open && !erase.isPending) setConfirmation(null)
-        }}
-      >
-        {confirmation && (
-          <AlertDialogContent>
-            <ConfirmationText confirmation={confirmation} />
-            <AlertDialogFooter>
-              <AlertDialogCancel disabled={erase.isPending}>
-                {texts.common.cancel}
-              </AlertDialogCancel>
-              <Button
-                variant="destructive"
-                onClick={confirm}
-                disabled={erase.isPending}
-              >
-                {erase.isPending && <Spinner />}
-                {confirmation.scope === "all"
-                  ? texts.trash.confirmEmpty.confirm
-                  : confirmation.scope === "selection"
-                    ? texts.trash.confirmSelection.confirm
-                    : texts.trash.confirmErase.confirm}
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        )}
-      </AlertDialog>
+        {...confirmationWords(confirmation)}
+        pending={erase.isPending}
+        onCancel={() => setConfirmation(null)}
+        onConfirm={confirm}
+      />
     </>
   )
 }
 
-function ConfirmationText({ confirmation }: { confirmation: Confirmation }) {
-  let title: string
-  let description: string
+/** Le titre, la description et le bouton d'une confirmation (tout, la sélection, un élément). */
+function confirmationWords(confirmation: Confirmation | null) {
+  if (!confirmation) return { title: "", description: "", confirmLabel: "" }
   if (confirmation.scope === "all") {
-    title = texts.trash.confirmEmpty.title
-    description = texts.trash.confirmEmpty.description(
-      confirmation.items.length
-    )
-  } else if (confirmation.scope === "selection") {
-    title = texts.trash.confirmSelection.title(confirmation.items.length)
-    description = texts.trash.confirmSelection.description(
-      confirmation.items.length
-    )
-  } else {
-    title = texts.trash.confirmErase.title
-    description = texts.trash.confirmErase.description(
-      displayTitle(confirmation.item.title)
-    )
+    const words = texts.trash.confirmEmpty
+    return {
+      title: words.title,
+      description: words.description(confirmation.items.length),
+      confirmLabel: words.confirm,
+    }
   }
-  return (
-    <AlertDialogHeader>
-      <AlertDialogTitle>{title}</AlertDialogTitle>
-      <AlertDialogDescription>{description}</AlertDialogDescription>
-    </AlertDialogHeader>
-  )
+  if (confirmation.scope === "selection") {
+    const words = texts.trash.confirmSelection
+    return {
+      title: words.title(confirmation.items.length),
+      description: words.description(confirmation.items.length),
+      confirmLabel: words.confirm,
+    }
+  }
+  const words = texts.trash.confirmErase
+  return {
+    title: words.title,
+    description: words.description(displayTitle(confirmation.item.title)),
+    confirmLabel: words.confirm,
+  }
 }
 
 function TrashRow({

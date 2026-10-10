@@ -9,7 +9,6 @@ import {
   Settings2,
   SquarePen,
   Eraser,
-  TriangleAlert,
   ArrowDownToLine,
   ArrowUpToLine,
 } from "lucide-react"
@@ -40,12 +39,11 @@ import { SortableRow } from "@/components/contents/sortable-rows"
 import { useCovers } from "@/components/contents/use-covers"
 import { LiveBadge, ScheduleBadge } from "@/components/editor/publication"
 import { SortableList } from "@/components/list-sorting"
-import { LoadState } from "@/components/load-state"
+import { LoadState, RefreshFailed } from "@/components/load-state"
 import { PageHeader } from "@/components/page-header"
 import { SearchInput } from "@/components/search-input"
 import { useAccessCheck } from "@/components/team/use-access-check"
-import { TrashDialog } from "@/components/trash-dialog"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { TrashDialog } from "@/components/confirm-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -342,12 +340,7 @@ export function ContentListPage({
       </ListCard>
     ) : (
       <div className="space-y-4">
-        {list.isError && (
-          <Alert variant="destructive">
-            <TriangleAlert />
-            <AlertDescription>{labels.refreshFailed}</AlertDescription>
-          </Alert>
-        )}
+        <RefreshFailed query={list} text={labels.refreshFailed} />
         <KeptNotice
           kept={bulk.kept}
           nameOf={(item) => displayTitle(item.title)}

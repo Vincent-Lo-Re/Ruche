@@ -23,7 +23,7 @@ import { SortableList } from "@/components/list-sorting"
 import { LoadState } from "@/components/load-state"
 import { SearchInput } from "@/components/search-input"
 import { useAccessCheck } from "@/components/team/use-access-check"
-import { TrashDialog } from "@/components/trash-dialog"
+import { TrashDialog } from "@/components/confirm-dialog"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
