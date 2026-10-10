@@ -331,6 +331,9 @@ function blockTexts(
       if (text) parts.push(text)
     } else if (block.type === "box") {
       block.blocks.forEach(add)
+    } else if (block.type === "image") {
+      const caption = block.caption?.trim()
+      if (caption) parts.push(caption)
     } else {
       const shown = resolve?.(block)
       if (shown) add(shown)

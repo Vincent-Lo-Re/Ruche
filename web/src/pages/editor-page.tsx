@@ -265,6 +265,7 @@ function ContentEditor({
     mustReload,
     reloadFailed,
     reload,
+    expectRev,
     take,
     prepare,
     applySettings,
@@ -404,7 +405,7 @@ function ContentEditor({
     contentId,
     session: editorSession,
     prepare,
-    reload,
+    expectRev,
     notifyLost: lock.notifyLost,
     onDone: () => setHistoryOpen(false),
   })

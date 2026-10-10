@@ -4,6 +4,7 @@ import { validateDraft } from "@/blocks/generated/validators"
 import {
   canShift,
   DRAFT_MAX_BYTES,
+  draftToPlainText,
   findBlock,
   prepareDraft,
   readingStats,
@@ -193,6 +194,34 @@ describe("readingStats", () => {
       words: 201,
       minutes: 2,
     })
+  })
+})
+
+describe("draftToPlainText (« Copier mon texte »)", () => {
+  it("rend le titre, les textes et les légendes des images", () => {
+    const draft = draftWith([
+      {
+        id: TEXT_ID,
+        type: "image",
+        mediaId: BOX_ID,
+        alt: "",
+        caption: "  Une légende  ",
+      } as Block,
+      {
+        id: INNER_ID,
+        type: "text",
+        doc: {
+          type: "doc",
+          content: [
+            {
+              type: "paragraph",
+              content: [{ type: "text", text: "Un texte" }],
+            },
+          ],
+        } as unknown as Doc,
+      },
+    ])
+    expect(draftToPlainText(draft)).toBe("Page\n\nUne légende\n\nUn texte")
   })
 })
 

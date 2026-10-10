@@ -170,7 +170,14 @@ export function useDraftSaving({
     }
   )
   const saving = autosave.controller
-  const { phase, serverRev, notifyLost } = lock
+  const { phase, notifyLost } = lock
+  // La révision de la base : celle des autres (edit-lock.ts), ou une de nos écritures hors de
+  // l'enregistrement automatique (« Revenir à cette version ») ; null tant qu'aucune n'est connue.
+  const [ownRev, setOwnRev] = useState(0)
+  const serverRev =
+    lock.serverRev === null && ownRev === 0
+      ? null
+      : Math.max(lock.serverRev ?? 0, ownRev)
 
   // Deux contenus d'une section ne portent pas le même titre : vérifié pendant qu'on tape, et
   // refusé par la base (titre_pris). Le titre pris reste à l'écran ; l'enregistrement garde
@@ -310,7 +317,7 @@ export function useDraftSaving({
     [saving]
   )
 
-  /** Relit le brouillon à la demande (« Réessayer », « Revenir à cette version »). */
+  /** Relit le brouillon à la demande (« Réessayer » du bandeau). */
   const reload = () => {
     void fetchFresh()
       .then(applyFresh)
@@ -320,7 +327,17 @@ export function useDraftSaving({
       })
   }
 
-  // Le brouillon a changé dans la base (quelqu'un d'autre écrit) : on le relit.
+  /**
+   * Une de nos écritures a changé le brouillon dans la base (« Revenir à cette version ») : il
+   * passe en lecture seule et se relit, avec un nouvel essai après un échec (ci-dessous).
+   */
+  const expectRev = useCallback(
+    (rev: number) => setOwnRev((known) => Math.max(known, rev)),
+    []
+  )
+
+  // Le brouillon a changé dans la base (quelqu'un d'autre écrit, ou un retour à une version) :
+  // on le relit.
   const mustReload =
     serverRev !== null &&
     serverRev > loadedRev &&
@@ -456,6 +473,7 @@ export function useDraftSaving({
     mustReload,
     reloadFailed,
     reload,
+    expectRev,
     prepare,
     applySettings,
     canCopy,

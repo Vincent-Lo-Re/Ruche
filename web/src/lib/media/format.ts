@@ -16,8 +16,10 @@ const GB = 1024 * MB
 /** « 812 octets », « 245 Ko », « 12,5 Mo », « 1 Go ». */
 export function formatBytes(bytes: number): string {
   if (bytes < KB) return units.bytes(integer.format(bytes))
-  if (bytes < MB) return units.kilobytes(integer.format(Math.round(bytes / KB)))
-  if (bytes < GB) {
+  // Arrondi d'abord : 1 048 500 octets s'écrit « 1 Mo », pas « 1 024 Ko ».
+  if (Math.round(bytes / KB) < KB)
+    return units.kilobytes(integer.format(Math.round(bytes / KB)))
+  if (Math.round(bytes / MB) < KB) {
     const value = bytes / MB
     return units.megabytes(
       value < 100 ? oneDecimal.format(value) : integer.format(value)

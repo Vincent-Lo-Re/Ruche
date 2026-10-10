@@ -500,29 +500,31 @@ export async function callFiles<M extends FilesMode>(
 }
 
 let kickRunning: Promise<void> | null = null
-let kickAgain = false
+// L'appel suivant, demandé pendant celui qui tourne : ceux qui l'attendent sont servis après lui.
+let kickNext: Promise<void> | null = null
 
 /**
  * Demande à la fonction « files » de faire tout de suite le travail en attente (vérifier les SVG
  * et Lottie, effacer ce qui a été vidé de la corbeille…). Les demandes rapprochées sont
- * regroupées. Un échec n'est pas grave : la tâche planifiée « fichiers » passe chaque minute.
+ * regroupées : une demande faite pendant un appel est servie par l'appel suivant, et sa promesse
+ * se résout après lui. Un échec n'est pas grave : la tâche planifiée « fichiers » passe chaque
+ * minute.
  */
 export function kickFiles(): Promise<void> {
-  if (kickRunning) {
-    kickAgain = true
+  if (!kickRunning) {
+    kickRunning = callFiles("kick")
+      .then(() => undefined)
+      .catch(() => undefined)
+      .finally(() => {
+        kickRunning = null
+      })
     return kickRunning
   }
-  kickRunning = callFiles("kick")
-    .then(() => undefined)
-    .catch(() => undefined)
-    .finally(() => {
-      kickRunning = null
-      if (kickAgain) {
-        kickAgain = false
-        void kickFiles()
-      }
-    })
-  return kickRunning
+  kickNext ??= kickRunning.then(() => {
+    kickNext = null
+    return kickFiles()
+  })
+  return kickNext
 }
 
 /**

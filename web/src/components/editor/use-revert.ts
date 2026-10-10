@@ -16,14 +16,15 @@ export function useRevert({
   contentId,
   session,
   prepare,
-  reload,
+  expectRev,
   notifyLost,
   onDone,
 }: {
   contentId: string
   session: string
   prepare: () => Promise<number | null>
-  reload: () => void
+  // La révision du brouillon après le retour : il se relit de lui-même (useDraftSaving).
+  expectRev: (rev: number) => void
   notifyLost: () => void
   onDone: () => void
 }) {
@@ -38,9 +39,9 @@ export function useRevert({
       for (const warning of result.warnings) {
         toast.warning(texts.publication.history.warnings[warning])
       }
-      // La version est dans le brouillon : on le relit. Un échec de cette relecture n'annule pas
-      // le retour à la version (il est dit, et la révision en retard sera relue d'elle-même).
-      reload()
+      // La version est dans le brouillon : il passe en lecture seule et se relit (un échec de
+      // la relecture est dit au-dessus du téléphone, et réessayé).
+      expectRev(result.rev)
     } catch (error) {
       checkAccess(error)
       toast.error(errorMessage(error))

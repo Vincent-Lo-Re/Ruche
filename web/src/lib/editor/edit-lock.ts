@@ -238,6 +238,8 @@ export class EditLockController {
   private channel: ChannelState | null = null
   private stopped = false
   private running = false
+  // Chaque ouverture (start) : une fermeture en cours ne coupe pas celle qui la suit.
+  private openings = 0
   // Édition : on veut la main ; Lecture : on la laisse aux autres.
   private writing: boolean
   // La main est en train d'être rendue (passage en Lecture) : revenu en Édition entre-temps, on
@@ -294,6 +296,10 @@ export class EditLockController {
    * puis lock_release), à laisser finir avant de prendre la main.
    */
   start(after?: Promise<void>) {
+    // Rouvert avant la fin d'une fermeture (React monte deux fois en développement) : on repart
+    // de zéro, et cette fermeture ne coupera pas la nouvelle ouverture (finishThenStop).
+    this.clearListeners()
+    this.openings += 1
     this.stopped = false
     this.running = true
     this.unsubscribe = this.api.subscribe(
@@ -476,6 +482,7 @@ export class EditLockController {
 
   /** Ferme l'éditeur après avoir terminé l'enregistrement en attente (beforeRelease). */
   async finishThenStop(): Promise<void> {
+    const opening = this.openings
     if (this.current.phase === "mine") {
       try {
         await this.beforeRelease?.()
@@ -483,6 +490,8 @@ export class EditLockController {
         // L'enregistrement prévient lui-même de ce qu'il n'a pas pu envoyer (onUnsavedAtClose).
       }
     }
+    // Rouvert entre-temps : la nouvelle ouverture garde l'écoute, les minuteries et la main.
+    if (opening !== this.openings) return
     await this.stop()
   }
 
@@ -491,6 +500,17 @@ export class EditLockController {
     const wasMine = this.current.phase === "mine"
     this.stopped = true
     this.running = false
+    this.clearListeners()
+    if (wasMine) {
+      try {
+        await this.api.release()
+      } catch {
+        // Le verrou expirera de lui-même au bout de 90 s.
+      }
+    }
+  }
+
+  private clearListeners() {
     this.unsubscribe?.()
     this.unsubscribe = null
     if (this.heartbeatTimer) clearInterval(this.heartbeatTimer)
@@ -499,12 +519,5 @@ export class EditLockController {
     this.heartbeatTimer = null
     this.pollTimer = null
     this.hiddenTimer = null
-    if (wasMine) {
-      try {
-        await this.api.release()
-      } catch {
-        // Le verrou expirera de lui-même au bout de 90 s.
-      }
-    }
   }
 }

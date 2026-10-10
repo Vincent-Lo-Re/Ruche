@@ -376,6 +376,23 @@ describe("EditLockController", () => {
     expect(lock.state.phase).toBe("mine")
   })
 
+  it("rouvert avant la fin de sa fermeture (React en développement) : la nouvelle ouverture garde la main", async () => {
+    const { api } = fakeApi()
+    const lock = new EditLockController({ api, myId: ME, session: SESSION })
+    lock.start()
+    await vi.advanceTimersByTimeAsync(0)
+    expect(lock.state.phase).toBe("mine")
+    const closing = lock.finishThenStop()
+    lock.start(closing)
+    await vi.advanceTimersByTimeAsync(0)
+    expect(api.release).not.toHaveBeenCalled()
+    expect(lock.state.phase).toBe("mine")
+    // Les minuteries de la nouvelle ouverture tournent, une seule fois chacune.
+    api.heartbeat.mockClear()
+    await vi.advanceTimersByTimeAsync(20_000)
+    expect(api.heartbeat).toHaveBeenCalledTimes(1)
+  })
+
   it("donne signe de vie toutes les 20 s, et passe en lecture seule si la main est perdue", async () => {
     const { api } = fakeApi()
     const lock = new EditLockController({ api, myId: ME, session: SESSION })

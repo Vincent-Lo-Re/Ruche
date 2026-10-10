@@ -15,6 +15,9 @@ describe("affichage", () => {
     expect(formatBytes(12.5 * 1024 * 1024)).toBe("12,5 Mo")
     expect(formatBytes(800 * 1024 * 1024)).toBe("800 Mo")
     expect(formatBytes(1024 * 1024 * 1024)).toBe("1 Go")
+    // Arrondi avant de changer d'unité : jamais « 1 024 Ko » ni « 1 024 Mo ».
+    expect(formatBytes(1_048_500)).toBe("1 Mo")
+    expect(formatBytes(1024 * 1024 * 1024 - 1000)).toBe("1 Go")
   })
 
   it("écrit les durées", () => {
