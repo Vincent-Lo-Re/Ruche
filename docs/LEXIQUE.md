@@ -125,7 +125,7 @@
 | version | version | Copie publiée et numérotée, qui ne change plus. | révision / revision |
 | historique | version history | La liste des versions publiées. | — / changelog |
 | revenir à cette version | restore this version | Recopier une version dans le brouillon. | restaurer (réservé à la Corbeille) / revert, roll back |
-| programmer | schedule | Publier seul au jour et à l'heure choisis, heure de Paris. | planifier / plan |
+| programmer | schedule | Publier seul au jour et à l'heure choisis, dans le fuseau de l'admin. | planifier / plan |
 | annuler la programmation | unschedule | Retirer une publication programmée. | déprogrammer |
 | retirer de l'app | unpublish | Ne plus montrer le contenu, en gardant brouillon et historique. | dépublier / hide, take down |
 | mettre à jour dans l'app | update in app | Republier seulement un fichier ou un bloc partagé changé. | pousser / push, sync |
