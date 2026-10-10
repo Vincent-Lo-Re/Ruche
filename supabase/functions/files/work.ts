@@ -49,7 +49,7 @@ export interface Store {
   remove(bucket: string, paths: string[]): Promise<void>
 }
 
-export type KickSummary = {
+type KickSummary = {
   mode: "kick"
   checked: number
   accepted: number
@@ -63,7 +63,7 @@ export type KickSummary = {
   remaining: boolean
 }
 
-export type KickOptions = {
+type KickOptions = {
   /** Nombre maximal de lots lus dans un passage. */
   maxRounds?: number
   /** Taille maximale de SVG et Lottie vérifiés dans un passage (2 s de processeur en ligne). */
@@ -236,7 +236,7 @@ export async function runKick(
   return summary
 }
 
-export type CleanSummary = { mode: "clean"; removed: number; orphans: number }
+type CleanSummary = { mode: "clean"; removed: number; orphans: number }
 
 /**
  * Mode « clean » (demandé par un membre) : efface les orphelins du dernier contrôle, revérifiés

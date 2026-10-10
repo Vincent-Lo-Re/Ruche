@@ -3,7 +3,7 @@
 -- Lancer avec : npm run db:test (Supabase doit tourner : npm run db:start)
 begin;
 \ir aides/roles.inc
-select plan(41);
+select plan(44);
 
 select pg_temp.create_people();
 
@@ -279,6 +279,28 @@ select results_eq(
   $$select bucket_id, name from public.files_orphans()$$,
   $$values ('files-protected'::text, '70000000-0000-4000-8000-000000000001/reste.png'::text)$$,
   'nettoyage : seulement les orphelins de plus de 24 h'
+);
+select pg_temp.as_postgres();
+
+-- ---------------------------------------------------------------------------------------------
+-- Un déplacement qui échoue : l'erreur est gardée (500 caractères au plus) et datée
+-- ---------------------------------------------------------------------------------------------
+
+select pg_temp.as_service();
+select lives_ok(
+  $$select public.files_mark_failed('60000000-0000-4000-8000-000000000002', repeat('x', 600))$$,
+  'files_mark_failed : l''erreur est enregistrée'
+);
+select pg_temp.as_postgres();
+select ok(
+  (select length(sync_error) = 500 and sync_failed_at is not null
+    from public.media where id = '60000000-0000-4000-8000-000000000002'),
+  'files_mark_failed : l''erreur coupée à 500 caractères, et l''heure de l''échec'
+);
+select pg_temp.as_person('editor');
+select throws_ok(
+  $$select public.files_mark_failed('60000000-0000-4000-8000-000000000002', 'x')$$,
+  '42501', null, 'files_mark_failed : réservé à la fonction « files »'
 );
 select pg_temp.as_postgres();
 

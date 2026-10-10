@@ -19,7 +19,7 @@ import {
 export type CheckResult = { ok: true } | { ok: false; reason: string; detail: string }
 
 // Codes des raisons de refus (colonne media.reject_reason), traduits par l'interface.
-export const svgReasons = {
+const svgReasons = {
   unreadable: "svg_illisible",
   forbiddenElement: "svg_element_interdit",
   forbiddenAttribute: "svg_attribut_interdit",
