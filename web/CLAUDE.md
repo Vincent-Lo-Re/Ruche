@@ -32,6 +32,7 @@ Ce fichier dit où ranger le code, les pièges à connaître et les briques à r
 ## La marque
 
 - Jamais « Ruche » ni le nom de la marque en dur dans un composant : `useBrandName`, `useBrand` (`hooks/use-brand-name.ts`), affichés par `BrandLogo` (`components/brand-logo.tsx`). L'identité de l'admin (nom, initiales, logos, image de connexion, monogramme animé) : `lib/admin-identity.ts` ; un réglage s'enregistre par `useBrandMutation`, puis se relit.
+- **L'identité de l'app** (App mobile › Identité, table `app_identity`) se règle avec les mêmes cartes que celle de l'admin : chacune reçoit sa cible, `target` (`IdentityTarget` : `"admin"` ou `"app"`), et les fonctions de `lib/admin-identity.ts` aussi (`saveBrandDetails(target, …)`, `saveBrandFile`, `saveScreenImage`…) ; ses mots propres : `identityWords(target)` ; sa lecture : `identityRead(target)` (`lib/reads.ts`), `useIdentity(target)`. Les sections : `components/settings/identity-sections.tsx`. L'app n'a pas de déclinaisons par palette. `useBrand`, `BrandLogo` (sans `target`) et le favicon restent ceux de l'admin.
 - Aucun logo de Ruche par défaut : sans logo, le nom en texte ; sans monogramme, les initiales (`brandMark`).
 - Les couleurs d'un logo SVG : `lib/brand-colors.ts` ; ses déclinaisons par palette : `presetLogoColors` de `lib/palettes.ts`.
 
@@ -57,6 +58,7 @@ Ce fichier dit où ranger le code, les pièges à connaître et les briques à r
   - `PageHeader` (`components/page-header.tsx`, l'icône de la section devant le titre), `PanelCard` (`components/panel-card.tsx`), `SaveFooter` (`components/settings/save-footer.tsx`), `SettingsSection` (`components/settings/settings-section.tsx`).
   - `TruncatedText` (`components/truncated-text.tsx`), `InfoTip` (`components/info-tip.tsx`), `IconBadge` (`components/icon-badge.tsx`).
   - `ColumnHeader` (`components/editor/column-header.tsx`) : l'en-tête d'une colonne ou d'une glissière de l'éditeur.
+  - `PhoneFrame` (`components/phone-frame.tsx`) : le téléphone des aperçus (cadre, barre d'état, thème de l'écran), dans l'éditeur des contenus et l'aperçu de l'écran de chargement. `ThemeToggleGroup` (`components/theme-choice.tsx`) : des thèmes en icônes.
   - `blocks/components/media-state.tsx` : une image à ses proportions, un fichier qui ne s'affiche pas.
 - **Logique sans React**
   - `lib/auth.ts` : tous les appels de Supabase Auth ; `lib/people.ts` : nom affiché, initiale.
@@ -95,7 +97,7 @@ Ce fichier dit où ranger le code, les pièges à connaître et les briques à r
 - Catégories : `lib/categories.ts`, `hooks/use-categories.ts`, `components/categories/` ; retirer une catégorie d'un contenu : `lib/contents/category-removal.ts`.
 - Formules : `lib/access-levels.ts` ; Corbeille : `lib/trash.ts`, `pages/trash-page.tsx`.
 - La team : `lib/team.ts` (la fonction serveur `equipe`), `components/team/` ; Mon compte : `pages/account-page.tsx`.
-- Le groupe « App mobile » (admins seulement) : `appSections` de `navigation.ts`, une seule page `pages/app-section-page.tsx` ; un éditeur ne le voit pas (`adminOnlySections`).
+- Le groupe « App mobile » (admins seulement) : `appSections` de `navigation.ts` ; un éditeur ne le voit pas (`adminOnlySections`). L'Identité de l'app : `pages/app-identity-page.tsx` ; les pages encore vides : `pages/app-section-page.tsx`.
 - Les couleurs de chacun : `lib/palettes.ts` (valeurs générées dans `lib/generated/palettes-data.ts` par `npm run palettes:generate`), `PaletteProvider`.
 
 ## Tests

@@ -297,9 +297,11 @@
 }
 
 /* Les mesures de chaque téléphone, une seule fois, sur la grille de l'aperçu (qui contient le
-   téléphone, ses barres et les messages au-dessus de lui). La hauteur de l'écran et le cadre
+   téléphone, ses barres et les messages au-dessus de lui) et sur le téléphone lui-même (seul,
+   dans l'aperçu de l'écran de chargement, App mobile › Identité). La hauteur de l'écran et le cadre
    donnent aussi la réduction du téléphone (deviceHeightOf de lib/editor/preview.ts). */
-.blocks-preview-layout[data-device="ios"] {
+.blocks-preview-layout[data-device="ios"],
+.blocks-device[data-device="ios"] {
   --blocks-phone-width: 402px;
   --blocks-screen-height: 874px;
   --blocks-screen-radius: 52px;
@@ -308,7 +310,8 @@
   --blocks-status-height: 50px;
 }
 
-.blocks-preview-layout[data-device="android"] {
+.blocks-preview-layout[data-device="android"],
+.blocks-device[data-device="android"] {
   --blocks-phone-width: 412px;
   --blocks-screen-height: 915px;
   --blocks-screen-radius: 32px;
@@ -355,6 +358,20 @@
 
 .blocks-preview-tools {
   grid-area: tools;
+}
+
+/* L'écran de chargement de l'app (App mobile › Identité) : le téléphone en petit dans sa carte,
+   et le voile de son image, au fond de l'écran (clair ou sombre). */
+.blocks-device-small {
+  --blocks-device-scale: 0.4;
+}
+
+.blocks-loading-veil {
+  background: color-mix(
+    in oklab,
+    var(--blocks-color-background) 70%,
+    transparent
+  );
 }
 
 /* Grand texte : comme le réglage du téléphone, le texte grandit et la page garde sa largeur. */

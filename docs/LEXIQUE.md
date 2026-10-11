@@ -34,7 +34,7 @@
 | Contenus (groupe du menu) | Content | Blog, Podcasts, Pages. | — / Contents |
 | Outils (groupe du menu) | Tools | Modèles de bloc, Médiathèque, Corbeille. | — |
 | App mobile (groupe du menu) | Mobile app | Les cinq pages qui régleront l'allure de l'app (admins seulement) : Identité, Charte graphique, Formes et fichier, Navigation, Mises en page. | — |
-| Identité (page de l'App mobile) | App identity | Le nom, l'icône et l'écran de chargement de l'app. | — |
+| Identité (page de l'App mobile) | App identity | La marque, les logos et l'écran de chargement de l'app. | — |
 | Charte graphique (page de l'App mobile) | Style | Les couleurs, les polices et les éléments de l'app. | — |
 | Formes et fichier (page de l'App mobile) | Shapes and file | Les formes de l'app, et sa charte dans un fichier. | — |
 | Navigation (page de l'App mobile) | Navigation | Les onglets et les menus de l'app. | — |
@@ -195,9 +195,10 @@
 | Initiale(s) | Initials | Une à trois lettres qui remplacent le monogramme tant qu'il n'est pas envoyé ; vide : la première lettre du nom. | — |
 | logotype | logo | Le logo complet, à gauche du header et à la connexion. En anglais « logo », dans les titres comme dans les phrases (10/10/2026). | logo (seul) / wordmark, logotype |
 | monogramme | icon | Le petit signe de la marque : onglet du navigateur, connexion. En anglais « icon », dans les titres comme dans les phrases (10/10/2026). | favicon, icône / favicon, logomark, monogram |
-| monogramme animé | animated icon | Le monogramme de l'écran de connexion, animé. | — |
+| monogramme animé | animated icon | Le monogramme de l'écran de connexion (ou de l'écran de chargement de l'app), animé. | — |
 | écran de connexion | sign-in screen | La page de connexion. | page de login / login page |
-| image de fond | background image | La photo à droite de l'écran de connexion. | — / cover |
+| écran de chargement | loading screen | L'écran de l'app qui suit le tout premier écran figé du démarrage : une image de fond facultative sous un voile, et le monogramme de l'app (App mobile › Identité, 10/10/2026). | écran de démarrage, splash / splash screen, launch screen |
+| image de fond | background image | La photo à droite de l'écran de connexion, ou derrière l'écran de chargement de l'app. | — / cover |
 | adresse e-mail de contact | contact email | Montrée à qui a perdu son téléphone ou son invitation. | — / support email |
 | thème | theme | Clair, Sombre ou Automatique, propre à chaque membre. | mode, apparence / appearance |
 | Automatique | System | Suit le thème de l'ordinateur. | Système / Auto |

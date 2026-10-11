@@ -4,6 +4,11 @@
 // « marque »), l'image de l'écran de connexion, et les déclinaisons du logo aux couleurs de chaque palette (table
 // admin_brand_variants). admin_brand() et admin_brand_variants() les donnent à tout le monde,
 // page de connexion comprise ; seul un admin les change.
+//
+// L'identité de l'app (table app_identity, groupe « App mobile », page Identité, ADMIN § 1) a les
+// mêmes réglages, sans déclinaisons par palette : l'écran de chargement de l'app à la place de
+// celui de connexion, ses fichiers dans les dossiers « app-… » du même espace. Les mêmes cartes
+// servent aux deux : chacune reçoit sa cible (IdentityTarget), « admin » ou « app ».
 
 import {
   analyzeSvgColors,
@@ -34,6 +39,15 @@ import { DEFAULT_TIME_ZONE, isTimeZone } from "@/lib/time-zone"
 import { texts } from "@/texts"
 
 export const adminBrandKey = ["admin-brand"] as const
+
+/** L'identité réglée par une carte : celle de l'admin (Paramètres) ou celle de l'app (App mobile). */
+export type IdentityTarget = "admin" | "app"
+
+/** La clé de chaque identité (TanStack Query) : celle de l'admin est lue dès son ouverture. */
+export const identityKeys = {
+  admin: adminBrandKey,
+  app: ["app-brand"] as const,
+} as const
 // Le monogramme prêt à animer, lu à son adresse (hooks/use-monogram-svg.ts).
 export const monogramSvgKey = (url: string | null) =>
   ["admin-brand", "monogram-svg", url] as const
@@ -65,35 +79,43 @@ export type BrandSurface = "light" | "dark"
 type BrandFile = { path: string; url: string }
 
 /**
- * L'identité enregistrée : le nom (ou null), les adresses publiques des fichiers (ou null), celles
- * des déclinaisons du logo par palette (« logotype:stone-orange:dark ») et l'image de l'écran de
- * connexion (ou null).
+ * Ce que l'admin et l'app ont en commun : le nom (ou null), les initiales, l'adresse de contact,
+ * le site web, les adresses publiques des fichiers (ou null), celles des déclinaisons du logo par
+ * palette (« logotype:stone-orange:dark » ; jamais pour l'app) et l'écran de connexion de l'admin,
+ * ou de chargement de l'app : son image (ou null) et son monogramme animé.
  */
-export type AdminBrand = { name: string | null } & Record<
+export type BrandIdentity = { name: string | null } & Record<
   BrandSlot,
   BrandFile | null
 > & {
     variants: Partial<Record<string, string>>
-    loginImage: BrandFile | null
-    /** Le monogramme de l'écran de connexion est animé (faux : immobile). */
+    screenImage: BrandFile | null
+    /** Le monogramme de l'écran est animé (faux : immobile). */
     monogramMotion: boolean
     /** Ses animations cochées (lib/monogram-motion.ts). */
     monogramMotions: Motion[]
-    /** L'adresse de contact de la marque, sur l'écran de connexion (ou null). */
+    /** L'adresse de contact de la marque (ou null) ; pour l'admin, sur l'écran de connexion. */
     contactEmail: string | null
-    /** Le site web du client, où mène « Site web » dans le header (ou null : pas de lien). */
+    /** Le site web du client (ou null) ; pour l'admin, le lien « Site web » du header. */
     websiteUrl: string | null
-    /** La langue de toute l'admin (Paramètres › Avancé). */
-    language: Language
-    /** Le fuseau horaire de toute l'admin (Paramètres › Avancé) : « Europe/Paris ». */
-    timeZone: string
-    /** Le format régional de toute l'admin (Paramètres › Avancé) ; null : celui de la langue. */
-    locale: RegionalFormat | null
     /** Les initiales, à la place d'un monogramme pas envoyé ; null : la première lettre du nom. */
     initials: string | null
-    /** Les noms du Blog et des Podcasts écrits par un admin (Paramètres › Avancé). */
-    sectionNames: CustomSectionNames
   }
+
+/**
+ * L'identité de l'admin enregistrée : la part commune, et les réglages de toute l'admin
+ * (Paramètres › Avancé).
+ */
+export type AdminBrand = BrandIdentity & {
+  /** La langue de toute l'admin (Paramètres › Avancé). */
+  language: Language
+  /** Le fuseau horaire de toute l'admin (Paramètres › Avancé) : « Europe/Paris ». */
+  timeZone: string
+  /** Le format régional de toute l'admin (Paramètres › Avancé) ; null : celui de la langue. */
+  locale: RegionalFormat | null
+  /** Les noms du Blog et des Podcasts écrits par un admin (Paramètres › Avancé). */
+  sectionNames: CustomSectionNames
+}
 
 type BrandRow = Pick<
   Tables<"admin_identity">,
@@ -137,7 +159,10 @@ const variantFolders = {
 const ORIGIN: PresetId = "neutral-none"
 
 /** Le logotype (ou le monogramme) a des déclinaisons par palette. */
-export function hasBrandVariants(brand: AdminBrand, kind: BrandKind): boolean {
+export function hasBrandVariants(
+  brand: BrandIdentity,
+  kind: BrandKind
+): boolean {
   return Object.keys(brand.variants).some((key) => key.startsWith(`${kind}:`))
 }
 
@@ -152,6 +177,46 @@ function fileOf(path: string | null): BrandFile | null {
   }
 }
 
+// Les colonnes communes aux deux identités, et celles de leur écran (connexion ou chargement).
+type SharedRow = Pick<
+  Tables<"app_identity">,
+  "name" | "initials" | "contact_email" | "website_url" | BrandColumn
+>
+type ScreenRow = {
+  image: string | null
+  motion: boolean | null
+  motions: string[] | null
+}
+
+/** La part commune d'une identité lue (sans déclinaisons). */
+function identityOf(row: SharedRow, screen: ScreenRow): BrandIdentity {
+  return {
+    name: row.name ?? null,
+    "logotype-light": fileOf(row.logotype_light),
+    "logotype-dark": fileOf(row.logotype_dark),
+    "monogram-light": fileOf(row.monogram_light),
+    "monogram-dark": fileOf(row.monogram_dark),
+    screenImage: fileOf(screen.image),
+    monogramMotion: screen.motion ?? true,
+    monogramMotions: (screen.motions ?? DEFAULT_MOTIONS).filter(isMotion),
+    contactEmail: row.contact_email ?? null,
+    websiteUrl: row.website_url ?? null,
+    initials: row.initials ?? null,
+    variants: {},
+  }
+}
+
+/** L'identité de l'app (app_brand(), la même lecture que l'app) : lue par l'équipe. */
+export async function getAppBrand(): Promise<BrandIdentity> {
+  const { data, error } = await supabase.rpc("app_brand").single()
+  if (error) throw error
+  return identityOf(data, {
+    image: data.loading_image,
+    motion: data.loading_monogram_motion,
+    motions: data.loading_monogram_motions,
+  })
+}
+
 export async function getAdminBrand(): Promise<AdminBrand> {
   const [identity, variants] = await Promise.all([
     supabase.rpc("admin_brand").single(),
@@ -161,22 +226,14 @@ export async function getAdminBrand(): Promise<AdminBrand> {
   if (variants.error) throw variants.error
   const row = identity.data as BrandRow
   return {
-    name: row.name ?? null,
-    "logotype-light": fileOf(row.logotype_light),
-    "logotype-dark": fileOf(row.logotype_dark),
-    "monogram-light": fileOf(row.monogram_light),
-    "monogram-dark": fileOf(row.monogram_dark),
-    loginImage: fileOf(row.login_image),
-    monogramMotion: row.login_monogram_motion ?? true,
-    monogramMotions: (row.login_monogram_motions ?? DEFAULT_MOTIONS).filter(
-      isMotion
-    ),
-    contactEmail: row.contact_email ?? null,
-    websiteUrl: row.website_url ?? null,
+    ...identityOf(row, {
+      image: row.login_image,
+      motion: row.login_monogram_motion,
+      motions: row.login_monogram_motions,
+    }),
     language: isLanguage(row.language) ? row.language : "en",
     timeZone: isTimeZone(row.time_zone) ? row.time_zone : DEFAULT_TIME_ZONE,
     locale: isRegionalFormat(row.locale) ? row.locale : null,
-    initials: row.initials ?? null,
     sectionNames: {
       fr: {
         blog: frenchForms(row.blog_name_fr, row.blog_le_fr, row.blog_du_fr),
@@ -204,7 +261,7 @@ export async function getAdminBrand(): Promise<AdminBrand> {
   }
 }
 
-async function updateIdentity(values: Partial<BrandRow>): Promise<void> {
+async function updateAdmin(values: Partial<BrandRow>): Promise<void> {
   const { error } = await supabase
     .from("admin_identity")
     .update(values)
@@ -212,17 +269,52 @@ async function updateIdentity(values: Partial<BrandRow>): Promise<void> {
   if (error) throw error
 }
 
+// Un changement d'une identité : ses colonnes communes, et celles de son écran (connexion pour
+// l'admin, chargement pour l'app). Une valeur absente ne part pas (undefined).
+type IdentityValues = Partial<SharedRow> & {
+  screenImage?: string | null
+  motion?: boolean
+  motions?: Motion[]
+}
+
+async function updateIdentity(
+  target: IdentityTarget,
+  { screenImage, motion, motions, ...shared }: IdentityValues
+): Promise<void> {
+  if (target === "admin") {
+    return updateAdmin({
+      ...shared,
+      login_image: screenImage,
+      login_monogram_motion: motion,
+      login_monogram_motions: motions,
+    })
+  }
+  const { error } = await supabase
+    .from("app_identity")
+    .update({
+      ...shared,
+      loading_image: screenImage,
+      loading_monogram_motion: motion,
+      loading_monogram_motions: motions,
+    })
+    .eq("id", true)
+  if (error) throw error
+}
+
 /**
- * Change le nom de la marque, son adresse de contact et son site web (admins) ; null : le nom à
- * défaut, pas d'adresse, pas de lien « Site web ».
+ * Change le nom de la marque, ses initiales, son adresse de contact et son site web (admins) ;
+ * null : le nom à défaut, pas d'adresse, pas de lien « Site web ».
  */
-export function saveBrandDetails(details: {
-  name: string | null
-  contactEmail: string | null
-  websiteUrl: string | null
-  initials: string | null
-}): Promise<void> {
-  return updateIdentity({
+export function saveBrandDetails(
+  target: IdentityTarget,
+  details: {
+    name: string | null
+    contactEmail: string | null
+    websiteUrl: string | null
+    initials: string | null
+  }
+): Promise<void> {
+  return updateIdentity(target, {
     name: details.name,
     initials: details.initials,
     contact_email: details.contactEmail,
@@ -233,7 +325,7 @@ export function saveBrandDetails(details: {
 /** Change les noms du Blog et des Podcasts (admins) ; null : le nom d'origine. */
 export function saveSectionNames(names: CustomSectionNames): Promise<void> {
   const { fr, en } = names
-  return updateIdentity({
+  return updateAdmin({
     blog_name_fr: fr.blog?.name ?? null,
     blog_le_fr: fr.blog?.le ?? null,
     blog_du_fr: fr.blog?.du ?? null,
@@ -247,17 +339,17 @@ export function saveSectionNames(names: CustomSectionNames): Promise<void> {
 
 /** Change la langue de toute l'admin (admins). */
 export function saveAdminLanguage(language: Language): Promise<void> {
-  return updateIdentity({ language })
+  return updateAdmin({ language })
 }
 
 /** Change le format régional de toute l'admin (admins) ; null : celui de la langue. */
 export function saveAdminFormat(format: RegionalFormat | null): Promise<void> {
-  return updateIdentity({ locale: format })
+  return updateAdmin({ locale: format })
 }
 
 /** Change le fuseau horaire de toute l'admin (admins). */
 export function saveAdminTimeZone(timeZone: string): Promise<void> {
-  return updateIdentity({ time_zone: timeZone })
+  return updateAdmin({ time_zone: timeZone })
 }
 
 /** Un fichier refusé avant l'envoi : son message est dans texts. */
@@ -354,20 +446,34 @@ const slotKind = (slot: BrandSlot): BrandKind =>
   slot.startsWith("logotype") ? "logotype" : "monogram"
 
 /**
+ * Le dossier d'un fichier dans « marque » : ceux de l'app portent « app- » devant, pour ne jamais
+ * se confondre avec ceux de l'admin (brand_path, migration de l'identité de l'app).
+ */
+function folderOf(target: IdentityTarget, folder: string): string {
+  return target === "app" ? `app-${folder}` : folder
+}
+
+/** Les déclinaisons par palette : celles de l'admin seulement (l'app n'en a pas). */
+async function clearVariantsOf(target: IdentityTarget, kind: BrandKind) {
+  if (target === "admin") await clearBrandVariants(kind)
+}
+
+/**
  * Envoie un fichier de la marque (admins) sous un nouveau nom, l'enregistre, puis retire l'ancien
  * (s'il reste, il ne sert plus : rien ne casse). Les déclinaisons du logo d'avant partent aussi :
  * elles ne lui ressemblent plus.
  */
 export async function saveBrandFile(
+  target: IdentityTarget,
   slot: BrandSlot,
   file: PreparedBrandFile,
   previous: string | null
 ): Promise<void> {
   const { folder, column } = brandSlots[slot]
-  const path = `${folder}/${crypto.randomUUID()}.${extensions[file.mime]}`
+  const path = `${folderOf(target, folder)}/${crypto.randomUUID()}.${extensions[file.mime]}`
   await upload(path, file.body, file.mime)
-  await updateIdentity({ [column]: path })
-  await clearBrandVariants(slotKind(slot))
+  await updateIdentity(target, { [column]: path })
+  await clearVariantsOf(target, slotKind(slot))
   if (previous) await supabase.storage.from(BUCKET).remove([previous])
 }
 
@@ -377,24 +483,27 @@ export async function saveBrandFile(
  * fichiers, et l'autre ne leur ressemble peut-être pas.
  */
 export async function removeBrandFile(
+  target: IdentityTarget,
   slot: BrandSlot,
   previous: string
 ): Promise<void> {
-  await updateIdentity({ [brandSlots[slot].column]: null })
-  await clearBrandVariants(slotKind(slot))
+  await updateIdentity(target, { [brandSlots[slot].column]: null })
+  await clearVariantsOf(target, slotKind(slot))
   await supabase.storage.from(BUCKET).remove([previous])
 }
 
-// L'image de l'écran de connexion : une photo, réduite dans le navigateur comme celles de la
-// Médiathèque (environ 300 Ko, 2 000 px au plus, en WebP ou en JPEG avec Safari).
-const loginImageTypes = ["image/jpeg", "image/png", "image/webp"]
-export const loginImageAccept = loginImageTypes.join(",")
-const LOGIN_FOLDER = "connexion"
+// L'image de l'écran (connexion de l'admin, chargement de l'app) : une photo, réduite dans le
+// navigateur comme celles de la Médiathèque (environ 300 Ko, 2 000 px au plus, en WebP ou en JPEG
+// avec Safari).
+const screenImageTypes = ["image/jpeg", "image/png", "image/webp"]
+export const screenImageAccept = screenImageTypes.join(",")
+const SCREEN_FOLDER = "connexion"
+const APP_SCREEN_FOLDER = "app-chargement"
 
-/** Réduit l'image de l'écran de connexion avant l'envoi. */
-export async function prepareLoginImage(file: File): Promise<Blob> {
+/** Réduit l'image de l'écran avant l'envoi. */
+export async function prepareScreenImage(file: File): Promise<Blob> {
   const words = texts.settings.adminIdentity.files.errors
-  if (!loginImageTypes.includes(file.type)) {
+  if (!screenImageTypes.includes(file.type)) {
     throw new BrandFileError(words.photoType)
   }
   let image
@@ -410,34 +519,45 @@ export async function prepareLoginImage(file: File): Promise<Blob> {
   }
 }
 
-/** Envoie l'image de l'écran de connexion (admins) sous un nouveau nom, puis retire l'ancienne. */
-export async function saveLoginImage(
+/** Envoie l'image de l'écran (admins) sous un nouveau nom, puis retire l'ancienne. */
+export async function saveScreenImage(
+  target: IdentityTarget,
   image: Blob,
   previous: string | null
 ): Promise<void> {
   const mime = image.type === "image/webp" ? "image/webp" : "image/jpeg"
-  const path = `${LOGIN_FOLDER}/${crypto.randomUUID()}.${mime === "image/webp" ? "webp" : "jpg"}`
+  const folder = target === "app" ? APP_SCREEN_FOLDER : SCREEN_FOLDER
+  const path = `${folder}/${crypto.randomUUID()}.${mime === "image/webp" ? "webp" : "jpg"}`
   const { error } = await supabase.storage
     .from(BUCKET)
     .upload(path, image, { contentType: mime })
   if (error) throw error
-  await updateIdentity({ login_image: path })
+  await updateIdentity(target, { screenImage: path })
   if (previous) await supabase.storage.from(BUCKET).remove([previous])
 }
 
-/** Active ou désactive le monogramme animé de l'écran de connexion (admins). */
-export function saveMonogramMotion(enabled: boolean): Promise<void> {
-  return updateIdentity({ login_monogram_motion: enabled })
+/** Active ou désactive le monogramme animé de l'écran (admins). */
+export function saveMonogramMotion(
+  target: IdentityTarget,
+  enabled: boolean
+): Promise<void> {
+  return updateIdentity(target, { motion: enabled })
 }
 
-/** Les animations cochées du monogramme de l'écran de connexion (admins ; une au moins). */
-export function saveMonogramMotions(motions: Motion[]): Promise<void> {
-  return updateIdentity({ login_monogram_motions: motions })
+/** Les animations cochées du monogramme de l'écran (admins ; aucune : immobile). */
+export function saveMonogramMotions(
+  target: IdentityTarget,
+  motions: Motion[]
+): Promise<void> {
+  return updateIdentity(target, { motions })
 }
 
-/** Retire l'image de l'écran de connexion (admins) : le monogramme reprend sa place. */
-export async function removeLoginImage(previous: string): Promise<void> {
-  await updateIdentity({ login_image: null })
+/** Retire l'image de l'écran (admins) : le fond seul reprend sa place, sous le monogramme. */
+export async function removeScreenImage(
+  target: IdentityTarget,
+  previous: string
+): Promise<void> {
+  await updateIdentity(target, { screenImage: null })
   await supabase.storage.from(BUCKET).remove([previous])
 }
 
@@ -490,7 +610,7 @@ export async function saveBrandVariants(
   }
   const { error } = await supabase.from("admin_brand_variants").insert(rows)
   if (error) throw error
-  if (fill) await saveOtherSurface(svg, fill)
+  if (fill) await saveOtherSurface("admin", svg, fill)
 }
 
 /** La version d'un SVG pour l'autre fond (aux couleurs du fichier), tirée de lui. */
@@ -509,17 +629,18 @@ export function otherSurfaceVersion(
  * fond clair »), aux couleurs du fichier.
  */
 export async function saveOtherSurface(
+  target: IdentityTarget,
   svg: BrandSvg,
   fill: BrandSlot
 ): Promise<void> {
   const surface: BrandSurface = fill.endsWith("dark") ? "dark" : "light"
-  const path = `${brandSlots[fill].folder}/${crypto.randomUUID()}.svg`
+  const path = `${folderOf(target, brandSlots[fill].folder)}/${crypto.randomUUID()}.svg`
   await upload(
     path,
     new Blob([otherSurfaceVersion(svg, surface)], { type: "image/svg+xml" }),
     "image/svg+xml"
   )
-  await updateIdentity({ [brandSlots[fill].column]: path })
+  await updateIdentity(target, { [brandSlots[fill].column]: path })
 }
 
 /** Retire les déclinaisons du logotype (ou du monogramme), lignes et fichiers. */
@@ -535,6 +656,44 @@ async function clearBrandVariants(kind: BrandKind): Promise<void> {
   }
 }
 
+type SectionWords = { title: string; description: readonly string[] }
+
+/**
+ * Les mots propres à chaque identité, les mêmes en forme pour l'admin et pour l'app : le titre et
+ * l'explication de ses sections (Marque, écran de connexion ou de chargement, Logos), le nom de
+ * l'aperçu de l'écran et l'usage de chaque logo. Le reste (champs, fichiers, animations) est commun
+ * (texts.settings.adminIdentity).
+ */
+export function identityWords(target: IdentityTarget): {
+  brand: SectionWords
+  screen: SectionWords & { preview: string }
+  logos: SectionWords & { uses: Record<BrandKind, string> }
+} {
+  const admin = texts.settings.adminIdentity
+  const { files } = admin
+  if (target === "admin") {
+    return {
+      brand: { title: admin.title, description: admin.description },
+      screen: files.loginScreen,
+      logos: {
+        title: files.title,
+        description: files.description,
+        uses: { logotype: files.logotype.use, monogram: files.monogram.use },
+      },
+    }
+  }
+  const app = texts.appPages.identity
+  return {
+    brand: { title: admin.title, description: app.brand },
+    screen: app.loadingScreen,
+    logos: {
+      title: files.title,
+      description: app.logos.description,
+      uses: { logotype: app.logos.logotype, monogram: app.logos.monogram },
+    },
+  }
+}
+
 /** Le nom à afficher : celui de la marque, sinon « Ruche ». */
 export function brandName(name: string | null | undefined): string {
   return name ?? texts.app.name
@@ -547,7 +706,7 @@ export function brandName(name: string | null | undefined): string {
  * passe avant la déclinaison : ce sont les couleurs d'origine.
  */
 export function brandFileFor(
-  brand: AdminBrand | undefined,
+  brand: BrandIdentity | undefined,
   kind: BrandKind,
   surface: BrandSurface,
   preset: PresetId | null = null

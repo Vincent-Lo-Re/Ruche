@@ -142,7 +142,8 @@ export const en = {
     },
     appIdentity: {
       title: "App identity",
-      description: "Your app's name, icon and splash screen.",
+      description:
+        "Your app's name, logos, and loading screen. The app picks up changes the next time it opens.",
     },
     appStyle: {
       title: "Style",
@@ -352,6 +353,35 @@ export const en = {
     soon: {
       title: "Coming soon",
       description: "This page will be built along with the mobile app.",
+    },
+    // La page Identité (ADMIN § 1) : les sections de Paramètres › Identité de l'admin, pour l'app.
+    // Les titres, les champs et les fichiers reprennent ceux de settings.adminIdentity.
+    identity: {
+      brand: [
+        "Fill in your app's brand details: its name, initials*, a contact email, and your website. They're separate from the admin's: changing one doesn't change the other.",
+        "* Shown in place of the icon until you upload one.",
+      ],
+      // L'écran qui suit le tout premier écran figé du démarrage de l'app.
+      loadingScreen: {
+        title: "Loading screen",
+        description: [
+          "Customize the screen your readers see while the app opens: its background image* and the icon animation**.",
+          "* JPEG, PNG, or WebP, resized and compressed automatically. Without one, a plain background, light or dark like the phone. Click the preview to choose it, or drag it there.",
+          "** Until you upload an icon, your initials animate instead.",
+        ],
+        preview: "Loading screen preview",
+        // Le thème du téléphone de l'aperçu (son fond sans image, et le monogramme qui va avec).
+        theme: "Phone theme",
+      },
+      logos: {
+        description: [
+          "Upload your app's logo* and icon** for light and dark backgrounds (SVG, PNG, or WebP, up to 1 MB each).",
+          "* Without a logo, your app's name is shown as text.",
+          "** Without an icon, your initials are shown.",
+        ],
+        logotype: "top bar",
+        monogram: "loading screen",
+      },
     },
   },
 
@@ -2418,6 +2448,16 @@ export const en = {
             light: "Also create the version for light backgrounds",
             dark: "Also create the version for dark backgrounds",
             hint: "Made from this file, in the same colors.",
+          },
+          // L'app, sans palettes : un SVG aux couleurs modifiables propose seulement sa version
+          // pour l'autre fond, s'il est vide.
+          otherOnly: {
+            title: {
+              light: "Create the version for light backgrounds too?",
+              dark: "Create the version for dark backgrounds too?",
+            },
+            keep: "Not now",
+            confirm: "Create it",
           },
           // Un fichier qui semble fait pour l'autre fond (un logo clair sur fond clair…).
           surface: {

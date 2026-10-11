@@ -53,10 +53,10 @@ function AuthAside() {
     // Sous la classe dark : le fond et le voile prennent celui du menu (la carte sombre de la
     // palette). Sans image envoyée, ce fond seul : aucune image de Ruche (09/10/2026).
     <div className="dark relative hidden w-1/2 items-center justify-center bg-card md:flex">
-      {brand.loginImage && (
+      {brand.screenImage && (
         <>
           <img
-            src={brand.loginImage.url}
+            src={brand.screenImage.url}
             alt=""
             className="absolute inset-0 size-full object-cover"
           />

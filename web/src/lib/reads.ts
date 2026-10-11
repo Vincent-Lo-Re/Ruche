@@ -1,7 +1,15 @@
 import { queryOptions } from "@tanstack/react-query"
 
 import { accessLevelsKey, listAccessLevels } from "@/lib/access-levels"
-import { adminBrandKey, getAdminBrand } from "@/lib/admin-identity"
+import {
+  adminBrandKey,
+  getAdminBrand,
+  getAppBrand,
+  identityKeys,
+  monogramSvgKey,
+  type BrandIdentity,
+  type IdentityTarget,
+} from "@/lib/admin-identity"
 import {
   categoryKeys,
   listCategories,
@@ -38,6 +46,7 @@ import {
   type MediaFilters,
 } from "@/lib/media/api"
 import type { Media } from "@/lib/media/constants"
+import { fetchSvgText, prepareAnimatedSvg } from "@/lib/monogram-motion"
 import { listMembers, teamQueryKey } from "@/lib/team"
 
 /*
@@ -61,6 +70,29 @@ export const adminBrandRead = () =>
   queryOptions({
     queryKey: adminBrandKey,
     queryFn: getAdminBrand,
+    staleTime: Infinity,
+  })
+
+/**
+ * Une identité réglée dans l'admin, par ses cartes : celle de l'admin (la même lecture
+ * qu'adminBrandRead) ou celle de l'app (App mobile › Identité), relue après chaque changement.
+ */
+export const identityRead = (target: IdentityTarget) =>
+  queryOptions<BrandIdentity>({
+    queryKey: identityKeys[target],
+    queryFn: target === "admin" ? getAdminBrand : getAppBrand,
+    staleTime: Infinity,
+  })
+
+/** Un monogramme SVG lu à son adresse et prêt à animer (null : pas compatible, ou pas de fichier). */
+export const monogramSvgRead = (url: string | null) =>
+  queryOptions({
+    queryKey: monogramSvgKey(url),
+    queryFn: async () => {
+      const text = url ? await fetchSvgText(url) : null
+      return text ? prepareAnimatedSvg(text) : null
+    },
+    enabled: url !== null,
     staleTime: Infinity,
   })
 

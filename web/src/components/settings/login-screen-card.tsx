@@ -1,10 +1,13 @@
 import { cn } from "cn"
 import { ImagePlus, UploadCloud } from "lucide-react"
-import { useId } from "react"
+import { useId, useState } from "react"
 
 import { AnimatedMonogram } from "@/components/auth/animated-monogram"
 import { InfoTip } from "@/components/info-tip"
 import { HiddenFileInput, RemoveFileButton } from "@/components/file-input"
+import { PhoneFrame } from "@/components/phone-frame"
+import { ThemeToggleGroup } from "@/components/theme-choice"
+import { themeOptions } from "@/components/theme/theme-options"
 import { Card } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -20,15 +23,18 @@ import { Spinner } from "@/components/ui/spinner"
 import { Switch } from "@/components/ui/switch"
 import { useFileDrop } from "@/hooks/use-file-drop"
 import { useMonogramSvg } from "@/hooks/use-monogram-svg"
-import { useBrand, useBrandMutation } from "@/hooks/use-brand-name"
+import { useBrandMutation, useIdentity } from "@/hooks/use-brand-name"
 import {
   BrandFileError,
-  loginImageAccept,
-  prepareLoginImage,
-  removeLoginImage,
-  saveLoginImage,
+  identityWords,
+  prepareScreenImage,
+  removeScreenImage,
   saveMonogramMotion,
   saveMonogramMotions,
+  saveScreenImage,
+  screenImageAccept,
+  type BrandSurface,
+  type IdentityTarget,
 } from "@/lib/admin-identity"
 import {
   DEFAULT_MOTIONS,
@@ -39,8 +45,13 @@ import {
 import { texts } from "@/texts"
 
 const files = texts.settings.adminIdentity.files
-const labels = files.loginScreen
 const motionLabels = files.monogramMotion
+const phoneThemeLabel = texts.appPages.identity.loadingScreen.theme
+// Le thème du téléphone de l'aperçu de l'app : clair ou sombre (pas « Automatique »).
+const phoneThemes = themeOptions.filter(
+  (option): option is Extract<typeof option, { value: BrandSurface }> =>
+    option.value !== "system"
+)
 
 /**
  * L'écran de connexion (Paramètres, section « Écran de connexion ») : une carte, l'aperçu tel que
@@ -51,32 +62,48 @@ const motionLabels = files.monogramMotion
  * (dessous sur une carte étroite), l'image de fond (son titre et ses formats, sans bouton) et le
  * monogramme animé (son interrupteur, puis ses animations à cocher). Les mêmes pour toute
  * l'équipe.
+ *
+ * Pour l'app (`target="app"`, App mobile › Identité), l'écran de chargement : le même, mais son
+ * aperçu est dans un téléphone (PhoneFrame), clair ou sombre au choix ; sans image, le fond uni du
+ * téléphone, et le monogramme pour ce fond (ADMIN § 1).
  */
-export function LoginScreenCard() {
+export function LoginScreenCard({ target }: { target: IdentityTarget }) {
   const inputId = useId()
-  const brand = useBrand()
-  const monogram = useMonogramSvg()
-  const image = brand?.loginImage ?? null
+  const brand = useIdentity(target)
+  const words = identityWords(target).screen
+  // Le fond de l'écran : sombre pour la connexion de l'admin, celui du téléphone pour l'app.
+  const [phoneTheme, setPhoneTheme] = useState<BrandSurface>("light")
+  const surface: BrandSurface = target === "app" ? phoneTheme : "dark"
+  const monogram = useMonogramSvg(target, surface)
+  const image = brand?.screenImage ?? null
 
   const save = useBrandMutation({
     mutationFn: async (chosen: File) =>
-      saveLoginImage(await prepareLoginImage(chosen), image?.path ?? null),
+      saveScreenImage(
+        target,
+        await prepareScreenImage(chosen),
+        image?.path ?? null
+      ),
     saved: files.saved,
     errorText: (error) =>
       error instanceof BrandFileError ? error.message : texts.common.unexpected,
+    target,
   })
   const remove = useBrandMutation({
-    mutationFn: (path: string) => removeLoginImage(path),
+    mutationFn: (path: string) => removeScreenImage(target, path),
     saved: files.removed,
+    target,
   })
   const motion = useBrandMutation({
-    mutationFn: (next: boolean) => saveMonogramMotion(next),
+    mutationFn: (next: boolean) => saveMonogramMotion(target, next),
     saved: (next) =>
       next ? files.monogramMotion.on : files.monogramMotion.off,
+    target,
   })
   const chosenMotions = useBrandMutation({
-    mutationFn: (next: Motion[]) => saveMonogramMotions(next),
+    mutationFn: (next: Motion[]) => saveMonogramMotions(target, next),
     saved: motionLabels.saved,
+    target,
   })
   const busy = save.isPending || remove.isPending
   // Pendant l'enregistrement, l'interrupteur et les cases montrent déjà le choix.
@@ -91,6 +118,61 @@ export function LoginScreenCard() {
       MOTIONS.filter((one) => (one === which ? checked : motions.includes(one)))
     )
   const drop = useFileDrop((dropped) => save.mutate(dropped), busy)
+  // L'image sous son voile (sinon le fond seul), et le monogramme par-dessus.
+  const scene = (
+    <>
+      {image && (
+        <>
+          <img
+            src={image.url}
+            alt=""
+            className="absolute inset-0 size-full object-cover"
+          />
+          <div
+            aria-hidden
+            className={cn(
+              "absolute inset-0",
+              target === "admin" ? "bg-card/70" : "blocks-loading-veil"
+            )}
+          />
+        </>
+      )}
+      <div className={cn("relative", target === "admin" && "text-foreground")}>
+        {/* Rallumé, ou ses animations changées, il repart du début. */}
+        <AnimatedMonogram
+          key={animated ? motions.join() : "still"}
+          motions={animated ? motions : []}
+          target={target}
+          surface={surface}
+          className={target === "admin" ? "h-24 text-7xl" : "h-32 text-8xl"}
+        />
+      </div>
+    </>
+  )
+  // Tel que sur l'écran, le monogramme par-dessus ; au survol, il pâlit et le « + » apparaît.
+  const preview =
+    target === "admin" ? (
+      <div
+        role="img"
+        aria-label={words.preview}
+        className="absolute inset-0 flex items-center justify-center transition-opacity group-hover/preview:opacity-30"
+      >
+        {scene}
+      </div>
+    ) : (
+      <PhoneFrame
+        role="img"
+        label={words.preview}
+        device="ios"
+        theme={phoneTheme}
+        className="blocks-device-small transition-opacity group-hover/preview:opacity-30"
+        backdrop={
+          <div className="absolute inset-0 flex items-center justify-center">
+            {scene}
+          </div>
+        }
+      />
+    )
 
   return (
     <Card className="@container overflow-hidden py-0">
@@ -101,63 +183,39 @@ export function LoginScreenCard() {
           className="group/preview relative flex flex-col @lg:flex-1"
           {...drop.handlers}
         >
-          {/* Sous la classe dark : le voile prend le fond du menu, comme sur l'écran de connexion. */}
+          {/* Admin : sous la classe dark, le voile prend le fond du menu, comme sur l'écran de
+              connexion. App : le téléphone, en petit, sur le fond gris de la carte. */}
           <label
             htmlFor={inputId}
             className={cn(
-              "dark relative flex aspect-video cursor-pointer items-center justify-center bg-card text-muted-foreground @lg:aspect-auto @lg:min-h-56 @lg:flex-1",
+              "relative flex cursor-pointer items-center justify-center text-muted-foreground @lg:flex-1",
+              target === "admin"
+                ? "dark aspect-video bg-card @lg:aspect-auto @lg:min-h-56"
+                : "bg-muted py-6",
               drop.dragging && "ring-2 ring-primary ring-inset"
             )}
           >
             <span className="sr-only">
               {image ? files.replace : files.loginImage.choose}
             </span>
+            {/* L'aperçu de l'admin laisse la place à l'envoi ; le téléphone reste, l'envoi
+                par-dessus. */}
+            {(target === "app" || !(busy || drop.dragging)) && preview}
             {busy ? (
-              <Spinner className="size-8" />
+              <Spinner className="absolute size-8" />
             ) : drop.dragging ? (
-              <UploadCloud aria-hidden className="size-8" />
+              <UploadCloud aria-hidden className="absolute size-8" />
             ) : (
-              <>
-                {/* Tel que sur la connexion : l'image envoyée sous le voile, sinon le fond seul ;
-                    le monogramme par-dessus. Au survol, il pâlit et le « + » apparaît. */}
-                <div
-                  role="img"
-                  aria-label={labels.preview}
-                  className="absolute inset-0 flex items-center justify-center transition-opacity group-hover/preview:opacity-30"
-                >
-                  {image && (
-                    <>
-                      <img
-                        src={image.url}
-                        alt=""
-                        className="absolute inset-0 size-full object-cover"
-                      />
-                      <div
-                        aria-hidden
-                        className="absolute inset-0 bg-card/70"
-                      />
-                    </>
-                  )}
-                  <div className="relative text-foreground">
-                    {/* Rallumé, ou ses animations changées, il repart du début. */}
-                    <AnimatedMonogram
-                      key={animated ? motions.join() : "still"}
-                      motions={animated ? motions : []}
-                      className="h-24 text-7xl"
-                    />
-                  </div>
-                </div>
-                <ImagePlus
-                  aria-hidden
-                  className="relative size-8 text-foreground opacity-0 transition-opacity group-hover/preview:opacity-100"
-                />
-              </>
+              <ImagePlus
+                aria-hidden
+                className="absolute size-8 text-foreground opacity-0 transition-opacity group-hover/preview:opacity-100"
+              />
             )}
           </label>
           <HiddenFileInput
             id={inputId}
-            accept={loginImageAccept}
-            aria-label={labels.title}
+            accept={screenImageAccept}
+            aria-label={words.title}
             disabled={busy}
             onFiles={(chosen) => {
               if (chosen?.[0]) save.mutate(chosen[0])
@@ -173,6 +231,21 @@ export function LoginScreenCard() {
           )}
         </div>
         <ItemGroup className="justify-center gap-0 divide-y p-2 @lg:w-80">
+          {target === "app" && (
+            <Item size="sm">
+              <ItemContent>
+                <ItemTitle>{phoneThemeLabel}</ItemTitle>
+              </ItemContent>
+              <ItemActions>
+                <ThemeToggleGroup
+                  label={phoneThemeLabel}
+                  options={phoneThemes}
+                  value={phoneTheme}
+                  onChange={setPhoneTheme}
+                />
+              </ItemActions>
+            </Item>
+          )}
           <Item size="sm">
             <ItemContent>
               <ItemTitle>{files.loginImage.title}</ItemTitle>

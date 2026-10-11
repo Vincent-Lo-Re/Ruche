@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { BrandLogo } from "@/components/brand-logo"
 import { useBrandName } from "@/hooks/use-brand-name"
 import { useMonogramSvg } from "@/hooks/use-monogram-svg"
+import type { BrandSurface, IdentityTarget } from "@/lib/admin-identity"
 import {
   motionLoop,
   penTiming,
@@ -21,17 +22,23 @@ import {
  * (penTiming), mesurée une fois le SVG sur la page. Immobile si l'ordinateur demande moins
  * d'animations (index.css).
  * `className` : sa hauteur, et la taille des initiales quand aucun monogramme n'a été envoyé.
+ * `target` et `surface` : le monogramme de l'app (écran de chargement), dans la version pour le
+ * fond du téléphone, plutôt que celui de l'admin pour fond sombre.
  */
 export function AnimatedMonogram({
   motions,
   className,
+  target = "admin",
+  surface = "dark",
 }: {
   motions: readonly Motion[]
   className: string
+  target?: IdentityTarget
+  surface?: BrandSurface
 }) {
   const animated = motions.length > 0
-  const name = useBrandName()
-  const { url, svg } = useMonogramSvg()
+  const name = useBrandName(target)
+  const { url, svg } = useMonogramSvg(target, surface)
   // Immobile : une seule étape, la pause, sans fin.
   const loop = useMemo(
     () =>
@@ -93,7 +100,12 @@ export function AnimatedMonogram({
       dangerouslySetInnerHTML={{ __html: svg.data.markup }}
     />
   ) : (
-    <BrandLogo kind="monogram" surface="dark" className="h-full" />
+    <BrandLogo
+      kind="monogram"
+      surface={surface}
+      target={target}
+      className="h-full"
+    />
   )
   return (
     <div

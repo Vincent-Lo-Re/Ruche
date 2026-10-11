@@ -37,9 +37,9 @@ vi.mock("@/lib/admin-identity", async (importOriginal) => {
     // jsdom ne dessine pas : la clarté d'un fichier ne se mesure pas ici.
     brandFileSurface: vi.fn(async () => null),
     removeBrandFile: vi.fn(),
-    prepareLoginImage: vi.fn(),
-    saveLoginImage: vi.fn(),
-    removeLoginImage: vi.fn(),
+    prepareScreenImage: vi.fn(),
+    saveScreenImage: vi.fn(),
+    removeScreenImage: vi.fn(),
     saveMonogramMotion: vi.fn(),
     saveMonogramMotions: vi.fn(),
     saveAdminLanguage: vi.fn(),
@@ -74,7 +74,7 @@ const brand = (name: string | null): identityApi.AdminBrand => ({
   "logotype-dark": null,
   "monogram-light": null,
   "monogram-dark": null,
-  loginImage: null,
+  screenImage: null,
   monogramMotion: true,
   monogramMotions: ["trace", "glint", "breathe"],
   contactEmail: null,
@@ -94,8 +94,8 @@ beforeEach(() => {
   vi.mocked(identityApi.saveBrandFile).mockResolvedValue()
   vi.mocked(identityApi.saveBrandVariants).mockResolvedValue()
   vi.mocked(identityApi.removeBrandFile).mockResolvedValue()
-  vi.mocked(identityApi.saveLoginImage).mockResolvedValue()
-  vi.mocked(identityApi.removeLoginImage).mockResolvedValue()
+  vi.mocked(identityApi.saveScreenImage).mockResolvedValue()
+  vi.mocked(identityApi.removeScreenImage).mockResolvedValue()
   vi.mocked(identityApi.saveMonogramMotion).mockResolvedValue()
   vi.mocked(identityApi.saveMonogramMotions).mockResolvedValue()
   vi.mocked(identityApi.saveAdminLanguage).mockResolvedValue()
@@ -270,7 +270,7 @@ describe("Paramètres : le nom de la marque", () => {
 
     // Sans les espaces autour ; puis relu pour toute l'admin.
     await waitFor(() =>
-      expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
+      expect(identityApi.saveBrandDetails).toHaveBeenCalledWith("admin", {
         name: "Essaim",
         initials: null,
         contactEmail: null,
@@ -298,7 +298,7 @@ describe("Paramètres : le nom de la marque", () => {
     fireEvent.change(field, { target: { value: "   " } })
     fireEvent.click(role("button", texts.common.save))
     await waitFor(() =>
-      expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
+      expect(identityApi.saveBrandDetails).toHaveBeenCalledWith("admin", {
         name: null,
         initials: null,
         contactEmail: null,
@@ -322,7 +322,7 @@ describe("Paramètres : l'adresse de contact de la marque", () => {
     fireEvent.change(field, { target: { value: "aide@exemple.fr" } })
     fireEvent.click(role("button", texts.common.save))
     await waitFor(() =>
-      expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
+      expect(identityApi.saveBrandDetails).toHaveBeenCalledWith("admin", {
         name: null,
         initials: null,
         contactEmail: "aide@exemple.fr",
@@ -346,7 +346,7 @@ describe("Paramètres : le site web du client", () => {
     fireEvent.change(field, { target: { value: " https://example.com/fr " } })
     fireEvent.click(role("button", texts.common.save))
     await waitFor(() =>
-      expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
+      expect(identityApi.saveBrandDetails).toHaveBeenCalledWith("admin", {
         name: null,
         initials: null,
         contactEmail: null,
@@ -370,7 +370,7 @@ describe("Paramètres : les initiales de la marque", () => {
     fireEvent.change(field, { target: { value: " ES " } })
     fireEvent.click(role("button", texts.common.save))
     await waitFor(() =>
-      expect(identityApi.saveBrandDetails).toHaveBeenCalledWith({
+      expect(identityApi.saveBrandDetails).toHaveBeenCalledWith("admin", {
         name: "Essaim",
         initials: "ES",
         contactEmail: null,
@@ -419,6 +419,7 @@ describe("Paramètres : le logotype et le monogramme", () => {
     // Sans couleur à changer : enregistré tel quel, sans question.
     await waitFor(() =>
       expect(identityApi.saveBrandFile).toHaveBeenCalledWith(
+        "admin",
         "logotype-light",
         expect.objectContaining({ mime: "image/svg+xml", svg: null }),
         null
@@ -429,6 +430,7 @@ describe("Paramètres : le logotype et le monogramme", () => {
     await waitFor(() =>
       // Ses déclinaisons partent avec lui (removeBrandFile).
       expect(identityApi.removeBrandFile).toHaveBeenCalledWith(
+        "admin",
         "logotype-dark",
         logo.path
       )
@@ -455,6 +457,7 @@ describe("Paramètres : déposer un fichier de la marque", () => {
 
     await waitFor(() =>
       expect(identityApi.saveBrandFile).toHaveBeenCalledWith(
+        "admin",
         "monogram-dark",
         expect.objectContaining({ mime: "image/png" }),
         null
@@ -500,6 +503,7 @@ describe("Paramètres : décliner un logo aux couleurs des palettes", () => {
       )
     )
     expect(identityApi.saveBrandFile).toHaveBeenCalledWith(
+      "admin",
       "monogram-light",
       expect.anything(),
       null
@@ -675,10 +679,10 @@ describe("Paramètres : l'image de l'écran de connexion", () => {
     }
     vi.mocked(identityApi.getAdminBrand).mockResolvedValue({
       ...brand(null),
-      loginImage: image,
+      screenImage: image,
     })
     const reduced = new Blob(["x"], { type: "image/webp" })
-    vi.mocked(identityApi.prepareLoginImage).mockResolvedValue(reduced)
+    vi.mocked(identityApi.prepareScreenImage).mockResolvedValue(reduced)
     await renderApp("/settings")
 
     // L'aperçu montre l'image choisie, sous le voile et le monogramme.
@@ -698,16 +702,20 @@ describe("Paramètres : l'image de l'écran de connexion", () => {
       target: { files: [photo] },
     })
     await waitFor(() =>
-      expect(identityApi.saveLoginImage).toHaveBeenCalledWith(
+      expect(identityApi.saveScreenImage).toHaveBeenCalledWith(
+        "admin",
         reduced,
         image.path
       )
     )
-    expect(identityApi.prepareLoginImage).toHaveBeenCalledWith(photo)
+    expect(identityApi.prepareScreenImage).toHaveBeenCalledWith(photo)
 
     fireEvent.click(role("button", files.remove, card))
     await waitFor(() =>
-      expect(identityApi.removeLoginImage).toHaveBeenCalledWith(image.path)
+      expect(identityApi.removeScreenImage).toHaveBeenCalledWith(
+        "admin",
+        image.path
+      )
     )
   })
 })
@@ -721,7 +729,10 @@ describe("Paramètres : le monogramme animé de l'écran de connexion", () => {
     expect(toggle).toHaveAttribute("aria-checked", "true")
     fireEvent.click(toggle)
     await waitFor(() =>
-      expect(identityApi.saveMonogramMotion).toHaveBeenCalledWith(false)
+      expect(identityApi.saveMonogramMotion).toHaveBeenCalledWith(
+        "admin",
+        false
+      )
     )
     expect(await screen.findByText(motion.off)).toBeVisible()
   })
@@ -731,7 +742,7 @@ describe("Paramètres : le monogramme animé de l'écran de connexion", () => {
     const group = await findRole("list", motion.group)
     fireEvent.click(role("checkbox", motion.motions.shine, group))
     await waitFor(() =>
-      expect(identityApi.saveMonogramMotions).toHaveBeenCalledWith([
+      expect(identityApi.saveMonogramMotions).toHaveBeenCalledWith("admin", [
         "trace",
         "glint",
         "shine",
@@ -791,7 +802,7 @@ describe("Paramètres : le monogramme animé de l'écran de connexion", () => {
     expect(sway).not.toHaveAttribute("aria-disabled", "true")
     fireEvent.click(sway)
     await waitFor(() =>
-      expect(identityApi.saveMonogramMotions).toHaveBeenCalledWith([])
+      expect(identityApi.saveMonogramMotions).toHaveBeenCalledWith("admin", [])
     )
   })
 })

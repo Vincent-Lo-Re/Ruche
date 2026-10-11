@@ -1,4 +1,6 @@
-import { isTheme, useTheme } from "@/components/theme/theme-context"
+import type { LucideIcon } from "lucide-react"
+
+import { useTheme } from "@/components/theme/theme-context"
 import { themeOptions } from "@/components/theme/theme-options"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import {
@@ -13,25 +15,50 @@ export function ThemeChoice() {
   const { theme, setTheme } = useTheme()
 
   return (
+    <ThemeToggleGroup
+      label={texts.theme.title}
+      options={themeOptions}
+      value={theme}
+      onChange={setTheme}
+    />
+  )
+}
+
+/**
+ * Des thèmes en icônes, leur nom dans l'infobulle : celui de chacun (ThemeChoice), ou celui d'un
+ * aperçu (le téléphone de l'écran de chargement de l'app).
+ */
+export function ThemeToggleGroup<T extends string>({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string
+  options: readonly { value: T; label: string; icon: LucideIcon }[]
+  value: T
+  onChange: (value: T) => void
+}) {
+  return (
     <ToggleGroup
       variant="outline"
       size="icon"
-      aria-label={texts.theme.title}
-      value={[theme]}
-      onValueChange={(value) => {
+      aria-label={label}
+      value={[value]}
+      onValueChange={(next: string[]) => {
         // Un clic sur le choix déjà actif ne le désélectionne pas.
-        const next = value[0]
-        if (isTheme(next)) setTheme(next)
+        const chosen = options.find((option) => option.value === next[0])
+        if (chosen) onChange(chosen.value)
       }}
     >
-      {themeOptions.map(({ value, label, icon: Icon }) => (
-        <Tooltip key={value}>
+      {options.map(({ value: option, label: name, icon: Icon }) => (
+        <Tooltip key={option}>
           <TooltipTrigger
-            render={<ToggleGroupItem value={value} aria-label={label} />}
+            render={<ToggleGroupItem value={option} aria-label={name} />}
           >
             <Icon />
           </TooltipTrigger>
-          <TooltipContent>{label}</TooltipContent>
+          <TooltipContent>{name}</TooltipContent>
         </Tooltip>
       ))}
     </ToggleGroup>

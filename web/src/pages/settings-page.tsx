@@ -7,12 +7,10 @@ import {
 
 import { PageHeader } from "@/components/page-header"
 import { AccessLevelsCard } from "@/components/settings/access-levels-card"
-import { AdminIdentityCard } from "@/components/settings/admin-identity-card"
 import { AdminFormatCard } from "@/components/settings/admin-format-card"
 import { AdminLanguageCard } from "@/components/settings/admin-language-card"
 import { AdminTimeZoneCard } from "@/components/settings/admin-time-zone-card"
-import { BrandLogosCard } from "@/components/settings/brand-logos-card"
-import { LoginScreenCard } from "@/components/settings/login-screen-card"
+import { IdentitySections } from "@/components/settings/identity-sections"
 import { SectionNamesCard } from "@/components/settings/section-names-card"
 import { SettingsSection } from "@/components/settings/settings-section"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -73,30 +71,7 @@ export function SettingsPage() {
         {settingsTabs.map((value) => (
           <TabsContent key={value} value={value} data-settings-tab={value}>
             {value === "admin" ? (
-              // Des sections de réglages : le titre à gauche, la carte à droite ; empilées
-              // sur un écran étroit (conteneur, maquette docs/maquettes/parametres-identite.html).
-              <div className="@container space-y-8 pt-4">
-                <SettingsSection
-                  title={labels.adminIdentity.title}
-                  description={labels.adminIdentity.description}
-                >
-                  <AdminIdentityCard />
-                </SettingsSection>
-                <SettingsSection
-                  title={labels.adminIdentity.files.loginScreen.title}
-                  description={
-                    labels.adminIdentity.files.loginScreen.description
-                  }
-                >
-                  <LoginScreenCard />
-                </SettingsSection>
-                <SettingsSection
-                  title={labels.adminIdentity.files.title}
-                  description={labels.adminIdentity.files.description}
-                >
-                  <BrandLogosCard />
-                </SettingsSection>
-              </div>
+              <IdentitySections target="admin" />
             ) : value === "plans" ? (
               <AccessLevelsCard />
             ) : (

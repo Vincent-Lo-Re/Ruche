@@ -11,6 +11,7 @@ import {
   prepareContentList,
   prepareEditor,
   prepareMedia,
+  prepareAppIdentity,
   prepareSettings,
   prepareTeam,
   prepareTemplates,
@@ -69,7 +70,7 @@ function authPage<M>(
 
 const editorCode = () => import("@/pages/editor-page")
 const listCode = () => import("@/pages/content-list-page")
-// Les cinq pages « App mobile » : une seule page, chargée une fois.
+// Les pages « App mobile » encore vides : une seule page, chargée une fois.
 const appSectionCode = () => import("@/pages/app-section-page")
 // Les éditeurs plein écran : la section (pour « ← Blog »), la sorte de contenu et l'adresse.
 type EditorRoute = { section: SectionKey; kind: ContentKind; path: string }
@@ -198,14 +199,24 @@ export const routes: RouteObject[] = [
                   {
                     element: <RequireAdmin />,
                     children: [
-                      ...appSections.map((section) =>
-                        page(
-                          sections[section].path,
-                          appSectionCode,
-                          (m) => <m.AppSectionPage section={section} />,
-                          null
-                        )
+                      // L'Identité de l'app, la première construite (ADMIN § 1) ; les autres
+                      // pages « App mobile » sont encore vides.
+                      page(
+                        sections.appIdentity.path,
+                        () => import("@/pages/app-identity-page"),
+                        (m) => <m.AppIdentityPage />,
+                        prepareAppIdentity
                       ),
+                      ...appSections
+                        .filter((section) => section !== "appIdentity")
+                        .map((section) =>
+                          page(
+                            sections[section].path,
+                            appSectionCode,
+                            (m) => <m.AppSectionPage section={section} />,
+                            null
+                          )
+                        ),
                       page(
                         sections.settings.path,
                         () => import("@/pages/settings-page"),

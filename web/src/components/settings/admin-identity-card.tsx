@@ -8,8 +8,12 @@ import { FormField } from "@/components/form-field"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { useBrandMutation } from "@/hooks/use-brand-name"
-import { brandInitial, saveBrandDetails } from "@/lib/admin-identity"
-import { adminBrandRead } from "@/lib/reads"
+import {
+  brandInitial,
+  saveBrandDetails,
+  type IdentityTarget,
+} from "@/lib/admin-identity"
+import { identityRead } from "@/lib/reads"
 import { adminNameSchema } from "@/lib/schemas"
 import { texts } from "@/texts"
 
@@ -21,11 +25,14 @@ const labels = texts.settings.adminIdentity
  * gauche, SettingsSection) : le nom et les initiales côte à côte, l'adresse et le site web dessous, « Enregistrer »
  * dans le pied gris. Le nom s'affiche dans l'admin (vide : le nom à défaut) ; l'adresse aide sur
  * l'écran de connexion ; le site web est le lien « Site web » du header (vide : pas de lien).
+ * Avec `target="app"`, les mêmes champs pour la marque de l'app (App mobile › Identité), à part
+ * de ceux de l'admin.
  */
-export function AdminIdentityCard() {
-  const brand = useQuery(adminBrandRead())
+export function AdminIdentityCard({ target }: { target: IdentityTarget }) {
+  const brand = useQuery(identityRead(target))
   return brand.isSuccess ? (
     <BrandDetailsForm
+      target={target}
       name={brand.data.name}
       initials={brand.data.initials}
       contactEmail={brand.data.contactEmail}
@@ -41,11 +48,13 @@ export function AdminIdentityCard() {
 }
 
 function BrandDetailsForm({
+  target,
   name,
   initials,
   contactEmail,
   websiteUrl,
 }: {
+  target: IdentityTarget
   name: string | null
   initials: string | null
   contactEmail: string | null
@@ -69,7 +78,7 @@ function BrandDetailsForm({
       contactEmail: string
       websiteUrl: string
     }) =>
-      saveBrandDetails({
+      saveBrandDetails(target, {
         name: values.name || null,
         initials: values.initials || null,
         contactEmail: values.contactEmail || null,
@@ -77,6 +86,7 @@ function BrandDetailsForm({
       }),
     saved: labels.saved,
     onSaved: (values) => form.reset(values),
+    target,
   })
 
   const onSubmit = form.handleSubmit((values) => save.mutate(values))
@@ -89,7 +99,7 @@ function BrandDetailsForm({
           <FormField
             control={form.control}
             name="name"
-            id="admin-name"
+            id={`${target}-name`}
             label={labels.name}
             render={(field, props) => (
               <Input {...field} {...props} placeholder={texts.app.name} />
@@ -98,7 +108,7 @@ function BrandDetailsForm({
           <FormField
             control={form.control}
             name="initials"
-            id="admin-initials"
+            id={`${target}-initials`}
             label={labels.initials}
             render={(field, props) => (
               <Input
@@ -113,7 +123,7 @@ function BrandDetailsForm({
           <FormField
             control={form.control}
             name="contactEmail"
-            id="admin-email"
+            id={`${target}-email`}
             label={labels.email}
             render={(field, props) => (
               <Input
@@ -128,7 +138,7 @@ function BrandDetailsForm({
           <FormField
             control={form.control}
             name="websiteUrl"
-            id="admin-website"
+            id={`${target}-website`}
             label={labels.website}
             render={(field, props) => (
               <Input

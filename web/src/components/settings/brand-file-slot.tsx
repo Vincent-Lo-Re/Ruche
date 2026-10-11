@@ -5,9 +5,9 @@ import { toast } from "sonner"
 import { BrandSurfaceDialog } from "@/components/settings/brand-surface-dialog"
 import { BrandVariantsDialog } from "@/components/settings/brand-variants-dialog"
 import { FileSlot } from "@/components/settings/file-slot"
-import { useBrand } from "@/hooks/use-brand-name"
+import { OtherSurfaceDialog } from "@/components/settings/other-surface-dialog"
+import { useIdentity } from "@/hooks/use-brand-name"
 import {
-  adminBrandKey,
   BrandFileError,
   brandFileAccept,
   brandFileSurface,
@@ -17,6 +17,8 @@ import {
   saveBrandFile,
   saveBrandVariants,
   saveOtherSurface,
+  identityKeys,
+  type IdentityTarget,
   type PreparedBrandFile,
 } from "@/lib/admin-identity"
 import { texts } from "@/texts"
@@ -30,24 +32,29 @@ type Surface = "light" | "dark"
  * qui semble fait pour l'autre fond (un logo clair sur fond clair…) le fait dire, et peut y aller
  * (BrandSurfaceDialog). Un SVG aux couleurs modifiables demande s'il faut le décliner aux couleurs
  * des palettes, et propose sa version pour l'autre fond si celui-ci est vide (BrandVariantsDialog).
+ * Pour l'app (`target="app"`), pas de palettes : seule la version pour l'autre fond vide est
+ * proposée (OtherSurfaceDialog).
  */
 export function BrandFileSlot({
+  target,
   kind,
   surface,
 }: {
+  target: IdentityTarget
   kind: "logotype" | "monogram"
   surface: "light" | "dark"
 }) {
   const slot = `${kind}-${surface}` as const
   const queryClient = useQueryClient()
-  const brand = useBrand()
+  const brand = useIdentity(target)
+  const palettes = target === "admin"
   const file = brand?.[slot] ?? null
   const label = labels.label(labels[kind].title, labels[surface])
   // Où va le fichier choisi : ce fond, ou l'autre si l'admin l'y envoie (BrandSurfaceDialog).
-  const [target, setTarget] = useState<Surface>(surface)
+  const [destination, setDestination] = useState<Surface>(surface)
   const slotOf = (on: Surface) => `${kind}-${on}` as const
   const opposite = (on: Surface): Surface => (on === "light" ? "dark" : "light")
-  const other = brand?.[slotOf(opposite(target))]
+  const other = brand?.[slotOf(opposite(destination))]
   // Un fichier qui semble fait pour l'autre fond, en attente de la réponse.
   const [mismatch, setMismatch] = useState<{
     prepared: PreparedBrandFile
@@ -62,7 +69,7 @@ export function BrandFileSlot({
   // le dit sous le message (un SVG aux couleurs modifiables repose la question avant).
   const hadVariants = brand ? hasBrandVariants(brand, kind) : false
   const onDone = async (message: string, variantsRemoved: boolean) => {
-    await queryClient.invalidateQueries({ queryKey: adminBrandKey })
+    await queryClient.invalidateQueries({ queryKey: identityKeys[target] })
     toast.success(message, {
       description: variantsRemoved ? labels.variants.removed : undefined,
     })
@@ -76,22 +83,25 @@ export function BrandFileSlot({
       prepared,
       decline,
       on,
+      withOther,
     }: {
       prepared: PreparedBrandFile
       decline: boolean
       on: Surface
+      // La version pour l'autre fond est demandée.
+      withOther: boolean
     }) => {
       const replaced = brand?.[slotOf(on)]?.path ?? null
-      await saveBrandFile(slotOf(on), prepared, replaced)
+      await saveBrandFile(target, slotOf(on), prepared, replaced)
       // La carte de l'autre fond, vide, reçoit sa version si elle est demandée.
       const fill =
-        !brand?.[slotOf(opposite(on))] && alsoOther
+        !brand?.[slotOf(opposite(on))] && withOther
           ? slotOf(opposite(on))
           : null
       if (decline && prepared.svg) {
         await saveBrandVariants(kind, prepared.svg, fill)
       } else if (fill && prepared.svg) {
-        await saveOtherSurface(prepared.svg, fill)
+        await saveOtherSurface(target, prepared.svg, fill)
       }
     },
     onSuccess: (_, { decline }) =>
@@ -103,19 +113,21 @@ export function BrandFileSlot({
     onSettled: () => setAsking(null),
   })
   const remove = useMutation({
-    mutationFn: (path: string) => removeBrandFile(slot, path),
+    mutationFn: (path: string) => removeBrandFile(target, slot, path),
     onSuccess: () => onDone(labels.removed, hadVariants),
     onError,
   })
   const busy = save.isPending || remove.isPending
 
-  // Un SVG aux couleurs modifiables pose la question ; les autres fichiers partent tels quels.
+  // Un SVG aux couleurs modifiables pose la question (pour l'app, seulement si l'autre fond est
+  // vide) ; les autres fichiers partent tels quels.
   const place = (prepared: PreparedBrandFile, on: Surface) => {
-    setTarget(on)
-    if (prepared.svg) {
+    setDestination(on)
+    const otherEmpty = !brand?.[slotOf(opposite(on))]
+    if (prepared.svg && (palettes || otherEmpty)) {
       setAlsoOther(true)
       setAsking(prepared)
-    } else save.mutate({ prepared, decline: false, on })
+    } else save.mutate({ prepared, decline: false, on, withOther: false })
   }
   // D'abord : ce fichier semble-t-il fait pour l'autre fond ?
   const choose = async (chosen: File) => {
@@ -163,26 +175,63 @@ export function BrandFileSlot({
           place(mismatch.prepared, surface)
         }}
       />
-      <BrandVariantsDialog
-        file={asking}
-        pending={save.isPending}
-        other={
-          other
-            ? null
-            : {
-                surface: opposite(target),
-                checked: alsoOther,
-              }
-        }
-        onOtherChange={setAlsoOther}
-        onKeep={() =>
-          asking &&
-          save.mutate({ prepared: asking, decline: false, on: target })
-        }
-        onConfirm={() =>
-          asking && save.mutate({ prepared: asking, decline: true, on: target })
-        }
-      />
+      {palettes ? (
+        <BrandVariantsDialog
+          file={asking}
+          pending={save.isPending}
+          other={
+            other
+              ? null
+              : {
+                  surface: opposite(destination),
+                  checked: alsoOther,
+                }
+          }
+          onOtherChange={setAlsoOther}
+          onKeep={() =>
+            asking &&
+            save.mutate({
+              prepared: asking,
+              decline: false,
+              on: destination,
+              withOther: alsoOther,
+            })
+          }
+          onConfirm={() =>
+            asking &&
+            save.mutate({
+              prepared: asking,
+              decline: true,
+              on: destination,
+              withOther: alsoOther,
+            })
+          }
+        />
+      ) : (
+        <OtherSurfaceDialog
+          file={asking}
+          surface={opposite(destination)}
+          pending={save.isPending}
+          onKeep={() =>
+            asking &&
+            save.mutate({
+              prepared: asking,
+              decline: false,
+              on: destination,
+              withOther: false,
+            })
+          }
+          onConfirm={() =>
+            asking &&
+            save.mutate({
+              prepared: asking,
+              decline: false,
+              on: destination,
+              withOther: true,
+            })
+          }
+        />
+      )}
     </>
   )
 }
