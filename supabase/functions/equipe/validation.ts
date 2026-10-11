@@ -18,6 +18,9 @@ export type TeamRequest =
   | { action: "set_role"; user_id: string; role: TeamRole }
   | { action: "remove"; user_id: string }
   | { action: "reset_mfa"; user_id: string }
+  // La langue des e-mails des membres qui suivent celle de l'admin, remise à la sienne (après un
+  // changement de langue de toute l'admin).
+  | { action: "sync_email_languages" }
 
 export type ParseResult = { ok: true; request: TeamRequest } | { ok: false; message: string }
 
@@ -35,6 +38,7 @@ const fieldsByAction = {
   set_role: ["user_id", "role"],
   remove: ["user_id"],
   reset_mfa: ["user_id"],
+  sync_email_languages: [],
 } as const
 
 type Action = keyof typeof fieldsByAction
@@ -98,6 +102,7 @@ export function parseRequest(body: unknown): ParseResult {
 
     switch (action) {
       case "list":
+      case "sync_email_languages":
         return { ok: true, request: { action } }
       case "invite":
         return {

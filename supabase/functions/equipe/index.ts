@@ -1,6 +1,6 @@
 // Fonction serveur « equipe » : la liste de l'équipe, lisible par toute l'équipe (admins et
-// éditeurs, 09/10/2026) ; inviter, changer un rôle, retirer un membre ou réinitialiser sa double
-// vérification, réservés aux admins.
+// éditeurs, 09/10/2026) ; inviter, changer un rôle, retirer un membre, réinitialiser sa double
+// vérification ou remettre la langue des e-mails à celle de l'admin, réservés aux admins.
 //
 // Appel : POST avec un JSON { action, ... } (voir validation.ts) et la session de l'admin dans
 // l'en-tête Authorization (supabase.functions.invoke l'ajoute tout seul).
@@ -159,6 +159,41 @@ async function sendInvitation(email: string): Promise<void> {
   if (error) throw inviteError(error)
 }
 
+// La langue de toute l'admin (Paramètres › Avancé).
+async function adminLanguage(): Promise<TeamLanguage> {
+  const { data, error } = await admin
+    .from("admin_identity")
+    .select("language")
+    .single<{ language: TeamLanguage }>()
+  if (error) throw new Error(`langue de l'admin : ${error.message}`)
+  return data.language
+}
+
+// Les modèles d'e-mails ne lisent que le compte (user_metadata), pas la base : chaque compte
+// porte la langue de ses e-mails (email_language), la sienne, sinon celle de l'admin. Ici, celle
+// des membres qui suivent l'admin est remise à la langue de l'admin. Renvoie le nombre de comptes
+// changés.
+async function syncEmailLanguages(): Promise<number> {
+  const language = await adminLanguage()
+  let changed = 0
+  for (let page = 1;; page++) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 1000 })
+    if (error) throw new Error(`comptes : ${error.message}`)
+    for (const user of data.users) {
+      const metadata = user.user_metadata ?? {}
+      const own = metadata.language === "en" || metadata.language === "fr"
+      if (own || metadata.email_language === language) continue
+      // Ajouté aux données du compte, sans toucher aux autres (nom, langue, format).
+      const { error: updateError } = await admin.auth.admin.updateUserById(user.id, {
+        user_metadata: { email_language: language },
+      })
+      if (updateError) throw new Error(`compte : ${updateError.message}`)
+      changed++
+    }
+    if (data.users.length < 1000) return changed
+  }
+}
+
 // Crée le compte avec son rôle dans app_metadata (que seule la clé secrète peut écrire) : la
 // base crée la fiche avec ce rôle (handle_new_user), puis l'invitation part. Le nom et la langue
 // vont dans user_metadata, que lisent les e-mails (et la langue, l'admin). Si l'e-mail ne part
@@ -175,6 +210,7 @@ async function createInvitedUser(
     user_metadata: {
       ...(fullName ? { full_name: fullName } : {}),
       ...(language ? { language } : {}),
+      email_language: language ?? (await adminLanguage()),
     },
   })
   if (error || !data.user) throw inviteError(error)
@@ -251,6 +287,9 @@ async function run(request: TeamRequest, caller: User): Promise<unknown> {
       }
       return { ok: true }
     }
+
+    case "sync_email_languages":
+      return { ok: true, changed: await syncEmailLanguages() }
 
     case "reset_mfa": {
       refuseOnYourself(request.user_id, caller)
