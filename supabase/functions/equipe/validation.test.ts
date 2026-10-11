@@ -13,6 +13,17 @@ Deno.test("list : accepté sans autre champ", () => {
   assertEquals(parseRequest({ action: "list" }), { ok: true, request: { action: "list" } })
 })
 
+Deno.test("sync_email_languages : accepté sans autre champ", () => {
+  assertEquals(parseRequest({ action: "sync_email_languages" }), {
+    ok: true,
+    request: { action: "sync_email_languages" },
+  })
+  assertEquals(
+    refused({ action: "sync_email_languages", language: "fr" }),
+    "Champ inattendu : language.",
+  )
+})
+
 Deno.test("invite : e-mail nettoyé, nom facultatif", () => {
   assertEquals(
     parseRequest({ action: "invite", email: "  Marie@Exemple.FR ", role: "editor" }),

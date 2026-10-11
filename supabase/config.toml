@@ -266,23 +266,23 @@ otp_expiry = 600
 # l'anglais sinon) ; l'objet aussi. Les chemins partent de la racine du dépôt.
 # Invitation : lien vers la page /invitation de l'admin, qui demande un clic avant de valider.
 [auth.email.template.invite]
-subject = "{{ if and .Data.language (eq .Data.language \"fr\") }}Ton invitation à rejoindre l'équipe{{ else }}You're invited to join the team{{ end }}"
+subject = "{{ if eq (or .Data.email_language .Data.language \"\") \"fr\" }}Ton invitation à rejoindre l'équipe{{ else }}You're invited to join the team{{ end }}"
 content_path = "./supabase/templates/invitation.html"
 
 # Code de connexion (envoyé par signInWithOtp à un membre qui a déjà accepté son invitation).
 [auth.email.template.magic_link]
-subject = "{{ if and .Data.language (eq .Data.language \"fr\") }}Ton code de connexion{{ else }}Your sign-in code{{ end }}"
+subject = "{{ if eq (or .Data.email_language .Data.language \"\") \"fr\" }}Ton code de connexion{{ else }}Your sign-in code{{ end }}"
 content_path = "./supabase/templates/code-connexion.html"
 
 # Confirmation d'adresse : ne devrait pas servir (inscriptions fermées), traduite par prudence.
 [auth.email.template.confirmation]
-subject = "{{ if and .Data.language (eq .Data.language \"fr\") }}Confirme ton adresse e-mail{{ else }}Confirm your email address{{ end }}"
+subject = "{{ if eq (or .Data.email_language .Data.language \"\") \"fr\" }}Confirme ton adresse e-mail{{ else }}Confirm your email address{{ end }}"
 content_path = "./supabase/templates/confirmation.html"
 
 # Changement d'adresse (Mon compte) : un code à l'ancienne adresse et un à la nouvelle
 # (double_confirm_changes).
 [auth.email.template.email_change]
-subject = "{{ if and .Data.language (eq .Data.language \"fr\") }}Ton code pour changer d'adresse{{ else }}Your code to change your email address{{ end }}"
+subject = "{{ if eq (or .Data.email_language .Data.language \"\") \"fr\" }}Ton code pour changer d'adresse{{ else }}Your code to change your email address{{ end }}"
 content_path = "./supabase/templates/changement-adresse.html"
 
 # Uncomment to customize notification email template
