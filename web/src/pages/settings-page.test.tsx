@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import * as levelsApi from "@/lib/access-levels"
 import * as identityApi from "@/lib/admin-identity"
+import * as teamApi from "@/lib/team"
 import { fakeAuth, renderApp } from "@/test/render"
 import { texts } from "@/texts"
 import { NO_CUSTOM_NAMES } from "@/lib/section-names"
@@ -19,6 +20,11 @@ vi.mock("@/lib/access-levels", async (importOriginal) => {
     reorderAccessLevels: vi.fn(),
   }
 })
+
+vi.mock("@/lib/team", async (importOriginal) => ({
+  ...(await importOriginal<typeof teamApi>()),
+  syncEmailLanguages: vi.fn(async () => {}),
+}))
 
 vi.mock("@/lib/admin-identity", async (importOriginal) => {
   const actual = await importOriginal<typeof identityApi>()
@@ -100,7 +106,7 @@ beforeEach(() => {
 afterEach(() => vi.clearAllMocks())
 
 describe("Paramètres : la langue de l'admin (Avancé)", () => {
-  it("un admin choisit la langue de toute l'admin, l'identité est relue", async () => {
+  it("un admin choisit la langue de toute l'admin, l'identité est relue, les e-mails suivent", async () => {
     vi.mocked(identityApi.getAdminBrand).mockResolvedValue({
       ...brand(null),
       language: "fr",
@@ -121,6 +127,8 @@ describe("Paramètres : la langue de l'admin (Avancé)", () => {
     await waitFor(() =>
       expect(identityApi.saveAdminLanguage).toHaveBeenCalledWith("en")
     )
+    // Les e-mails des membres qui suivent l'admin passent à la nouvelle langue.
+    await waitFor(() => expect(teamApi.syncEmailLanguages).toHaveBeenCalled())
     expect(await screen.findByText(words.saved)).toBeVisible()
     await waitFor(() =>
       expect(
