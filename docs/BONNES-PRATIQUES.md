@@ -2,7 +2,7 @@
 
 > Adoptées le 28/09/2026. Elles font règle pour tout changement du dépôt (code, base, fonctions, tests, documentation), qu'il soit fait par l'utilisateur ou par Claude. Quand une pratique change, on la change d'abord ici, avec l'accord de l'utilisateur.
 >
-> Le détail est ailleurs : les décisions dans [ADMINISTRATION.md](ADMINISTRATION.md), l'architecture dans [ARCHITECTURE-CONTENUS.md](ARCHITECTURE-CONTENUS.md), les commandes et l'emplacement du code dans [CLAUDE.md](../CLAUDE.md).
+> Le détail est ailleurs : les décisions dans [ADMINISTRATION.md](ADMINISTRATION.md), l'architecture dans [ARCHITECTURE-CONTENUS.md](ARCHITECTURE-CONTENUS.md), les commandes dans [CLAUDE.md](../CLAUDE.md), l'emplacement du code de l'admin dans [web/CLAUDE.md](../web/CLAUDE.md) et celui de la base dans [supabase/CLAUDE.md](../supabase/CLAUDE.md).
 
 ## 1. Façon de travailler
 
@@ -17,8 +17,8 @@
 
 ## 2. Interface (React, shadcn/ui, Tailwind CSS)
 
-- **Réutiliser avant d'écrire** : les briques communes sont listées dans `CLAUDE.md` (« Briques communes »). Dès qu'un morceau apparaît une deuxième fois, on l'extrait. Le garde-fou refuse un copier-coller de plus de 10 lignes (jscpd).
-- **Rien n'est laissé à l'apparence du navigateur** quand l'admin a son composant : les infobulles passent par `Tooltip` (ESLint refuse l'attribut `title`), la recherche par `SearchInput`, le jour et l'heure par `DayField` et `TimeField` (« 25/10/2099 », « 08h00 »), l'audio par `AudioPlayer` ; les barres de défilement suivent le thème (`web/src/index.css`). Seuls restent au navigateur la fenêtre « Quitter le site ? » et le choix des fichiers, qu'on ne peut pas remplacer.
+- **Réutiliser avant d'écrire** : les briques communes sont listées dans `web/CLAUDE.md` (« Briques communes »). Dès qu'un morceau apparaît une deuxième fois, on l'extrait. Le garde-fou refuse un copier-coller de plus de 10 lignes (jscpd).
+- **Rien n'est laissé à l'apparence du navigateur** quand l'admin a son composant : les infobulles passent par `Tooltip` (ESLint refuse l'attribut `title`), la recherche par `SearchInput`, le jour et l'heure par `DayField` et `TimeField` (dans le format régional : « 25/10/2099 », « 08h00 » en France), l'audio par `AudioPlayer` ; les barres de défilement suivent le thème (`web/src/index.css`). Seuls restent au navigateur la fenêtre « Quitter le site ? » et le choix des fichiers, qu'on ne peut pas remplacer.
 - **Pas d'icône de corbeille** (règle du 09/10/2026) : retirer, supprimer ou mettre à la corbeille se montre par la gomme (`Eraser` de Lucide), partout dans l'admin ; ESLint refuse `Trash` et `Trash2`. Sur une image, ce bouton n'apparaît qu'au survol (ou au clavier).
 - **shadcn/ui : seulement ce qui sert.** Après `npx shadcn add`, on retire les morceaux et les variantes inutilisés.
 - **Composants shadcn/ui** (sur Base UI) avant tout sur-mesure, adaptés dans `web/src/components/ui/`. Icônes Lucide, avec un trait d'un pixel pour toute l'admin (`LucideProvider` dans `web/src/components/app-providers.tsx`) : pas d'épaisseur réglée icône par icône. **Seule exception** (02/10/2026) : un logo de marque, là où il désigne cette marque et nulle part ailleurs, tiré de Simple Icons (licence CC0) dans `web/src/components/brand-icons.tsx`, dessiné en contour d'un pixel comme les icônes Lucide ; aujourd'hui, Apple et Android dans l'aperçu du téléphone. Jamais dans l'app publique.
@@ -56,7 +56,7 @@
 - **Chaque table a ses règles d'accès (RLS) et son test pgTAP.** La base fait la loi : l'interface ne fait que cacher ce qu'on n'a pas le droit de faire.
 - **Les écritures sensibles passent par des fonctions de la base** (RPC). Elles vérifient le rôle, la double vérification et la révision, et renvoient des erreurs au code stable (`P0001` et un message court), traduites dans `texts.ts`.
 - **Fonctions `security definer`** avec un `search_path` vide, et sans `EXECUTE` pour `public` ni `anon`. Le schéma `private` n'est jamais exécutable par `anon` ni `authenticated` (sauf `reader_can_open`). `anon` n'exécute qu'une liste fermée (`ping`, `admin_brand`, `admin_brand_variants` et les `app_*`), vérifiée par `supabase/tests/05_prive.test.sql`.
-- **Forme des blocs** : décrite une seule fois dans `blocks/`, puis `cd web && npm run blocks:generate`. On ne fait qu'ajouter ; ni `oneOf`, ni `anyOf`, ni `format`. Seule exception, acceptée par QCM le 04/10/2026 : le résumé, retiré quand aucun contenu n'existait ni en local ni en ligne.
+- **Forme des blocs** : décrite une seule fois dans `blocks/`, puis `cd web && npm run blocks:generate`. On ne fait qu'ajouter ; ni `oneOf`, ni `anyOf`, ni `format`. Exceptions : le résumé, retiré le 04/10/2026 (QCM) quand aucun contenu n'existait ni en local ni en ligne ; la variante « style » et la teinte de l'Encadré, retirées le 10/10/2026 avec la première charte graphique de l'app (`…_charte_app_retiree.sql`).
 - **Aucun secret rangé dans la base**, tâches planifiées comprises.
 
 ## 5. Fonctions serveur et fichiers
@@ -79,7 +79,7 @@
 - **Double vérification obligatoire** pour toute l'équipe, et fiche d'équipe **sur invitation seulement**.
 - **Aucun secret dans le dépôt ni dans le navigateur.** Les secrets sont saisis par l'utilisateur lui-même (tableaux de bord, secrets GitHub).
 - **Vercel ne met en ligne** que si les garde-fous « Administration » et « Base de données » sont verts.
-- **Suivi** : Sentry (en Europe, sans données personnelles), sauvegarde de la base chaque semaine, et un appel chaque jour pour que le projet gratuit ne se mette pas en pause.
+- **Suivi** : Sentry (en Europe, sans données personnelles ; le code est en place, mais il n'est pas branché sur la démo : `VITE_SENTRY_DSN` vide), sauvegarde de la base chaque semaine (`.github/workflows/sauvegarde.yml`, seulement dans le dépôt privé d'une installation : désactivée dans Ruche, public), et un appel chaque jour pour que le projet gratuit ne se mette pas en pause.
 - **Dependabot** surveille les dépendances. Une alerte se traite par une mise à jour vérifiée, jamais par un correctif forcé qui casse le reste.
 - **Offre Pro de Supabase** avant le lancement de l'app.
 
