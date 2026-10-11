@@ -85,6 +85,7 @@ const brand = (name: string | null): identityApi.AdminBrand => ({
   initials: null,
   sectionNames: NO_CUSTOM_NAMES,
   variants: {},
+  loadingExit: null,
 })
 
 beforeEach(() => {

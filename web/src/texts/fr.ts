@@ -371,7 +371,16 @@ export const fr: Texts = {
           "** Tant qu'aucun monogramme n'est envoyé, ce sont tes initiales qui s'animent.",
         ],
         preview: "Aperçu de l'écran de chargement",
-        theme: "Thème du téléphone",
+        theme: "Voir en",
+        exit: {
+          title: "Sortie",
+          description:
+            "Comment l'écran de chargement s'ouvre sur l'app, une fois l'animation en cours finie.",
+          fade: "Fondu",
+          zoom: "Zoom",
+          saved: "Sortie enregistrée.",
+        },
+        play: "Rejouer l'ouverture",
       },
       logos: {
         description: [

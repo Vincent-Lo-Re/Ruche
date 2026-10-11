@@ -53,6 +53,7 @@ describe("le nom de la marque", () => {
       "monogram-light": null,
       "monogram-dark": null,
       screenImage: null,
+      loadingExit: null,
       monogramMotion: true,
       monogramMotions: ["trace", "glint", "breathe"],
       contactEmail: null,
@@ -190,6 +191,7 @@ describe("le nom de la marque", () => {
       initials: null,
       sectionNames: NO_CUSTOM_NAMES,
       variants: {},
+      loadingExit: null,
     }
     expect(brandFileFor(empty, "monogram", "dark")).toBeNull()
     expect(brandFileFor(empty, "logotype", "light", "zinc-blue")).toBeNull()

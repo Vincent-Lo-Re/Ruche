@@ -1,13 +1,15 @@
 import { cn } from "cn"
-import { ImagePlus, UploadCloud } from "lucide-react"
+import { Blend, ImagePlus, Play, UploadCloud, ZoomIn } from "lucide-react"
 import { useId, useState } from "react"
 
 import { AnimatedMonogram } from "@/components/auth/animated-monogram"
+import { BrandLogo } from "@/components/brand-logo"
 import { InfoTip } from "@/components/info-tip"
 import { HiddenFileInput, RemoveFileButton } from "@/components/file-input"
 import { PhoneFrame } from "@/components/phone-frame"
-import { ThemeToggleGroup } from "@/components/theme-choice"
+import { IconToggleGroup } from "@/components/icon-toggle-group"
 import { themeOptions } from "@/components/theme/theme-options"
+import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -23,6 +25,7 @@ import { Spinner } from "@/components/ui/spinner"
 import { Switch } from "@/components/ui/switch"
 import { useFileDrop } from "@/hooks/use-file-drop"
 import { useMonogramSvg } from "@/hooks/use-monogram-svg"
+import { useOpening } from "@/hooks/use-opening"
 import { useBrandMutation, useIdentity } from "@/hooks/use-brand-name"
 import {
   BrandFileError,
@@ -30,23 +33,33 @@ import {
   prepareScreenImage,
   removeScreenImage,
   saveMonogramMotion,
+  saveLoadingExit,
   saveMonogramMotions,
   saveScreenImage,
   screenImageAccept,
   type BrandSurface,
   type IdentityTarget,
 } from "@/lib/admin-identity"
+import { DEFAULT_EXIT, type LoadingExit } from "@/lib/loading-opening"
 import {
   DEFAULT_MOTIONS,
   type Motion,
   motionBlocker,
+  motionLoop,
   MOTIONS,
 } from "@/lib/monogram-motion"
 import { texts } from "@/texts"
 
 const files = texts.settings.adminIdentity.files
 const motionLabels = files.monogramMotion
-const phoneThemeLabel = texts.appPages.identity.loadingScreen.theme
+const loadingWords = texts.appPages.identity.loadingScreen
+const phoneThemeLabel = loadingWords.theme
+const exitWords = loadingWords.exit
+// La sortie de l'écran de chargement : fondu ou zoom.
+const exitOptions = [
+  { value: "fade", label: exitWords.fade, icon: Blend },
+  { value: "zoom", label: exitWords.zoom, icon: ZoomIn },
+] as const
 // Le thème du téléphone de l'aperçu de l'app : clair ou sombre (pas « Automatique »).
 const phoneThemes = themeOptions.filter(
   (option): option is Extract<typeof option, { value: BrandSurface }> =>
@@ -105,6 +118,11 @@ export function LoginScreenCard({ target }: { target: IdentityTarget }) {
     saved: motionLabels.saved,
     target,
   })
+  const chosenExit = useBrandMutation({
+    mutationFn: (next: LoadingExit) => saveLoadingExit(next),
+    saved: exitWords.saved,
+    target,
+  })
   const busy = save.isPending || remove.isPending
   // Pendant l'enregistrement, l'interrupteur et les cases montrent déjà le choix.
   const animated = motion.isPending
@@ -117,6 +135,14 @@ export function LoginScreenCard({ target }: { target: IdentityTarget }) {
     chosenMotions.mutate(
       MOTIONS.filter((one) => (one === which ? checked : motions.includes(one)))
     )
+  const exit = chosenExit.isPending
+    ? chosenExit.variables
+    : (brand?.loadingExit ?? DEFAULT_EXIT)
+  // L'ouverture rejouée dans le téléphone : un tour des animations, la sortie, puis l'app.
+  const opening = useOpening(
+    animated ? motionLoop(monogram.svg.data ?? null, motions) : [],
+    exit
+  )
   const drop = useFileDrop((dropped) => save.mutate(dropped), busy)
   // L'image sous son voile (sinon le fond seul), et le monogramme par-dessus.
   const scene = (
@@ -137,11 +163,15 @@ export function LoginScreenCard({ target }: { target: IdentityTarget }) {
           />
         </>
       )}
-      <div className={cn("relative", target === "admin" && "text-foreground")}>
-        {/* Rallumé, ou ses animations changées, il repart du début. */}
+      <div
+        data-opening-mark
+        className={cn("relative", target === "admin" && "text-foreground")}
+      >
+        {/* Rallumé, ses animations changées ou l'ouverture rejouée, il repart du début. */}
         <AnimatedMonogram
-          key={animated ? motions.join() : "still"}
+          key={`${animated ? motions.join() : "still"}-${opening.run}`}
           motions={animated ? motions : []}
+          phase={opening.step?.phase}
           target={target}
           surface={surface}
           className={target === "admin" ? "h-24 text-7xl" : "h-32 text-8xl"}
@@ -167,8 +197,17 @@ export function LoginScreenCard({ target }: { target: IdentityTarget }) {
         theme={phoneTheme}
         className="blocks-device-small transition-opacity group-hover/preview:opacity-30"
         backdrop={
-          <div className="absolute inset-0 flex items-center justify-center">
-            {scene}
+          // L'écran de chargement, et par-dessus le premier écran de l'app, montré par la
+          // sortie (preview.css, data-opening).
+          <div
+            className="absolute inset-0"
+            data-opening={opening.step?.stage}
+            data-exit={exit}
+          >
+            <div className="absolute inset-0 flex items-center justify-center">
+              {scene}
+            </div>
+            <AppScreen theme={phoneTheme} />
           </div>
         }
       />
@@ -237,7 +276,7 @@ export function LoginScreenCard({ target }: { target: IdentityTarget }) {
                 <ItemTitle>{phoneThemeLabel}</ItemTitle>
               </ItemContent>
               <ItemActions>
-                <ThemeToggleGroup
+                <IconToggleGroup
                   label={phoneThemeLabel}
                   options={phoneThemes}
                   value={phoneTheme}
@@ -308,8 +347,56 @@ export function LoginScreenCard({ target }: { target: IdentityTarget }) {
               </ul>
             </div>
           </Item>
+          {target === "app" && (
+            <Item size="sm">
+              <ItemContent>
+                <ItemTitle>{exitWords.title}</ItemTitle>
+                <ItemDescription className="line-clamp-none">
+                  {exitWords.description}
+                </ItemDescription>
+              </ItemContent>
+              <ItemActions>
+                <IconToggleGroup
+                  label={exitWords.title}
+                  options={exitOptions}
+                  value={exit}
+                  onChange={(next) => chosenExit.mutate(next)}
+                />
+              </ItemActions>
+              <div className="basis-full pt-1">
+                <Button variant="outline" size="sm" onClick={opening.play}>
+                  <Play />
+                  {loadingWords.play}
+                </Button>
+              </div>
+            </Item>
+          )}
         </ItemGroup>
       </div>
     </Card>
+  )
+}
+
+/**
+ * Le premier écran de l'app, neutre, montré par la sortie : la barre du haut avec le logotype de
+ * l'app (sinon son nom), et des emplacements gris, sans contenu inventé.
+ */
+function AppScreen({ theme }: { theme: BrandSurface }) {
+  return (
+    <div aria-hidden className="blocks-opening-app">
+      <div className="blocks-appbar">
+        <BrandLogo
+          target="app"
+          kind="logotype"
+          surface={theme}
+          className="h-6"
+        />
+      </div>
+      <div className="flex flex-col gap-3 p-5">
+        <div className="blocks-placeholder h-48" />
+        <div className="blocks-placeholder h-5" />
+        <div className="blocks-placeholder h-5 w-2/3" />
+      </div>
+    </div>
   )
 }

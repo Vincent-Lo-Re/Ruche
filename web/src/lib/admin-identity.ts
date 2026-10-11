@@ -22,6 +22,11 @@ import type { Tables, TablesInsert } from "@/lib/database.types"
 import { decodeImage, reduceImage } from "@/lib/media/image"
 import { cleanSvg } from "@/lib/media/svg"
 import { isLanguage, type Language } from "@/lib/language"
+import {
+  DEFAULT_EXIT,
+  isLoadingExit,
+  type LoadingExit,
+} from "@/lib/loading-opening"
 import { DEFAULT_MOTIONS, isMotion, type Motion } from "@/lib/monogram-motion"
 import { palettePresets, presetLogoColors, type PresetId } from "@/lib/palettes"
 import type {
@@ -100,6 +105,8 @@ export type BrandIdentity = { name: string | null } & Record<
     websiteUrl: string | null
     /** Les initiales, à la place d'un monogramme pas envoyé ; null : la première lettre du nom. */
     initials: string | null
+    /** La sortie de l'écran de chargement de l'app ; null pour l'admin, qui n'en a pas. */
+    loadingExit: LoadingExit | null
   }
 
 /**
@@ -203,6 +210,7 @@ function identityOf(row: SharedRow, screen: ScreenRow): BrandIdentity {
     websiteUrl: row.website_url ?? null,
     initials: row.initials ?? null,
     variants: {},
+    loadingExit: null,
   }
 }
 
@@ -210,11 +218,16 @@ function identityOf(row: SharedRow, screen: ScreenRow): BrandIdentity {
 export async function getAppBrand(): Promise<BrandIdentity> {
   const { data, error } = await supabase.rpc("app_brand").single()
   if (error) throw error
-  return identityOf(data, {
-    image: data.loading_image,
-    motion: data.loading_monogram_motion,
-    motions: data.loading_monogram_motions,
-  })
+  return {
+    ...identityOf(data, {
+      image: data.loading_image,
+      motion: data.loading_monogram_motion,
+      motions: data.loading_monogram_motions,
+    }),
+    loadingExit: isLoadingExit(data.loading_exit)
+      ? data.loading_exit
+      : DEFAULT_EXIT,
+  }
 }
 
 export async function getAdminBrand(): Promise<AdminBrand> {
@@ -275,11 +288,13 @@ type IdentityValues = Partial<SharedRow> & {
   screenImage?: string | null
   motion?: boolean
   motions?: Motion[]
+  // La sortie de l'écran de chargement : l'app seulement.
+  exit?: LoadingExit
 }
 
 async function updateIdentity(
   target: IdentityTarget,
-  { screenImage, motion, motions, ...shared }: IdentityValues
+  { screenImage, motion, motions, exit, ...shared }: IdentityValues
 ): Promise<void> {
   if (target === "admin") {
     return updateAdmin({
@@ -296,6 +311,7 @@ async function updateIdentity(
       loading_image: screenImage,
       loading_monogram_motion: motion,
       loading_monogram_motions: motions,
+      loading_exit: exit,
     })
     .eq("id", true)
   if (error) throw error
@@ -550,6 +566,11 @@ export function saveMonogramMotions(
   motions: Motion[]
 ): Promise<void> {
   return updateIdentity(target, { motions })
+}
+
+/** La sortie de l'écran de chargement de l'app (admins) : fondu ou zoom. */
+export function saveLoadingExit(exit: LoadingExit): Promise<void> {
+  return updateIdentity("app", { exit })
 }
 
 /** Retire l'image de l'écran (admins) : le fond seul reprend sa place, sous le monogramme. */

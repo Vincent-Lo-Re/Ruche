@@ -516,24 +516,46 @@
   animation-delay: calc(var(--motion-order, 0) * 180ms);
 }
 
-/* Le reflet : une bande de lumière en biais traverse le monogramme. C'est sa copie blanche,
-   lumineuse (visible même sur un monogramme blanc), montrée par la bande seulement. */
+/* Le reflet, chromé : une large bande de lumière, entre deux fines lignes grises, traverse le
+   monogramme en biais, comme sur du métal poli. Ce sont deux copies, blanche et grise, montrées
+   chacune par sa bande : sur des formes foncées, on voit la lumière ; sur des formes claires, les
+   lignes grises. Le reflet reste sur les formes, sans lueur qui déborderait sur le fond. */
 [data-shine] {
-  filter: brightness(0) invert(1) drop-shadow(0 0 0.35rem white)
-    drop-shadow(0 0 0.9rem white);
-  mask-image: linear-gradient(
-    105deg,
-    transparent 44%,
-    black 50%,
-    transparent 56%
-  );
   /* Deux fois plus large que le monogramme : la bande va d'un bord à l'autre. */
   mask-size: 200% 100%;
   mask-repeat: no-repeat;
   animation: monogram-shine 1.6s ease-in-out both;
 }
 
-/* Le halo : deux anneaux de lumière partent du monogramme et s'éloignent en s'effaçant. */
+[data-shine="light"] {
+  filter: brightness(0) invert(1);
+  mask-image: linear-gradient(
+    105deg,
+    transparent 45%,
+    rgb(0 0 0 / 0.7) 48%,
+    black 50%,
+    rgb(0 0 0 / 0.7) 52%,
+    transparent 55%
+  );
+}
+
+[data-shine="dark"] {
+  /* Un gris moyen, discret : la teinte du métal, pas une ombre. */
+  filter: brightness(0) invert(0.5);
+  opacity: 0.45;
+  mask-image: linear-gradient(
+    105deg,
+    transparent 42%,
+    black 44%,
+    transparent 46%,
+    transparent 54%,
+    black 56%,
+    transparent 58%
+  );
+}
+
+/* Le halo : deux anneaux partent du monogramme et s'éloignent en s'effaçant. Ils prennent la
+   couleur du monogramme (claire sur fond sombre, foncée sur fond clair) : visibles sur les deux. */
 [data-motion-phase="halo"]::before,
 [data-motion-phase="halo"]::after {
   content: "";
@@ -542,7 +564,7 @@
   left: 50%;
   height: 100%;
   aspect-ratio: 1;
-  border: 2px solid rgb(255 255 255 / 0.7);
+  border: 2px solid color-mix(in oklch, currentColor 70%, transparent);
   border-radius: 9999px;
   translate: -50% -50%;
   pointer-events: none;

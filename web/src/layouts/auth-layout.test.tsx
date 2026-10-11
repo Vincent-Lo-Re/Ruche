@@ -32,6 +32,7 @@ const brand = (
   initials: null,
   sectionNames: NO_CUSTOM_NAMES,
   variants: {},
+  loadingExit: null,
 })
 
 afterEach(() => vi.clearAllMocks())

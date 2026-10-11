@@ -28,6 +28,7 @@ vi.mock("@/lib/admin-identity", async (importOriginal) => {
     removeScreenImage: vi.fn(),
     saveMonogramMotion: vi.fn(),
     saveMonogramMotions: vi.fn(),
+    saveLoadingExit: vi.fn(),
   }
 })
 
@@ -48,6 +49,7 @@ const identity = (name: string | null): identityApi.BrandIdentity => ({
   websiteUrl: null,
   initials: null,
   variants: {},
+  loadingExit: "fade",
 })
 
 beforeEach(() => {
@@ -67,6 +69,7 @@ beforeEach(() => {
   vi.mocked(identityApi.removeScreenImage).mockResolvedValue()
   vi.mocked(identityApi.saveMonogramMotion).mockResolvedValue()
   vi.mocked(identityApi.saveMonogramMotions).mockResolvedValue()
+  vi.mocked(identityApi.saveLoadingExit).mockResolvedValue()
 })
 
 afterEach(() => vi.clearAllMocks())
@@ -292,5 +295,56 @@ describe("App mobile › Identité : les logos", () => {
       null
     )
     expect(identityApi.saveBrandVariants).not.toHaveBeenCalled()
+  })
+})
+
+describe("App mobile › Identité : la sortie de l'écran de chargement", () => {
+  const exit = words.loadingScreen.exit
+
+  it("fondu au départ ; le zoom choisi est enregistré, puis relu", async () => {
+    await renderApp("/app/identity")
+    const choice = await findRole("group", exit.title)
+    expect(role("button", exit.fade, choice)).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    )
+    vi.mocked(identityApi.getAppBrand).mockResolvedValue({
+      ...identity("Essaim"),
+      loadingExit: "zoom",
+    })
+    fireEvent.click(role("button", exit.zoom, choice))
+    await waitFor(() =>
+      expect(identityApi.saveLoadingExit).toHaveBeenCalledWith("zoom")
+    )
+    expect(await screen.findByText(exit.saved)).toBeVisible()
+    await waitFor(() =>
+      expect(role("button", exit.zoom, choice)).toHaveAttribute(
+        "aria-pressed",
+        "true"
+      )
+    )
+  })
+
+  it("« Rejouer l'ouverture » joue la sortie, puis montre le premier écran de l'app", async () => {
+    vi.mocked(identityApi.getAppBrand).mockResolvedValue({
+      ...identity("Essaim"),
+      loadingExit: "zoom",
+    })
+    await renderApp("/app/identity")
+    const phone = await findRole("img", words.loadingScreen.preview)
+    const stage = () => phone.querySelector("[data-opening]")
+    expect(phone.querySelector('[data-exit="zoom"]')).not.toBeNull()
+    expect(stage()).toBeNull()
+    // Le monogramme est immobile : la sortie tout de suite.
+    fireEvent.click(role("button", words.loadingScreen.play))
+    expect(stage()).toHaveAttribute("data-opening", "exit")
+    await waitFor(
+      () => expect(stage()).toHaveAttribute("data-opening", "app"),
+      { timeout: 2_000 }
+    )
+    // Le premier écran : le nom de l'app dans sa barre du haut (sans logotype).
+    expect(phone.querySelector(".blocks-opening-app")).toHaveTextContent(
+      "Essaim"
+    )
   })
 })

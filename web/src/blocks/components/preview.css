@@ -363,7 +363,7 @@
 /* L'écran de chargement de l'app (App mobile › Identité) : le téléphone en petit dans sa carte,
    et le voile de son image, au fond de l'écran (clair ou sombre). */
 .blocks-device-small {
-  --blocks-device-scale: 0.4;
+  --blocks-device-scale: 0.6;
 }
 
 .blocks-loading-veil {
@@ -372,6 +372,72 @@
     var(--blocks-color-background) 70%,
     transparent
   );
+}
+
+/* L'ouverture de l'app rejouée (lib/loading-opening.ts, data-opening sur l'écran) : le premier
+   écran de l'app, caché pendant le chargement, montré par la sortie. Le fondu le fait apparaître
+   par-dessus ; le zoom grossit le monogramme (en accélérant) pendant que l'app s'ouvre en cercle
+   depuis son centre. Les durées sont celles de EXIT_MS. Moins d'animations demandées par
+   l'ordinateur : la sortie devient un passage immédiat. */
+.blocks-opening-app {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  padding-top: var(--blocks-status-height);
+  background: var(--blocks-color-background);
+  color: var(--blocks-color-text);
+}
+
+[data-opening="exit"] .blocks-opening-app,
+[data-opening="app"] .blocks-opening-app {
+  visibility: visible;
+}
+
+[data-opening="exit"][data-exit="fade"] .blocks-opening-app {
+  animation: blocks-opening-fade 600ms ease-in-out both;
+}
+
+[data-opening="exit"][data-exit="zoom"] .blocks-opening-app {
+  animation: blocks-opening-open 800ms ease-in both;
+}
+
+[data-opening="exit"][data-exit="zoom"] [data-opening-mark] {
+  animation: blocks-opening-zoom 800ms ease-in both;
+}
+
+/* Un emplacement gris du premier écran de l'app. */
+.blocks-placeholder {
+  border-radius: var(--blocks-radius-image);
+  background: var(--blocks-color-image-placeholder);
+}
+
+@keyframes blocks-opening-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes blocks-opening-open {
+  from,
+  35% {
+    clip-path: circle(0% at 50% 50%);
+  }
+  to {
+    clip-path: circle(75% at 50% 50%);
+  }
+}
+
+@keyframes blocks-opening-zoom {
+  to {
+    transform: scale(12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-opening] .blocks-opening-app,
+  [data-opening] [data-opening-mark] {
+    animation: none;
+  }
 }
 
 /* Grand texte : comme le réglage du téléphone, le texte grandit et la page garde sa largeur. */

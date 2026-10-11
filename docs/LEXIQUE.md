@@ -198,6 +198,10 @@
 | monogramme animé | animated icon | Le monogramme de l'écran de connexion (ou de l'écran de chargement de l'app), animé. | — |
 | écran de connexion | sign-in screen | La page de connexion. | page de login / login page |
 | écran de chargement | loading screen | L'écran de l'app qui suit le tout premier écran figé du démarrage : une image de fond facultative sous un voile, et le monogramme de l'app (App mobile › Identité, 10/10/2026). | écran de démarrage, splash / splash screen, launch screen |
+| sortie (de l'écran de chargement) | exit | Comment l'écran de chargement s'ouvre sur l'app, une fois le tour d'animation en cours fini : fondu ou zoom (11/10/2026). | transition / transition |
+| fondu | fade | La sortie au départ : l'app apparaît par-dessus l'écran de chargement. | — / crossfade |
+| zoom | zoom | La sortie où le monogramme grossit vite et s'ouvre sur l'app. | — |
+| ouverture (de l'app) | opening | L'écran de chargement puis sa sortie ; « Rejouer l'ouverture » / « Play the opening » la montre dans le téléphone de l'aperçu. | démarrage (réservé au tout premier écran figé) / launch |
 | image de fond | background image | La photo à droite de l'écran de connexion, ou derrière l'écran de chargement de l'app. | — / cover |
 | adresse e-mail de contact | contact email | Montrée à qui a perdu son téléphone ou son invitation. | — / support email |
 | thème | theme | Clair, Sombre ou Automatique, propre à chaque membre. | mode, apparence / appearance |

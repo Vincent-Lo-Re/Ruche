@@ -58,7 +58,7 @@ Ce fichier dit où ranger le code, les pièges à connaître et les briques à r
   - `PageHeader` (`components/page-header.tsx`, l'icône de la section devant le titre), `PanelCard` (`components/panel-card.tsx`), `SaveFooter` (`components/settings/save-footer.tsx`), `SettingsSection` (`components/settings/settings-section.tsx`).
   - `TruncatedText` (`components/truncated-text.tsx`), `InfoTip` (`components/info-tip.tsx`), `IconBadge` (`components/icon-badge.tsx`).
   - `ColumnHeader` (`components/editor/column-header.tsx`) : l'en-tête d'une colonne ou d'une glissière de l'éditeur.
-  - `PhoneFrame` (`components/phone-frame.tsx`) : le téléphone des aperçus (cadre, barre d'état, thème de l'écran), dans l'éditeur des contenus et l'aperçu de l'écran de chargement. `ThemeToggleGroup` (`components/theme-choice.tsx`) : des thèmes en icônes.
+  - `PhoneFrame` (`components/phone-frame.tsx`) : le téléphone des aperçus (cadre, barre d'état, thème de l'écran), dans l'éditeur des contenus et l'aperçu de l'écran de chargement. `IconToggleGroup` (`components/icon-toggle-group.tsx`) : un choix en icônes, leur nom dans l'infobulle (thème, sortie de l'écran de chargement).
   - `blocks/components/media-state.tsx` : une image à ses proportions, un fichier qui ne s'affiche pas.
 - **Logique sans React**
   - `lib/auth.ts` : tous les appels de Supabase Auth ; `lib/people.ts` : nom affiché, initiale.

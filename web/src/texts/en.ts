@@ -370,8 +370,20 @@ export const en = {
           "** Until you upload an icon, your initials animate instead.",
         ],
         preview: "Loading screen preview",
-        // Le thème du téléphone de l'aperçu (son fond sans image, et le monogramme qui va avec).
-        theme: "Phone theme",
+        // L'aperçu en clair ou en sombre (son fond sans image, et le monogramme qui va avec) ;
+        // seulement l'aperçu : dans l'app, l'écran suit le réglage du téléphone.
+        theme: "Preview in",
+        // La sortie : comment l'écran s'ouvre sur l'app, une fois le tour d'animation fini.
+        exit: {
+          title: "Exit",
+          description:
+            "How the loading screen opens onto the app, once the current animation finishes.",
+          fade: "Fade",
+          zoom: "Zoom",
+          saved: "Exit saved.",
+        },
+        // Rejoue dans le téléphone : un tour des animations, la sortie, puis l'app un moment.
+        play: "Play the opening",
       },
       logos: {
         description: [
