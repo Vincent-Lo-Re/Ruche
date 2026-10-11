@@ -9,6 +9,7 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 
 import { profileQueryKey, useAuth } from "@/auth/auth-context"
 import { AuthProvider } from "@/auth/auth-provider"
+import { language } from "@/lib/language"
 import { createQueryClient } from "@/lib/query-client"
 import { supabase } from "@/lib/supabase"
 
@@ -169,5 +170,34 @@ describe("AuthProvider", () => {
     await vi.waitFor(() =>
       expect(signOut).toHaveBeenCalledWith({ scope: "local" })
     )
+  })
+  it("garde sur le compte la langue de ses e-mails, celle qui s'applique ici", async () => {
+    const emit = captureAuthListener()
+    mockProfile({ id: "u1", role: "admin" })
+    const updateUser = vi
+      .spyOn(supabase.auth, "updateUser")
+      .mockResolvedValue({ data: { user: null }, error: null } as never)
+    renderProvider()
+
+    // Il suit la langue de l'admin : son compte n'en dit rien, l'admin l'écrit.
+    emit("INITIAL_SESSION", aal2Session)
+    await vi.waitFor(() =>
+      expect(updateUser).toHaveBeenCalledWith({
+        data: { email_language: language },
+      })
+    )
+
+    // Déjà à jour : rien n'est réécrit.
+    updateUser.mockClear()
+    emit("USER_UPDATED", {
+      ...aal2Session,
+      user: {
+        id: "u1",
+        factors: [],
+        user_metadata: { email_language: language },
+      },
+    } as unknown as Session)
+    await act(async () => {})
+    expect(updateUser).not.toHaveBeenCalled()
   })
 })

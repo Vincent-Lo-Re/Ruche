@@ -7,6 +7,8 @@ import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
 import { useBrandMutation } from "@/hooks/use-brand-name"
 import { saveAdminLanguage } from "@/lib/admin-identity"
 import { isLanguage, LANGUAGES, type Language } from "@/lib/language"
+import { reportError } from "@/lib/sentry"
+import { syncEmailLanguages } from "@/lib/team"
 import { adminBrandRead } from "@/lib/reads"
 import { texts } from "@/texts"
 
@@ -20,12 +22,18 @@ const items = LANGUAGES.map((value) => ({
 /**
  * La langue de toute l'admin (onglet « Avancé » des Paramètres, admins) : celle de l'équipe tant
  * qu'un membre n'a pas choisi la sienne dans Mon compte, et celle des pages de connexion.
- * L'identité de l'admin relue, useAdminSettings recharge la page si la langue change.
+ * L'identité de l'admin relue, useAdminSettings recharge la page si la langue change. La langue
+ * des e-mails des membres qui la suivent est remise à la nouvelle (fonction equipe).
  */
 export function AdminLanguageCard() {
   const brand = useQuery(adminBrandRead())
   const save = useBrandMutation({
-    mutationFn: (language: Language) => saveAdminLanguage(language),
+    mutationFn: async (language: Language) => {
+      await saveAdminLanguage(language)
+      // La langue est enregistrée ; les e-mails des membres qui la suivent, au mieux : à défaut,
+      // chacun la reprend à sa prochaine ouverture de l'admin (AuthProvider).
+      await syncEmailLanguages().catch(reportError)
+    },
     saved: labels.saved,
   })
 

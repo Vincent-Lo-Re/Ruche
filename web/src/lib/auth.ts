@@ -162,6 +162,18 @@ export async function saveLanguage(language: Language | null): Promise<void> {
 }
 
 /**
+ * Enregistre sur le compte la langue de ses e-mails : la sienne, sinon celle de l'admin. Les
+ * modèles d'e-mails ne lisent que le compte, pas la base : sans elle, un membre qui suit la langue
+ * de l'admin recevrait ses e-mails en anglais.
+ */
+export async function saveEmailLanguage(language: Language): Promise<void> {
+  const { error } = await supabase.auth.updateUser({
+    data: { email_language: language },
+  })
+  if (error) throw error
+}
+
+/**
  * Enregistre le format régional du membre sur son compte (Mon compte ; null : celui de l'admin) :
  * il le suit d'un navigateur à l'autre.
  */

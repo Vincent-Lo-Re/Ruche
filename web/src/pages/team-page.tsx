@@ -56,12 +56,12 @@ import { texts } from "@/texts"
 type Confirmation = { action: "remove" | "reset_mfa"; member: Member }
 
 // Actions sur un membre de la liste.
-type MemberRequest = Exclude<TeamRequest, { action: "list" | "invite" }>
+type MemberRequest = Exclude<
+  TeamRequest,
+  { action: "list" | "invite" | "sync_email_languages" }
+>
 
-const successMessages: Record<
-  Exclude<TeamRequest["action"], "list" | "invite">,
-  string
-> = {
+const successMessages: Record<MemberRequest["action"], string> = {
   resend: texts.team.done.resent,
   set_role: texts.team.done.role,
   reset_mfa: texts.team.done.resetMfa,

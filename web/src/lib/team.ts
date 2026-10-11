@@ -38,6 +38,7 @@ export type TeamRequest =
   | { action: "set_role"; user_id: string; role: TeamRole }
   | { action: "remove"; user_id: string }
   | { action: "reset_mfa"; user_id: string }
+  | { action: "sync_email_languages" }
 
 type TeamErrorCode = keyof typeof texts.team.errors
 
@@ -81,6 +82,14 @@ export async function callTeam<T>(request: TeamRequest): Promise<T> {
   })
   if (error) throw await toTeamError(error)
   return data as T
+}
+
+/**
+ * Après un changement de langue de toute l'admin : la fonction remet la langue des e-mails de
+ * chaque membre qui suit l'admin à la nouvelle (les modèles d'e-mails ne lisent que le compte).
+ */
+export async function syncEmailLanguages(): Promise<void> {
+  await callTeam({ action: "sync_email_languages" })
 }
 
 export const teamQueryKey = ["team"] as const

@@ -63,7 +63,9 @@ function AuthAside() {
           <div aria-hidden className="absolute inset-0 bg-card/70" />
         </>
       )}
-      <div className="relative">
+      {/* text-foreground : les initiales prennent le texte du fond sombre, pas celui hérité de
+          la page (clair), qui les rendrait presque noires. */}
+      <div className="relative text-foreground">
         <AnimatedMonogram
           motions={brand.monogramMotion ? brand.monogramMotions : []}
           className="h-32 text-8xl"

@@ -8,9 +8,15 @@ import {
   type AuthValue,
 } from "@/auth/auth-context"
 import { assuranceLevel, verifiedTotpFactor } from "@/auth/session"
-import { applyMemberLanguage, memberLanguage } from "@/lib/language"
+import { applyMemberLanguage, language, memberLanguage } from "@/lib/language"
 import { applyMemberFormat, memberFormat } from "@/lib/regional-format"
-import { fetchProfile, onSessionChange, signOutHere } from "@/lib/auth"
+import {
+  fetchProfile,
+  onSessionChange,
+  saveEmailLanguage,
+  signOutHere,
+} from "@/lib/auth"
+import { reportError } from "@/lib/sentry"
 
 /** Suit la session Supabase et charge la fiche du membre connecté. */
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -38,6 +44,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (userId) applyMemberLanguage(chosenLanguage)
   }, [userId, chosenLanguage])
+  // La langue de ses e-mails, celle qui s'applique ici (la sienne, sinon celle de l'admin), tenue
+  // à jour sur son compte. Pas tant qu'un rechargement va changer la langue de la page.
+  const emailLanguage = session?.user.user_metadata?.email_language
+  useEffect(() => {
+    if (!userId || emailLanguage === language) return
+    if (chosenLanguage !== null && chosenLanguage !== language) return
+    saveEmailLanguage(language).catch(reportError)
+  }, [userId, emailLanguage, chosenLanguage])
   // De même pour son format régional.
   const chosenFormat = memberFormat(session?.user.user_metadata)
   useEffect(() => {
