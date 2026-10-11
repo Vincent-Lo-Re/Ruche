@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { BrandLogo } from "@/components/brand-logo"
 import { useBrandName } from "@/hooks/use-brand-name"
 import { useMonogramSvg } from "@/hooks/use-monogram-svg"
+import type { BrandSurface, IdentityTarget } from "@/lib/admin-identity"
 import {
   motionLoop,
   penTiming,
@@ -21,17 +22,26 @@ import {
  * (penTiming), mesurée une fois le SVG sur la page. Immobile si l'ordinateur demande moins
  * d'animations (index.css).
  * `className` : sa hauteur, et la taille des initiales quand aucun monogramme n'a été envoyé.
+ * `target` et `surface` : le monogramme de l'app (écran de chargement), dans la version pour le
+ * fond du téléphone, plutôt que celui de l'admin pour fond sombre.
  */
 export function AnimatedMonogram({
   motions,
   className,
+  target = "admin",
+  surface = "dark",
+  phase: forced,
 }: {
   motions: readonly Motion[]
   className: string
+  target?: IdentityTarget
+  surface?: BrandSurface
+  // L'étape imposée (l'ouverture de l'app rejouée, lib/loading-opening.ts) ; sinon sa boucle.
+  phase?: MotionPhase
 }) {
   const animated = motions.length > 0
-  const name = useBrandName()
-  const { url, svg } = useMonogramSvg()
+  const name = useBrandName(target)
+  const { url, svg } = useMonogramSvg(target, surface)
   // Immobile : une seule étape, la pause, sans fin.
   const loop = useMemo(
     () =>
@@ -42,16 +52,16 @@ export function AnimatedMonogram({
   )
   const [step, setStep] = useState(0)
   const drawing = useRef<HTMLDivElement>(null)
-  const phase: MotionPhase = loop[step % loop.length].phase
+  const phase: MotionPhase = forced ?? loop[step % loop.length].phase
 
   useEffect(() => {
-    if (!animated) return
+    if (!animated || forced !== undefined) return
     const timer = window.setTimeout(
       () => setStep((current) => current + 1),
       loop[step % loop.length].ms
     )
     return () => window.clearTimeout(timer)
-  }, [animated, step, loop])
+  }, [animated, step, loop, forced])
 
   // Le moment, la durée et la longueur de chaque trait (index.css : --pen-delay, --pen-ms,
   // --pen-length).
@@ -93,7 +103,12 @@ export function AnimatedMonogram({
       dangerouslySetInnerHTML={{ __html: svg.data.markup }}
     />
   ) : (
-    <BrandLogo kind="monogram" surface="dark" className="h-full" />
+    <BrandLogo
+      kind="monogram"
+      surface={surface}
+      target={target}
+      className="h-full"
+    />
   )
   return (
     <div
@@ -107,17 +122,19 @@ export function AnimatedMonogram({
       )}
     >
       {mark}
-      {phase === "shine" && (
-        <div
-          data-shine
-          aria-hidden
-          // Centré comme le monogramme, pour se poser exactement dessus ; plus grand, pour que
-          // la lumière autour des formes ne soit pas coupée (p-6 le garde à sa taille).
-          className="absolute -inset-6 flex items-center justify-center p-6"
-        >
-          {mark}
-        </div>
-      )}
+      {/* Le reflet chromé : une copie blanche et une copie noire, chacune montrée par sa bande
+          (index.css) ; centrées comme le monogramme, pour se poser exactement dessus. */}
+      {phase === "shine" &&
+        (["light", "dark"] as const).map((tone) => (
+          <div
+            key={tone}
+            data-shine={tone}
+            aria-hidden
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            {mark}
+          </div>
+        ))}
     </div>
   )
 }

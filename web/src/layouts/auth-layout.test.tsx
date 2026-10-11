@@ -14,14 +14,14 @@ vi.mock("@/lib/admin-identity", async (importOriginal) => {
 })
 
 const brand = (
-  loginImage: identityApi.AdminBrand["loginImage"]
+  screenImage: identityApi.AdminBrand["screenImage"]
 ): identityApi.AdminBrand => ({
   name: null,
   "logotype-light": null,
   "logotype-dark": null,
   "monogram-light": null,
   "monogram-dark": null,
-  loginImage,
+  screenImage,
   monogramMotion: true,
   monogramMotions: ["trace", "glint", "breathe"],
   contactEmail: null,
@@ -32,6 +32,7 @@ const brand = (
   initials: null,
   sectionNames: NO_CUSTOM_NAMES,
   variants: {},
+  loadingExit: null,
 })
 
 afterEach(() => vi.clearAllMocks())

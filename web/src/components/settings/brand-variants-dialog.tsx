@@ -1,5 +1,6 @@
 import { cn } from "cn"
 
+import { OtherSurfacePreview } from "@/components/settings/other-surface-dialog"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -141,20 +142,11 @@ export function BrandVariantsDialog({
                     {labels.other.hint}
                   </span>
                 </span>
-                <span
-                  className={cn(
-                    "flex h-14 w-28 items-center justify-center rounded-md p-2",
-                    other.surface === "light"
-                      ? "bg-brand-light"
-                      : "bg-brand-dark"
-                  )}
-                >
-                  <img
-                    src={svgDataUrl(otherSurfaceVersion(svg, other.surface))}
-                    alt=""
-                    className="max-h-full max-w-full object-contain"
-                  />
-                </span>
+                <OtherSurfacePreview
+                  markup={otherSurfaceVersion(svg, other.surface)}
+                  surface={other.surface}
+                  className="h-14 w-28"
+                />
               </label>
             )}
           </>

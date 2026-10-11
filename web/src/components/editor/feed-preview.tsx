@@ -1,6 +1,5 @@
 import {
   ALargeSmall,
-  BatteryFull,
   Bookmark,
   ChevronLeft,
   Eye,
@@ -9,11 +8,9 @@ import {
   Moon,
   Pencil,
   Share,
-  Signal,
   Sun,
   UserCheck,
   UserX,
-  Wifi,
   type LucideIcon,
 } from "lucide-react"
 import {
@@ -31,6 +28,7 @@ import { StaticBlock } from "@/blocks/components/static-block"
 import { AndroidLogo, AppleLogo } from "@/components/brand-icons"
 import type { Block, Draft } from "@/blocks/types"
 import { AudioPreview, CoverPreview } from "@/components/editor/presentation"
+import { PhoneFrame } from "@/components/phone-frame"
 import { Kbd } from "@/components/ui/kbd"
 import { Separator } from "@/components/ui/separator"
 import { Toggle } from "@/components/ui/toggle"
@@ -127,29 +125,16 @@ export function FeedPreview({
         data-backdrop
         className="blocks-preview-frame flex min-h-0 flex-col items-center"
       >
-        <div
+        <PhoneFrame
           role="region"
-          aria-label={labels.screen[preview.device]}
-          className="blocks-device"
-          data-device={preview.device}
-          data-blocks-theme={preview.theme}
-          data-large-text={preview.largeText || undefined}
+          label={labels.screen[preview.device]}
+          device={preview.device}
+          theme={preview.theme}
+          largeText={preview.largeText}
         >
-          <div className="blocks-screen">
-            <div aria-hidden className="blocks-status">
-              <span>{labels.time[preview.device]}</span>
-              <span className="blocks-camera" />
-              <span className="blocks-status-icons">
-                <Signal />
-                <Wifi />
-                <BatteryFull />
-              </span>
-            </div>
-            {appBar}
-            <div className="blocks-screen-scroll">{children}</div>
-            <div aria-hidden className="blocks-home" />
-          </div>
-        </div>
+          {appBar}
+          <div className="blocks-screen-scroll">{children}</div>
+        </PhoneFrame>
       </div>
       <div className="blocks-preview-tools">
         <PreviewTools

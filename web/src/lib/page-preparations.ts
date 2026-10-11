@@ -4,6 +4,7 @@ import type { Draft } from "@/blocks/types"
 import { draftMediaIds } from "@/blocks/draft"
 import { linkedTemplateBlocks, linkedTemplateIds } from "@/blocks/templates"
 import { askedFileFromAddress, mediaFiltersFromAddress } from "@/lib/address"
+import { brandFileFor } from "@/lib/admin-identity"
 import type { ContentKind } from "@/lib/contents/api"
 import { isTemplateSort } from "@/lib/contents/templates"
 import { contentProfile } from "@/lib/editor/profile"
@@ -18,10 +19,12 @@ import {
   contentListRead,
   contentRead,
   coverIds,
+  identityRead,
   linkedTemplatesRead,
   mediaByIdsRead,
   mediaListRead,
   mediaRead,
+  monogramSvgRead,
   previewKeys,
   previewUrlsRead,
   publicationRead,
@@ -137,6 +140,15 @@ export const prepareSettings: Prepare = async ({ queryClient, member }) => {
     ready(queryClient, adminBrandRead()),
     ready(queryClient, accessLevelsRead()),
   ])
+}
+
+// App mobile › Identité (admins) : l'identité de l'app et son monogramme, prêt à animer dans
+// l'aperçu du téléphone (clair au départ : la version pour fond clair, sinon l'autre).
+export const prepareAppIdentity: Prepare = async ({ queryClient, member }) => {
+  if (member.role !== "admin") return
+  const app = await ready(queryClient, identityRead("app"))
+  const monogram = brandFileFor(app, "monogram", "light")
+  if (monogram) await ready(queryClient, monogramSvgRead(monogram))
 }
 
 /** Les fichiers d'un brouillon : ceux des blocs partagés d'abord (leurs modèles), puis les siens. */

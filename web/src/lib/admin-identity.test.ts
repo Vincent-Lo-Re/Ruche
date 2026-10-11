@@ -10,7 +10,7 @@ import {
   faviconHref,
   otherSurfaceVersion,
   prepareBrandFile,
-  prepareLoginImage,
+  prepareScreenImage,
   tabTitle,
   type AdminBrand,
 } from "@/lib/admin-identity"
@@ -52,7 +52,8 @@ describe("le nom de la marque", () => {
       "logotype-dark": null,
       "monogram-light": null,
       "monogram-dark": null,
-      loginImage: null,
+      screenImage: null,
+      loadingExit: null,
       monogramMotion: true,
       monogramMotions: ["trace", "glint", "breathe"],
       contactEmail: null,
@@ -85,7 +86,7 @@ describe("le nom de la marque", () => {
   it("l'image de l'écran de connexion : une photo, pas un SVG ; illisible, refusée", async () => {
     const errors = texts.settings.adminIdentity.files.errors
     const refused = (file: File) =>
-      prepareLoginImage(file).catch((error: Error) => error)
+      prepareScreenImage(file).catch((error: Error) => error)
 
     const svg = await refused(
       new File(["<svg/>"], "photo.svg", { type: "image/svg+xml" })
@@ -179,7 +180,7 @@ describe("le nom de la marque", () => {
       "logotype-dark": null,
       "monogram-light": null,
       "monogram-dark": null,
-      loginImage: null,
+      screenImage: null,
       monogramMotion: true,
       monogramMotions: ["trace", "glint", "breathe"],
       contactEmail: null,
@@ -190,6 +191,7 @@ describe("le nom de la marque", () => {
       initials: null,
       sectionNames: NO_CUSTOM_NAMES,
       variants: {},
+      loadingExit: null,
     }
     expect(brandFileFor(empty, "monogram", "dark")).toBeNull()
     expect(brandFileFor(empty, "logotype", "light", "zinc-blue")).toBeNull()

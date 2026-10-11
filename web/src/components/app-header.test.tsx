@@ -19,7 +19,7 @@ const brand = (websiteUrl: string | null): identityApi.AdminBrand => ({
   "logotype-dark": null,
   "monogram-light": null,
   "monogram-dark": null,
-  loginImage: null,
+  screenImage: null,
   monogramMotion: true,
   monogramMotions: ["breathe"],
   contactEmail: null,
@@ -30,6 +30,7 @@ const brand = (websiteUrl: string | null): identityApi.AdminBrand => ({
   initials: null,
   sectionNames: NO_CUSTOM_NAMES,
   variants: {},
+  loadingExit: null,
 })
 
 beforeEach(() => {

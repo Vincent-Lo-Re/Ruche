@@ -143,7 +143,8 @@ export const fr: Texts = {
     },
     appIdentity: {
       title: "Identité",
-      description: "Le nom, l'icône et l'écran de chargement de ton app.",
+      description:
+        "Le nom, les logos et l'écran de chargement de ton app. Elle prend tes changements à sa prochaine ouverture.",
     },
     appStyle: {
       title: "Charte graphique",
@@ -356,6 +357,40 @@ export const fr: Texts = {
     soon: {
       title: "Bientôt",
       description: "Cette page se construira avec l'app mobile.",
+    },
+    identity: {
+      brand: [
+        "Renseigne les informations de la marque de ton app : son nom, ses initiales*, une adresse de contact et ton site web. Elles sont à part de celles de l'admin : changer l'une ne change pas l'autre.",
+        "* Remplacent le monogramme tant qu'il n'est pas envoyé.",
+      ],
+      loadingScreen: {
+        title: "Écran de chargement",
+        description: [
+          "Personnalise l'écran que voient tes lecteurs pendant l'ouverture de l'app : son image de fond* et l'animation du monogramme**.",
+          "* JPEG, PNG ou WebP, réduite et allégée automatiquement. Sans image, un fond uni, clair ou sombre comme le téléphone. Clique sur l'aperçu pour la choisir, ou glisse-la dessus.",
+          "** Tant qu'aucun monogramme n'est envoyé, ce sont tes initiales qui s'animent.",
+        ],
+        preview: "Aperçu de l'écran de chargement",
+        theme: "Voir en",
+        exit: {
+          title: "Sortie",
+          description:
+            "Comment l'écran de chargement s'ouvre sur l'app, une fois l'animation en cours finie.",
+          fade: "Fondu",
+          zoom: "Zoom",
+          saved: "Sortie enregistrée.",
+        },
+        play: "Rejouer l'ouverture",
+      },
+      logos: {
+        description: [
+          "Envoie le logotype* et le monogramme** de ton app pour les fonds clairs et sombres (SVG, PNG ou WebP, 1 Mo au plus chacun).",
+          "* Sans logotype, le nom de ton app s'affiche en texte.",
+          "** Sans monogramme, ce sont tes initiales.",
+        ],
+        logotype: "barre du haut",
+        monogram: "écran de chargement",
+      },
     },
   },
 
@@ -2466,6 +2501,14 @@ export const fr: Texts = {
             light: "Créer aussi la version pour fond clair",
             dark: "Créer aussi la version pour fond sombre",
             hint: "Tirée de ce fichier, aux mêmes couleurs.",
+          },
+          otherOnly: {
+            title: {
+              light: "Créer aussi la version pour fond clair ?",
+              dark: "Créer aussi la version pour fond sombre ?",
+            },
+            keep: "Pas maintenant",
+            confirm: "La créer",
           },
           // Un fichier qui semble fait pour l'autre fond (un logo clair sur fond clair…).
           surface: {
