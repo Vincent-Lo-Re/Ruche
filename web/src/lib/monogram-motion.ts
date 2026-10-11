@@ -1,4 +1,4 @@
-// Le monogramme animé de l'écran de connexion (ADMIN § 2, « La connexion en slides ») : les
+// Le monogramme animé de l'écran de connexion (ADMIN § 2, « Les pages de connexion sur le modèle « login-04 » de shadcn ») : les
 // animations cochées par un admin (Paramètres, section « Écran de connexion ») s'enchaînent dans
 // un ordre fixe, séparées par des pauses. Un SVG aux couleurs modifiables (lib/brand-colors.ts)
 // est préparé pour être montré en ligne, ses formes marquées pour le CSS (index.css, data-motion) ;

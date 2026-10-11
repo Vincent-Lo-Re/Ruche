@@ -6,7 +6,7 @@ import { brandFileFor, brandMark } from "@/lib/admin-identity"
 import { presetOf } from "@/lib/palettes"
 
 /**
- * La marque dessinée (ADMIN § 7, « Le nom de la marque ») : le logotype ou le monogramme pour le
+ * La marque dessinée (ADMIN § 1, « Le nom de la marque ») : le logotype ou le monogramme pour le
  * fond où il est posé (« theme » : celui du thème, clair ou sombre), décliné aux couleurs de la
  * palette de ce membre s'il l'a été, sinon le nom en texte. Son nom reste lu par les lecteurs
  * d'écran (alt).
