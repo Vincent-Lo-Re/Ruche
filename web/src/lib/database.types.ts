@@ -157,6 +157,55 @@ export type Database = {
         }
         Relationships: []
       }
+      app_identity: {
+        Row: {
+          contact_email: string | null
+          id: boolean
+          initials: string | null
+          loading_exit: string
+          loading_image: string | null
+          loading_monogram_motion: boolean
+          loading_monogram_motions: string[]
+          logotype_dark: string | null
+          logotype_light: string | null
+          monogram_dark: string | null
+          monogram_light: string | null
+          name: string | null
+          website_url: string | null
+        }
+        ComputedFields: never
+        Insert: {
+          contact_email?: string | null
+          id?: boolean
+          initials?: string | null
+          loading_exit?: string
+          loading_image?: string | null
+          loading_monogram_motion?: boolean
+          loading_monogram_motions?: string[]
+          logotype_dark?: string | null
+          logotype_light?: string | null
+          monogram_dark?: string | null
+          monogram_light?: string | null
+          name?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          contact_email?: string | null
+          id?: boolean
+          initials?: string | null
+          loading_exit?: string
+          loading_image?: string | null
+          loading_monogram_motion?: boolean
+          loading_monogram_motions?: string[]
+          logotype_dark?: string | null
+          logotype_light?: string | null
+          monogram_dark?: string | null
+          monogram_light?: string | null
+          name?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
@@ -750,6 +799,23 @@ export type Database = {
           id: string
           name: string
           rank: number
+        }[]
+      }
+      app_brand: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          contact_email: string
+          initials: string
+          loading_exit: string
+          loading_image: string
+          loading_monogram_motion: boolean
+          loading_monogram_motions: string[]
+          logotype_dark: string
+          logotype_light: string
+          monogram_dark: string
+          monogram_light: string
+          name: string
+          website_url: string
         }[]
       }
       app_categories: {
