@@ -100,7 +100,9 @@ export function AccountPage() {
         <Section
           title={texts.colors.preview.title}
           description={texts.colors.preview.description}
-          className="xl:sticky xl:top-0"
+          // Collé à la marge du haut de la page (p-8 d'AppLayout) : en top-0, le trait du haut de
+          // la carte, dessiné à l'extérieur, serait coupé par le bord du panneau qui défile.
+          className="xl:sticky xl:top-8"
         >
           <PalettePreview />
         </Section>
